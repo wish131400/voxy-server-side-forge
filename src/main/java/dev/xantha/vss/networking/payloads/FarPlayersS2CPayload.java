@@ -2,7 +2,10 @@ package dev.xantha.vss.networking.payloads;
 
 import dev.xantha.vss.common.VSSConstants;
 import java.util.UUID;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
@@ -24,6 +27,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             buf.writeFloat(entry.yaw());
             buf.writeFloat(entry.pitch());
             buf.writeFloat(entry.headYaw());
+            buf.writeFloat(entry.bodyYaw());
             buf.writeBoolean(entry.crouching());
             buf.writeBoolean(entry.sprinting());
             buf.writeEnum(orDefault(entry.pose(), Pose.STANDING));
@@ -33,17 +37,13 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             buf.writeVarInt(clampUseItemTicks(entry.useItemRemainingTicks()));
             buf.writeBoolean(entry.swinging());
             buf.writeEnum(orDefault(entry.swingingArm(), InteractionHand.MAIN_HAND));
-            buf.writeVarInt(Math.max(0, entry.swingTime()));
-            buf.writeFloat(entry.oAttackAnim());
-            buf.writeFloat(entry.attackAnim());
-            buf.writeBoolean(entry.fallFlying());
             buf.writeBoolean(entry.swimming());
-            buf.writeBoolean(entry.autoSpinAttack());
             buf.writeBoolean(entry.invisible());
             buf.writeBoolean(entry.glowing());
             buf.writeBoolean(entry.onGround());
             buf.writeBoolean(entry.onFire());
             writeEquipment(buf, entry);
+            writeVehicles(buf, entry.vehicles());
         }
     }
 
@@ -64,6 +64,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
                     buf.readFloat(),
                     buf.readFloat(),
                     buf.readFloat(),
+                    buf.readFloat(),
                     buf.readBoolean(),
                     buf.readBoolean(),
                     buf.readEnum(Pose.class),
@@ -73,11 +74,6 @@ public record FarPlayersS2CPayload(Entry[] entries) {
                     clampUseItemTicks(buf.readVarInt()),
                     buf.readBoolean(),
                     buf.readEnum(InteractionHand.class),
-                    Math.max(0, buf.readVarInt()),
-                    buf.readFloat(),
-                    buf.readFloat(),
-                    buf.readBoolean(),
-                    buf.readBoolean(),
                     buf.readBoolean(),
                     buf.readBoolean(),
                     buf.readBoolean(),
@@ -88,7 +84,8 @@ public record FarPlayersS2CPayload(Entry[] entries) {
                     buf.readItem(),
                     buf.readItem(),
                     buf.readItem(),
-                    buf.readItem());
+                    buf.readItem(),
+                    readVehicles(buf));
         }
         return new FarPlayersS2CPayload(entries);
     }
@@ -100,6 +97,108 @@ public record FarPlayersS2CPayload(Entry[] entries) {
         buf.writeItem(orEmpty(entry.chest()));
         buf.writeItem(orEmpty(entry.legs()));
         buf.writeItem(orEmpty(entry.feet()));
+    }
+
+    private static void writeVehicles(FriendlyByteBuf buf, VehicleSnapshot[] vehicles) {
+        if (vehicles == null || vehicles.length == 0) {
+            buf.writeVarInt(0);
+            return;
+        }
+
+        int count = 0;
+        for (VehicleSnapshot vehicle : vehicles) {
+            if (vehicle != null && vehicle.entityTypeId() != null) {
+                count++;
+                if (count >= VSSConstants.MAX_FAR_VEHICLE_PARENT_DEPTH) {
+                    break;
+                }
+            }
+        }
+        buf.writeVarInt(count);
+        int written = 0;
+        for (VehicleSnapshot vehicle : vehicles) {
+            if (vehicle == null || vehicle.entityTypeId() == null) {
+                continue;
+            }
+            writeVehicle(buf, vehicle);
+            written++;
+            if (written >= count) {
+                break;
+            }
+        }
+    }
+
+    private static void writeVehicle(FriendlyByteBuf buf, VehicleSnapshot vehicle) {
+        ResourceLocation entityTypeId = vehicle.entityTypeId();
+        buf.writeVarInt(vehicle.sourceEntityId());
+        buf.writeResourceLocation(entityTypeId != null ? entityTypeId : BuiltInRegistries.ENTITY_TYPE.getDefaultKey());
+        buf.writeDouble(vehicle.x());
+        buf.writeDouble(vehicle.y());
+        buf.writeDouble(vehicle.z());
+        buf.writeFloat(vehicle.yaw());
+        buf.writeFloat(vehicle.pitch());
+        buf.writeFloat(vehicle.headYaw());
+        buf.writeBoolean(vehicle.onGround());
+        buf.writeBoolean(vehicle.onFire());
+        buf.writeBoolean(vehicle.invisible());
+        buf.writeBoolean(vehicle.glowing());
+        buf.writeBoolean(vehicle.fullData());
+        if (vehicle.fullData()) {
+            buf.writeNbt(vehicle.entityData());
+            buf.writeByteArray(orEmpty(vehicle.spawnData()));
+        }
+    }
+
+    private static VehicleSnapshot[] readVehicles(FriendlyByteBuf buf) {
+        int count = buf.readVarInt();
+        if (count < 0 || count > VSSConstants.MAX_FAR_VEHICLE_PARENT_DEPTH) {
+            throw new IllegalArgumentException("Far vehicle chain count out of range: " + count);
+        }
+
+        VehicleSnapshot[] vehicles = new VehicleSnapshot[count];
+        for (int i = 0; i < count; i++) {
+            vehicles[i] = readVehicle(buf);
+        }
+        return vehicles;
+    }
+
+    private static VehicleSnapshot readVehicle(FriendlyByteBuf buf) {
+        boolean fullData;
+        CompoundTag entityData = null;
+        byte[] spawnData = new byte[0];
+        int sourceEntityId = buf.readVarInt();
+        ResourceLocation entityTypeId = buf.readResourceLocation();
+        double x = buf.readDouble();
+        double y = buf.readDouble();
+        double z = buf.readDouble();
+        float yaw = buf.readFloat();
+        float pitch = buf.readFloat();
+        float headYaw = buf.readFloat();
+        boolean onGround = buf.readBoolean();
+        boolean onFire = buf.readBoolean();
+        boolean invisible = buf.readBoolean();
+        boolean glowing = buf.readBoolean();
+        fullData = buf.readBoolean();
+        if (fullData) {
+            entityData = buf.readNbt();
+            spawnData = buf.readByteArray(VSSConstants.MAX_FAR_VEHICLE_DATA_BYTES);
+        }
+        return new VehicleSnapshot(
+                sourceEntityId,
+                entityTypeId,
+                x,
+                y,
+                z,
+                yaw,
+                pitch,
+                headYaw,
+                onGround,
+                onFire,
+                invisible,
+                glowing,
+                fullData,
+                entityData,
+                spawnData);
     }
 
     private static int clampUseItemTicks(int ticks) {
@@ -114,6 +213,10 @@ public record FarPlayersS2CPayload(Entry[] entries) {
         return stack != null ? stack : ItemStack.EMPTY;
     }
 
+    private static byte[] orEmpty(byte[] bytes) {
+        return bytes != null ? bytes : new byte[0];
+    }
+
     public record Entry(
             UUID uuid,
             String name,
@@ -123,6 +226,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             float yaw,
             float pitch,
             float headYaw,
+            float bodyYaw,
             boolean crouching,
             boolean sprinting,
             Pose pose,
@@ -132,12 +236,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             int useItemRemainingTicks,
             boolean swinging,
             InteractionHand swingingArm,
-            int swingTime,
-            float oAttackAnim,
-            float attackAnim,
-            boolean fallFlying,
             boolean swimming,
-            boolean autoSpinAttack,
             boolean invisible,
             boolean glowing,
             boolean onGround,
@@ -147,7 +246,8 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             ItemStack head,
             ItemStack chest,
             ItemStack legs,
-            ItemStack feet) {
+            ItemStack feet,
+            VehicleSnapshot[] vehicles) {
         public ItemStack itemBySlot(EquipmentSlot slot) {
             return switch (slot) {
                 case MAINHAND -> mainHand;
@@ -158,5 +258,23 @@ public record FarPlayersS2CPayload(Entry[] entries) {
                 case FEET -> feet;
             };
         }
+    }
+
+    public record VehicleSnapshot(
+            int sourceEntityId,
+            ResourceLocation entityTypeId,
+            double x,
+            double y,
+            double z,
+            float yaw,
+            float pitch,
+            float headYaw,
+            boolean onGround,
+            boolean onFire,
+            boolean invisible,
+            boolean glowing,
+            boolean fullData,
+            CompoundTag entityData,
+            byte[] spawnData) {
     }
 }

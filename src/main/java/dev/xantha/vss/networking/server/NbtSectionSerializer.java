@@ -41,7 +41,7 @@ final class NbtSectionSerializer {
         try {
             optionalTag = storage.read(new ChunkPos(cx, cz)).get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
-            return SectionSerializer.emptyColumn(cx, cz);
+            return null;
         }
         return serializeTag(level, cx, cz, optionalTag);
     }

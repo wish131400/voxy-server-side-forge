@@ -1,9 +1,24 @@
+buildscript {
+    repositories {
+        maven {
+            name = 'SpongePowered'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
+        }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
+
+apply plugin: 'org.spongepowered.mixin'
 
 version = mod_version
 group = mod_group_id
@@ -56,6 +71,7 @@ sourceSets {
             include 'pack.mcmeta'
             include 'icon.png'
             include 'vss.compat.mixins.json'
+            include 'vss.refmap.json'
             include 'assets/vss/**'
         }
     }
@@ -71,7 +87,13 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
+}
+
+mixin {
+    add sourceSets.main, 'vss.refmap.json'
+    config 'vss.compat.mixins.json'
 }
 
 tasks.named('processResources', ProcessResources).configure {

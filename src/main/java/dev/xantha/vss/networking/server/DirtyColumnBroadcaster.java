@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
@@ -40,7 +41,7 @@ public final class DirtyColumnBroadcaster {
             cleanupDirtyVersionCache(VSSConstants.epochMillis());
         }
 
-        int interval = VSSServerConfig.CONFIG.dirtyBroadcastIntervalSeconds * 20;
+        int interval = VSSServerConfig.CONFIG.dirtyBroadcastIntervalTicks;
         if (++tickCounter < interval) {
             return;
         }
@@ -59,10 +60,15 @@ public final class DirtyColumnBroadcaster {
             if (positions.isEmpty()) {
                 DIRTY.remove(level);
             }
-            DirtyColumnsS2CPayload payload = new DirtyColumnsS2CPayload(packed);
+            long[] timestamps = dirtyTimestamps(level, packed);
             for (ServerPlayer player : level.players()) {
-                if (VSSServerNetworking.isRegistered(player)) {
-                    VSSNetworking.sendToPlayer(player, payload);
+                if (!VSSServerNetworking.isRegistered(player)) {
+                    continue;
+                }
+
+                DirtyColumnsS2CPayload playerPayload = filterColumnsForPlayer(player, packed, timestamps);
+                if (playerPayload.dirtyPositions().length > 0) {
+                    VSSNetworking.sendToPlayer(player, playerPayload);
                 }
             }
         }
@@ -130,6 +136,20 @@ public final class DirtyColumnBroadcaster {
                 && VSSServerConfig.CONFIG.enabled) {
             markDirtyColumnAndNeighbors(level, cx, cz);
         }
+    }
+
+    public static void markDirtyBlock(Object levelAccess, BlockPos pos) {
+        if (levelAccess instanceof ServerLevel level
+                && VSSServerConfig.CONFIG.enabled
+                && pos != null) {
+            markDirtyBlock(level, pos);
+        }
+    }
+
+    private static void markDirtyBlock(ServerLevel level, BlockPos pos) {
+        int cx = pos.getX() >> 4;
+        int cz = pos.getZ() >> 4;
+        markDirtyColumnAndNeighbors(level, cx, cz);
     }
 
     private static void markDirtyColumnAndNeighbors(ServerLevel level, int cx, int cz) {
@@ -233,5 +253,42 @@ public final class DirtyColumnBroadcaster {
             iterator.remove();
         }
         return packed;
+    }
+
+    private static long[] dirtyTimestamps(ServerLevel level, long[] packedColumns) {
+        long[] timestamps = new long[packedColumns.length];
+        for (int i = 0; i < packedColumns.length; i++) {
+            int cx = PositionUtil.unpackX(packedColumns[i]);
+            int cz = PositionUtil.unpackZ(packedColumns[i]);
+            timestamps[i] = latestDirtyTimestamp(level.dimension(), cx, cz);
+        }
+        return timestamps;
+    }
+
+    private static DirtyColumnsS2CPayload filterColumnsForPlayer(ServerPlayer player, long[] packedColumns, long[] timestamps) {
+        int playerCx = player.getBlockX() >> 4;
+        int playerCz = player.getBlockZ() >> 4;
+        int maxDistance = VSSServerConfig.CONFIG.lodDistanceChunks + VSSConstants.LOD_DISTANCE_BUFFER;
+        long[] filtered = new long[packedColumns.length];
+        long[] filteredTimestamps = new long[packedColumns.length];
+        int count = 0;
+        for (int i = 0; i < packedColumns.length; i++) {
+            long packed = packedColumns[i];
+            int cx = PositionUtil.unpackX(packed);
+            int cz = PositionUtil.unpackZ(packed);
+            if (PositionUtil.chebyshevDistance(cx, cz, playerCx, playerCz) <= maxDistance) {
+                filtered[count] = packed;
+                filteredTimestamps[count] = i < timestamps.length ? timestamps[i] : 0L;
+                count++;
+            }
+        }
+        if (count == packedColumns.length) {
+            return new DirtyColumnsS2CPayload(packedColumns, timestamps);
+        }
+        long[] trimmed = new long[count];
+        long[] trimmedTimestamps = new long[count];
+        System.arraycopy(filtered, 0, trimmed, 0, count);
+        System.arraycopy(filteredTimestamps, 0, trimmedTimestamps, 0, count);
+        return new DirtyColumnsS2CPayload(trimmed, trimmedTimestamps);
     }
 }

@@ -3,6 +3,7 @@ package dev.xantha.vss.compat;
 import dev.xantha.vss.api.VSSApi;
 import dev.xantha.vss.api.VoxelColumnData;
 import dev.xantha.vss.common.VSSLogger;
+import dev.xantha.vss.networking.client.VSSClientNetworking;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -45,6 +46,9 @@ final class VoxyCompat {
                             DataLayer.class));
 
             VSSApi.registerColumnConsumer((level, dimension, chunkX, chunkZ, columnData) -> {
+                if (!VSSClientNetworking.isClientLodSessionActive()) {
+                    return;
+                }
                 try {
                     Object worldId = worldIdentifierOf.invoke(level);
                     if (worldId == null) {

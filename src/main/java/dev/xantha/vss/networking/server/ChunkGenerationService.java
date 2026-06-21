@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +32,7 @@ final class ChunkGenerationService {
     private static final TicketType<ChunkPos> VSS_GEN_TICKET =
             TicketType.create("vss_generation", Comparator.comparingLong(ChunkPos::toLong));
     private static final int VSS_GEN_TICKET_DISTANCE = 0;
+    private static final int PRIORITY_PACKING_QUEUE_EXTRA_LIMIT = 256;
 
     private final LinkedHashMap<PendingGenerationKey, PendingGeneration> active = new LinkedHashMap<>();
     private final LinkedHashMap<PendingGenerationKey, PendingGeneration> queued = new LinkedHashMap<>();
@@ -50,6 +51,8 @@ final class ChunkGenerationService {
     private long totalPackingFailures;
     private double startBudget;
     private int startsThisTick;
+    private volatile long packingEpoch;
+    private long nextPackingTaskSequence;
 
     ChunkGenerationService(VSSServerConfig config) {
         this.config = config;
@@ -59,7 +62,7 @@ final class ChunkGenerationService {
         PendingGenerationKey key = new PendingGenerationKey(level.dimension(), cx, cz);
         PendingGeneration existing = active.get(key);
         if (existing != null) {
-            existing.callbacks.add(new GenerationCallback(playerUuid, requestState, requestId));
+            existing.callbacks.add(new GenerationCallback(playerUuid, requestState, requestId, false));
             incrementCount(playerUuid);
             return true;
         }
@@ -69,14 +72,14 @@ final class ChunkGenerationService {
             if (!canQueue(playerUuid)) {
                 return false;
             }
-            queuedGeneration.callbacks.add(new GenerationCallback(playerUuid, requestState, requestId));
+            queuedGeneration.callbacks.add(new GenerationCallback(playerUuid, requestState, requestId, false));
             incrementQueuedCount(playerUuid);
             return true;
         }
 
         ChunkPos pos = new ChunkPos(cx, cz);
         PendingGeneration generation = new PendingGeneration(pos, level);
-        generation.callbacks.add(new GenerationCallback(playerUuid, requestState, requestId));
+        generation.callbacks.add(new GenerationCallback(playerUuid, requestState, requestId, false));
         if (canStart(generation) && tryConsumeStartBudget()) {
             startGeneration(key, generation);
         } else {
@@ -98,8 +101,9 @@ final class ChunkGenerationService {
             LevelChunk chunk,
             int cx,
             int cz,
-            long minimumTimestamp) {
-        if (!canSubmitPackingTask()) {
+            long minimumTimestamp,
+            boolean priority) {
+        if (!canSubmitPackingTask(priority)) {
             return false;
         }
 
@@ -112,12 +116,16 @@ final class ChunkGenerationService {
         }
 
         try {
-            packingExecutor().execute(() -> packSnapshot(
-                    level.dimension(),
-                    snapshot,
-                    List.of(new GenerationCallback(playerUuid, requestState, requestId)),
-                    false,
-                    minimumTimestamp));
+            long taskEpoch = packingEpoch;
+            submitPackingRunnable(
+                    priority,
+                    () -> packSnapshot(
+                            taskEpoch,
+                            level.dimension(),
+                            snapshot,
+                            List.of(new GenerationCallback(playerUuid, requestState, requestId, priority)),
+                            false,
+                            minimumTimestamp));
             totalPackingSubmitted++;
             totalLivePackingSubmitted++;
             return true;
@@ -165,7 +173,7 @@ final class ChunkGenerationService {
             if (processedThisTick >= config.generationCompletionsPerTickLimit) {
                 continue;
             }
-            if (!canSubmitPackingTask()) {
+            if (!canSubmitPackingTask(false)) {
                 continue;
             }
 
@@ -243,7 +251,8 @@ final class ChunkGenerationService {
         promoteQueued();
     }
 
-    void shutdown() {
+    void releaseIdleMemory() {
+        packingEpoch++;
         for (PendingGeneration generation : active.values()) {
             removeTicket(generation);
         }
@@ -253,6 +262,10 @@ final class ChunkGenerationService {
         queued.clear();
         perPlayerActiveCount.clear();
         perPlayerQueuedCount.clear();
+    }
+
+    void shutdown() {
+        releaseIdleMemory();
     }
 
     String diagnostics() {
@@ -274,7 +287,10 @@ final class ChunkGenerationService {
                 + String.format(", livePackingSubmitted=%d, livePackingCompleted=%d", totalLivePackingSubmitted, totalLivePackingCompleted);
     }
 
-    Component diagnosticsComponent() {
+    Component diagnosticsComponent(Component storageDiagnostics) {
+        ThreadPoolExecutor executor = this.packingExecutor;
+        int packingActive = executor != null ? executor.getActiveCount() : 0;
+        int packingQueued = executor != null ? executor.getQueue().size() : 0;
         return Component.translatable(
                 "vss.command.generation.stats.details",
                 totalSubmitted,
@@ -282,7 +298,18 @@ final class ChunkGenerationService {
                 active.size(),
                 queued.size(),
                 totalQueued,
-                totalTimeouts);
+                totalTimeouts)
+                .append(Component.literal("; "))
+                .append(Component.translatable(
+                        "vss.command.generation.packing.details",
+                        totalPackingSubmitted,
+                        packingActive,
+                        packingQueued,
+                        totalPackingFailures,
+                        totalLivePackingSubmitted,
+                        totalLivePackingCompleted))
+                .append(Component.literal("; "))
+                .append(storageDiagnostics);
     }
 
     private void promoteQueued() {
@@ -370,33 +397,54 @@ final class ChunkGenerationService {
     }
 
     private boolean canSubmitPackingTask() {
+        return canSubmitPackingTask(false);
+    }
+
+    private boolean canSubmitPackingTask(boolean priority) {
         ThreadPoolExecutor executor = packingExecutor();
+        int queueLimit = Math.max(1, config.generationPackingQueueLimit);
+        if (priority) {
+            queueLimit += PRIORITY_PACKING_QUEUE_EXTRA_LIMIT;
+        }
         return executor.getActiveCount() < executor.getCorePoolSize()
-                || executor.getQueue().size() < Math.max(1, config.generationPackingQueueLimit);
+                || executor.getQueue().size() < queueLimit;
     }
 
     private void submitPackingTask(PendingGeneration generation, SectionSerializer.ColumnSnapshot snapshot) {
         ResourceKey<Level> dimension = generation.level.dimension();
         List<GenerationCallback> callbacks = List.copyOf(generation.callbacks);
+        boolean priority = callbacks.stream().anyMatch(GenerationCallback::priority);
         try {
-            packingExecutor().execute(() -> packSnapshot(dimension, snapshot, callbacks, true, 0L));
+            long taskEpoch = packingEpoch;
+            submitPackingRunnable(priority, () -> packSnapshot(taskEpoch, dimension, snapshot, callbacks, true, 0L));
             totalPackingSubmitted++;
         } catch (RejectedExecutionException e) {
             throw e;
         }
     }
 
+    private void submitPackingRunnable(boolean priority, Runnable runnable) {
+        packingExecutor().execute(new PackingTask(priority, nextPackingTaskSequence++, runnable));
+    }
+
     private void packSnapshot(
+            long taskEpoch,
             ResourceKey<Level> dimension,
             SectionSerializer.ColumnSnapshot snapshot,
             List<GenerationCallback> callbacks,
             boolean generationWork,
             long minimumTimestamp) {
+        if (taskEpoch != packingEpoch || Thread.currentThread().isInterrupted()) {
+            return;
+        }
         ArrayList<GenerationResult> results = new ArrayList<>(callbacks.size());
         boolean completed = false;
         boolean failed = false;
         try {
             LoadedColumnData columnData = SectionSerializer.serializeSnapshot(snapshot);
+            if (taskEpoch != packingEpoch || Thread.currentThread().isInterrupted()) {
+                return;
+            }
             long columnTimestamp = Math.max(VSSConstants.epochMillis(), minimumTimestamp);
             for (GenerationCallback callback : callbacks) {
                 results.add(new GenerationResult(
@@ -406,15 +454,19 @@ final class ChunkGenerationService {
                         dimension,
                         columnData,
                         columnTimestamp,
-                        false));
+                        false,
+                        callback.priority()));
             }
             completed = true;
         } catch (Exception e) {
             failed = true;
             VSSLogger.error("Failed to pack generated chunk at " + snapshot.chunkX() + ", " + snapshot.chunkZ(), e);
             for (GenerationCallback callback : callbacks) {
-                results.add(GenerationResult.notGenerated(callback.playerUuid(), callback.requestState(), callback.requestId(), dimension));
+                results.add(GenerationResult.notGenerated(callback.playerUuid(), callback.requestState(), callback.requestId(), dimension, callback.priority()));
             }
+        }
+        if (taskEpoch != packingEpoch || Thread.currentThread().isInterrupted()) {
+            return;
         }
         completedPackingResults.add(new PackingResult(results, completed, failed, generationWork));
     }
@@ -454,7 +506,7 @@ final class ChunkGenerationService {
                 threads,
                 0L,
                 TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(),
+                new PriorityBlockingQueue<>(),
                 task -> {
                     Thread thread = new Thread(task, "VSS-LOD-Packer");
                     thread.setDaemon(true);
@@ -598,10 +650,26 @@ final class ChunkGenerationService {
         }
     }
 
-    private record GenerationCallback(UUID playerUuid, PlayerRequestState requestState, int requestId) {
+    record GenerationCallback(UUID playerUuid, PlayerRequestState requestState, int requestId, boolean priority) {
     }
 
     private record PackingResult(List<GenerationResult> results, boolean completed, boolean failed, boolean generationWork) {
+    }
+
+    private record PackingTask(boolean priority, long sequence, Runnable delegate) implements Runnable, Comparable<PackingTask> {
+        @Override
+        public void run() {
+            delegate.run();
+        }
+
+        @Override
+        public int compareTo(PackingTask other) {
+            int priorityCompare = Boolean.compare(other.priority, priority);
+            if (priorityCompare != 0) {
+                return priorityCompare;
+            }
+            return Long.compare(sequence, other.sequence);
+        }
     }
 
     record GenerationResult(
@@ -611,9 +679,14 @@ final class ChunkGenerationService {
             ResourceKey<Level> dimension,
             LoadedColumnData columnData,
             long columnTimestamp,
-            boolean notGenerated) {
+            boolean notGenerated,
+            boolean priority) {
         private static GenerationResult notGenerated(UUID playerUuid, PlayerRequestState requestState, int requestId, ResourceKey<Level> dimension) {
-            return new GenerationResult(playerUuid, requestState, requestId, dimension, null, 0L, true);
+            return notGenerated(playerUuid, requestState, requestId, dimension, false);
+        }
+
+        private static GenerationResult notGenerated(UUID playerUuid, PlayerRequestState requestState, int requestId, ResourceKey<Level> dimension, boolean priority) {
+            return new GenerationResult(playerUuid, requestState, requestId, dimension, null, 0L, true, priority);
         }
     }
 }

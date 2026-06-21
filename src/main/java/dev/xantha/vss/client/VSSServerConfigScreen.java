@@ -77,6 +77,11 @@ final class VSSServerConfigScreen extends Screen {
                 value -> config.syncOnLoadConcurrencyLimitPerPlayer = value, left, inputX, inputWidth, y);
         y += rowHeight;
 
+        addField("vss.config.server.dirty_broadcast_interval", config.dirtyBroadcastIntervalTicks,
+                VSSServerConfig.MIN_DIRTY_BROADCAST_INTERVAL_TICKS, VSSServerConfig.MAX_DIRTY_BROADCAST_INTERVAL_TICKS,
+                value -> config.dirtyBroadcastIntervalTicks = value, left, inputX, inputWidth, y);
+        y += rowHeight;
+
         addField("vss.config.server.generation_packing_threads", config.generationPackingThreads, 1, 8,
                 value -> config.generationPackingThreads = value, left, inputX, inputWidth, y);
         y += rowHeight;

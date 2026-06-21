@@ -2,6 +2,7 @@ package dev.xantha.vss.config;
 
 public class VSSClientConfig extends JsonConfig {
     private static final String FILE_NAME = "vss-client-config.json";
+    public static final int MAX_LOD_DISTANCE_CHUNKS = 512;
     public static VSSClientConfig CONFIG = load(VSSClientConfig.class, FILE_NAME);
 
     public boolean receiveServerLods = true;
@@ -16,7 +17,7 @@ public class VSSClientConfig extends JsonConfig {
 
     @Override
     protected void validate() {
-        lodDistanceChunks = clamp(lodDistanceChunks, 0, 512);
+        lodDistanceChunks = clamp(lodDistanceChunks, 0, MAX_LOD_DISTANCE_CHUNKS);
         desiredBandwidthMiB = clamp(desiredBandwidthMiB, 0, 100);
     }
 

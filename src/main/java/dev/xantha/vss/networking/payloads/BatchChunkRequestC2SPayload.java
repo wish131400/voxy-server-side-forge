@@ -3,13 +3,19 @@ package dev.xantha.vss.networking.payloads;
 import dev.xantha.vss.common.VSSConstants;
 import net.minecraft.network.FriendlyByteBuf;
 
-public record BatchChunkRequestC2SPayload(int[] requestIds, long[] packedPositions, long[] clientTimestamps, int count) {
+public record BatchChunkRequestC2SPayload(
+        int[] requestIds,
+        long[] packedPositions,
+        long[] clientTimestamps,
+        boolean[] allowGeneration,
+        int count) {
     public static void encode(BatchChunkRequestC2SPayload payload, FriendlyByteBuf buf) {
         buf.writeVarInt(payload.count);
         for (int i = 0; i < payload.count; i++) {
             buf.writeVarInt(payload.requestIds[i]);
             buf.writeLong(payload.packedPositions[i]);
             buf.writeLong(payload.clientTimestamps[i]);
+            buf.writeBoolean(payload.allowGeneration[i]);
         }
     }
 
@@ -21,11 +27,13 @@ public record BatchChunkRequestC2SPayload(int[] requestIds, long[] packedPositio
         int[] requestIds = new int[count];
         long[] packedPositions = new long[count];
         long[] clientTimestamps = new long[count];
+        boolean[] allowGeneration = new boolean[count];
         for (int i = 0; i < count; i++) {
             requestIds[i] = buf.readVarInt();
             packedPositions[i] = buf.readLong();
             clientTimestamps[i] = buf.readLong();
+            allowGeneration[i] = buf.readBoolean();
         }
-        return new BatchChunkRequestC2SPayload(requestIds, packedPositions, clientTimestamps, count);
+        return new BatchChunkRequestC2SPayload(requestIds, packedPositions, clientTimestamps, allowGeneration, count);
     }
 }

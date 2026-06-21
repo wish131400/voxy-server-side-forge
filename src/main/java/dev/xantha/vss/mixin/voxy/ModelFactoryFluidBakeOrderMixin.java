@@ -73,7 +73,7 @@ public abstract class ModelFactoryFluidBakeOrderMixin {
 
             int blockId = vss$getBakeBlockId(bake);
             if (vss$loggedFluidDefers.add(blockId)) {
-                VSSLogger.warn("Deferred Voxy LOD model bake until its fluid model is ready: " + state);
+                VSSLogger.debug("Deferred Voxy LOD model bake until its fluid model is ready: " + state);
             }
             cir.setReturnValue(!bakeQueue.isEmpty());
         } catch (Throwable t) {

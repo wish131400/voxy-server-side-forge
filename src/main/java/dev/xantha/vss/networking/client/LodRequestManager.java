@@ -2,9 +2,9 @@ package dev.xantha.vss.networking.client;
 
 import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.common.VSSConstants;
+import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.compat.ModCompat;
 import dev.xantha.vss.config.VSSClientConfig;
-import dev.xantha.vss.networking.VSSNetworking;
 import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.CancelRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
@@ -13,25 +13,30 @@ import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.ArrayDeque;
-import java.util.OptionalInt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientChunkCache;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ChunkStatus;
 
 public final class LodRequestManager {
     private static final int SCAN_INTERVAL_TICKS = 1;
     private static final long SYNC_REQUEST_TIMEOUT_NANOS = 30_000_000_000L;
     private static final long GENERATION_REQUEST_TIMEOUT_NANOS = 300_000_000_000L;
+    private static final long DIRTY_REFRESH_BACKOFF_NANOS = 250_000_000L;
     private static final long RATE_LIMIT_BACKOFF_NANOS = 2_000_000_000L;
     private static final long GENERATION_BACKOFF_NANOS = 10_000_000_000L;
     private static final long MAX_RETRY_BACKOFF_NANOS = 60_000_000_000L;
+    private static final int DIRTY_REFRESH_RATE_LIMIT = 1024;
+    private static final int DIRTY_REFRESH_CONCURRENCY_LIMIT = 128;
+    private static final int MAX_SCAN_CANDIDATES_PER_TICK = 4096;
+    private static final int MAX_DEFERRED_CANDIDATES_PER_TICK = 2048;
+    private static final int MAX_DEFERRED_COLUMNS = 65536;
+    private static final long REQUEST_DIAGNOSTIC_INTERVAL_NANOS = 5_000_000_000L;
 
     private final Long2LongOpenHashMap columnTimestamps = new Long2LongOpenHashMap();
     private final LongOpenHashSet dirtyColumns = new LongOpenHashSet();
+    private final Long2LongOpenHashMap dirtyColumnTimestamps = new Long2LongOpenHashMap();
     private final LongOpenHashSet inFlight = new LongOpenHashSet();
     private final LongOpenHashSet deferredColumns = new LongOpenHashSet();
     private final ArrayDeque<Long> deferredQueue = new ArrayDeque<>();
@@ -53,6 +58,8 @@ public final class LodRequestManager {
     private int scanIndex;
     private double syncRequestBudget;
     private double generationRequestBudget;
+    private double dirtyRefreshBudget;
+    private long lastRequestDiagnosticNanos;
 
     public LodRequestManager() {
         columnTimestamps.defaultReturnValue(-1L);
@@ -61,6 +68,7 @@ public final class LodRequestManager {
         requestSendTimes.defaultReturnValue(0L);
         retryAfterNanos.defaultReturnValue(0L);
         retryAttempts.defaultReturnValue(0);
+        dirtyColumnTimestamps.defaultReturnValue(0L);
     }
 
     public void onSessionConfig(SessionConfigS2CPayload config) {
@@ -102,50 +110,84 @@ public final class LodRequestManager {
     }
 
     public ColumnReceiveResult onColumnReceived(int requestId, long columnTimestamp) {
-        boolean replaceMissingSections = isDirtyRefreshRequest(requestId);
+        boolean dirtyRefreshRequest = isDirtyRefreshRequest(requestId);
         long packed = removeRequest(requestId);
         if (packed == Long.MIN_VALUE) {
-            return new ColumnReceiveResult(false, false);
+            return new ColumnReceiveResult(false, false, false);
         }
 
-        dirtyColumns.remove(packed);
+        long requiredTimestamp = dirtyColumnTimestamps.get(packed);
         columnTimestamps.put(packed, columnTimestamp);
-        clearBackoff(packed);
-        return new ColumnReceiveResult(true, true);
+        if (requiredTimestamp > 0L && columnTimestamp < requiredTimestamp) {
+            dirtyColumns.add(packed);
+            deferredColumns.remove(packed);
+            deferColumn(packed, true);
+        } else {
+            dirtyColumns.remove(packed);
+            dirtyColumnTimestamps.remove(packed);
+            clearBackoff(packed);
+        }
+        return new ColumnReceiveResult(dirtyRefreshRequest, true, dirtyRefreshRequest);
     }
 
-    public void onDirtyColumns(long[] dirtyPositions) {
-        for (long packed : dirtyPositions) {
+    public void onDirtyColumns(long[] dirtyPositions, long[] dirtyTimestamps) {
+        for (int i = 0; i < dirtyPositions.length; i++) {
+            long packed = dirtyPositions[i];
+            long dirtyTimestamp = i < dirtyTimestamps.length ? dirtyTimestamps[i] : VSSConstants.epochMillis();
+            long existingTimestamp = dirtyColumnTimestamps.get(packed);
+            if (dirtyTimestamp > existingTimestamp) {
+                dirtyColumnTimestamps.put(packed, dirtyTimestamp);
+            }
             dirtyColumns.add(packed);
-            deferColumn(packed);
+            clearBackoff(packed);
+            deferColumn(packed, true);
         }
     }
 
     public void onColumnNotGenerated(int requestId) {
+        boolean generationRequest = isGenerationRequest(requestId);
         long packed = removeRequest(requestId);
         if (packed != Long.MIN_VALUE) {
             columnTimestamps.put(packed, 0L);
-            markBackoff(packed, true);
-            deferColumn(packed);
+            if (generationRequest) {
+                markBackoff(packed, true);
+            } else {
+                clearBackoff(packed);
+            }
+            deferredColumns.remove(packed);
+            deferColumn(packed, dirtyColumns.contains(packed));
         }
     }
 
     public void onColumnUpToDate(int requestId) {
         long packed = removeRequest(requestId);
         if (packed != Long.MIN_VALUE) {
-            dirtyColumns.remove(packed);
-            if (columnTimestamps.get(packed) <= 0L) {
+            long requiredTimestamp = dirtyColumnTimestamps.get(packed);
+            long localTimestamp = columnTimestamps.get(packed);
+            boolean dirtySatisfied = requiredTimestamp <= 0L || localTimestamp >= requiredTimestamp;
+            if (dirtySatisfied) {
+                dirtyColumns.remove(packed);
+                dirtyColumnTimestamps.remove(packed);
+            }
+            if (columnTimestamps.get(packed) <= 0L && dirtySatisfied) {
                 columnTimestamps.put(packed, VSSConstants.epochMillis());
             }
             clearBackoff(packed);
+            if (!dirtySatisfied) {
+                dirtyColumns.add(packed);
+                deferredColumns.remove(packed);
+                deferColumn(packed, true);
+            }
         }
     }
 
     public void onRateLimited(int requestId) {
+        boolean generationRequest = isGenerationRequest(requestId);
         long packed = removeRequest(requestId);
         if (packed != Long.MIN_VALUE) {
-            markBackoff(packed, isGenerationCandidate(packed));
-            deferColumn(packed);
+            markBackoff(packed, generationRequest || isGenerationCandidate(packed));
+            deferredColumns.remove(packed);
+            deferColumn(packed, dirtyColumns.contains(packed));
         }
     }
 
@@ -170,48 +212,47 @@ public final class LodRequestManager {
         int[] requestIds = new int[maxCount];
         long[] positions = new long[maxCount];
         long[] timestamps = new long[maxCount];
+        boolean[] allowGeneration = new boolean[maxCount];
         int count = 0;
 
         if (lodDistance <= 0) {
             return;
         }
 
-        ClientChunkCache chunkSource = level.getChunkSource();
         long now = System.nanoTime();
-        count = drainDeferredColumns(level, playerCx, playerCz, lodDistance, requestIds, positions, timestamps, count, maxCount, requestWindow, now);
-        if (sessionConfig.generationEnabled() && !requestWindow.canSendGeneration()) {
-            if (count > 0) {
-                syncRequestBudget = Math.max(0.0D, syncRequestBudget - requestWindow.syncSent);
-                generationRequestBudget = Math.max(0.0D, generationRequestBudget - requestWindow.generationSent);
-                VSSNetworking.sendToServer(new BatchChunkRequestC2SPayload(requestIds, positions, timestamps, count));
-            }
-            return;
-        }
+        count = drainDeferredColumns(playerCx, playerCz, lodDistance, requestIds, positions, timestamps, allowGeneration, count, maxCount, requestWindow, now);
 
         int radius = Math.max(1, scanRing);
         if (radius > lodDistance) {
             radius = 1;
             scanIndex = 0;
         }
+        int scannedCandidates = 0;
         int ringsChecked = 0;
         int totalRings = Math.max(1, lodDistance);
-        while (count < maxCount && requestWindow.hasCapacity() && ringsChecked < totalRings) {
+        while (count < maxCount
+                && requestWindow.hasCapacity()
+                && ringsChecked < totalRings
+                && scannedCandidates < MAX_SCAN_CANDIDATES_PER_TICK) {
             int ringSize = Math.max(1, radius * 8);
             int i = Math.min(scanIndex, ringSize);
-            for (; i < ringSize && count < maxCount && requestWindow.hasCapacity(); i++) {
-                int[] coord = ringIndexToCoord(radius, i, playerCx, playerCz);
-                long packed = PositionUtil.packPosition(coord[0], coord[1]);
-                if (!shouldRequestColumn(chunkSource, packed, coord[0], coord[1], now)) {
+            for (; i < ringSize
+                    && count < maxCount
+                    && requestWindow.hasCapacity()
+                    && scannedCandidates < MAX_SCAN_CANDIDATES_PER_TICK; i++, scannedCandidates++) {
+                long packed = ringIndexToPackedCoord(radius, i, playerCx, playerCz);
+                if (!shouldRequestColumn(packed, now)) {
                     continue;
                 }
 
-        boolean generationCandidate = isGenerationCandidate(packed) && !dirtyColumns.contains(packed);
-                if (!requestWindow.canSend(generationCandidate)) {
+                boolean dirtyRefresh = dirtyColumns.contains(packed);
+                boolean generationCandidate = !dirtyRefresh && isGenerationCandidate(packed);
+                if (!requestWindow.canSend(dirtyRefresh, generationCandidate)) {
                     continue;
                 }
 
-                count = appendRequest(packed, requestIds, positions, timestamps, count, generationCandidate);
-                requestWindow.record(generationCandidate);
+                count = appendRequest(packed, requestIds, positions, timestamps, allowGeneration, count, generationCandidate);
+                requestWindow.record(dirtyRefresh, generationCandidate);
             }
             if (i >= ringSize) {
                 radius++;
@@ -230,13 +271,16 @@ public final class LodRequestManager {
         if (count > 0) {
             syncRequestBudget = Math.max(0.0D, syncRequestBudget - requestWindow.syncSent);
             generationRequestBudget = Math.max(0.0D, generationRequestBudget - requestWindow.generationSent);
-            VSSNetworking.sendToServer(new BatchChunkRequestC2SPayload(requestIds, positions, timestamps, count));
+            dirtyRefreshBudget = Math.max(0.0D, dirtyRefreshBudget - requestWindow.dirtySent);
+            VSSClientNetworking.sendBatchRequest(new BatchChunkRequestC2SPayload(requestIds, positions, timestamps, allowGeneration, count));
+            logRequestBatch(now, count, requestWindow.syncSent, requestWindow.generationSent, requestWindow.dirtySent, lodDistance, playerCx, playerCz);
         }
     }
 
     private RequestWindow createRequestWindow() {
+        int dirtyInFlightCount = dirtyRefreshInFlight.size();
         int generationInFlightCount = generationInFlight.size();
-        int syncInFlightCount = Math.max(0, inFlight.size() - generationInFlightCount);
+        int syncInFlightCount = Math.max(0, inFlight.size() - generationInFlightCount - dirtyInFlightCount);
 
         int syncConcurrencyLimit = Math.max(1, sessionConfig.syncOnLoadConcurrencyLimitPerPlayer());
         int generationConcurrencyLimit = sessionConfig.generationEnabled()
@@ -245,31 +289,33 @@ public final class LodRequestManager {
 
         int syncSlots = Math.max(0, syncConcurrencyLimit - syncInFlightCount);
         int generationSlots = Math.max(0, generationConcurrencyLimit - generationInFlightCount);
+        int dirtySlots = Math.max(0, DIRTY_REFRESH_CONCURRENCY_LIMIT - dirtyInFlightCount);
 
         int syncRate = Math.max(1, sessionConfig.syncOnLoadRateLimitPerPlayer());
         int generationRate = Math.max(1, sessionConfig.generationRateLimitPerPlayer());
         syncRequestBudget = Math.min(syncRate, syncRequestBudget + syncRate / 20.0D);
         generationRequestBudget = Math.min(generationRate, generationRequestBudget + generationRate / 20.0D);
+        dirtyRefreshBudget = Math.min(DIRTY_REFRESH_RATE_LIMIT, dirtyRefreshBudget + DIRTY_REFRESH_RATE_LIMIT / 20.0D);
 
         return new RequestWindow(
                 Math.min(syncSlots, (int) syncRequestBudget),
-                Math.min(generationSlots, (int) generationRequestBudget));
+                Math.min(generationSlots, (int) generationRequestBudget),
+                Math.min(dirtySlots, (int) dirtyRefreshBudget));
     }
 
     private int drainDeferredColumns(
-            ClientLevel level,
             int playerCx,
             int playerCz,
             int lodDistance,
             int[] requestIds,
             long[] positions,
             long[] timestamps,
+            boolean[] allowGeneration,
             int count,
             int maxCount,
             RequestWindow requestWindow,
             long now) {
-        ClientChunkCache chunkSource = level.getChunkSource();
-        int attempts = deferredQueue.size();
+        int attempts = Math.min(deferredQueue.size(), MAX_DEFERRED_CANDIDATES_PER_TICK);
         while (count < maxCount && requestWindow.hasCapacity() && attempts-- > 0 && !deferredQueue.isEmpty()) {
             long packed = deferredQueue.removeFirst();
             if (!deferredColumns.remove(packed)) {
@@ -285,24 +331,26 @@ public final class LodRequestManager {
                 deferColumn(packed);
                 continue;
             }
-            if (!shouldRequestColumn(chunkSource, packed, cx, cz, now)) {
+            if (!shouldRequestColumn(packed, now)) {
                 continue;
             }
 
-                boolean generationCandidate = isGenerationCandidate(packed) && !dirtyColumns.contains(packed);
-            if (!requestWindow.canSend(generationCandidate)) {
-                deferColumn(packed);
+            boolean dirtyRefresh = dirtyColumns.contains(packed);
+            boolean generationCandidate = !dirtyRefresh && isGenerationCandidate(packed);
+            if (!requestWindow.canSend(dirtyRefresh, generationCandidate)) {
+                deferColumn(packed, dirtyRefresh);
                 continue;
             }
 
-            count = appendRequest(packed, requestIds, positions, timestamps, count, generationCandidate);
-            requestWindow.record(generationCandidate);
+            count = appendRequest(packed, requestIds, positions, timestamps, allowGeneration, count, generationCandidate);
+            requestWindow.record(dirtyRefresh, generationCandidate);
         }
         return count;
     }
 
-    private boolean shouldRequestColumn(ClientChunkCache chunkSource, long packed, int cx, int cz, long now) {
-        if (chunkSource.getChunk(cx, cz, ChunkStatus.FULL, false) != null || inFlight.contains(packed)) {
+    private boolean shouldRequestColumn(long packed, long now) {
+        boolean dirty = dirtyColumns.contains(packed);
+        if (inFlight.contains(packed)) {
             return false;
         }
         if (isCoolingDown(packed, now)) {
@@ -310,21 +358,29 @@ public final class LodRequestManager {
         }
 
         long timestamp = columnTimestamps.get(packed);
-        if (timestamp > 0L && !dirtyColumns.contains(packed)) {
+        if (timestamp > 0L && !dirty) {
             return false;
         }
-        return dirtyColumns.contains(packed) || timestamp != 0L || sessionConfig.generationEnabled();
+        return dirty || timestamp != 0L || sessionConfig.generationEnabled();
     }
 
     private boolean isGenerationCandidate(long packed) {
-        return sessionConfig != null && sessionConfig.generationEnabled() && columnTimestamps.get(packed) <= 0L;
+        return sessionConfig != null && sessionConfig.generationEnabled() && columnTimestamps.get(packed) == 0L;
     }
 
-    private int appendRequest(long packed, int[] requestIds, long[] positions, long[] timestamps, int count, boolean generationCandidate) {
+    private int appendRequest(
+            long packed,
+            int[] requestIds,
+            long[] positions,
+            long[] timestamps,
+            boolean[] allowGeneration,
+            int count,
+            boolean generationCandidate) {
         int requestId = nextRequestId++;
         requestIds[count] = requestId;
         positions[count] = packed;
         timestamps[count] = columnTimestamps.get(packed);
+        allowGeneration[count] = generationCandidate;
         markRequest(packed, requestId, generationCandidate);
         return count + 1;
     }
@@ -332,12 +388,35 @@ public final class LodRequestManager {
     private int getEffectiveLodDistance() {
         int serverDistance = sessionConfig.lodDistanceChunks();
         int clientDistance = VSSClientConfig.CONFIG.lodDistanceChunks;
-        int effective = clientDistance > 0 ? Math.min(clientDistance, serverDistance) : serverDistance;
-        OptionalInt voxyDistance = ModCompat.getVoxyViewDistanceChunks();
-        if (voxyDistance.isPresent() && voxyDistance.getAsInt() > 0) {
-            effective = Math.min(effective, voxyDistance.getAsInt());
+        int hardClientLimit = VSSClientConfig.MAX_LOD_DISTANCE_CHUNKS;
+        if (clientDistance > 0) {
+            return Math.min(Math.min(clientDistance, serverDistance), hardClientLimit);
         }
-        return effective;
+        int voxyDistance = ModCompat.getVoxyViewDistanceChunks().orElse(hardClientLimit);
+        return Math.min(Math.min(serverDistance, voxyDistance), hardClientLimit);
+    }
+
+    private void logRequestBatch(
+            long now,
+            int count,
+            int syncCount,
+            int generationCount,
+            int dirtyCount,
+            int lodDistance,
+            int playerCx,
+            int playerCz) {
+        if (now - lastRequestDiagnosticNanos < REQUEST_DIAGNOSTIC_INTERVAL_NANOS) {
+            return;
+        }
+        lastRequestDiagnosticNanos = now;
+        VSSLogger.debug("LOD requests sent: count=" + count
+                + ", sync=" + syncCount
+                + ", generation=" + generationCount
+                + ", dirty=" + dirtyCount
+                + ", distance=" + lodDistance
+                + ", pending=" + inFlight.size()
+                + ", deferred=" + deferredColumns.size()
+                + ", playerChunk=" + playerCx + "," + playerCz);
     }
 
     private void markRequest(long packed, int requestId, boolean generationCandidate) {
@@ -371,6 +450,11 @@ public final class LodRequestManager {
         return packed != Long.MIN_VALUE && dirtyRefreshInFlight.contains(packed);
     }
 
+    private boolean isGenerationRequest(int requestId) {
+        long packed = requestIdToPosition.get(requestId);
+        return packed != Long.MIN_VALUE && generationInFlight.contains(packed);
+    }
+
     private void timeoutSweep() {
         long now = System.nanoTime();
         LongOpenHashSet expired = new LongOpenHashSet();
@@ -392,14 +476,14 @@ public final class LodRequestManager {
             generationInFlight.remove(packed);
             dirtyRefreshInFlight.remove(packed);
             markBackoff(packed, generationCandidate);
-            deferColumn(packed);
+            deferColumn(packed, dirtyColumns.contains(packed));
         }
     }
 
     private long timeoutFor(long packed) {
         if (sessionConfig != null
                 && sessionConfig.generationEnabled()
-                && columnTimestamps.get(packed) <= 0L
+                && isGenerationCandidate(packed)
                 && !dirtyColumns.contains(packed)) {
             return GENERATION_REQUEST_TIMEOUT_NANOS;
         }
@@ -441,14 +525,29 @@ public final class LodRequestManager {
     }
 
     private void deferColumn(long packed) {
-        if (deferredColumns.add(packed)) {
+        deferColumn(packed, false);
+    }
+
+    private void deferColumn(long packed, boolean urgent) {
+        boolean alreadyDeferred = deferredColumns.contains(packed);
+        if (!alreadyDeferred && deferredColumns.size() >= MAX_DEFERRED_COLUMNS) {
+            Long oldest = deferredQueue.pollFirst();
+            if (oldest != null) {
+                deferredColumns.remove(oldest.longValue());
+            }
+        }
+        if (deferredColumns.add(packed) || urgent) {
+            if (urgent) {
+                deferredQueue.addFirst(packed);
+                return;
+            }
             deferredQueue.addLast(packed);
         }
     }
 
     private void sendCancelPacket(int requestId) {
         try {
-            VSSNetworking.sendToServer(new CancelRequestC2SPayload(requestId));
+            VSSClientNetworking.sendCancelRequest(new CancelRequestC2SPayload(requestId));
         } catch (Exception ignored) {
         }
     }
@@ -456,6 +555,7 @@ public final class LodRequestManager {
     private void resetRequestState() {
         columnTimestamps.clear();
         dirtyColumns.clear();
+        dirtyColumnTimestamps.clear();
         inFlight.clear();
         deferredColumns.clear();
         deferredQueue.clear();
@@ -474,6 +574,7 @@ public final class LodRequestManager {
         scanTickCounter = SCAN_INTERVAL_TICKS - 1;
         syncRequestBudget = 0.0D;
         generationRequestBudget = 0.0D;
+        dirtyRefreshBudget = 0.0D;
     }
 
     private void resetScanCursor() {
@@ -482,17 +583,17 @@ public final class LodRequestManager {
         scanTickCounter = SCAN_INTERVAL_TICKS - 1;
     }
 
-    private static int[] ringIndexToCoord(int r, int i, int centerX, int centerZ) {
+    private static long ringIndexToPackedCoord(int r, int i, int centerX, int centerZ) {
         if (r == 0) {
-            return new int[] {centerX, centerZ};
+            return PositionUtil.packPosition(centerX, centerZ);
         }
         int edge = i / (2 * r);
         int pos = i % (2 * r);
         return switch (edge) {
-            case 0 -> new int[] {centerX - r + pos, centerZ - r};
-            case 1 -> new int[] {centerX + r, centerZ - r + pos};
-            case 2 -> new int[] {centerX + r - pos, centerZ + r};
-            default -> new int[] {centerX - r, centerZ + r - pos};
+            case 0 -> PositionUtil.packPosition(centerX - r + pos, centerZ - r);
+            case 1 -> PositionUtil.packPosition(centerX + r, centerZ - r + pos);
+            case 2 -> PositionUtil.packPosition(centerX + r - pos, centerZ + r);
+            default -> PositionUtil.packPosition(centerX - r, centerZ + r - pos);
         };
     }
 
@@ -510,7 +611,9 @@ public final class LodRequestManager {
 
     private void markBackoff(long packed, boolean generationCandidate) {
         int attempts = Math.min(6, retryAttempts.addTo(packed, 1) + 1);
-        long baseDelay = generationCandidate ? GENERATION_BACKOFF_NANOS : RATE_LIMIT_BACKOFF_NANOS;
+        long baseDelay = dirtyColumns.contains(packed)
+                ? DIRTY_REFRESH_BACKOFF_NANOS
+                : generationCandidate ? GENERATION_BACKOFF_NANOS : RATE_LIMIT_BACKOFF_NANOS;
         long delay = Math.min(MAX_RETRY_BACKOFF_NANOS, baseDelay << Math.max(0, attempts - 1));
         retryAfterNanos.put(packed, System.nanoTime() + delay);
     }
@@ -523,32 +626,37 @@ public final class LodRequestManager {
     private static final class RequestWindow {
         private int syncRemaining;
         private int generationRemaining;
+        private int dirtyRemaining;
         private int syncSent;
         private int generationSent;
+        private int dirtySent;
 
-        private RequestWindow(int syncRemaining, int generationRemaining) {
+        private RequestWindow(int syncRemaining, int generationRemaining, int dirtyRemaining) {
             this.syncRemaining = syncRemaining;
             this.generationRemaining = generationRemaining;
+            this.dirtyRemaining = dirtyRemaining;
         }
 
         private boolean hasCapacity() {
-            return syncRemaining > 0 || generationRemaining > 0;
+            return syncRemaining > 0 || generationRemaining > 0 || dirtyRemaining > 0;
         }
 
         private int remaining() {
-            return Math.max(0, syncRemaining) + Math.max(0, generationRemaining);
+            return Math.max(0, syncRemaining) + Math.max(0, generationRemaining) + Math.max(0, dirtyRemaining);
         }
 
-        private boolean canSend(boolean generationCandidate) {
+        private boolean canSend(boolean dirtyRefresh, boolean generationCandidate) {
+            if (dirtyRefresh) {
+                return dirtyRemaining > 0;
+            }
             return generationCandidate ? generationRemaining > 0 : syncRemaining > 0;
         }
 
-        private boolean canSendGeneration() {
-            return generationRemaining > 0;
-        }
-
-        private void record(boolean generationCandidate) {
-            if (generationCandidate) {
+        private void record(boolean dirtyRefresh, boolean generationCandidate) {
+            if (dirtyRefresh) {
+                dirtyRemaining--;
+                dirtySent++;
+            } else if (generationCandidate) {
                 generationRemaining--;
                 generationSent++;
             } else {
@@ -558,6 +666,6 @@ public final class LodRequestManager {
         }
     }
 
-    public record ColumnReceiveResult(boolean replaceMissingSections, boolean knownRequest) {
+    public record ColumnReceiveResult(boolean replaceMissingSections, boolean knownRequest, boolean priority) {
     }
 }

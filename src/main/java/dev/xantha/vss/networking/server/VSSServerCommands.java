@@ -158,6 +158,32 @@ public final class VSSServerCommands {
                                         .executes(context -> setFarPlayersInterval(
                                                 context.getSource(),
                                                 IntegerArgumentType.getInteger(context, "tick"))))))
+                .then(Commands.literal("dirty")
+                        .executes(context -> showDirtyRefresh(context.getSource()))
+                        .then(Commands.literal("get")
+                                .executes(context -> showDirtyRefresh(context.getSource())))
+                        .then(Commands.literal("set_interval")
+                                .then(Commands.argument(
+                                                "ticks",
+                                                IntegerArgumentType.integer(
+                                                        VSSServerConfig.MIN_DIRTY_BROADCAST_INTERVAL_TICKS,
+                                                        VSSServerConfig.MAX_DIRTY_BROADCAST_INTERVAL_TICKS))
+                                        .executes(context -> setDirtyRefreshInterval(
+                                                context.getSource(),
+                                                IntegerArgumentType.getInteger(context, "ticks"))))))
+                .then(Commands.literal("刷新")
+                        .executes(context -> showDirtyRefresh(context.getSource()))
+                        .then(Commands.literal("查看")
+                                .executes(context -> showDirtyRefresh(context.getSource())))
+                        .then(Commands.literal("设置间隔")
+                                .then(Commands.argument(
+                                                "tick",
+                                                IntegerArgumentType.integer(
+                                                        VSSServerConfig.MIN_DIRTY_BROADCAST_INTERVAL_TICKS,
+                                                        VSSServerConfig.MAX_DIRTY_BROADCAST_INTERVAL_TICKS))
+                                        .executes(context -> setDirtyRefreshInterval(
+                                                context.getSource(),
+                                                IntegerArgumentType.getInteger(context, "tick"))))))
                 .then(Commands.literal("generation")
                         .executes(context -> showGeneration(context.getSource()))
                         .then(Commands.literal("get")
@@ -381,6 +407,34 @@ public final class VSSServerCommands {
                         config.farPlayerSyncIntervalTicks,
                         config.lodDistanceChunks)), true);
         return config.farPlayerSyncEnabled ? 1 : 0;
+    }
+
+    private static int showDirtyRefresh(CommandSourceStack source) {
+        VSSServerConfig config = VSSServerConfig.CONFIG;
+        source.sendSuccess(() -> Component.translatable("vss.command.dirty.show")
+                .withStyle(ChatFormatting.GREEN)
+                .append(Component.translatable(
+                        "vss.command.dirty.details",
+                        config.dirtyBroadcastIntervalTicks,
+                        DirtyColumnBroadcaster.diagnosticsComponent())), false);
+        return config.dirtyBroadcastIntervalTicks;
+    }
+
+    private static int setDirtyRefreshInterval(CommandSourceStack source, int ticks) {
+        VSSServerConfig.CONFIG.dirtyBroadcastIntervalTicks = ticks;
+        VSSServerConfig.CONFIG.normalizeAndSave();
+        return reportDirtyRefreshUpdated(source);
+    }
+
+    private static int reportDirtyRefreshUpdated(CommandSourceStack source) {
+        VSSServerConfig config = VSSServerConfig.CONFIG;
+        source.sendSuccess(() -> Component.translatable("vss.command.dirty.saved")
+                .withStyle(ChatFormatting.YELLOW)
+                .append(Component.translatable(
+                        "vss.command.dirty.details",
+                        config.dirtyBroadcastIntervalTicks,
+                        DirtyColumnBroadcaster.diagnosticsComponent())), true);
+        return config.dirtyBroadcastIntervalTicks;
     }
 
     private static int showGeneration(CommandSourceStack source) {

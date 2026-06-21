@@ -9,6 +9,8 @@ public class VSSServerConfig extends JsonConfig {
     public static final int BYTES_PER_MIB = 1024 * 1024;
     public static final int MIN_SEND_QUEUE_BYTES_PER_PLAYER = 4 * BYTES_PER_MIB;
     public static final int MAX_SEND_QUEUE_BYTES_PER_PLAYER = 512 * BYTES_PER_MIB;
+    public static final int MIN_DIRTY_BROADCAST_INTERVAL_TICKS = 1;
+    public static final int MAX_DIRTY_BROADCAST_INTERVAL_TICKS = 600;
     private static final int OLD_DEFAULT_BYTES_PER_SECOND_LIMIT_PER_PLAYER = 0x1400000;
     private static final int OLD_DEFAULT_SEND_QUEUE_LIMIT_PER_PLAYER = 4000;
     private static final int OLD_DEFAULT_SYNC_ON_LOAD_RATE_LIMIT_PER_PLAYER = 800;
@@ -45,7 +47,9 @@ public class VSSServerConfig extends JsonConfig {
     public int generationPackingThreads = 2;
     public int generationPackingQueueLimit = 64;
     public int generationTimeoutSeconds = 60;
-    public int dirtyBroadcastIntervalSeconds = 2;
+    @Deprecated
+    public transient int dirtyBroadcastIntervalSeconds = 2;
+    public int dirtyBroadcastIntervalTicks = 5;
     public boolean dirtyVersionCacheEnabled = true;
     public int dirtyVersionCacheMaxEntries = 200000;
     public int dirtyVersionCacheRetentionSeconds = 86400;
@@ -83,7 +87,7 @@ public class VSSServerConfig extends JsonConfig {
         generationPackingThreads = clamp(generationPackingThreads, 1, 8);
         generationPackingQueueLimit = clamp(generationPackingQueueLimit, 1, 1024);
         generationTimeoutSeconds = clamp(generationTimeoutSeconds, 1, 600);
-        dirtyBroadcastIntervalSeconds = clamp(dirtyBroadcastIntervalSeconds, 1, 300);
+        dirtyBroadcastIntervalTicks = clamp(dirtyBroadcastIntervalTicks, MIN_DIRTY_BROADCAST_INTERVAL_TICKS, MAX_DIRTY_BROADCAST_INTERVAL_TICKS);
         dirtyVersionCacheMaxEntries = clamp(dirtyVersionCacheMaxEntries, 1, 5000000);
         dirtyVersionCacheRetentionSeconds = clamp(dirtyVersionCacheRetentionSeconds, 60, 604800);
         farPlayerSyncIntervalTicks = clamp(farPlayerSyncIntervalTicks, 1, 100);

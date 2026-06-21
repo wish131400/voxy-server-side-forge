@@ -5,22 +5,24 @@ import dev.xantha.vss.networking.payloads.BandwidthUpdateC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchResponseS2CPayload;
 import dev.xantha.vss.networking.payloads.CancelRequestC2SPayload;
-import dev.xantha.vss.networking.payloads.ClientDirtyColumnsC2SPayload;
 import dev.xantha.vss.networking.payloads.DirtyColumnsS2CPayload;
 import dev.xantha.vss.networking.payloads.FarPlayersS2CPayload;
 import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
+import java.util.function.Supplier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.simple.SimpleChannel;
-import java.util.function.Supplier;
 
 public final class VSSNetworking {
     private static final String PROTOCOL = Integer.toString(VSSConstants.PROTOCOL_VERSION);
@@ -55,11 +57,6 @@ public final class VSSNetworking {
                 .decoder(BandwidthUpdateC2SPayload::decode)
                 .consumerMainThread(VSSServerNetworking::handleBandwidthUpdate)
                 .add();
-        CHANNEL.messageBuilder(ClientDirtyColumnsC2SPayload.class, id++, NetworkDirection.PLAY_TO_SERVER)
-                .encoder(ClientDirtyColumnsC2SPayload::encode)
-                .decoder(ClientDirtyColumnsC2SPayload::decode)
-                .consumerMainThread(VSSServerNetworking::handleClientDirtyColumns)
-                .add();
         CHANNEL.messageBuilder(SessionConfigS2CPayload.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(SessionConfigS2CPayload::encode)
                 .decoder(SessionConfigS2CPayload::decode)
@@ -92,7 +89,17 @@ public final class VSSNetworking {
     }
 
     public static void sendToPlayer(ServerPlayer player, Object payload) {
+        if (trySendToIntegratedHost(player, payload)) {
+            return;
+        }
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), payload);
+    }
+
+    private static boolean trySendToIntegratedHost(ServerPlayer player, Object payload) {
+        Boolean delivered = DistExecutor.safeCallWhenOn(
+                Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.tryHandleIntegratedHostPayload(player, payload));
+        return delivered != null && delivered;
     }
 
     private static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -116,6 +123,35 @@ public final class VSSNetworking {
     }
 
     private static final class ClientPacketHandlers {
+        private static boolean tryHandleIntegratedHostPayload(ServerPlayer player, Object payload) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.getSingleplayerServer() == null || minecraft.getSingleplayerServer() != player.server) {
+                return false;
+            }
+
+            LocalPlayer localPlayer = minecraft.player;
+            if (localPlayer == null || !localPlayer.getUUID().equals(player.getUUID())) {
+                return false;
+            }
+
+            minecraft.execute(() -> handleDirectPayload(payload));
+            return true;
+        }
+
+        private static void handleDirectPayload(Object payload) {
+            if (payload instanceof SessionConfigS2CPayload sessionConfig) {
+                handleSessionConfig(sessionConfig, () -> null);
+            } else if (payload instanceof BatchResponseS2CPayload batchResponse) {
+                handleBatchResponse(batchResponse, () -> null);
+            } else if (payload instanceof DirtyColumnsS2CPayload dirtyColumns) {
+                handleDirtyColumns(dirtyColumns, () -> null);
+            } else if (payload instanceof VoxelColumnS2CPayload voxelColumn) {
+                handleVoxelColumn(voxelColumn, () -> null);
+            } else if (payload instanceof FarPlayersS2CPayload farPlayers) {
+                handleFarPlayers(farPlayers, () -> null);
+            }
+        }
+
         private static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
             dev.xantha.vss.networking.client.VSSClientNetworking.handleSessionConfig(payload, contextSupplier);
         }

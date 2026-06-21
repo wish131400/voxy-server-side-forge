@@ -7,37 +7,50 @@ import dev.xantha.vss.config.VSSClientConfig;
 import dev.xantha.vss.networking.VSSNetworking;
 import dev.xantha.vss.networking.payloads.BandwidthUpdateC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchResponseS2CPayload;
+import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
+import dev.xantha.vss.networking.payloads.CancelRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.DirtyColumnsS2CPayload;
 import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
+import dev.xantha.vss.networking.server.VSSServerNetworking;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent;
 
 public final class VSSClientNetworking {
     private static volatile boolean serverEnabled;
     private static volatile int serverLodDistance;
-    private static volatile boolean waitingForLanPublish;
-    private static volatile boolean lanHostHandshakeSent;
-    private static int lanHostHandshakeRetryTicks;
+    private static volatile boolean waitingForHandshake;
+    private static volatile boolean handshakeSent;
+    private static int handshakeRetryTicks;
     private static volatile LodRequestManager requestManager;
     private static final ClientColumnProcessor COLUMN_PROCESSOR = new ClientColumnProcessor();
     private static final AtomicLong columnsReceived = new AtomicLong();
     private static final AtomicLong bytesReceived = new AtomicLong();
-    private static final int LAN_HANDSHAKE_RETRY_INTERVAL_TICKS = 40;
-    private static final int LAN_HANDSHAKE_FAILED_RETRY_INTERVAL_TICKS = 20;
+    private static final int HANDSHAKE_RETRY_INTERVAL_TICKS = 40;
+    private static final int HANDSHAKE_FAILED_RETRY_INTERVAL_TICKS = 20;
+    private static final long COLUMN_RECEIVE_DIAGNOSTIC_INTERVAL_NANOS = 5_000_000_000L;
+    private static volatile long lastColumnReceiveDiagnosticNanos;
 
     private VSSClientNetworking() {
     }
 
     public static boolean isServerEnabled() {
         return serverEnabled;
+    }
+
+    public static boolean isClientLodSessionActive() {
+        return serverEnabled && COLUMN_PROCESSOR.isActive() && isClientWorldReady();
     }
 
     public static int getServerLodDistance() {
@@ -61,17 +74,19 @@ public final class VSSClientNetworking {
     }
 
     public static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!isClientWorldReady()) {
+            discardSession();
+            return;
+        }
         if (payload.protocolVersion() != VSSConstants.PROTOCOL_VERSION) {
             VSSLogger.warn("Server has incompatible VSS protocol " + payload.protocolVersion());
-            serverEnabled = false;
-            waitingForLanPublish = false;
-            lanHostHandshakeRetryTicks = 0;
+            discardSession();
             return;
         }
 
-        waitingForLanPublish = false;
-        lanHostHandshakeSent = true;
-        lanHostHandshakeRetryTicks = 0;
+        waitingForHandshake = false;
+        handshakeSent = true;
+        handshakeRetryTicks = 0;
         serverEnabled = payload.enabled();
         serverLodDistance = payload.lodDistanceChunks();
         if (payload.enabled()) {
@@ -80,12 +95,23 @@ public final class VSSClientNetworking {
             manager.onSessionConfig(payload);
             requestManager = manager;
             sendBandwidthPreference();
-            VSSLogger.info("Server session config received (LOD distance: " + payload.lodDistanceChunks()
-                    + " chunks, generation: " + (payload.generationEnabled() ? "enabled" : "disabled") + ")");
+            VSSLogger.info("VSS LOD session ready: distance=" + payload.lodDistanceChunks()
+                    + " chunks, generation=" + (payload.generationEnabled() ? "enabled" : "disabled"));
+        } else {
+            LodRequestManager manager = requestManager;
+            requestManager = null;
+            if (manager != null) {
+                manager.disconnect();
+            }
+            FarPlayerClientRenderer.clear();
+            COLUMN_PROCESSOR.shutdown();
         }
     }
 
     public static void handleBatchResponse(BatchResponseS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!serverEnabled || !isClientWorldReady()) {
+            return;
+        }
         LodRequestManager manager = requestManager;
         if (manager == null) {
             return;
@@ -102,61 +128,52 @@ public final class VSSClientNetworking {
     }
 
     public static void handleDirtyColumns(DirtyColumnsS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!serverEnabled || !isClientWorldReady()) {
+            return;
+        }
         LodRequestManager manager = requestManager;
         if (manager != null) {
-            manager.onDirtyColumns(payload.dirtyPositions());
+            manager.onDirtyColumns(payload.dirtyPositions(), payload.dirtyTimestamps());
         }
     }
 
     public static void handleVoxelColumn(VoxelColumnS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!isClientLodSessionActive()) {
+            return;
+        }
         columnsReceived.incrementAndGet();
         bytesReceived.addAndGet(payload.estimatedBytes());
+        logColumnReceive(payload);
         LodRequestManager manager = requestManager;
-        LodRequestManager.ColumnReceiveResult receiveResult = new LodRequestManager.ColumnReceiveResult(false, false);
-        if (manager != null) {
+        LodRequestManager.ColumnReceiveResult receiveResult;
+        if (payload.requestId() < 0) {
+            receiveResult = new LodRequestManager.ColumnReceiveResult(true, true, true);
+        } else if (manager != null) {
             receiveResult = manager.onColumnReceived(payload.requestId(), payload.columnTimestamp());
+        } else {
+            receiveResult = new LodRequestManager.ColumnReceiveResult(false, false, false);
         }
-        COLUMN_PROCESSOR.offer(payload, receiveResult.replaceMissingSections(), receiveResult.knownRequest());
+        COLUMN_PROCESSOR.offer(payload, receiveResult.replaceMissingSections(), receiveResult.knownRequest(), receiveResult.priority());
     }
 
     @SubscribeEvent
     public static void onClientLogin(ClientPlayerNetworkEvent.LoggingIn event) {
         serverEnabled = false;
         serverLodDistance = 0;
-        waitingForLanPublish = false;
-        lanHostHandshakeSent = false;
-        lanHostHandshakeRetryTicks = 0;
+        waitingForHandshake = false;
+        handshakeSent = false;
+        handshakeRetryTicks = 0;
         requestManager = null;
         if (!VSSClientConfig.CONFIG.receiveServerLods) {
             return;
         }
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.isLocalServer() && !Boolean.getBoolean("vss.test.integratedServer")) {
-            waitingForLanPublish = true;
-            return;
-        }
-
-        sendHandshake("Handshake send failed: ");
+        waitingForHandshake = true;
+        handshakeRetryTicks = 0;
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
-        LodRequestManager manager = requestManager;
-        requestManager = null;
-        serverEnabled = false;
-        serverLodDistance = 0;
-        waitingForLanPublish = false;
-        lanHostHandshakeSent = false;
-        lanHostHandshakeRetryTicks = 0;
-        if (manager != null) {
-            manager.disconnect();
-        }
-        ClientDirtyColumnReporter.clear();
-        FarPlayerClientRenderer.clear();
-        COLUMN_PROCESSOR.shutdown();
-        COLUMN_PROCESSOR.resetStats();
-        columnsReceived.set(0);
-        bytesReceived.set(0);
+        stopClientSessionForWorldShutdown();
     }
 
     @SubscribeEvent
@@ -164,12 +181,12 @@ public final class VSSClientNetworking {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
-        tryLanHostHandshake();
+        ensureHandshakePending();
+        tryPendingHandshake();
         LodRequestManager manager = requestManager;
         if (manager != null && serverEnabled) {
             manager.tick();
         }
-        ClientDirtyColumnReporter.tick();
         COLUMN_PROCESSOR.scheduleProcessing(serverEnabled);
     }
 
@@ -180,38 +197,120 @@ public final class VSSClientNetworking {
         long desiredRate = VSSClientConfig.CONFIG.desiredBandwidthMiB > 0
                 ? (long) VSSClientConfig.CONFIG.desiredBandwidthMiB * 1024L * 1024L
                 : 0L;
+        sendBandwidthUpdate(new BandwidthUpdateC2SPayload(desiredRate));
+    }
+
+    public static void stopClientSessionForWorldShutdown() {
+        stopClientSession(true);
+    }
+
+    static void sendBatchRequest(BatchChunkRequestC2SPayload payload) {
+        if (trySendToIntegratedServer(serverPlayer -> VSSServerNetworking.handleIntegratedBatchRequest(serverPlayer, payload))) {
+            return;
+        }
+        VSSNetworking.sendToServer(payload);
+    }
+
+    static void sendCancelRequest(CancelRequestC2SPayload payload) {
+        if (trySendToIntegratedServer(serverPlayer -> VSSServerNetworking.handleIntegratedCancel(serverPlayer, payload))) {
+            return;
+        }
+        VSSNetworking.sendToServer(payload);
+    }
+
+    private static void sendBandwidthUpdate(BandwidthUpdateC2SPayload payload) {
         try {
-            VSSNetworking.sendToServer(new BandwidthUpdateC2SPayload(desiredRate));
+            if (trySendToIntegratedServer(serverPlayer -> VSSServerNetworking.handleIntegratedBandwidthUpdate(serverPlayer, payload))) {
+                return;
+            }
+            VSSNetworking.sendToServer(payload);
         } catch (Exception e) {
             VSSLogger.debug("Bandwidth preference send failed: " + e.getMessage());
         }
     }
 
-    private static void tryLanHostHandshake() {
-        if (!waitingForLanPublish || requestManager != null || !VSSClientConfig.CONFIG.receiveServerLods) {
+    private static boolean trySendToIntegratedServer(java.util.function.Consumer<ServerPlayer> consumer) {
+        Minecraft minecraft = Minecraft.getInstance();
+        IntegratedServer server = minecraft.getSingleplayerServer();
+        LocalPlayer localPlayer = minecraft.player;
+        if (server == null || localPlayer == null) {
+            return false;
+        }
+
+        server.execute(() -> {
+            ServerPlayer serverPlayer = server.getPlayerList().getPlayer(localPlayer.getUUID());
+            if (serverPlayer != null) {
+                consumer.accept(serverPlayer);
+            }
+        });
+        return true;
+    }
+
+    private static void tryPendingHandshake() {
+        if (!waitingForHandshake || requestManager != null || !VSSClientConfig.CONFIG.receiveServerLods) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
-        IntegratedServer server = mc.getSingleplayerServer();
-        if (server == null || !server.isPublished()) {
+        if (mc.getConnection() == null || !isClientWorldReady()) {
+            return;
+        }
+        IntegratedServer integratedServer = mc.getSingleplayerServer();
+        if (integratedServer != null) {
+            tryIntegratedServerHandshake(mc, integratedServer);
             return;
         }
 
-        if (lanHostHandshakeRetryTicks > 0) {
-            lanHostHandshakeRetryTicks--;
+        if (handshakeRetryTicks > 0) {
+            handshakeRetryTicks--;
             return;
         }
 
-        boolean sent = sendHandshake("LAN host handshake send failed: ");
+        boolean sent = sendHandshake("Handshake send failed: ");
         if (sent) {
-            if (!lanHostHandshakeSent) {
-                VSSLogger.info("LAN host VSS handshake sent; waiting for session config");
+            if (!handshakeSent) {
+                VSSLogger.debug("VSS handshake sent; waiting for session config");
             }
-            lanHostHandshakeSent = true;
-            lanHostHandshakeRetryTicks = LAN_HANDSHAKE_RETRY_INTERVAL_TICKS;
+            handshakeSent = true;
+            handshakeRetryTicks = HANDSHAKE_RETRY_INTERVAL_TICKS;
         } else {
-            lanHostHandshakeRetryTicks = LAN_HANDSHAKE_FAILED_RETRY_INTERVAL_TICKS;
+            handshakeRetryTicks = HANDSHAKE_FAILED_RETRY_INTERVAL_TICKS;
         }
+    }
+
+    private static void ensureHandshakePending() {
+        if (waitingForHandshake || handshakeSent || requestManager != null || serverEnabled || !VSSClientConfig.CONFIG.receiveServerLods) {
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getConnection() != null && isClientWorldReady()) {
+            waitingForHandshake = true;
+            handshakeRetryTicks = 0;
+        }
+    }
+
+    private static void tryIntegratedServerHandshake(Minecraft minecraft, IntegratedServer server) {
+        if (handshakeRetryTicks > 0) {
+            handshakeRetryTicks--;
+            return;
+        }
+
+        LocalPlayer localPlayer = minecraft.player;
+        if (localPlayer == null) {
+            return;
+        }
+
+        handshakeSent = true;
+        handshakeRetryTicks = HANDSHAKE_RETRY_INTERVAL_TICKS;
+        server.execute(() -> {
+            ServerPlayer serverPlayer = server.getPlayerList().getPlayer(localPlayer.getUUID());
+            if (serverPlayer == null) {
+                return;
+            }
+            SessionConfigS2CPayload config = VSSServerNetworking.registerIntegratedHost(
+                    serverPlayer,
+                    VSSConstants.PROTOCOL_VERSION);
+            minecraft.execute(() -> handleSessionConfig(config, () -> null));
+        });
     }
 
     private static boolean sendHandshake(String failurePrefix) {
@@ -223,5 +322,50 @@ public final class VSSClientNetworking {
             VSSLogger.debug(failurePrefix + e.getMessage());
             return false;
         }
+    }
+
+    private static boolean isClientWorldReady() {
+        Minecraft mc = Minecraft.getInstance();
+        ClientLevel level = mc.level;
+        LocalPlayer player = mc.player;
+        return level != null && player != null && !player.isRemoved();
+    }
+
+    private static void discardSession() {
+        stopClientSession(false);
+    }
+
+    private static void stopClientSession(boolean resetStats) {
+        LodRequestManager manager = requestManager;
+        requestManager = null;
+        serverEnabled = false;
+        serverLodDistance = 0;
+        waitingForHandshake = false;
+        handshakeSent = false;
+        handshakeRetryTicks = 0;
+        if (manager != null) {
+            manager.disconnect();
+        }
+        FarPlayerClientRenderer.clear();
+        COLUMN_PROCESSOR.shutdown();
+        if (resetStats) {
+            COLUMN_PROCESSOR.resetStats();
+            columnsReceived.set(0);
+            bytesReceived.set(0);
+            lastColumnReceiveDiagnosticNanos = 0L;
+        }
+    }
+
+    private static void logColumnReceive(VoxelColumnS2CPayload payload) {
+        long now = System.nanoTime();
+        if (now - lastColumnReceiveDiagnosticNanos < COLUMN_RECEIVE_DIAGNOSTIC_INTERVAL_NANOS) {
+            return;
+        }
+        lastColumnReceiveDiagnosticNanos = now;
+        VSSLogger.debug("LOD columns received: total=" + columnsReceived.get()
+                + ", bytes=" + bytesReceived.get()
+                + ", queued=" + COLUMN_PROCESSOR.getQueuedCount()
+                + ", last=" + payload.chunkX() + "," + payload.chunkZ()
+                + ", sectionsBytes=" + payload.decompressedSections().length);
     }
 }

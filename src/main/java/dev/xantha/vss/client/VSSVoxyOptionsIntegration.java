@@ -205,6 +205,18 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding((config, value) -> config.syncOnLoadRateLimitPerPlayer = value, config -> config.syncOnLoadRateLimitPerPlayer)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
+                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.dirty_broadcast_interval"))
+                        .setTooltip(Component.translatable("vss.voxy_options.dirty_broadcast_interval.tooltip"))
+                        .setControl(option -> new SliderControl(
+                                option,
+                                VSSServerConfig.MIN_DIRTY_BROADCAST_INTERVAL_TICKS,
+                                VSSServerConfig.MAX_DIRTY_BROADCAST_INTERVAL_TICKS,
+                                1,
+                                VSSVoxyOptionsIntegration::formatTicks))
+                        .setBinding((config, value) -> config.dirtyBroadcastIntervalTicks = value, config -> config.dirtyBroadcastIntervalTicks)
+                        .setImpact(OptionImpact.MEDIUM)
+                        .build())
                 .build());
 
         groups.add(OptionGroup.createBuilder()
@@ -293,6 +305,10 @@ public final class VSSVoxyOptionsIntegration {
 
     private static Component formatSeconds(int value) {
         return Component.translatable("vss.voxy_options.seconds", value);
+    }
+
+    private static Component formatTicks(int value) {
+        return Component.translatable("vss.voxy_options.ticks", value);
     }
 
     private static final class ClientStorage implements OptionStorage<VSSClientConfig> {

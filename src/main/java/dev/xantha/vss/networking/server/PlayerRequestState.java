@@ -13,7 +13,9 @@ final class PlayerRequestState {
     private final Set<Integer> cancelled = new HashSet<>();
     private final Map<Integer, Long> requestPositions = new HashMap<>();
     private final Set<Long> activePositions = new HashSet<>();
+    private final Queue<QueuedPayload> prioritySendQueue = new ArrayDeque<>();
     private final Queue<QueuedPayload> sendQueue = new ArrayDeque<>();
+    private int priorityQueuedPayloads;
     private long queuedBytes;
     private long desiredBandwidth = Long.MAX_VALUE;
     private long availableBytes;
@@ -51,25 +53,49 @@ final class PlayerRequestState {
         }
     }
 
-    boolean enqueue(VoxelColumnS2CPayload payload) {
+    boolean enqueue(VoxelColumnS2CPayload payload, boolean priority) {
         int estimatedBytes = payload.estimatedBytes();
         VSSServerConfig config = VSSServerConfig.CONFIG;
-        if (sendQueue.size() >= config.sendQueueLimitPerPlayer
+        if (queuedPayloadCount() >= config.sendQueueLimitPerPlayer
                 || queuedBytes + estimatedBytes > config.sendQueueBytesLimitPerPlayer) {
             clearRequest(payload.requestId());
             return false;
         }
-        sendQueue.add(new QueuedPayload(payload, estimatedBytes));
+        if (priority) {
+            prioritySendQueue.add(new QueuedPayload(payload, estimatedBytes, true));
+            priorityQueuedPayloads++;
+        } else {
+            sendQueue.add(new QueuedPayload(payload, estimatedBytes, false));
+        }
         queuedBytes += estimatedBytes;
         return true;
     }
 
+    QueuedPayload peekPriorityQueuedPayload() {
+        return prioritySendQueue.peek();
+    }
+
     QueuedPayload peekQueuedPayload() {
-        return sendQueue.peek();
+        QueuedPayload priorityPayload = prioritySendQueue.peek();
+        return priorityPayload != null ? priorityPayload : sendQueue.peek();
+    }
+
+    QueuedPayload pollPriorityQueuedPayload() {
+        QueuedPayload payload = prioritySendQueue.poll();
+        if (payload != null) {
+            priorityQueuedPayloads = Math.max(0, priorityQueuedPayloads - 1);
+            queuedBytes = Math.max(0L, queuedBytes - payload.estimatedBytes());
+        }
+        return payload;
     }
 
     QueuedPayload pollQueuedPayload() {
-        QueuedPayload payload = sendQueue.poll();
+        QueuedPayload payload = prioritySendQueue.poll();
+        if (payload != null) {
+            priorityQueuedPayloads = Math.max(0, priorityQueuedPayloads - 1);
+        } else {
+            payload = sendQueue.poll();
+        }
         if (payload != null) {
             queuedBytes = Math.max(0L, queuedBytes - payload.estimatedBytes());
         }
@@ -77,7 +103,11 @@ final class PlayerRequestState {
     }
 
     int queuedPayloadCount() {
-        return sendQueue.size();
+        return prioritySendQueue.size() + sendQueue.size();
+    }
+
+    int priorityQueuedPayloadCount() {
+        return priorityQueuedPayloads;
     }
 
     long queuedBytes() {
@@ -106,6 +136,16 @@ final class PlayerRequestState {
         return desiredBandwidth;
     }
 
+    void clearAll() {
+        cancelled.clear();
+        requestPositions.clear();
+        activePositions.clear();
+        prioritySendQueue.clear();
+        sendQueue.clear();
+        priorityQueuedPayloads = 0;
+        queuedBytes = 0L;
+    }
+
     private void refill(long configuredLimit) {
         long limit = effectiveLimit(configuredLimit);
         long now = System.nanoTime();
@@ -126,6 +166,6 @@ final class PlayerRequestState {
         return Math.min(safeConfiguredLimit, desiredBandwidth);
     }
 
-    record QueuedPayload(VoxelColumnS2CPayload payload, int estimatedBytes) {
+    record QueuedPayload(VoxelColumnS2CPayload payload, int estimatedBytes, boolean priority) {
     }
 }

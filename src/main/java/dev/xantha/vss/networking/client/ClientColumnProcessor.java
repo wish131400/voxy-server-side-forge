@@ -22,32 +22,37 @@ import net.minecraft.world.level.chunk.DataLayer;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
 final class ClientColumnProcessor {
-    static final int MAX_QUEUED_COLUMNS = 2000;
-    private static final long MAX_QUEUED_BYTES = 64L * 1024L * 1024L;
+    static final int MAX_QUEUED_COLUMNS = 512;
+    private static final long MAX_QUEUED_BYTES = 16L * 1024L * 1024L;
+    private static final int MAX_COLUMNS_PER_DRAIN = 16;
+    private static final int MAX_SECTIONS_DISPATCHED_PER_DRAIN = 192;
     private static final int MAX_SECTIONS_PER_COLUMN = 64;
     private static final long DROP_WARN_INTERVAL_MS = 5000L;
 
+    private final ConcurrentLinkedQueue<QueuedColumn> priorityColumnQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<QueuedColumn> columnQueue = new ConcurrentLinkedQueue<>();
     private final AtomicInteger queueSize = new AtomicInteger();
+    private final AtomicInteger priorityQueueSize = new AtomicInteger();
     private final AtomicLong queueBytes = new AtomicLong();
     private final AtomicLong columnsDropped = new AtomicLong();
     private final AtomicBoolean processing = new AtomicBoolean();
     private final AtomicInteger sessionEpoch = new AtomicInteger();
-    private volatile ExecutorService executor = createExecutor();
-    private volatile boolean shuttingDown;
+    private volatile ExecutorService executor;
+    private volatile boolean shuttingDown = true;
     private volatile long lastDropWarnMs;
 
     void beginSession() {
         sessionEpoch.incrementAndGet();
         clearQueue();
         processing.set(false);
-        shuttingDown = false;
-        if (executor.isShutdown() || executor.isTerminated()) {
+        ExecutorService currentExecutor = executor;
+        if (currentExecutor == null || currentExecutor.isShutdown() || currentExecutor.isTerminated()) {
             executor = createExecutor();
         }
+        shuttingDown = false;
     }
 
-    void offer(VoxelColumnS2CPayload payload, boolean replaceMissingSections, boolean knownRequest) {
+    void offer(VoxelColumnS2CPayload payload, boolean replaceMissingSections, boolean knownRequest, boolean priority) {
         if (shuttingDown) {
             return;
         }
@@ -58,7 +63,12 @@ final class ClientColumnProcessor {
 
         int estimatedBytes = payload.estimatedBytes();
         if (queueSize.get() < MAX_QUEUED_COLUMNS && queueBytes.get() + estimatedBytes <= MAX_QUEUED_BYTES) {
-            columnQueue.add(new QueuedColumn(payload, replaceMissingSections));
+            if (priority) {
+                priorityColumnQueue.add(new QueuedColumn(payload, replaceMissingSections));
+                priorityQueueSize.incrementAndGet();
+            } else {
+                columnQueue.add(new QueuedColumn(payload, replaceMissingSections));
+            }
             queueSize.incrementAndGet();
             queueBytes.addAndGet(estimatedBytes);
             return;
@@ -77,7 +87,11 @@ final class ClientColumnProcessor {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
             ClientLevel level = minecraft.level;
-            if (sessionEpoch.get() != epoch || shuttingDown || level == null || !level.dimension().equals(payload.dimension())) {
+            if (sessionEpoch.get() != epoch
+                    || shuttingDown
+                    || !VSSClientNetworking.isClientLodSessionActive()
+                    || level == null
+                    || !level.dimension().equals(payload.dimension())) {
                 return;
             }
             Registry<Biome> biomeRegistry = level.registryAccess().registryOrThrow(Registries.BIOME);
@@ -107,15 +121,20 @@ final class ClientColumnProcessor {
             clearQueue();
             return;
         }
-        if (columnQueue.isEmpty()) {
+        if (priorityColumnQueue.isEmpty() && columnQueue.isEmpty()) {
             return;
         }
 
         if (VSSClientConfig.CONFIG.offThreadSectionProcessing) {
             if (processing.compareAndSet(false, true)) {
                 int epoch = sessionEpoch.get();
+                ExecutorService currentExecutor = executor;
+                if (currentExecutor == null || currentExecutor.isShutdown()) {
+                    processing.set(false);
+                    return;
+                }
                 try {
-                    executor.execute(() -> {
+                    currentExecutor.execute(() -> {
                         try {
                             drainColumnQueue(level, epoch);
                         } finally {
@@ -135,7 +154,17 @@ final class ClientColumnProcessor {
         Registry<Biome> biomeRegistry = level.registryAccess().registryOrThrow(Registries.BIOME);
 
         QueuedColumn queuedColumn;
-        while (!Thread.currentThread().isInterrupted() && sessionEpoch.get() == epoch && (queuedColumn = columnQueue.poll()) != null) {
+        int processedColumns = 0;
+        int dispatchedSections = 0;
+        while (processedColumns < MAX_COLUMNS_PER_DRAIN
+                && dispatchedSections < MAX_SECTIONS_DISPATCHED_PER_DRAIN
+                && !Thread.currentThread().isInterrupted()
+                && sessionEpoch.get() == epoch
+                && (queuedColumn = pollQueuedColumn()) != null) {
+            if (shuttingDown || !VSSClientNetworking.isClientLodSessionActive()) {
+                clearQueue();
+                return;
+            }
             VoxelColumnS2CPayload payload = queuedColumn.payload();
             queueSize.decrementAndGet();
             int estimatedBytes = payload.estimatedBytes();
@@ -177,12 +206,22 @@ final class ClientColumnProcessor {
                     if (sessionEpoch.get() != epoch || shuttingDown) {
                         return;
                     }
+                    if (!VSSClientNetworking.isClientLodSessionActive()) {
+                        clearQueue();
+                        return;
+                    }
+                    if (sessionEpoch.get() != epoch || shuttingDown || !VSSClientNetworking.isClientLodSessionActive()) {
+                        clearQueue();
+                        return;
+                    }
                     VSSApi.dispatchColumn(
                             level,
                             payload.dimension(),
                             payload.chunkX(),
                             payload.chunkZ(),
                             new VoxelColumnData(finalSections, payload.columnTimestamp(), queuedColumn.replaceMissingSections()));
+                    processedColumns++;
+                    dispatchedSections += finalSections.length;
                 } finally {
                     buf.release();
                 }
@@ -198,9 +237,15 @@ final class ClientColumnProcessor {
         ExecutorService old = executor;
         clearQueue();
         processing.set(false);
-        old.shutdownNow();
-        executor = createExecutor();
-        shuttingDown = false;
+        executor = null;
+        if (old != null) {
+            old.shutdownNow();
+        }
+        VSSLogger.debug("Stopped VSS column processor and cleared queued LOD columns");
+    }
+
+    boolean isActive() {
+        return !shuttingDown;
     }
 
     int getQueuedCount() {
@@ -217,9 +262,20 @@ final class ClientColumnProcessor {
     }
 
     private void clearQueue() {
+        priorityColumnQueue.clear();
         columnQueue.clear();
         queueSize.set(0);
+        priorityQueueSize.set(0);
         queueBytes.set(0L);
+    }
+
+    private QueuedColumn pollQueuedColumn() {
+        QueuedColumn queuedColumn = priorityColumnQueue.poll();
+        if (queuedColumn != null) {
+            priorityQueueSize.updateAndGet(value -> Math.max(0, value - 1));
+            return queuedColumn;
+        }
+        return columnQueue.poll();
     }
 
     private static ExecutorService createExecutor() {
