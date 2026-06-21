@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -73,7 +78,30 @@ public final class FarPlayerBroadcaster {
                         target.getXRot(),
                         target.getYHeadRot(),
                         target.isCrouching(),
-                        target.isSprinting()));
+                        target.isSprinting(),
+                        orDefault(target.getPose(), Pose.STANDING),
+                        orDefault(target.getMainArm(), HumanoidArm.RIGHT),
+                        target.isUsingItem(),
+                        target.isUsingItem() ? orDefault(target.getUsedItemHand(), InteractionHand.MAIN_HAND) : InteractionHand.MAIN_HAND,
+                        target.isUsingItem() ? target.getUseItemRemainingTicks() : 0,
+                        target.swinging,
+                        orDefault(target.swingingArm, InteractionHand.MAIN_HAND),
+                        target.swingTime,
+                        target.oAttackAnim,
+                        target.attackAnim,
+                        target.isFallFlying(),
+                        target.isSwimming(),
+                        target.isAutoSpinAttack(),
+                        target.isInvisible(),
+                        target.isCurrentlyGlowing(),
+                        target.onGround(),
+                        target.isOnFire(),
+                        copyItem(target, EquipmentSlot.MAINHAND),
+                        copyItem(target, EquipmentSlot.OFFHAND),
+                        copyItem(target, EquipmentSlot.HEAD),
+                        copyItem(target, EquipmentSlot.CHEST),
+                        copyItem(target, EquipmentSlot.LEGS),
+                        copyItem(target, EquipmentSlot.FEET)));
                 if (entries.size() >= VSSConstants.MAX_FAR_PLAYER_ENTRIES) {
                     break;
                 }
@@ -85,5 +113,14 @@ public final class FarPlayerBroadcaster {
 
     private static double square(double value) {
         return value * value;
+    }
+
+    private static <E extends Enum<E>> E orDefault(E value, E fallback) {
+        return value != null ? value : fallback;
+    }
+
+    private static ItemStack copyItem(ServerPlayer player, EquipmentSlot slot) {
+        ItemStack stack = player.getItemBySlot(slot);
+        return stack != null ? stack.copy() : ItemStack.EMPTY;
     }
 }

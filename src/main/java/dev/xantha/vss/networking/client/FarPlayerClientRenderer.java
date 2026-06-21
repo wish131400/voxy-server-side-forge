@@ -3,6 +3,8 @@ package dev.xantha.vss.networking.client;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.xantha.vss.common.VSSLogger;
+import dev.xantha.vss.mixin.minecraft.EntityFlagAccessor;
+import dev.xantha.vss.mixin.minecraft.LivingEntityFlagAccessor;
 import dev.xantha.vss.networking.payloads.FarPlayersS2CPayload;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +23,10 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,6 +38,10 @@ public final class FarPlayerClientRenderer {
     private static final long MIN_INTERPOLATION_NANOS = 50L * NANOS_PER_MILLI;
     private static final long MAX_INTERPOLATION_NANOS = 1_000L * NANOS_PER_MILLI;
     private static final double TELEPORT_DISTANCE_SQR = 32.0D * 32.0D;
+    private static final int SHARED_FLAG_FALL_FLYING = 7;
+    private static final int LIVING_FLAG_USING_ITEM = 1;
+    private static final int LIVING_FLAG_OFF_HAND = 2;
+    private static final int LIVING_FLAG_SPIN_ATTACK = 4;
     private static final Map<UUID, FarPlayerState> FAR_PLAYERS = new HashMap<>();
 
     private FarPlayerClientRenderer() {
@@ -138,7 +147,9 @@ public final class FarPlayerClientRenderer {
                         poseStack,
                         bufferSource,
                         LightTexture.FULL_BRIGHT);
-                renderNameTag(mc, dispatcher, bufferSource, poseStack, state, cameraX, cameraY, cameraZ);
+                if (!player.isInvisible()) {
+                    renderNameTag(mc, dispatcher, bufferSource, poseStack, state, cameraX, cameraY, cameraZ);
+                }
                 renderedAny = true;
             } catch (RuntimeException e) {
                 VSSLogger.debug("Far player render failed for " + state.name + ": " + e.getMessage());
@@ -278,6 +289,8 @@ public final class FarPlayerClientRenderer {
             player.walkAnimation.update(Math.min(movement * 4.0F, 1.0F), 0.4F);
             player.setDeltaMovement(dx, sample.y - oldY, dz);
             player.tickCount++;
+            tickSyncedActionState();
+            stabilizeMovementState();
 
             animationX = sample.x;
             animationY = sample.y;
@@ -299,6 +312,7 @@ public final class FarPlayerClientRenderer {
             player.setXRot(sample.pitch);
             player.setYBodyRot(sample.yaw);
             player.setYHeadRot(sample.headYaw);
+            stabilizeMovementState();
         }
 
         private PoseSample sample(long now) {
@@ -349,14 +363,75 @@ public final class FarPlayerClientRenderer {
             interpolationStartNanos = System.nanoTime();
             interpolationDurationNanos = MIN_INTERPOLATION_NANOS;
             applyStateFlags(entry);
+            stabilizeMovementState();
         }
 
         private void applyStateFlags(FarPlayersS2CPayload.Entry entry) {
-            player.setShiftKeyDown(entry.crouching());
+            applyEquipment(entry);
+            player.setMainArm(entry.mainArm());
+            player.setOnGround(entry.onGround());
+            player.setSharedFlagOnFire(entry.onFire());
+            player.setInvisible(entry.invisible());
+            player.setGlowingTag(entry.glowing());
+            player.setShiftKeyDown(entry.crouching() || entry.pose() == Pose.CROUCHING);
             player.setSprinting(entry.sprinting());
-            player.setPose(entry.crouching() ? Pose.CROUCHING : Pose.STANDING);
+            player.setSwimming(entry.swimming());
+            player.setPose(entry.pose());
+            ((EntityFlagAccessor) player).vss$setSharedFlag(SHARED_FLAG_FALL_FLYING, entry.fallFlying());
+            LivingEntityFlagAccessor living = (LivingEntityFlagAccessor) player;
+            living.vss$setFallFlyTicks(entry.fallFlying() ? 5 : 0);
+            living.vss$setLivingEntityFlag(LIVING_FLAG_SPIN_ATTACK, entry.autoSpinAttack());
+            applyUseItemState(entry, living);
+            applySwingState(entry);
             player.setNoGravity(true);
             player.noCulling = true;
+        }
+
+        private void applyEquipment(FarPlayersS2CPayload.Entry entry) {
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                ItemStack next = entry.itemBySlot(slot);
+                if (!ItemStack.matches(player.getItemBySlot(slot), next)) {
+                    player.setItemSlot(slot, next.copy());
+                }
+            }
+        }
+
+        private void applyUseItemState(FarPlayersS2CPayload.Entry entry, LivingEntityFlagAccessor living) {
+            InteractionHand hand = entry.usedItemHand();
+            living.vss$setLivingEntityFlag(LIVING_FLAG_USING_ITEM, entry.usingItem());
+            living.vss$setLivingEntityFlag(LIVING_FLAG_OFF_HAND, entry.usingItem() && hand == InteractionHand.OFF_HAND);
+            if (entry.usingItem()) {
+                living.vss$setUseItem(player.getItemInHand(hand));
+                living.vss$setUseItemRemaining(entry.useItemRemainingTicks());
+            } else {
+                living.vss$setUseItem(ItemStack.EMPTY);
+                living.vss$setUseItemRemaining(0);
+            }
+        }
+
+        private void applySwingState(FarPlayersS2CPayload.Entry entry) {
+            player.swinging = entry.swinging();
+            player.swingingArm = entry.swingingArm();
+            player.swingTime = entry.swingTime();
+            player.oAttackAnim = entry.oAttackAnim();
+            player.attackAnim = entry.attackAnim();
+        }
+
+        private void tickSyncedActionState() {
+            LivingEntityFlagAccessor living = (LivingEntityFlagAccessor) player;
+            if (player.swinging) {
+                living.vss$updateSwingTime();
+            }
+            int remaining = living.vss$getUseItemRemaining();
+            if (remaining > 0) {
+                living.vss$setUseItemRemaining(remaining - 1);
+            }
+        }
+
+        private void stabilizeMovementState() {
+            player.oBob = 0.0F;
+            player.bob = 0.0F;
+            player.walkDistO = player.walkDist;
         }
 
         private static RemotePlayer createPlayer(ClientLevel level, FarPlayersS2CPayload.Entry entry) {
