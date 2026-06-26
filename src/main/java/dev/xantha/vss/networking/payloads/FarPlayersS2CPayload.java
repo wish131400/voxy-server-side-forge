@@ -138,6 +138,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
         buf.writeFloat(vehicle.yaw());
         buf.writeFloat(vehicle.pitch());
         buf.writeFloat(vehicle.headYaw());
+        buf.writeFloat(vehicle.bodyYaw());
         buf.writeBoolean(vehicle.onGround());
         buf.writeBoolean(vehicle.onFire());
         buf.writeBoolean(vehicle.invisible());
@@ -174,6 +175,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
         float yaw = buf.readFloat();
         float pitch = buf.readFloat();
         float headYaw = buf.readFloat();
+        float bodyYaw = buf.readFloat();
         boolean onGround = buf.readBoolean();
         boolean onFire = buf.readBoolean();
         boolean invisible = buf.readBoolean();
@@ -192,6 +194,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
                 yaw,
                 pitch,
                 headYaw,
+                bodyYaw,
                 onGround,
                 onFire,
                 invisible,
@@ -269,6 +272,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             float yaw,
             float pitch,
             float headYaw,
+            float bodyYaw,
             boolean onGround,
             boolean onFire,
             boolean invisible,

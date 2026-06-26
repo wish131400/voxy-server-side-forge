@@ -35,6 +35,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemStack;
@@ -785,9 +786,11 @@ public final class FarPlayerClientRenderer {
         private float previousYaw;
         private float previousPitch;
         private float previousHeadYaw;
+        private float previousBodyYaw;
         private float targetYaw;
         private float targetPitch;
         private float targetHeadYaw;
+        private float targetBodyYaw;
         private long interpolationStartNanos;
         private long interpolationDurationNanos = MIN_INTERPOLATION_NANOS;
 
@@ -823,12 +826,14 @@ public final class FarPlayerClientRenderer {
                     previousYaw = current.yaw;
                     previousPitch = current.pitch;
                     previousHeadYaw = current.headYaw;
+                    previousBodyYaw = current.bodyYaw;
                     targetX = snapshot.x();
                     targetY = snapshot.y();
                     targetZ = snapshot.z();
                     targetYaw = snapshot.yaw();
                     targetPitch = snapshot.pitch();
                     targetHeadYaw = snapshot.headYaw();
+                    targetBodyYaw = snapshot.bodyYaw();
                     long packetInterval = lastSeenNanos > 0L ? now - lastSeenNanos : MIN_INTERPOLATION_NANOS;
                     interpolationStartNanos = now;
                     interpolationDurationNanos = FarPlayerState.clamp(packetInterval, MIN_INTERPOLATION_NANOS, MAX_INTERPOLATION_NANOS);
@@ -934,11 +939,19 @@ public final class FarPlayerClientRenderer {
             vehicle.zOld = sample.z;
             vehicle.yRotO = sample.yaw;
             vehicle.xRotO = sample.pitch;
+            if (vehicle instanceof LivingEntity livingEntity) {
+                livingEntity.yBodyRotO = sample.bodyYaw;
+                livingEntity.yHeadRotO = sample.headYaw;
+            }
             vehicle.syncPacketPositionCodec(sample.x, sample.y, sample.z);
             vehicle.setPos(sample.x, sample.y, sample.z);
             vehicle.setYRot(sample.yaw);
             vehicle.setXRot(sample.pitch);
             vehicle.setYHeadRot(sample.headYaw);
+            if (vehicle instanceof LivingEntity livingEntity) {
+                livingEntity.setYBodyRot(sample.bodyYaw);
+                livingEntity.setYHeadRot(sample.headYaw);
+            }
         }
 
         private VehiclePoseSample sample(long now) {
@@ -952,7 +965,8 @@ public final class FarPlayerClientRenderer {
                     Mth.lerp(progress, previousZ, targetZ),
                     Mth.rotLerp(progress, previousYaw, targetYaw),
                     Mth.lerp(progress, previousPitch, targetPitch),
-                    Mth.rotLerp(progress, previousHeadYaw, targetHeadYaw));
+                    Mth.rotLerp(progress, previousHeadYaw, targetHeadYaw),
+                    Mth.rotLerp(progress, previousBodyYaw, targetBodyYaw));
         }
 
         private float interpolationProgress(long now) {
@@ -973,9 +987,11 @@ public final class FarPlayerClientRenderer {
             previousYaw = snapshot.yaw();
             previousPitch = snapshot.pitch();
             previousHeadYaw = snapshot.headYaw();
+            previousBodyYaw = snapshot.bodyYaw();
             targetYaw = snapshot.yaw();
             targetPitch = snapshot.pitch();
             targetHeadYaw = snapshot.headYaw();
+            targetBodyYaw = snapshot.bodyYaw();
             interpolationStartNanos = System.nanoTime();
             interpolationDurationNanos = MIN_INTERPOLATION_NANOS;
         }
@@ -1096,6 +1112,6 @@ public final class FarPlayerClientRenderer {
     private record PoseSample(double x, double y, double z, float yaw, float pitch, float headYaw, float bodyYaw) {
     }
 
-    private record VehiclePoseSample(double x, double y, double z, float yaw, float pitch, float headYaw) {
+    private record VehiclePoseSample(double x, double y, double z, float yaw, float pitch, float headYaw, float bodyYaw) {
     }
 }

@@ -1,6 +1,7 @@
 package dev.xantha.vss.networking.payloads;
 
 import dev.xantha.vss.common.VSSConstants;
+import dev.xantha.vss.common.processing.EncodedColumnData;
 import dev.xantha.vss.common.processing.LodByteCompression;
 import dev.xantha.vss.config.VSSServerConfig;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.Level;
 
 public final class VoxelColumnS2CPayload {
     private static final int MAX_SECTIONS_SIZE = 0x200000;
+    private static final int MAX_ENCODED_SECTIONS_SIZE = MAX_SECTIONS_SIZE + 65536;
     private static final int MAX_DIMENSION_STRING_LENGTH = 256;
 
     private final int requestId;
@@ -20,6 +22,9 @@ public final class VoxelColumnS2CPayload {
     private final ResourceKey<Level> dimension;
     private final long columnTimestamp;
     private final byte[] sectionBytes;
+    private final byte[] encodedSectionBytes;
+    private final int encodedCompression;
+    private final int encodedRawSize;
     private final boolean completeColumn;
     private boolean allowZstdEncoding;
 
@@ -34,7 +39,23 @@ public final class VoxelColumnS2CPayload {
         this.dimension = dimension;
         this.columnTimestamp = columnTimestamp;
         this.sectionBytes = sectionBytes;
+        this.encodedSectionBytes = null;
+        this.encodedCompression = LodByteCompression.METHOD_NONE;
+        this.encodedRawSize = sectionBytes != null ? sectionBytes.length : 0;
         this.completeColumn = completeColumn;
+    }
+
+    public VoxelColumnS2CPayload(int requestId, ResourceKey<Level> dimension, EncodedColumnData columnData) {
+        this.requestId = requestId;
+        this.chunkX = columnData.chunkX();
+        this.chunkZ = columnData.chunkZ();
+        this.dimension = dimension;
+        this.columnTimestamp = columnData.columnStamp();
+        this.sectionBytes = null;
+        this.encodedSectionBytes = columnData.encodedBytes();
+        this.encodedCompression = columnData.compression();
+        this.encodedRawSize = columnData.rawSize();
+        this.completeColumn = columnData.completeColumn();
     }
 
     public int requestId() {
@@ -58,7 +79,16 @@ public final class VoxelColumnS2CPayload {
     }
 
     public byte[] decompressedSections() {
-        return sectionBytes;
+        if (sectionBytes != null) {
+            return sectionBytes;
+        }
+        try {
+            return encodedSectionBytes != null
+                    ? LodByteCompression.decompress(encodedSectionBytes, encodedCompression, encodedRawSize, MAX_SECTIONS_SIZE)
+                    : new byte[0];
+        } catch (IOException e) {
+            throw new IllegalStateException("Invalid encoded voxel column payload", e);
+        }
     }
 
     public boolean completeColumn() {
@@ -66,7 +96,7 @@ public final class VoxelColumnS2CPayload {
     }
 
     public int estimatedBytes() {
-        return sectionBytes.length + VSSConstants.ESTIMATED_COLUMN_OVERHEAD_BYTES;
+        return wireBodyLength() + VSSConstants.ESTIMATED_COLUMN_OVERHEAD_BYTES;
     }
 
     public void setAllowZstdEncoding(boolean allowZstdEncoding) {
@@ -84,9 +114,14 @@ public final class VoxelColumnS2CPayload {
         }
         buf.writeLong(payload.columnTimestamp);
         buf.writeBoolean(payload.completeColumn);
-        LodByteCompression.Result encoded = VSSServerConfig.CONFIG.enableNetworkColumnCompression
-                ? LodByteCompression.compressForNetwork(payload.sectionBytes, payload.allowZstdEncoding)
-                : LodByteCompression.Result.raw(payload.sectionBytes);
+        LodByteCompression.Result encoded = payload.encodedSectionBytes != null
+                ? new LodByteCompression.Result(payload.encodedSectionBytes, payload.encodedCompression, payload.encodedRawSize)
+                : VSSServerConfig.CONFIG.enableNetworkColumnCompression
+                    ? LodByteCompression.compressForNetwork(payload.sectionBytes, payload.allowZstdEncoding)
+                    : LodByteCompression.Result.raw(payload.sectionBytes);
+        if (encoded.method() == LodByteCompression.METHOD_ZSTD && !payload.allowZstdEncoding) {
+            throw new IllegalStateException("Cannot send Zstd LOD column to a client without Zstd capability");
+        }
         buf.writeVarInt(encoded.method());
         buf.writeVarInt(encoded.originalLength());
         buf.writeByteArray(encoded.bytes());
@@ -107,7 +142,7 @@ public final class VoxelColumnS2CPayload {
         boolean completeColumn = buf.readBoolean();
         int method = buf.readVarInt();
         int originalLength = buf.readVarInt();
-        byte[] encodedSections = buf.readByteArray(MAX_SECTIONS_SIZE);
+        byte[] encodedSections = buf.readByteArray(MAX_ENCODED_SECTIONS_SIZE);
         byte[] sections;
         try {
             sections = LodByteCompression.decompress(encodedSections, method, originalLength, MAX_SECTIONS_SIZE);
@@ -128,5 +163,12 @@ public final class VoxelColumnS2CPayload {
             return 2;
         }
         return -1;
+    }
+
+    private int wireBodyLength() {
+        if (encodedSectionBytes != null) {
+            return encodedSectionBytes.length;
+        }
+        return sectionBytes != null ? sectionBytes.length : 0;
     }
 }

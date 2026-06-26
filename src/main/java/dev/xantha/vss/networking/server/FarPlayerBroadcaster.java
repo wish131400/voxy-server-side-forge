@@ -23,6 +23,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
@@ -230,6 +231,7 @@ public final class FarPlayerBroadcaster {
                     vehicle.yaw(),
                     vehicle.pitch(),
                     vehicle.headYaw(),
+                    vehicle.bodyYaw(),
                     vehicle.onGround(),
                     vehicle.onFire(),
                     vehicle.invisible(),
@@ -393,6 +395,7 @@ public final class FarPlayerBroadcaster {
                 vehicle.getYRot(),
                 vehicle.getXRot(),
                 vehicle.getYHeadRot(),
+                vehicleBodyYaw(vehicle),
                 vehicle.onGround(),
                 vehicle.isOnFire(),
                 vehicle.isInvisible(),
@@ -400,6 +403,10 @@ public final class FarPlayerBroadcaster {
                 fullData,
                 fullData ? captureEntityData(vehicle) : null,
                 fullData ? captureSpawnData(vehicle) : new byte[0]);
+    }
+
+    private static float vehicleBodyYaw(Entity vehicle) {
+        return vehicle instanceof LivingEntity livingEntity ? livingEntity.yBodyRot : vehicle.getYRot();
     }
 
     private static CompoundTag captureEntityData(Entity vehicle) {
