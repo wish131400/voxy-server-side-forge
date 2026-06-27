@@ -216,6 +216,18 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding((config, value) -> config.dirtyBroadcastIntervalTicks = value, config -> config.dirtyBroadcastIntervalTicks)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
+                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.disk_reader_threads"))
+                        .setTooltip(Component.translatable("vss.voxy_options.disk_reader_threads.tooltip"))
+                        .setControl(option -> new SliderControl(
+                                option,
+                                VSSServerConfig.MIN_DISK_READER_THREADS,
+                                VSSServerConfig.MAX_DISK_READER_THREADS,
+                                1,
+                                VSSVoxyOptionsIntegration::formatThreads))
+                        .setBinding((config, value) -> config.diskReaderThreads = value, config -> config.diskReaderThreads)
+                        .setImpact(OptionImpact.MEDIUM)
+                        .build())
                 .build());
 
         groups.add(OptionGroup.createBuilder()
