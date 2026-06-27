@@ -1,6 +1,7 @@
 package dev.xantha.vss.networking;
 
 import dev.xantha.vss.common.VSSConstants;
+import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.networking.payloads.BandwidthUpdateC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchResponseS2CPayload;
@@ -14,6 +15,7 @@ import dev.xantha.vss.networking.server.VSSServerNetworking;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -26,6 +28,8 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class VSSNetworking {
     private static final String PROTOCOL = Integer.toString(VSSConstants.PROTOCOL_VERSION);
+    private static final long INTEGRATED_HOST_DELIVERY_DIAGNOSTIC_INTERVAL_NANOS = 5_000_000_000L;
+    private static volatile long lastIntegratedHostDeliveryDiagnosticNanos;
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(VSSConstants.MOD_ID, "main"),
             () -> PROTOCOL,
@@ -125,17 +129,33 @@ public final class VSSNetworking {
     private static final class ClientPacketHandlers {
         private static boolean tryHandleIntegratedHostPayload(ServerPlayer player, Object payload) {
             Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft.getSingleplayerServer() == null || minecraft.getSingleplayerServer() != player.server) {
+            IntegratedServer server = minecraft.getSingleplayerServer();
+            if (server == null || server != player.server) {
                 return false;
             }
 
             LocalPlayer localPlayer = minecraft.player;
-            if (localPlayer == null || !localPlayer.getUUID().equals(player.getUUID())) {
+            if (localPlayer == null) {
                 return false;
             }
 
+            ServerPlayer integratedPlayer = server.getPlayerList().getPlayer(localPlayer.getUUID());
+            if (integratedPlayer == null || integratedPlayer != player) {
+                return false;
+            }
+
+            logIntegratedHostDelivery(payload);
             minecraft.execute(() -> handleDirectPayload(payload));
             return true;
+        }
+
+        private static void logIntegratedHostDelivery(Object payload) {
+            long now = System.nanoTime();
+            if (now - lastIntegratedHostDeliveryDiagnosticNanos < INTEGRATED_HOST_DELIVERY_DIAGNOSTIC_INTERVAL_NANOS) {
+                return;
+            }
+            lastIntegratedHostDeliveryDiagnosticNanos = now;
+            VSSLogger.debug("Integrated host direct S2C delivered: " + payload.getClass().getSimpleName());
         }
 
         private static void handleDirectPayload(Object payload) {
