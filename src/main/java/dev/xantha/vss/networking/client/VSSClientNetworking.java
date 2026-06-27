@@ -100,15 +100,23 @@ public final class VSSClientNetworking {
             return;
         }
 
+        boolean wasEnabled = serverEnabled;
         waitingForHandshake = false;
         handshakeSent = true;
         handshakeRetryTicks = 0;
         serverEnabled = payload.enabled();
         serverLodDistance = payload.lodDistanceChunks();
         if (payload.enabled()) {
-            COLUMN_PROCESSOR.beginSession();
-            LodRequestManager manager = new LodRequestManager();
-            manager.onSessionConfig(payload);
+            LodRequestManager manager = requestManager;
+            boolean newSession = manager == null || !wasEnabled;
+            if (newSession) {
+                COLUMN_PROCESSOR.beginSession();
+                manager = new LodRequestManager();
+            }
+            boolean requestStateReset = manager.onSessionConfig(payload);
+            if (requestStateReset && !newSession) {
+                COLUMN_PROCESSOR.beginSession();
+            }
             requestManager = manager;
             sendBandwidthPreference();
 
