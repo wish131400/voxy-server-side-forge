@@ -76,7 +76,7 @@ public final class VSSServerNetworking {
                 VSSServerConfig.MIN_DISK_READER_THREADS,
                 Math.min(VSSServerConfig.MAX_DISK_READER_THREADS, threads));
         AtomicInteger threadId = new AtomicInteger();
-        return new ThreadPoolExecutor(
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 clampedThreads,
                 clampedThreads,
                 0L,
@@ -88,6 +88,8 @@ public final class VSSServerNetworking {
                     return thread;
                 },
                 new ThreadPoolExecutor.AbortPolicy());
+        executor.prestartAllCoreThreads();
+        return executor;
     }
 
     private static void resizeDiskReadExecutor() {
@@ -105,6 +107,7 @@ public final class VSSServerNetworking {
             DISK_READ_EXECUTOR.setCorePoolSize(desiredThreads);
             DISK_READ_EXECUTOR.setMaximumPoolSize(desiredThreads);
         }
+        DISK_READ_EXECUTOR.prestartAllCoreThreads();
         VSSLogger.info("VSS disk reader threads resized to " + desiredThreads);
     }
 
@@ -575,6 +578,10 @@ public final class VSSServerNetworking {
             requestState.clearRequest(requestId);
             return;
         }
+        if (!isColumnStillRelevant(player, level.dimension(), cx, cz)) {
+            requestState.clearRequest(requestId);
+            return;
+        }
         if (storedData != null && storedData.columnData() != null) {
             EncodedColumnData columnData = storedData.columnData().withColumnStamp(Math.max(storedData.timestamp(), columnTimestamp));
             totalDiskReadHits.incrementAndGet();
@@ -662,6 +669,11 @@ public final class VSSServerNetworking {
                 continue;
             }
 
+            if (!isColumnStillRelevant(player, result.dimension(), columnData.chunkX(), columnData.chunkZ())) {
+                state.clearRequest(result.requestId());
+                continue;
+            }
+
             if (!columnData.hasBody() || !columnData.completeColumn()) {
                 state.clearRequest(result.requestId());
                 VSSNetworking.sendToPlayer(player, new BatchResponseS2CPayload(
@@ -738,15 +750,45 @@ public final class VSSServerNetworking {
             state.clearRequest(payload.requestId());
             return;
         }
+        if (!isPayloadStillRelevant(player, payload)) {
+            state.clearRequest(payload.requestId());
+            return;
+        }
         payload.setAllowZstdEncoding(state.supportsZstdColumns());
         if (!state.enqueue(payload, priority)) {
-            VSSNetworking.sendToPlayer(
-                    player,
-                    new BatchResponseS2CPayload(
-                            new byte[] {VSSConstants.RESPONSE_RATE_LIMITED},
-                            new int[] {payload.requestId()},
-                            1));
+            sendRateLimited(player, payload.requestId());
         }
+    }
+
+    private static boolean isPayloadStillRelevant(ServerPlayer player, VoxelColumnS2CPayload payload) {
+        return isColumnStillRelevant(player, payload.dimension(), payload.chunkX(), payload.chunkZ());
+    }
+
+    private static boolean isColumnStillRelevant(
+            ServerPlayer player,
+            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
+            int cx,
+            int cz) {
+        if (serverStopping || player == null || !VSSServerConfig.CONFIG.enabled) {
+            return false;
+        }
+        if (!player.serverLevel().dimension().equals(dimension)) {
+            return false;
+        }
+
+        int playerCx = player.getBlockX() >> 4;
+        int playerCz = player.getBlockZ() >> 4;
+        int maxDistance = VSSServerConfig.CONFIG.lodDistanceChunks + VSSConstants.LOD_DISTANCE_BUFFER;
+        return PositionUtil.chebyshevDistance(cx, cz, playerCx, playerCz) <= maxDistance;
+    }
+
+    private static void sendRateLimited(ServerPlayer player, int requestId) {
+        VSSNetworking.sendToPlayer(
+                player,
+                new BatchResponseS2CPayload(
+                        new byte[] {VSSConstants.RESPONSE_RATE_LIMITED},
+                        new int[] {requestId},
+                        1));
     }
 
     private static int serverCapabilities() {
@@ -843,6 +885,10 @@ public final class VSSServerNetworking {
                 if (state.consumeCancelled(queued.payload().requestId())) {
                     continue;
                 }
+                if (!isPayloadStillRelevant(player, queued.payload())) {
+                    state.clearRequest(queued.payload().requestId());
+                    continue;
+                }
                 VSSNetworking.sendToPlayer(player, queued.payload());
                 state.recordSend(queued.estimatedBytes());
                 state.clearRequest(queued.payload().requestId());
@@ -858,6 +904,10 @@ public final class VSSServerNetworking {
                 }
                 state.pollQueuedPayload(playerCx, playerCz);
                 if (state.consumeCancelled(queued.payload().requestId())) {
+                    continue;
+                }
+                if (!isPayloadStillRelevant(player, queued.payload())) {
+                    state.clearRequest(queued.payload().requestId());
                     continue;
                 }
                 VSSNetworking.sendToPlayer(player, queued.payload());
