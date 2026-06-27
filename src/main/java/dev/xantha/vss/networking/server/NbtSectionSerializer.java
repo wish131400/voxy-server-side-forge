@@ -122,7 +122,7 @@ final class NbtSectionSerializer {
             }
 
             if (includedCount == 0) {
-                return SectionSerializer.emptyColumn(cx, cz);
+                return SectionSerializer.emptyColumn(cx, cz, highestSurfaceSection(chunkNbt).isEmpty());
             }
 
             int endWriterIndex = buf.writerIndex();

@@ -143,11 +143,11 @@ public final class VSSVoxyOptionsIntegration {
                 .add(OptionImpl.createBuilder(int.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.desired_bandwidth"))
                         .setTooltip(Component.translatable("vss.voxy_options.desired_bandwidth.tooltip"))
-                        .setControl(option -> new SliderControl(option, 0, 100, 1, VSSVoxyOptionsIntegration::formatMiBAuto))
+                        .setControl(option -> new SliderControl(option, 0, 100000, 1, VSSVoxyOptionsIntegration::formatKbpsAuto))
                         .setBinding((config, value) -> {
-                            config.desiredBandwidthMiB = value;
+                            config.desiredBandwidthKbps = value;
                             Minecraft.getInstance().execute(VSSClientNetworking::sendBandwidthPreference);
-                        }, config -> config.desiredBandwidthMiB)
+                        }, config -> config.desiredBandwidthKbps)
                         .setImpact(OptionImpact.LOW)
                         .build())
                 .build());
@@ -175,13 +175,13 @@ public final class VSSVoxyOptionsIntegration {
                         .setTooltip(Component.translatable("vss.voxy_options.server_bandwidth.tooltip"))
                         .setControl(option -> new SliderControl(
                                 option,
+                                VSSServerConfig.MIN_BANDWIDTH_KBPS_PER_PLAYER,
+                                VSSServerConfig.MAX_BANDWIDTH_KBPS_PER_PLAYER,
                                 1,
-                                VSSServerConfig.MAX_BYTES_PER_SECOND_LIMIT_PER_PLAYER / VSSServerConfig.BYTES_PER_MIB,
-                                1,
-                                VSSVoxyOptionsIntegration::formatMiB))
+                                VSSVoxyOptionsIntegration::formatKbps))
                         .setBinding(
-                                (config, value) -> config.bytesPerSecondLimitPerPlayer = Math.multiplyExact(value, VSSServerConfig.BYTES_PER_MIB),
-                                VSSServerConfig::getPerPlayerBandwidthMiBRounded)
+                                VSSServerConfig::setPerPlayerBandwidthKbpsUnsaved,
+                                VSSServerConfig::getPerPlayerBandwidthKbpsRounded)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
@@ -201,7 +201,7 @@ public final class VSSVoxyOptionsIntegration {
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.sync_rate"))
                         .setTooltip(Component.translatable("vss.voxy_options.sync_rate.tooltip"))
-                        .setControl(option -> new SliderControl(option, 20, 1000, 20, VSSVoxyOptionsIntegration::formatRequestsPerSecond))
+                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatRequestsPerSecond))
                         .setBinding((config, value) -> config.syncOnLoadRateLimitPerPlayer = value, config -> config.syncOnLoadRateLimitPerPlayer)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
@@ -281,14 +281,21 @@ public final class VSSVoxyOptionsIntegration {
                 : Component.translatable("vss.voxy_options.chunks", value);
     }
 
-    private static Component formatMiBAuto(int value) {
+    private static Component formatKbpsAuto(int value) {
         return value == 0
                 ? Component.translatable("vss.voxy_options.server_limit")
-                : Component.translatable("vss.voxy_options.mib_per_second", value);
+                : formatKbps(value);
+    }
+
+    private static Component formatKbps(int value) {
+        if (value >= VSSServerConfig.KBPS_PER_MBPS) {
+            return Component.translatable("vss.voxy_options.mbps", String.format("%.2f", value / (float) VSSServerConfig.KBPS_PER_MBPS));
+        }
+        return Component.translatable("vss.voxy_options.kbps", value);
     }
 
     private static Component formatMiB(int value) {
-        return Component.translatable("vss.voxy_options.mib_per_second", value);
+        return Component.translatable("vss.voxy_options.mib", value);
     }
 
     private static Component formatRequestsPerSecond(int value) {

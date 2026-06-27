@@ -16,9 +16,11 @@
   ],
   "client": [
     "client.ClientChunkCacheDropMixin",
+    "client.EntityFallFlyingFlagAccessorMixin",
     "client.LevelRendererFarPlayerChunkMixin",
     "voxy.ModelBakerySubsystemShutdownMixin",
     "voxy.ModelFactoryFluidBakeOrderMixin",
+    "voxy.NormalRenderPipelineDepthMaskMixin",
     "voxy.VoxyRenderSystemDefaultFramebufferMixin"
   ],
   "injectors": {
