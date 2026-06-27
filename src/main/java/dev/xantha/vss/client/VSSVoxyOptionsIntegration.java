@@ -339,7 +339,7 @@ public final class VSSVoxyOptionsIntegration {
             VSSServerConfig.CONFIG.normalizeAndSave();
             Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.getSingleplayerServer() != null) {
-                VSSServerNetworking.refreshSessionConfigs(minecraft.getSingleplayerServer());
+                VSSServerNetworking.bumpAndRefreshSessionConfigs(minecraft.getSingleplayerServer());
             }
         }
     }

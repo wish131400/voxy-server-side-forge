@@ -282,7 +282,8 @@ public final class LodRequestManager {
                 || sessionConfig.syncOnLoadConcurrencyLimitPerPlayer() != config.syncOnLoadConcurrencyLimitPerPlayer()
                 || sessionConfig.generationRateLimitPerPlayer() != config.generationRateLimitPerPlayer()
                 || sessionConfig.generationConcurrencyLimitPerPlayer() != config.generationConcurrencyLimitPerPlayer()
-                || sessionConfig.generationEnabled() != config.generationEnabled();
+                || sessionConfig.generationEnabled() != config.generationEnabled()
+                || sessionConfig.configRevision() != config.configRevision();
     }
 
     private void resetRequestStateAfterConfigChange() {

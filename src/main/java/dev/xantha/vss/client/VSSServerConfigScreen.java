@@ -120,7 +120,7 @@ final class VSSServerConfigScreen extends Screen {
         }
         config.normalizeAndSave();
         if (minecraft != null && minecraft.getSingleplayerServer() != null) {
-            VSSServerNetworking.refreshSessionConfigs(minecraft.getSingleplayerServer());
+            VSSServerNetworking.bumpAndRefreshSessionConfigs(minecraft.getSingleplayerServer());
         }
         status = Component.translatable("vss.config.server.saved").withStyle(ChatFormatting.GREEN);
         return true;

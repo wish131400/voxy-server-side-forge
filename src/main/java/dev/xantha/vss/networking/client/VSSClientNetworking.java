@@ -128,6 +128,8 @@ public final class VSSClientNetworking {
 
             VSSLogger.info("VSS LOD session ready: distance=" + payload.lodDistanceChunks()
                     + " chunks, generation=" + (payload.generationEnabled() ? "enabled" : "disabled")
+                    + ", revision=" + payload.configRevision()
+                    + ", reset=" + requestStateReset
                     + ", consumers=" + hasConsumers);
         } else {
             LodRequestManager manager = requestManager;
@@ -401,7 +403,8 @@ public final class VSSClientNetworking {
                     clientCapabilities());
             minecraft.execute(() -> {
                 VSSLogger.info("VSS integrated host session ready: distance=" + config.lodDistanceChunks()
-                        + " chunks, generation=" + (config.generationEnabled() ? "enabled" : "disabled"));
+                        + " chunks, generation=" + (config.generationEnabled() ? "enabled" : "disabled")
+                        + ", revision=" + config.configRevision());
                 handleSessionConfig(config, () -> null);
             });
         });

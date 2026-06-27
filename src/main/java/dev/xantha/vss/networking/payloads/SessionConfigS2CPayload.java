@@ -12,7 +12,8 @@ public record SessionConfigS2CPayload(
         int generationRateLimitPerPlayer,
         int generationConcurrencyLimitPerPlayer,
         boolean generationEnabled,
-        long playerBandwidthLimit) {
+        long playerBandwidthLimit,
+        long configRevision) {
     public static void encode(SessionConfigS2CPayload payload, FriendlyByteBuf buf) {
         buf.writeVarInt(payload.protocolVersion);
         buf.writeBoolean(payload.enabled);
@@ -24,6 +25,7 @@ public record SessionConfigS2CPayload(
         buf.writeVarInt(payload.generationConcurrencyLimitPerPlayer);
         buf.writeBoolean(payload.generationEnabled);
         buf.writeVarLong(payload.playerBandwidthLimit);
+        buf.writeVarLong(payload.configRevision);
     }
 
     public static SessionConfigS2CPayload decode(FriendlyByteBuf buf) {
@@ -37,6 +39,7 @@ public record SessionConfigS2CPayload(
                 buf.readVarInt(),
                 buf.readVarInt(),
                 buf.readBoolean(),
+                buf.readVarLong(),
                 buf.readVarLong());
     }
 }
