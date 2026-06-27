@@ -23,6 +23,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -1139,21 +1140,26 @@ public final class FarPlayerClientRenderer {
         }
 
         @Override
+        protected PlayerInfo getPlayerInfo() {
+            return getSourcePlayerInfo();
+        }
+
+        @Override
         public boolean isSkinLoaded() {
             PlayerInfo playerInfo = getSourcePlayerInfo();
-            return playerInfo != null ? playerInfo.isSkinLoaded() : super.isSkinLoaded();
+            return playerInfo == null || playerInfo.isSkinLoaded();
         }
 
         @Override
         public ResourceLocation getSkinTextureLocation() {
             PlayerInfo playerInfo = getSourcePlayerInfo();
-            return playerInfo != null ? playerInfo.getSkinLocation() : super.getSkinTextureLocation();
+            return playerInfo != null ? playerInfo.getSkinLocation() : DefaultPlayerSkin.getDefaultSkin(sourceUuid);
         }
 
         @Override
         public boolean isCapeLoaded() {
             PlayerInfo playerInfo = getSourcePlayerInfo();
-            return playerInfo != null && playerInfo.getCapeLocation() != null || super.isCapeLoaded();
+            return playerInfo != null && playerInfo.getCapeLocation() != null;
         }
 
         @Override
@@ -1161,13 +1167,13 @@ public final class FarPlayerClientRenderer {
             PlayerInfo playerInfo = getSourcePlayerInfo();
             return playerInfo != null && playerInfo.getCapeLocation() != null
                     ? playerInfo.getCapeLocation()
-                    : super.getCloakTextureLocation();
+                    : null;
         }
 
         @Override
         public boolean isElytraLoaded() {
             PlayerInfo playerInfo = getSourcePlayerInfo();
-            return playerInfo != null && playerInfo.getElytraLocation() != null || super.isElytraLoaded();
+            return playerInfo != null && playerInfo.getElytraLocation() != null;
         }
 
         @Override
@@ -1175,7 +1181,7 @@ public final class FarPlayerClientRenderer {
             PlayerInfo playerInfo = getSourcePlayerInfo();
             return playerInfo != null && playerInfo.getElytraLocation() != null
                     ? playerInfo.getElytraLocation()
-                    : super.getElytraTextureLocation();
+                    : null;
         }
 
         @Override
@@ -1186,7 +1192,7 @@ public final class FarPlayerClientRenderer {
         @Override
         public String getModelName() {
             PlayerInfo playerInfo = getSourcePlayerInfo();
-            return playerInfo != null ? playerInfo.getModelName() : super.getModelName();
+            return playerInfo != null ? playerInfo.getModelName() : DefaultPlayerSkin.getSkinModelName(sourceUuid);
         }
 
         private PlayerInfo getSourcePlayerInfo() {
