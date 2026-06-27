@@ -20,8 +20,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 public final class VSSVoxyOptionsIntegration {
-    private static OptionPage vssOptionPage;
-
     private VSSVoxyOptionsIntegration() {
     }
 
@@ -35,7 +33,8 @@ public final class VSSVoxyOptionsIntegration {
             pagesField.setAccessible(true);
             List<OptionPage> pages = (List<OptionPage>) pagesField.get(sodiumOptionsScreen);
             addPage(pages);
-        } catch (Throwable ignored) {
+        } catch (Throwable e) {
+            VSSLogger.warn("Failed to add VSS options page to Embeddium/Sodium options", e);
         }
     }
 
@@ -43,17 +42,21 @@ public final class VSSVoxyOptionsIntegration {
         if (pages == null) {
             return;
         }
-        OptionPage page = page();
-        if (pages.contains(page) || containsPageNamed(pages, page.getName().getString())) {
-            return;
-        }
+        try {
+            OptionPage page = createPage();
+            if (containsPageNamed(pages, page.getName().getString())) {
+                return;
+            }
 
-        int insertAt = findVoxyPageIndex(pages) + 1;
-        if (insertAt <= 0) {
-            insertAt = pages.size();
+            int insertAt = findVoxyPageIndex(pages) + 1;
+            if (insertAt <= 0) {
+                insertAt = pages.size();
+            }
+            pages.add(insertAt, page);
+            VSSLogger.info("Added Voxy Server Side options page to Embeddium/Sodium options");
+        } catch (Throwable e) {
+            VSSLogger.warn("Failed to build VSS options page; leaving video settings unchanged", e);
         }
-        pages.add(insertAt, page);
-        VSSLogger.info("Added Voxy Server Side options page to Embeddium/Sodium options");
     }
 
     private static boolean containsPageNamed(List<OptionPage> pages, String name) {
@@ -106,11 +109,7 @@ public final class VSSVoxyOptionsIntegration {
         return null;
     }
 
-    private static OptionPage page() {
-        if (vssOptionPage != null) {
-            return vssOptionPage;
-        }
-
+    private static OptionPage createPage() {
         List<OptionGroup> groups = new ArrayList<>();
         ClientStorage clientStorage = new ClientStorage();
         ServerStorage serverStorage = new ServerStorage();
@@ -223,28 +222,28 @@ public final class VSSVoxyOptionsIntegration {
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_player_concurrency"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_player_concurrency.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 64, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationConcurrencyLimitPerPlayer = value, config -> config.generationConcurrencyLimitPerPlayer)
                         .setImpact(OptionImpact.HIGH)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_global_concurrency"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_global_concurrency.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 128, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationConcurrencyLimitGlobal = value, config -> config.generationConcurrencyLimitGlobal)
                         .setImpact(OptionImpact.HIGH)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_starts_per_tick"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_starts_per_tick.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 32, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option, 1, 256, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationStartsPerTickLimit = value, config -> config.generationStartsPerTickLimit)
                         .setImpact(OptionImpact.HIGH)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_completions_per_tick"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_completions_per_tick.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 32, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option, 1, 256, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationCompletionsPerTickLimit = value, config -> config.generationCompletionsPerTickLimit)
                         .setImpact(OptionImpact.HIGH)
                         .build())
@@ -258,21 +257,20 @@ public final class VSSVoxyOptionsIntegration {
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_packing_queue"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_packing_queue.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 256, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option, 1, 1024, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationPackingQueueLimit = value, config -> config.generationPackingQueueLimit)
                         .setImpact(OptionImpact.HIGH)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_timeout"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_timeout.tooltip"))
-                        .setControl(option -> new SliderControl(option, 5, 120, 5, VSSVoxyOptionsIntegration::formatSeconds))
+                        .setControl(option -> new SliderControl(option, 1, 600, 1, VSSVoxyOptionsIntegration::formatSeconds))
                         .setBinding((config, value) -> config.generationTimeoutSeconds = value, config -> config.generationTimeoutSeconds)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
                 .build());
 
-        vssOptionPage = new OptionPage(Component.translatable("vss.voxy_options.title"), ImmutableList.copyOf(groups));
-        return vssOptionPage;
+        return new OptionPage(Component.translatable("vss.voxy_options.title"), ImmutableList.copyOf(groups));
     }
 
     private static Component formatChunksAuto(int value) {

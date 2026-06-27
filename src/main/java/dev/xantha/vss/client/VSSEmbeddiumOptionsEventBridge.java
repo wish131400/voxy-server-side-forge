@@ -20,7 +20,11 @@ public final class VSSEmbeddiumOptionsEventBridge {
     }
 
     private static void onOptionsGuiConstruction(OptionGUIConstructionEvent event) {
-        VSSVoxyOptionsIntegration.addPage(event.getPages());
+        try {
+            VSSVoxyOptionsIntegration.addPage(event.getPages());
+        } catch (Throwable e) {
+            VSSLogger.warn("Failed to hook VSS options into Embeddium options", e);
+        }
     }
 
     private static boolean classExists(String className) {
