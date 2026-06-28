@@ -447,7 +447,7 @@ final class ChunkGenerationService {
                 return;
             }
             long columnTimestamp = Math.max(VSSConstants.epochMillis(), minimumTimestamp);
-            EncodedColumnData columnData = EncodedColumnData.encodeZstd(rawColumnData, columnTimestamp);
+            EncodedColumnData columnData = EncodedColumnData.encode(rawColumnData, columnTimestamp);
             for (GenerationCallback callback : callbacks) {
                 results.add(new GenerationResult(
                         callback.playerUuid(),

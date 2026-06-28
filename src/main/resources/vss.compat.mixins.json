@@ -7,15 +7,18 @@
   "mixins": [
     "ftbessentials.TeleportCommandsNoBlockingMixin",
     "ftbchunks.FTBChunksExpectedImplMixin",
+    "minecraft.ChunkMapEntityTrackingAccessor",
     "minecraft.LevelBlockEntityTickerCompactionMixin",
     "minecraft.LevelBlockUpdateDirtyColumnMixin",
     "minecraft.LevelChunkClearBlockEntitiesMixin",
     "minecraft.LevelDirtyColumnMixin",
     "minecraft.LevelChunkDirtyColumnMixin",
-    "minecraft.LevelChunkRebindableTickerAccessor"
+    "minecraft.LevelChunkRebindableTickerAccessor",
+    "minecraft.TrackedEntitySeenByAccessor"
   ],
   "client": [
     "client.ClientChunkCacheDropMixin",
+    "client.ClientLevelFarPlayerLeaveEventMixin",
     "client.EntityFallFlyingFlagAccessorMixin",
     "client.LevelRendererFarPlayerChunkMixin",
     "voxy.ModelBakerySubsystemShutdownMixin",

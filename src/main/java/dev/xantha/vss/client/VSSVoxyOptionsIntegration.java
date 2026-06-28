@@ -17,10 +17,23 @@ import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
 import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public final class VSSVoxyOptionsIntegration {
     private VSSVoxyOptionsIntegration() {
+    }
+
+    public static Screen createSodiumConfigScreen(Screen parent) {
+        try {
+            Class<?> screenClass = Class.forName("me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI");
+            OptionPage page = createPage();
+            Object screen = screenClass.getConstructor(Screen.class).newInstance(parent);
+            screenClass.getMethod("setPage", OptionPage.class).invoke(screen, page);
+            return screen instanceof Screen sodiumScreen ? sodiumScreen : null;
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -169,6 +182,35 @@ public final class VSSVoxyOptionsIntegration {
                 .build());
 
         groups.add(OptionGroup.createBuilder()
+                .add(OptionImpl.createBuilder(boolean.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.far_player_sync"))
+                        .setTooltip(Component.translatable("vss.voxy_options.far_player_sync.tooltip"))
+                        .setControl(TickBoxControl::new)
+                        .setBinding((config, value) -> config.farPlayerSyncEnabled = value, config -> config.farPlayerSyncEnabled)
+                        .setImpact(OptionImpact.LOW)
+                        .build())
+                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.far_player_sync_interval"))
+                        .setTooltip(Component.translatable("vss.voxy_options.far_player_sync_interval.tooltip"))
+                        .setControl(option -> new SliderControl(option, 1, 100, 1, VSSVoxyOptionsIntegration::formatTicks))
+                        .setBinding((config, value) -> config.farPlayerSyncIntervalTicks = value, config -> config.farPlayerSyncIntervalTicks)
+                        .setImpact(OptionImpact.LOW)
+                        .build())
+                .build());
+
+        groups.add(OptionGroup.createBuilder()
+                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.server_lod_distance"))
+                        .setTooltip(Component.translatable("vss.voxy_options.server_lod_distance.tooltip"))
+                        .setControl(option -> new SliderControl(
+                                option,
+                                VSSServerConfig.MIN_LOD_DISTANCE_CHUNKS,
+                                VSSServerConfig.MAX_LOD_DISTANCE_CHUNKS,
+                                1,
+                                VSSVoxyOptionsIntegration::formatChunks))
+                        .setBinding((config, value) -> config.lodDistanceChunks = value, config -> config.lodDistanceChunks)
+                        .setImpact(OptionImpact.MEDIUM)
+                        .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.server_bandwidth"))
                         .setTooltip(Component.translatable("vss.voxy_options.server_bandwidth.tooltip"))
@@ -181,6 +223,13 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding(
                                 VSSServerConfig::setPerPlayerBandwidthKbpsUnsaved,
                                 VSSServerConfig::getPerPlayerBandwidthKbpsRounded)
+                        .setImpact(OptionImpact.MEDIUM)
+                        .build())
+                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.server_queue_count"))
+                        .setTooltip(Component.translatable("vss.voxy_options.server_queue_count.tooltip"))
+                        .setControl(option -> new SliderControl(option, 1, 100000, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setBinding((config, value) -> config.sendQueueLimitPerPlayer = value, config -> config.sendQueueLimitPerPlayer)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
@@ -202,6 +251,13 @@ public final class VSSVoxyOptionsIntegration {
                         .setTooltip(Component.translatable("vss.voxy_options.sync_rate.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatRequestsPerSecond))
                         .setBinding((config, value) -> config.syncOnLoadRateLimitPerPlayer = value, config -> config.syncOnLoadRateLimitPerPlayer)
+                        .setImpact(OptionImpact.MEDIUM)
+                        .build())
+                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.sync_concurrency"))
+                        .setTooltip(Component.translatable("vss.voxy_options.sync_concurrency.tooltip"))
+                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setBinding((config, value) -> config.syncOnLoadConcurrencyLimitPerPlayer = value, config -> config.syncOnLoadConcurrencyLimitPerPlayer)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, serverStorage)
@@ -289,6 +345,10 @@ public final class VSSVoxyOptionsIntegration {
         return value == 0
                 ? Component.translatable("vss.voxy_options.auto")
                 : Component.translatable("vss.voxy_options.chunks", value);
+    }
+
+    private static Component formatChunks(int value) {
+        return Component.translatable("vss.voxy_options.chunks", value);
     }
 
     private static Component formatKbpsAuto(int value) {

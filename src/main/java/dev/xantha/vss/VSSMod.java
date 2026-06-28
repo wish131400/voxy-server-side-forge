@@ -1,8 +1,8 @@
 package dev.xantha.vss;
 
 import dev.xantha.vss.client.VSSClientConfigScreens;
-import dev.xantha.vss.client.VSSEmbeddiumOptionsEventBridge;
 import dev.xantha.vss.common.VSSConstants;
+import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.compat.ModCompat;
 import dev.xantha.vss.compat.ftbchunks.FTBChunksForceLoadCompat;
 import dev.xantha.vss.networking.VSSNetworking;
@@ -29,10 +29,31 @@ public final class VSSMod {
     private static final class ClientInit {
         private static void init() {
             VSSClientConfigScreens.register();
-            VSSEmbeddiumOptionsEventBridge.register();
+            registerEmbeddiumOptionsBridge();
             ModCompat.init();
             MinecraftForge.EVENT_BUS.register(VSSClientNetworking.class);
             MinecraftForge.EVENT_BUS.register(FarPlayerClientRenderer.class);
+        }
+
+        private static void registerEmbeddiumOptionsBridge() {
+            if (!classExists("org.embeddedt.embeddium.api.OptionGUIConstructionEvent")) {
+                return;
+            }
+            try {
+                Class<?> bridge = Class.forName("dev.xantha.vss.client.VSSEmbeddiumOptionsEventBridge");
+                bridge.getMethod("register").invoke(null);
+            } catch (Throwable e) {
+                VSSLogger.warn("Failed to register Embeddium options bridge", e);
+            }
+        }
+
+        private static boolean classExists(String className) {
+            try {
+                Class.forName(className, false, VSSMod.class.getClassLoader());
+                return true;
+            } catch (ClassNotFoundException e) {
+                return false;
+            }
         }
     }
 }

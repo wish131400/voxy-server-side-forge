@@ -143,6 +143,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
         buf.writeBoolean(vehicle.onFire());
         buf.writeBoolean(vehicle.invisible());
         buf.writeBoolean(vehicle.glowing());
+        buf.writeFloat(vehicle.rocketFinalLiftVelocity());
         buf.writeBoolean(vehicle.fullData());
         if (vehicle.fullData()) {
             buf.writeNbt(vehicle.entityData());
@@ -180,6 +181,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
         boolean onFire = buf.readBoolean();
         boolean invisible = buf.readBoolean();
         boolean glowing = buf.readBoolean();
+        float rocketFinalLiftVelocity = buf.readFloat();
         fullData = buf.readBoolean();
         if (fullData) {
             entityData = buf.readNbt();
@@ -199,6 +201,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
                 onFire,
                 invisible,
                 glowing,
+                rocketFinalLiftVelocity,
                 fullData,
                 entityData,
                 spawnData);
@@ -277,6 +280,7 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             boolean onFire,
             boolean invisible,
             boolean glowing,
+            float rocketFinalLiftVelocity,
             boolean fullData,
             CompoundTag entityData,
             byte[] spawnData) {
