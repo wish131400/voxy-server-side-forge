@@ -4,12 +4,16 @@ Forge 1.20.1 的 Voxy 服务端远景同步 mod。服务端会把已有、缓存
 
 NeoForge 1.21.1 版本见：[wish131400/voxy-server-side-neoforge](https://github.com/wish131400/voxy-server-side-neoforge)
 
+下载地址 / Download: [CurseForge](https://www.curseforge.com/minecraft/mc-mods/voxy-server-side-forge-neoforge)
+
 <details>
 <summary>English version</summary>
 
 Forge 1.20.1 server-side LOD sync mod for Voxy. The server sends existing, cached, or server-generated LOD columns to clients with Voxy installed, so distant terrain can fill from the player outward instead of relying on each client to generate it locally.
 
 NeoForge 1.21.1 version: [wish131400/voxy-server-side-neoforge](https://github.com/wish131400/voxy-server-side-neoforge)
+
+Download: [CurseForge](https://www.curseforge.com/minecraft/mc-mods/voxy-server-side-forge-neoforge)
 
 ## Status
 
