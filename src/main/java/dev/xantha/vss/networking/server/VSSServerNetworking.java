@@ -368,7 +368,7 @@ public final class VSSServerNetworking {
                         + ": count=" + payload.count() + ", first chunk=" + cx + "," + cz);
             }
 
-            if (!state.beginRequest(requestId, packed)) {
+            if (!state.beginRequest(requestId, level.dimension(), packed)) {
                 totalDuplicateRequests.incrementAndGet();
                 continue;
             }
@@ -880,6 +880,7 @@ public final class VSSServerNetworking {
             long effectiveLimit = Math.min(configuredLimit, state.desiredBandwidth());
             int playerCx = player.getBlockX() >> 4;
             int playerCz = player.getBlockZ() >> 4;
+            state.prepareSendOrder(playerCx, playerCz);
             int priorityColumnsSent = 0;
             long priorityBytesSent = 0L;
             while (priorityColumnsSent < PRIORITY_SEND_COLUMNS_PER_TICK) {
@@ -891,7 +892,9 @@ public final class VSSServerNetworking {
                         && priorityBytesSent + queued.estimatedBytes() > PRIORITY_SEND_BYTES_PER_TICK) {
                     break;
                 }
-                state.pollPriorityQueuedPayload(playerCx, playerCz);
+                if (state.pollPriorityQueuedPayload(queued) == null) {
+                    continue;
+                }
                 if (state.consumeCancelled(queued.payload().requestId())) {
                     continue;
                 }
@@ -912,7 +915,9 @@ public final class VSSServerNetworking {
                 if (queued == null || !state.canSend(effectiveLimit)) {
                     break;
                 }
-                state.pollQueuedPayload(playerCx, playerCz);
+                if (state.pollQueuedPayload(queued) == null) {
+                    continue;
+                }
                 if (state.consumeCancelled(queued.payload().requestId())) {
                     continue;
                 }
@@ -979,6 +984,7 @@ public final class VSSServerNetworking {
         GENERATION_SERVICE.releaseIdleMemory();
         DirtyColumnBroadcaster.clear();
         COLUMN_CACHE.clear();
+        PERSISTENT_COLUMN_STORE.clearMemory();
         idleMemoryReleased = true;
         VSSLogger.info("Released idle VSS memory after the last VSS player disconnected");
     }
@@ -1009,6 +1015,7 @@ public final class VSSServerNetworking {
         PLAYER_STATES.clear();
         DirtyColumnBroadcaster.clear();
         COLUMN_CACHE.clear();
+        PERSISTENT_COLUMN_STORE.clearMemory();
         DISK_READ_EXECUTOR.getQueue().clear();
         DISK_WRITE_EXECUTOR.getQueue().clear();
         pendingDiskReads.set(0);
@@ -1030,6 +1037,7 @@ public final class VSSServerNetworking {
         GENERATION_SERVICE.shutdown();
         DirtyColumnBroadcaster.clear();
         COLUMN_CACHE.clear();
+        PERSISTENT_COLUMN_STORE.clearMemory();
         idleMemoryReleased = true;
         PLAYER_STATES.clear();
         VSSLogger.info("Stopped VSS LOD sync and cleared generation tickets during server shutdown");
