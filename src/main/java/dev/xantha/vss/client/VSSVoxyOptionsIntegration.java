@@ -164,42 +164,43 @@ public final class VSSVoxyOptionsIntegration {
                         .build())
                 .build());
 
-        groups.add(OptionGroup.createBuilder()
-                .add(OptionImpl.createBuilder(boolean.class, serverStorage)
+        if (canEditLocalServerConfig()) {
+            groups.add(OptionGroup.createBuilder()
+                    .add(OptionImpl.createBuilder(boolean.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.server_sync"))
                         .setTooltip(Component.translatable("vss.voxy_options.server_sync.tooltip"))
                         .setControl(TickBoxControl::new)
                         .setBinding((config, value) -> config.enabled = value, config -> config.enabled)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(boolean.class, serverStorage)
+                    .add(OptionImpl.createBuilder(boolean.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation.tooltip"))
                         .setControl(TickBoxControl::new)
                         .setBinding((config, value) -> config.enableChunkGeneration = value, config -> config.enableChunkGeneration)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .build());
+                    .build());
 
-        groups.add(OptionGroup.createBuilder()
-                .add(OptionImpl.createBuilder(boolean.class, serverStorage)
+            groups.add(OptionGroup.createBuilder()
+                    .add(OptionImpl.createBuilder(boolean.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.far_player_sync"))
                         .setTooltip(Component.translatable("vss.voxy_options.far_player_sync.tooltip"))
                         .setControl(TickBoxControl::new)
                         .setBinding((config, value) -> config.farPlayerSyncEnabled = value, config -> config.farPlayerSyncEnabled)
                         .setImpact(OptionImpact.LOW)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.far_player_sync_interval"))
                         .setTooltip(Component.translatable("vss.voxy_options.far_player_sync_interval.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 100, 1, VSSVoxyOptionsIntegration::formatTicks))
                         .setBinding((config, value) -> config.farPlayerSyncIntervalTicks = value, config -> config.farPlayerSyncIntervalTicks)
                         .setImpact(OptionImpact.LOW)
                         .build())
-                .build());
+                    .build());
 
-        groups.add(OptionGroup.createBuilder()
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+            groups.add(OptionGroup.createBuilder()
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.server_lod_distance"))
                         .setTooltip(Component.translatable("vss.voxy_options.server_lod_distance.tooltip"))
                         .setControl(option -> new SliderControl(
@@ -211,7 +212,7 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding((config, value) -> config.lodDistanceChunks = value, config -> config.lodDistanceChunks)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.server_bandwidth"))
                         .setTooltip(Component.translatable("vss.voxy_options.server_bandwidth.tooltip"))
                         .setControl(option -> new SliderControl(
@@ -225,14 +226,14 @@ public final class VSSVoxyOptionsIntegration {
                                 VSSServerConfig::getPerPlayerBandwidthKbpsRounded)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.server_queue_count"))
                         .setTooltip(Component.translatable("vss.voxy_options.server_queue_count.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 100000, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.sendQueueLimitPerPlayer = value, config -> config.sendQueueLimitPerPlayer)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.server_queue_memory"))
                         .setTooltip(Component.translatable("vss.voxy_options.server_queue_memory.tooltip"))
                         .setControl(option -> new SliderControl(
@@ -246,21 +247,39 @@ public final class VSSVoxyOptionsIntegration {
                                 VSSServerConfig::getSendQueueBytesMiBRounded)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
-                        .setName(Component.translatable("vss.voxy_options.sync_rate"))
-                        .setTooltip(Component.translatable("vss.voxy_options.sync_rate.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatRequestsPerSecond))
-                        .setBinding((config, value) -> config.syncOnLoadRateLimitPerPlayer = value, config -> config.syncOnLoadRateLimitPerPlayer)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.sync_near_rate"))
+                        .setTooltip(Component.translatable("vss.voxy_options.sync_near_rate.tooltip"))
+                        .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_SYNC_RATE_LIMIT_PER_TICK,
+                                VSSServerConfig.MAX_SYNC_RATE_LIMIT_PER_TICK, 1, VSSVoxyOptionsIntegration::formatNearRequestsPerTick))
+                        .setBinding((config, value) -> config.nearSyncRateLimitPerTick = value, config -> config.nearSyncRateLimitPerTick)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
-                        .setName(Component.translatable("vss.voxy_options.sync_concurrency"))
-                        .setTooltip(Component.translatable("vss.voxy_options.sync_concurrency.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
-                        .setBinding((config, value) -> config.syncOnLoadConcurrencyLimitPerPlayer = value, config -> config.syncOnLoadConcurrencyLimitPerPlayer)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.sync_mid_rate"))
+                        .setTooltip(Component.translatable("vss.voxy_options.sync_mid_rate.tooltip"))
+                        .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_SYNC_RATE_LIMIT_PER_TICK,
+                                VSSServerConfig.MAX_SYNC_RATE_LIMIT_PER_TICK, 1, VSSVoxyOptionsIntegration::formatRequestsPerTick))
+                        .setBinding((config, value) -> config.midSyncRateLimitPerTick = value, config -> config.midSyncRateLimitPerTick)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.sync_far_rate"))
+                        .setTooltip(Component.translatable("vss.voxy_options.sync_far_rate.tooltip"))
+                        .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_SYNC_RATE_LIMIT_PER_TICK,
+                                VSSServerConfig.MAX_SYNC_RATE_LIMIT_PER_TICK, 1, VSSVoxyOptionsIntegration::formatRequestsPerTick))
+                        .setBinding((config, value) -> config.farSyncRateLimitPerTick = value, config -> config.farSyncRateLimitPerTick)
+                        .setImpact(OptionImpact.MEDIUM)
+                        .build())
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.sync_distant_rate"))
+                        .setTooltip(Component.translatable("vss.voxy_options.sync_distant_rate.tooltip"))
+                        .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_SYNC_RATE_LIMIT_PER_TICK,
+                                VSSServerConfig.MAX_SYNC_RATE_LIMIT_PER_TICK, 1, VSSVoxyOptionsIntegration::formatRequestsPerTick))
+                        .setBinding((config, value) -> config.distantSyncRateLimitPerTick = value, config -> config.distantSyncRateLimitPerTick)
+                        .setImpact(OptionImpact.MEDIUM)
+                        .build())
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.dirty_broadcast_interval"))
                         .setTooltip(Component.translatable("vss.voxy_options.dirty_broadcast_interval.tooltip"))
                         .setControl(option -> new SliderControl(
@@ -272,7 +291,7 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding((config, value) -> config.dirtyBroadcastIntervalTicks = value, config -> config.dirtyBroadcastIntervalTicks)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.disk_reader_threads"))
                         .setTooltip(Component.translatable("vss.voxy_options.disk_reader_threads.tooltip"))
                         .setControl(option -> new SliderControl(
@@ -284,59 +303,60 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding((config, value) -> config.diskReaderThreads = value, config -> config.diskReaderThreads)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .build());
+                    .build());
 
-        groups.add(OptionGroup.createBuilder()
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+            groups.add(OptionGroup.createBuilder()
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_player_concurrency"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_player_concurrency.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationConcurrencyLimitPerPlayer = value, config -> config.generationConcurrencyLimitPerPlayer)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_global_concurrency"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_global_concurrency.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationConcurrencyLimitGlobal = value, config -> config.generationConcurrencyLimitGlobal)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_starts_per_tick"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_starts_per_tick.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 256, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationStartsPerTickLimit = value, config -> config.generationStartsPerTickLimit)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_completions_per_tick"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_completions_per_tick.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 256, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationCompletionsPerTickLimit = value, config -> config.generationCompletionsPerTickLimit)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_packing_threads"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_packing_threads.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 8, 1, VSSVoxyOptionsIntegration::formatThreads))
                         .setBinding((config, value) -> config.generationPackingThreads = value, config -> config.generationPackingThreads)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_packing_queue"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_packing_queue.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 1024, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationPackingQueueLimit = value, config -> config.generationPackingQueueLimit)
                         .setImpact(OptionImpact.HIGH)
                         .build())
-                .add(OptionImpl.createBuilder(int.class, serverStorage)
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_timeout"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_timeout.tooltip"))
                         .setControl(option -> new SliderControl(option, 1, 600, 1, VSSVoxyOptionsIntegration::formatSeconds))
                         .setBinding((config, value) -> config.generationTimeoutSeconds = value, config -> config.generationTimeoutSeconds)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .build());
+                    .build());
+        }
 
         return new OptionPage(Component.translatable("vss.voxy_options.title"), ImmutableList.copyOf(groups));
     }
@@ -368,8 +388,14 @@ public final class VSSVoxyOptionsIntegration {
         return Component.translatable("vss.voxy_options.mib", value);
     }
 
-    private static Component formatRequestsPerSecond(int value) {
-        return Component.translatable("vss.voxy_options.requests_per_second", value);
+    private static Component formatNearRequestsPerTick(int value) {
+        return value <= 0
+                ? Component.translatable("vss.voxy_options.unlimited")
+                : formatRequestsPerTick(value);
+    }
+
+    private static Component formatRequestsPerTick(int value) {
+        return Component.translatable("vss.voxy_options.requests_per_tick", value);
     }
 
     private static Component formatColumns(int value) {
@@ -386,6 +412,11 @@ public final class VSSVoxyOptionsIntegration {
 
     private static Component formatTicks(int value) {
         return Component.translatable("vss.voxy_options.ticks", value);
+    }
+
+    private static boolean canEditLocalServerConfig() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.level == null || minecraft.getSingleplayerServer() != null;
     }
 
     private static final class ClientStorage implements OptionStorage<VSSClientConfig> {
@@ -408,6 +439,9 @@ public final class VSSVoxyOptionsIntegration {
 
         @Override
         public void save() {
+            if (!canEditLocalServerConfig()) {
+                return;
+            }
             VSSServerConfig.CONFIG.normalizeAndSave();
             Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.getSingleplayerServer() != null) {

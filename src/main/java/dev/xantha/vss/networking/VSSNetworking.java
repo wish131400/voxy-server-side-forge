@@ -1,7 +1,6 @@
 package dev.xantha.vss.networking;
 
 import dev.xantha.vss.common.VSSConstants;
-import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.networking.payloads.BandwidthUpdateC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchResponseS2CPayload;
@@ -9,13 +8,11 @@ import dev.xantha.vss.networking.payloads.CancelRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.DirtyColumnsS2CPayload;
 import dev.xantha.vss.networking.payloads.FarPlayersS2CPayload;
 import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
+import dev.xantha.vss.networking.payloads.RegionPresenceC2SPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
 import java.util.function.Supplier;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,8 +25,6 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class VSSNetworking {
     private static final String PROTOCOL = Integer.toString(VSSConstants.PROTOCOL_VERSION);
-    private static final long INTEGRATED_HOST_DELIVERY_DIAGNOSTIC_INTERVAL_NANOS = 5_000_000_000L;
-    private static volatile long lastIntegratedHostDeliveryDiagnosticNanos;
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(VSSConstants.MOD_ID, "main"),
             () -> PROTOCOL,
@@ -60,6 +55,11 @@ public final class VSSNetworking {
                 .encoder(BandwidthUpdateC2SPayload::encode)
                 .decoder(BandwidthUpdateC2SPayload::decode)
                 .consumerMainThread(VSSServerNetworking::handleBandwidthUpdate)
+                .add();
+        CHANNEL.messageBuilder(RegionPresenceC2SPayload.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(RegionPresenceC2SPayload::encode)
+                .decoder(RegionPresenceC2SPayload::decode)
+                .consumerMainThread(VSSServerNetworking::handleRegionPresence)
                 .add();
         CHANNEL.messageBuilder(SessionConfigS2CPayload.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(SessionConfigS2CPayload::encode)
@@ -93,17 +93,7 @@ public final class VSSNetworking {
     }
 
     public static void sendToPlayer(ServerPlayer player, Object payload) {
-        if (trySendToIntegratedHost(player, payload)) {
-            return;
-        }
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), payload);
-    }
-
-    private static boolean trySendToIntegratedHost(ServerPlayer player, Object payload) {
-        Boolean delivered = DistExecutor.safeCallWhenOn(
-                Dist.CLIENT,
-                () -> () -> ClientPacketHandlers.tryHandleIntegratedHostPayload(player, payload));
-        return delivered != null && delivered;
     }
 
     private static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -127,51 +117,6 @@ public final class VSSNetworking {
     }
 
     private static final class ClientPacketHandlers {
-        private static boolean tryHandleIntegratedHostPayload(ServerPlayer player, Object payload) {
-            Minecraft minecraft = Minecraft.getInstance();
-            IntegratedServer server = minecraft.getSingleplayerServer();
-            if (server == null || server != player.server) {
-                return false;
-            }
-
-            LocalPlayer localPlayer = minecraft.player;
-            if (localPlayer == null) {
-                return false;
-            }
-
-            ServerPlayer integratedPlayer = server.getPlayerList().getPlayer(localPlayer.getUUID());
-            if (integratedPlayer == null || integratedPlayer != player) {
-                return false;
-            }
-
-            logIntegratedHostDelivery(payload);
-            minecraft.execute(() -> handleDirectPayload(payload));
-            return true;
-        }
-
-        private static void logIntegratedHostDelivery(Object payload) {
-            long now = System.nanoTime();
-            if (now - lastIntegratedHostDeliveryDiagnosticNanos < INTEGRATED_HOST_DELIVERY_DIAGNOSTIC_INTERVAL_NANOS) {
-                return;
-            }
-            lastIntegratedHostDeliveryDiagnosticNanos = now;
-            VSSLogger.debug("Integrated host direct S2C delivered: " + payload.getClass().getSimpleName());
-        }
-
-        private static void handleDirectPayload(Object payload) {
-            if (payload instanceof SessionConfigS2CPayload sessionConfig) {
-                handleSessionConfig(sessionConfig, () -> null);
-            } else if (payload instanceof BatchResponseS2CPayload batchResponse) {
-                handleBatchResponse(batchResponse, () -> null);
-            } else if (payload instanceof DirtyColumnsS2CPayload dirtyColumns) {
-                handleDirtyColumns(dirtyColumns, () -> null);
-            } else if (payload instanceof VoxelColumnS2CPayload voxelColumn) {
-                handleVoxelColumn(voxelColumn, () -> null);
-            } else if (payload instanceof FarPlayersS2CPayload farPlayers) {
-                handleFarPlayers(farPlayers, () -> null);
-            }
-        }
-
         private static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
             dev.xantha.vss.networking.client.VSSClientNetworking.handleSessionConfig(payload, contextSupplier);
         }

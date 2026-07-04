@@ -24,10 +24,11 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 final class ClientColumnProcessor {
     static final int MAX_QUEUED_COLUMNS = 1024;
     private static final long MAX_QUEUED_BYTES = 32L * 1024L * 1024L;
-    private static final int MAX_COLUMNS_PER_DRAIN = 48;
-    private static final int MAX_SECTIONS_DISPATCHED_PER_DRAIN = 512;
+    private static final int MAX_COLUMNS_PER_DRAIN = 64;
+    private static final int MAX_SECTIONS_DISPATCHED_PER_DRAIN = 768;
     private static final int MAX_SECTIONS_PER_COLUMN = 64;
     private static final long DROP_WARN_INTERVAL_MS = 5000L;
+    private static final int SECTION_POOL_SIZE = 128;
 
     private final ConcurrentLinkedQueue<QueuedColumn> priorityColumnQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<QueuedColumn> columnQueue = new ConcurrentLinkedQueue<>();
@@ -40,6 +41,35 @@ final class ClientColumnProcessor {
     private volatile ExecutorService executor;
     private volatile boolean shuttingDown = true;
     private volatile long lastDropWarnMs;
+
+    private static class SectionPool {
+        private final ConcurrentLinkedQueue<LevelChunkSection> pool = new ConcurrentLinkedQueue<>();
+        private final int maxSize;
+
+        SectionPool(int maxSize) {
+            this.maxSize = maxSize;
+        }
+
+        LevelChunkSection acquire(Registry<Biome> biomeRegistry) {
+            LevelChunkSection section = pool.poll();
+            if (section == null) {
+                return new LevelChunkSection(biomeRegistry);
+            }
+            return section;
+        }
+
+        void release(LevelChunkSection section) {
+            if (pool.size() < maxSize) {
+                pool.offer(section);
+            }
+        }
+
+        void clear() {
+            pool.clear();
+        }
+    }
+
+    private final SectionPool sectionPool = new SectionPool(SECTION_POOL_SIZE);
 
     void beginSession() {
         sessionEpoch.incrementAndGet();
@@ -183,7 +213,7 @@ final class ClientColumnProcessor {
                     VoxelColumnData.SectionData[] sections = new VoxelColumnData.SectionData[sectionCount];
                     for (int i = 0; i < sectionCount; i++) {
                         int sectionY = buf.readByte();
-                        LevelChunkSection section = new LevelChunkSection(biomeRegistry);
+                        LevelChunkSection section = sectionPool.acquire(biomeRegistry);
                         section.read(buf);
 
                         DataLayer blockLight = null;
@@ -245,6 +275,7 @@ final class ClientColumnProcessor {
         clearQueue();
         processing.set(false);
         executor = null;
+        sectionPool.clear();
         if (old != null) {
             old.shutdownNow();
         }

@@ -7,8 +7,10 @@ public record SessionConfigS2CPayload(
         boolean enabled,
         int lodDistanceChunks,
         int serverCapabilities,
-        int syncOnLoadRateLimitPerPlayer,
-        int syncOnLoadConcurrencyLimitPerPlayer,
+        int nearSyncRateLimitPerTick,
+        int midSyncRateLimitPerTick,
+        int farSyncRateLimitPerTick,
+        int distantSyncRateLimitPerTick,
         int generationRateLimitPerPlayer,
         int generationConcurrencyLimitPerPlayer,
         boolean generationEnabled,
@@ -19,8 +21,10 @@ public record SessionConfigS2CPayload(
         buf.writeBoolean(payload.enabled);
         buf.writeVarInt(payload.lodDistanceChunks);
         buf.writeVarInt(payload.serverCapabilities);
-        buf.writeVarInt(payload.syncOnLoadRateLimitPerPlayer);
-        buf.writeVarInt(payload.syncOnLoadConcurrencyLimitPerPlayer);
+        buf.writeVarInt(payload.nearSyncRateLimitPerTick);
+        buf.writeVarInt(payload.midSyncRateLimitPerTick);
+        buf.writeVarInt(payload.farSyncRateLimitPerTick);
+        buf.writeVarInt(payload.distantSyncRateLimitPerTick);
         buf.writeVarInt(payload.generationRateLimitPerPlayer);
         buf.writeVarInt(payload.generationConcurrencyLimitPerPlayer);
         buf.writeBoolean(payload.generationEnabled);
@@ -32,6 +36,8 @@ public record SessionConfigS2CPayload(
         return new SessionConfigS2CPayload(
                 buf.readVarInt(),
                 buf.readBoolean(),
+                buf.readVarInt(),
+                buf.readVarInt(),
                 buf.readVarInt(),
                 buf.readVarInt(),
                 buf.readVarInt(),
