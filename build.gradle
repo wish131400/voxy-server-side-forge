@@ -75,6 +75,11 @@ sourceSets {
             include 'assets/vss/**'
         }
     }
+    test {
+        java {
+            setSrcDirs(['src/test/java'])
+        }
+    }
 }
 
 repositories {
@@ -89,6 +94,11 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
+
+    // 单元测试：仅用于验证与 Minecraft 运行时解耦的纯逻辑单元（如 BandwidthLimiter）。
+    // 这些依赖只进入 test classpath，不影响主 mod 构建或 ForgeGradle 的 reobf 流程。
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 mixin {
@@ -143,4 +153,14 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+// 启用 JUnit 5（JUnit Platform）运行纯逻辑单元测试。
+// ForgeGradle 不会把 test sourceSet 纳入 reobf / mod 打包，因此这些测试
+// 不会影响最终 jar，只在 `./gradlew test` 时运行。
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
 }

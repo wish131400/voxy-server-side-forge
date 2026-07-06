@@ -77,6 +77,9 @@ public final class VSSClientNetworking {
     }
 
     public static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!runOnClientThread(() -> handleSessionConfig(payload, contextSupplier))) {
+            return;
+        }
         if (!isClientWorldReady()) {
             discardSession();
             return;
@@ -135,6 +138,9 @@ public final class VSSClientNetworking {
     }
 
     public static void handleBatchResponse(BatchResponseS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!runOnClientThread(() -> handleBatchResponse(payload, contextSupplier))) {
+            return;
+        }
         if (!serverEnabled || !isClientWorldReady()) {
             return;
         }
@@ -155,6 +161,9 @@ public final class VSSClientNetworking {
     }
 
     public static void handleDirtyColumns(DirtyColumnsS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!runOnClientThread(() -> handleDirtyColumns(payload, contextSupplier))) {
+            return;
+        }
         if (!serverEnabled || !isClientWorldReady()) {
             return;
         }
@@ -165,6 +174,9 @@ public final class VSSClientNetworking {
     }
 
     public static void handleVoxelColumn(VoxelColumnS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        if (!runOnClientThread(() -> handleVoxelColumn(payload, contextSupplier))) {
+            return;
+        }
         if (!isClientLodSessionActive()) {
             return;
         }
@@ -175,16 +187,18 @@ public final class VSSClientNetworking {
         LodRequestManager.ColumnReceiveResult receiveResult;
         if (payload.requestId() < 0) {
             long packed = PositionUtil.packPosition(payload.chunkX(), payload.chunkZ());
-            receiveResult = new LodRequestManager.ColumnReceiveResult(true, true, packed);
+            receiveResult = new LodRequestManager.ColumnReceiveResult(true, true, false, packed);
         } else if (manager != null) {
             receiveResult = manager.onColumnReceived(payload.requestId(), payload.columnTimestamp());
         } else {
-            receiveResult = new LodRequestManager.ColumnReceiveResult(false, false, Long.MIN_VALUE);
+            receiveResult = new LodRequestManager.ColumnReceiveResult(false, false, false, Long.MIN_VALUE);
         }
         if (payload.requestId() >= 0 && !receiveResult.knownRequest()) {
             return;
         }
-        boolean replaceMissingSections = receiveResult.knownRequest() && payload.completeColumn();
+        boolean replaceMissingSections = receiveResult.knownRequest()
+                && receiveResult.replaceExistingColumn()
+                && payload.completeColumn();
         boolean queued = COLUMN_PROCESSOR.offer(
                 payload,
                 receiveResult.knownRequest(),
@@ -366,6 +380,15 @@ public final class VSSClientNetworking {
         ClientLevel level = mc.level;
         LocalPlayer player = mc.player;
         return level != null && player != null && !player.isRemoved();
+    }
+
+    private static boolean runOnClientThread(Runnable task) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.isSameThread()) {
+            return true;
+        }
+        minecraft.execute(task);
+        return false;
     }
 
     private static void discardSession() {

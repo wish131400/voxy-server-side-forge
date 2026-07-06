@@ -1,5 +1,8 @@
-package dev.xantha.vss.networking.server;
+package dev.xantha.vss.networking.server.broadcast;
 
+
+import dev.xantha.vss.networking.server.compat.NorthstarRocketCompat;
+import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.common.VSSConstants;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.config.VSSServerConfig;
@@ -47,7 +50,7 @@ public final class FarPlayerBroadcaster {
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
+    public static synchronized void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
@@ -64,13 +67,13 @@ public final class FarPlayerBroadcaster {
     }
 
     @SubscribeEvent
-    public static void onServerStopping(ServerStoppingEvent event) {
+    public static synchronized void onServerStopping(ServerStoppingEvent event) {
         tickCounter = 0;
         VEHICLE_SYNC_CACHES.clear();
         NorthstarRocketCompat.removeAll();
     }
 
-    private static void broadcast(MinecraftServer server, VSSServerConfig config) {
+    private static synchronized void broadcast(MinecraftServer server, VSSServerConfig config) {
         List<ServerPlayer> players = server.getPlayerList().getPlayers();
         if (players.size() < 2) {
             VEHICLE_SYNC_CACHES.clear();
