@@ -15,13 +15,13 @@ public abstract class NormalRenderPipelineDepthMaskMixin {
     private boolean vss$previousDepthMask;
 
     @Inject(method = "finish(Lme/cortex/voxy/client/core/rendering/Viewport;III)V", at = @At("HEAD"), remap = false, require = 0)
-    private void vss$enableDepthWritesForFinalBlit(Object viewport, int depthTex, int targetFramebuffer, int width, CallbackInfo ci) {
+    private void vss$enableDepthWritesForFinalBlit(CallbackInfo ci) {
         vss$previousDepthMask = GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK);
         GL11.glDepthMask(true);
     }
 
     @Inject(method = "finish(Lme/cortex/voxy/client/core/rendering/Viewport;III)V", at = @At("RETURN"), remap = false, require = 0)
-    private void vss$restoreDepthWritesAfterFinalBlit(Object viewport, int depthTex, int targetFramebuffer, int width, CallbackInfo ci) {
+    private void vss$restoreDepthWritesAfterFinalBlit(CallbackInfo ci) {
         GL11.glDepthMask(vss$previousDepthMask);
     }
 }

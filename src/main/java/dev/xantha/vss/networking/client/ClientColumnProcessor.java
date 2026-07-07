@@ -86,7 +86,7 @@ final class ClientColumnProcessor {
         if (shuttingDown) {
             return false;
         }
-        if (knownRequest && payload.decompressedSections().length <= 1) {
+        if (knownRequest && payload.rawSectionBytesLength() <= 1) {
             processEmptyColumn(payload, sessionEpoch.get(), replaceMissingSections);
             return true;
         }
@@ -133,7 +133,9 @@ final class ClientColumnProcessor {
                     new VoxelColumnData(
                             new VoxelColumnData.SectionData[0],
                             payload.columnTimestamp(),
-                            replaceMissingSections));
+                            replaceMissingSections,
+                            payload.replacementSectionYs(),
+                            payload.completesRequest()));
         });
     }
 
@@ -249,7 +251,12 @@ final class ClientColumnProcessor {
                                 payload.dimension(),
                                 payload.chunkX(),
                                 payload.chunkZ(),
-                                new VoxelColumnData(sections, payload.columnTimestamp(), queuedColumn.replaceMissingSections()));
+                                new VoxelColumnData(
+                                        sections,
+                                        payload.columnTimestamp(),
+                                        queuedColumn.replaceMissingSections(),
+                                        payload.replacementSectionYs(),
+                                        payload.completesRequest()));
                     } else {
                         if (processedColumns == 0) {
                             VSSLogger.debug("Processing LOD column at " + payload.chunkX() + "," + payload.chunkZ()
