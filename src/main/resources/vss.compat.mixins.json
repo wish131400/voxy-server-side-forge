@@ -17,7 +17,6 @@
     "minecraft.TrackedEntitySeenByAccessor"
   ],
   "client": [
-    "client.ClientChunkCacheDropMixin",
     "client.ClientLevelFarPlayerLeaveEventMixin",
     "client.EntityFallFlyingFlagAccessorMixin",
     "client.LevelRendererFarPlayerChunkMixin",
