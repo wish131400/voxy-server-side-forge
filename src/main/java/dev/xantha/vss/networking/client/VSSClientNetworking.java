@@ -242,6 +242,7 @@ public final class VSSClientNetworking {
                 column.chunkX(),
                 column.chunkZ(),
                 column.columnTimestamp(),
+                columnData.replacementSectionYs(),
                 () -> VSSApi.dispatchColumnAndReport(
                         level,
                         column.dimension(),

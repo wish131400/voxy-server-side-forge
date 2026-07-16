@@ -14,8 +14,8 @@ NeoForge 1.21.1 版本见：[wish131400/voxy-server-side-neoforge](https://githu
 | --- | --- |
 | Minecraft | `1.20.1` |
 | Loader | Forge `47.x` |
-| VSS 版本 | `0.2.7-forge-1.20.1` |
-| VSS 协议 | `34` |
+| VSS 版本 | `0.2.8-forge-1.20.1` |
+| VSS 协议 | `38` |
 | 客户端渲染目标 | Voxy + Embeddium/Sodium 兼容环境 |
 
 客户端和服务端的 VSS 协议必须一致。协议不一致时玩家仍可进服，但本次会话不会启用 VSS LOD 同步。
