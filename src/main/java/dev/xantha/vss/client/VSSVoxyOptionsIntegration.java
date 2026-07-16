@@ -148,7 +148,12 @@ public final class VSSVoxyOptionsIntegration {
                 .add(OptionImpl.createBuilder(int.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.client_lod_distance"))
                         .setTooltip(Component.translatable("vss.voxy_options.client_lod_distance.tooltip"))
-                        .setControl(option -> new SliderControl(option, 0, 512, 16, VSSVoxyOptionsIntegration::formatChunksAuto))
+                        .setControl(option -> new SliderControl(
+                                option,
+                                0,
+                                VSSClientConfig.MAX_LOD_DISTANCE_CHUNKS,
+                                16,
+                                VSSVoxyOptionsIntegration::formatChunksAuto))
                         .setBinding((config, value) -> config.lodDistanceChunks = value, config -> config.lodDistanceChunks)
                         .setImpact(OptionImpact.LOW)
                         .build())
