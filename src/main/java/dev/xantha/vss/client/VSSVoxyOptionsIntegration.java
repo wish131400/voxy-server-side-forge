@@ -160,7 +160,7 @@ public final class VSSVoxyOptionsIntegration {
                 .add(OptionImpl.createBuilder(int.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.desired_bandwidth"))
                         .setTooltip(Component.translatable("vss.voxy_options.desired_bandwidth.tooltip"))
-                        .setControl(option -> new SliderControl(option, 0, 100000, 1, VSSVoxyOptionsIntegration::formatKbpsAuto))
+                        .setControl(option -> new SliderControl(option, 0, VSSClientConfig.MAX_DESIRED_BANDWIDTH_KBPS, 1, VSSVoxyOptionsIntegration::formatKbpsAuto))
                         .setBinding((config, value) -> {
                             config.desiredBandwidthKbps = value;
                             Minecraft.getInstance().execute(VSSClientNetworking::sendBandwidthPreference);
@@ -222,19 +222,22 @@ public final class VSSVoxyOptionsIntegration {
                         .setTooltip(Component.translatable("vss.voxy_options.server_bandwidth.tooltip"))
                         .setControl(option -> new SliderControl(
                                 option,
-                                VSSServerConfig.MIN_BANDWIDTH_KBPS_PER_PLAYER,
-                                VSSServerConfig.MAX_BANDWIDTH_KBPS_PER_PLAYER,
+                                VSSServerConfig.MIN_TOTAL_BANDWIDTH_KBPS,
+                                VSSServerConfig.MAX_TOTAL_BANDWIDTH_KBPS,
                                 1,
                                 VSSVoxyOptionsIntegration::formatKbps))
                         .setBinding(
-                                VSSServerConfig::setPerPlayerBandwidthKbpsUnsaved,
-                                VSSServerConfig::getPerPlayerBandwidthKbpsRounded)
+                                VSSServerConfig::setTotalBandwidthKbpsUnsaved,
+                                VSSServerConfig::getTotalBandwidthKbpsRounded)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
                     .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.server_queue_count"))
                         .setTooltip(Component.translatable("vss.voxy_options.server_queue_count.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 100000, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option,
+                                VSSServerConfig.MIN_SEND_QUEUE_LIMIT_PER_PLAYER,
+                                VSSServerConfig.MAX_SEND_QUEUE_LIMIT_PER_PLAYER,
+                                1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.sendQueueLimitPerPlayer = value, config -> config.sendQueueLimitPerPlayer)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
@@ -314,51 +317,18 @@ public final class VSSVoxyOptionsIntegration {
                     .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_player_concurrency"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_player_concurrency.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_GENERATION_LIMIT,
+                                VSSServerConfig.MAX_GENERATION_CONCURRENCY_LIMIT_PER_PLAYER, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationConcurrencyLimitPerPlayer = value, config -> config.generationConcurrencyLimitPerPlayer)
                         .setImpact(OptionImpact.HIGH)
                         .build())
                     .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_global_concurrency"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_global_concurrency.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 1000, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_GENERATION_LIMIT,
+                                VSSServerConfig.MAX_GENERATION_CONCURRENCY_LIMIT_GLOBAL, 1, VSSVoxyOptionsIntegration::formatColumns))
                         .setBinding((config, value) -> config.generationConcurrencyLimitGlobal = value, config -> config.generationConcurrencyLimitGlobal)
                         .setImpact(OptionImpact.HIGH)
-                        .build())
-                    .add(OptionImpl.createBuilder(int.class, serverStorage)
-                        .setName(Component.translatable("vss.voxy_options.generation_starts_per_tick"))
-                        .setTooltip(Component.translatable("vss.voxy_options.generation_starts_per_tick.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 256, 1, VSSVoxyOptionsIntegration::formatColumns))
-                        .setBinding((config, value) -> config.generationStartsPerTickLimit = value, config -> config.generationStartsPerTickLimit)
-                        .setImpact(OptionImpact.HIGH)
-                        .build())
-                    .add(OptionImpl.createBuilder(int.class, serverStorage)
-                        .setName(Component.translatable("vss.voxy_options.generation_completions_per_tick"))
-                        .setTooltip(Component.translatable("vss.voxy_options.generation_completions_per_tick.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 256, 1, VSSVoxyOptionsIntegration::formatColumns))
-                        .setBinding((config, value) -> config.generationCompletionsPerTickLimit = value, config -> config.generationCompletionsPerTickLimit)
-                        .setImpact(OptionImpact.HIGH)
-                        .build())
-                    .add(OptionImpl.createBuilder(int.class, serverStorage)
-                        .setName(Component.translatable("vss.voxy_options.generation_packing_threads"))
-                        .setTooltip(Component.translatable("vss.voxy_options.generation_packing_threads.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 8, 1, VSSVoxyOptionsIntegration::formatThreads))
-                        .setBinding((config, value) -> config.generationPackingThreads = value, config -> config.generationPackingThreads)
-                        .setImpact(OptionImpact.HIGH)
-                        .build())
-                    .add(OptionImpl.createBuilder(int.class, serverStorage)
-                        .setName(Component.translatable("vss.voxy_options.generation_packing_queue"))
-                        .setTooltip(Component.translatable("vss.voxy_options.generation_packing_queue.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 1024, 1, VSSVoxyOptionsIntegration::formatColumns))
-                        .setBinding((config, value) -> config.generationPackingQueueLimit = value, config -> config.generationPackingQueueLimit)
-                        .setImpact(OptionImpact.HIGH)
-                        .build())
-                    .add(OptionImpl.createBuilder(int.class, serverStorage)
-                        .setName(Component.translatable("vss.voxy_options.generation_timeout"))
-                        .setTooltip(Component.translatable("vss.voxy_options.generation_timeout.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1, 600, 1, VSSVoxyOptionsIntegration::formatSeconds))
-                        .setBinding((config, value) -> config.generationTimeoutSeconds = value, config -> config.generationTimeoutSeconds)
-                        .setImpact(OptionImpact.MEDIUM)
                         .build())
                     .build());
         }

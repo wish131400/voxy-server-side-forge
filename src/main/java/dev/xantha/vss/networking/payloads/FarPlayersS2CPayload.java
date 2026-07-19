@@ -42,6 +42,8 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             buf.writeBoolean(entry.glowing());
             buf.writeBoolean(entry.onGround());
             buf.writeBoolean(entry.onFire());
+            buf.writeByte(entry.modelParts());
+            buf.writeNbt(entry.curiosData());
             writeEquipment(buf, entry);
             writeVehicles(buf, entry.vehicles());
         }
@@ -79,6 +81,8 @@ public record FarPlayersS2CPayload(Entry[] entries) {
                     buf.readBoolean(),
                     buf.readBoolean(),
                     buf.readBoolean(),
+                    buf.readUnsignedByte(),
+                    buf.readNbt(),
                     buf.readItem(),
                     buf.readItem(),
                     buf.readItem(),
@@ -247,6 +251,8 @@ public record FarPlayersS2CPayload(Entry[] entries) {
             boolean glowing,
             boolean onGround,
             boolean onFire,
+            int modelParts,
+            CompoundTag curiosData,
             ItemStack mainHand,
             ItemStack offHand,
             ItemStack head,

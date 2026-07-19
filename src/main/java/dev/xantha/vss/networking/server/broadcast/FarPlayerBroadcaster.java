@@ -1,6 +1,7 @@
 package dev.xantha.vss.networking.server.broadcast;
 
 
+import dev.xantha.vss.compat.CuriosCompat;
 import dev.xantha.vss.networking.server.compat.NorthstarRocketCompat;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.common.VSSConstants;
@@ -29,6 +30,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -139,6 +141,8 @@ public final class FarPlayerBroadcaster {
                             target.isCurrentlyGlowing(),
                             target.onGround(),
                             target.isOnFire(),
+                            modelParts(target),
+                            CuriosCompat.capture(target),
                             copyItem(target, EquipmentSlot.MAINHAND),
                             copyItem(target, EquipmentSlot.OFFHAND),
                             copyItem(target, EquipmentSlot.HEAD),
@@ -210,26 +214,38 @@ public final class FarPlayerBroadcaster {
 
     private static FarPlayersS2CPayload safePayload(List<FarPlayersS2CPayload.Entry> entries) {
         FarPlayersS2CPayload payload = new FarPlayersS2CPayload(entries.toArray(FarPlayersS2CPayload.Entry[]::new));
-        if (!hasFullVehicleData(payload)) {
-            return payload;
-        }
-
         int size = encodedSize(payload);
         if (size >= 0 && size <= MAX_FAR_PLAYERS_PACKET_BYTES) {
             return payload;
         }
 
-        FarPlayersS2CPayload poseOnlyPayload = copyPayloadWithPoseOnlyVehicles(payload);
-        int poseOnlySize = encodedSize(poseOnlyPayload);
-        if (poseOnlySize >= 0 && poseOnlySize <= MAX_FAR_PLAYERS_PACKET_BYTES) {
-            VSSLogger.warn("Far player vehicle data exceeded packet budget (" + size
-                    + " bytes); sending pose-only vehicle data instead");
-            return poseOnlyPayload;
+        FarPlayersS2CPayload reducedPayload = payload;
+        if (hasFullVehicleData(payload)) {
+            reducedPayload = copyPayloadWithPoseOnlyVehicles(payload);
+            int poseOnlySize = encodedSize(reducedPayload);
+            if (poseOnlySize >= 0 && poseOnlySize <= MAX_FAR_PLAYERS_PACKET_BYTES) {
+                VSSLogger.warn("Far player payload exceeded packet budget (" + size
+                        + " bytes); sending pose-only vehicle data instead");
+                return reducedPayload;
+            }
         }
 
-        FarPlayersS2CPayload playerOnlyPayload = copyPayloadWithoutVehicles(payload);
-        VSSLogger.warn("Far player vehicle data could not be encoded safely; sending player-only far sync");
-        return playerOnlyPayload;
+        FarPlayersS2CPayload withoutCurios = copyPayloadWithoutCurios(reducedPayload);
+        int withoutCuriosSize = encodedSize(withoutCurios);
+        if (withoutCuriosSize >= 0 && withoutCuriosSize <= MAX_FAR_PLAYERS_PACKET_BYTES) {
+            VSSLogger.warn("Far player payload exceeded packet budget (" + size
+                    + " bytes); omitting Curios data for this update");
+            return withoutCurios;
+        }
+
+        FarPlayersS2CPayload playerOnlyPayload = copyPayloadWithoutVehicles(withoutCurios);
+        int playerOnlySize = encodedSize(playerOnlyPayload);
+        if (playerOnlySize >= 0 && playerOnlySize <= MAX_FAR_PLAYERS_PACKET_BYTES) {
+            VSSLogger.warn("Far player payload could not retain vehicle data; sending player-only far sync");
+            return playerOnlyPayload;
+        }
+        VSSLogger.warn("Far player payload could not be encoded safely; sending player-only far sync");
+        return new FarPlayersS2CPayload(new FarPlayersS2CPayload.Entry[0]);
     }
 
     private static boolean hasFullVehicleData(FarPlayersS2CPayload payload) {
@@ -279,6 +295,16 @@ public final class FarPlayerBroadcaster {
         return new FarPlayersS2CPayload(copy);
     }
 
+    private static FarPlayersS2CPayload copyPayloadWithoutCurios(FarPlayersS2CPayload payload) {
+        FarPlayersS2CPayload.Entry[] entries = payload.entries();
+        FarPlayersS2CPayload.Entry[] copy = new FarPlayersS2CPayload.Entry[entries.length];
+        for (int i = 0; i < entries.length; i++) {
+            FarPlayersS2CPayload.Entry entry = entries[i];
+            copy[i] = copyEntry(entry, entry.vehicles(), null);
+        }
+        return new FarPlayersS2CPayload(copy);
+    }
+
     private static FarPlayersS2CPayload.VehicleSnapshot[] poseOnlyVehicles(FarPlayersS2CPayload.VehicleSnapshot[] vehicles) {
         if (vehicles == null || vehicles.length == 0) {
             return new FarPlayersS2CPayload.VehicleSnapshot[0];
@@ -316,6 +342,13 @@ public final class FarPlayerBroadcaster {
     private static FarPlayersS2CPayload.Entry copyEntry(
             FarPlayersS2CPayload.Entry entry,
             FarPlayersS2CPayload.VehicleSnapshot[] vehicles) {
+        return copyEntry(entry, vehicles, entry.curiosData());
+    }
+
+    private static FarPlayersS2CPayload.Entry copyEntry(
+            FarPlayersS2CPayload.Entry entry,
+            FarPlayersS2CPayload.VehicleSnapshot[] vehicles,
+            CompoundTag curiosData) {
         return new FarPlayersS2CPayload.Entry(
                 entry.uuid(),
                 entry.name(),
@@ -340,6 +373,8 @@ public final class FarPlayerBroadcaster {
                 entry.glowing(),
                 entry.onGround(),
                 entry.onFire(),
+                entry.modelParts(),
+                curiosData,
                 entry.mainHand(),
                 entry.offHand(),
                 entry.head(),
@@ -394,6 +429,16 @@ public final class FarPlayerBroadcaster {
     private static ItemStack copyItem(ServerPlayer player, EquipmentSlot slot) {
         ItemStack stack = player.getItemBySlot(slot);
         return stack != null ? stack.copy() : ItemStack.EMPTY;
+    }
+
+    private static int modelParts(ServerPlayer player) {
+        int modelParts = 0;
+        for (PlayerModelPart part : PlayerModelPart.values()) {
+            if (player.isModelPartShown(part)) {
+                modelParts |= part.getMask();
+            }
+        }
+        return modelParts;
     }
 
     private static FarPlayersS2CPayload.VehicleSnapshot[] vehicleSnapshots(ServerPlayer viewer, ServerPlayer target, Set<Integer> sentVehicleIds) {
