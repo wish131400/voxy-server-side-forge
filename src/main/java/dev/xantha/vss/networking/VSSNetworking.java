@@ -8,7 +8,9 @@ import dev.xantha.vss.networking.payloads.CancelRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.DirtyColumnsS2CPayload;
 import dev.xantha.vss.networking.payloads.FarPlayersS2CPayload;
 import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
+import dev.xantha.vss.networking.payloads.HandshakeRequestS2CPayload;
 import dev.xantha.vss.networking.payloads.RegionPresenceC2SPayload;
+import dev.xantha.vss.networking.payloads.ServerIdentityS2CPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
@@ -22,6 +24,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.simple.SimpleChannel;
+import org.apache.commons.lang3.tuple.Pair;
 
 public final class VSSNetworking {
     private static final String PROTOCOL = Integer.toString(VSSConstants.PROTOCOL_VERSION);
@@ -86,6 +89,21 @@ public final class VSSNetworking {
                 .decoder(FarPlayersS2CPayload::decode)
                 .consumerMainThread(VSSNetworking::handleFarPlayers)
                 .add();
+        CHANNEL.messageBuilder(HandshakeRequestS2CPayload.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(HandshakeRequestS2CPayload::encode)
+                .decoder(HandshakeRequestS2CPayload::decode)
+                .consumerMainThread(VSSNetworking::handleHandshakeRequest)
+                .add();
+        CHANNEL.messageBuilder(ServerIdentityS2CPayload.class, id++, NetworkDirection.LOGIN_TO_CLIENT)
+                .encoder(ServerIdentityS2CPayload::encode)
+                .decoder(ServerIdentityS2CPayload::decode)
+                .loginIndex(ServerIdentityS2CPayload::getAsInt, ServerIdentityS2CPayload::setLoginIndex)
+                .buildLoginPacketList(isLocal -> java.util.List.of(Pair.of(
+                        VSSConstants.MOD_ID + ":server_identity",
+                        ServerIdentityS2CPayload.fromConfig())))
+                .consumerNetworkThread(VSSNetworking::handleServerIdentity)
+                .noResponse()
+                .add();
     }
 
     public static void sendToServer(Object payload) {
@@ -116,6 +134,15 @@ public final class VSSNetworking {
         DistExecutor.safeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> ClientPacketHandlers.handleFarPlayers(payload, contextSupplier));
     }
 
+    private static void handleHandshakeRequest(HandshakeRequestS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        DistExecutor.safeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> ClientPacketHandlers.handleHandshakeRequest(payload, contextSupplier));
+    }
+
+    private static boolean handleServerIdentity(ServerIdentityS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.handleServerIdentity(payload));
+        return true;
+    }
+
     private static final class ClientPacketHandlers {
         private static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
             dev.xantha.vss.networking.client.VSSClientNetworking.handleSessionConfig(payload, contextSupplier);
@@ -135,6 +162,14 @@ public final class VSSNetworking {
 
         private static void handleFarPlayers(FarPlayersS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
             dev.xantha.vss.networking.client.FarPlayerClientRenderer.handleFarPlayers(payload, contextSupplier);
+        }
+
+        private static void handleHandshakeRequest(HandshakeRequestS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+            dev.xantha.vss.networking.client.VSSClientNetworking.handleHandshakeRequest(payload, contextSupplier);
+        }
+
+        private static void handleServerIdentity(ServerIdentityS2CPayload payload) {
+            dev.xantha.vss.networking.client.ClientConnectionIdentity.acceptServerIdentity(payload);
         }
     }
 }

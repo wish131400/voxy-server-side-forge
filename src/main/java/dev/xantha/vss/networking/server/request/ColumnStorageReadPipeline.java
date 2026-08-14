@@ -5,6 +5,7 @@ import dev.xantha.vss.networking.server.diagnostics.ServerRequestStats;
 import dev.xantha.vss.networking.server.dirty.DirtyColumnBroadcaster;
 import dev.xantha.vss.networking.server.generation.ChunkGenerationService;
 import dev.xantha.vss.networking.server.runtime.DiskTaskRuntime;
+import dev.xantha.vss.networking.server.runtime.PersistentColumnReadCoordinator;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
 import dev.xantha.vss.networking.server.storage.ColumnLodCache;
@@ -35,6 +36,7 @@ public final class ColumnStorageReadPipeline {
     private final PersistentColumnWriter persistentWriter;
     private final ServerRequestStats requestStats;
     private final DiskTaskRuntime diskRuntime;
+    private final PersistentColumnReadCoordinator readCoordinator;
 
     public ColumnStorageReadPipeline(
             PlayerRequestRegistry playerRegistry,
@@ -43,7 +45,8 @@ public final class ColumnStorageReadPipeline {
             PersistentColumnLodStore persistentStore,
             PersistentColumnWriter persistentWriter,
             ServerRequestStats requestStats,
-            DiskTaskRuntime diskRuntime) {
+            DiskTaskRuntime diskRuntime,
+            PersistentColumnReadCoordinator readCoordinator) {
         this.playerRegistry = playerRegistry;
         this.generationService = generationService;
         this.columnCache = columnCache;
@@ -51,6 +54,7 @@ public final class ColumnStorageReadPipeline {
         this.persistentWriter = persistentWriter;
         this.requestStats = requestStats;
         this.diskRuntime = diskRuntime;
+        this.readCoordinator = readCoordinator;
     }
 
     public boolean submitLoadedColumn(
@@ -105,9 +109,19 @@ public final class ColumnStorageReadPipeline {
                 preferLoadedColumn,
                 allowGeneration,
                 priority);
-        boolean submitted = diskRuntime.submitManualRead(
+        boolean submitted = readCoordinator.submit(
+                level.dimension(),
+                cx,
+                cz,
                 VSSServerConfig.CONFIG.diskReadQueueLimit,
-                pendingRead -> readFromDisk(server, readContext, pendingRead, dirtyTimestamp),
+                false,
+                () -> readPersistentColumn(server, readContext, dirtyTimestamp),
+                storedData -> readFromDisk(server, readContext, storedData, dirtyTimestamp),
+                error -> {
+                    readContext.requestState().clearRequest(readContext.requestId());
+                    VSSLogger.warn("Failed to finish VSS disk read at "
+                            + readContext.cx() + ", " + readContext.cz() + ": " + error.getMessage());
+                },
                 e -> {
                     readContext.requestState().clearRequest(readContext.requestId());
                     sendBackpressured(player, readContext.requestId());
@@ -117,23 +131,39 @@ public final class ColumnStorageReadPipeline {
         }
     }
 
+    private PersistentColumnLodStore.Entry readPersistentColumn(
+            MinecraftServer server,
+            DiskReadContext readContext,
+            long dirtyTimestamp) {
+        if (VSSServerNetworking.isLifecycleStale(readContext.lifecycleEpoch())) {
+            return null;
+        }
+        ColumnLodCache.Entry cached = columnCache.get(
+                readContext.level().dimension(),
+                readContext.cx(),
+                readContext.cz());
+        long minimumTimestamp = Math.max(0L, dirtyTimestamp);
+        if (cached != null
+                && cached.completeColumn()
+                && cached.timestamp() >= minimumTimestamp) {
+            return new PersistentColumnLodStore.Entry(cached.columnData());
+        }
+        PersistentColumnLodStore.Entry storedData = persistentStore.read(
+                server,
+                readContext.level().dimension(),
+                readContext.cx(),
+                readContext.cz(),
+                minimumTimestamp);
+        return VSSServerNetworking.isLifecycleStale(readContext.lifecycleEpoch()) ? null : storedData;
+    }
+
     private void readFromDisk(
             MinecraftServer server,
             DiskReadContext readContext,
-            DiskTaskRuntime.PendingDiskTask pendingRead,
+            PersistentColumnLodStore.Entry storedData,
             long dirtyTimestamp) {
         boolean handedOffToServer = false;
         try {
-            if (VSSServerNetworking.isLifecycleStale(readContext.lifecycleEpoch())) {
-                return;
-            }
-
-            PersistentColumnLodStore.Entry storedData = persistentStore.read(
-                    server,
-                    readContext.level().dimension(),
-                    readContext.cx(),
-                    readContext.cz(),
-                    dirtyTimestamp > 0L ? dirtyTimestamp : 0L);
             if (VSSServerNetworking.isLifecycleStale(readContext.lifecycleEpoch())) {
                 return;
             }
@@ -145,7 +175,6 @@ public final class ColumnStorageReadPipeline {
 
             server.execute(() -> finishDiskRead(
                     readContext,
-                    pendingRead,
                     storedData,
                     diskNbtRead.columnData(),
                     diskNbtRead.failed()));
@@ -156,10 +185,6 @@ public final class ColumnStorageReadPipeline {
             readContext.requestState().clearRequest(readContext.requestId());
             VSSLogger.warn("Failed to finish VSS disk read at "
                     + readContext.cx() + ", " + readContext.cz() + ": " + e.getMessage());
-        } finally {
-            if (!handedOffToServer) {
-                pendingRead.complete();
-            }
         }
     }
 
@@ -209,11 +234,9 @@ public final class ColumnStorageReadPipeline {
 
     private void finishDiskRead(
             DiskReadContext readContext,
-            DiskTaskRuntime.PendingDiskTask pendingRead,
             PersistentColumnLodStore.Entry storedData,
             EncodedColumnData diskData,
             boolean readFailed) {
-        pendingRead.complete();
         if (VSSServerNetworking.isLifecycleStale(readContext.lifecycleEpoch())) {
             return;
         }

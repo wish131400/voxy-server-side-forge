@@ -36,6 +36,14 @@ public final class TrackedTaskExecutor {
     }
 
     boolean submit(int limit, Runnable task, Consumer<RejectedExecutionException> onRejected) {
+        return submit(limit, 0, task, onRejected);
+    }
+
+    boolean submit(
+            int limit,
+            int priority,
+            Runnable task,
+            Consumer<RejectedExecutionException> onRejected) {
         Objects.requireNonNull(task, "task");
         PendingTask pendingTask = tryBeginTask(limit);
         if (pendingTask == null) {
@@ -43,13 +51,13 @@ public final class TrackedTaskExecutor {
             return false;
         }
         try {
-            executorSupplier.get().execute(() -> {
+            executorSupplier.get().execute(new PrioritizedRunnable(priority, () -> {
                 try {
                     task.run();
                 } finally {
                     pendingTask.complete();
                 }
-            });
+            }));
             return true;
         } catch (RejectedExecutionException e) {
             pendingTask.complete();
@@ -64,6 +72,14 @@ public final class TrackedTaskExecutor {
             int limit,
             Consumer<DiskTaskRuntime.PendingDiskTask> task,
             Consumer<RejectedExecutionException> onRejected) {
+        return submitManual(limit, 0, task, onRejected);
+    }
+
+    boolean submitManual(
+            int limit,
+            int priority,
+            Consumer<DiskTaskRuntime.PendingDiskTask> task,
+            Consumer<RejectedExecutionException> onRejected) {
         Objects.requireNonNull(task, "task");
         PendingTask pendingTask = tryBeginTask(limit);
         if (pendingTask == null) {
@@ -71,7 +87,7 @@ public final class TrackedTaskExecutor {
             return false;
         }
         try {
-            executorSupplier.get().execute(() -> {
+            executorSupplier.get().execute(new PrioritizedRunnable(priority, () -> {
                 try {
                     task.accept(pendingTask);
                 } catch (RuntimeException e) {
@@ -81,7 +97,7 @@ public final class TrackedTaskExecutor {
                     pendingTask.complete();
                     throw e;
                 }
-            });
+            }));
             return true;
         } catch (RejectedExecutionException e) {
             pendingTask.complete();
@@ -99,6 +115,39 @@ public final class TrackedTaskExecutor {
     private static void reject(Consumer<RejectedExecutionException> onRejected, String message) {
         if (onRejected != null) {
             onRejected.accept(new RejectedExecutionException(message));
+        }
+    }
+
+    private static final class PrioritizedRunnable implements Runnable, Comparable<PrioritizedRunnable> {
+        private final int priority;
+        private final long sequence;
+        private final Runnable delegate;
+
+        private PrioritizedRunnable(int priority, Runnable delegate) {
+            this.priority = priority;
+            this.sequence = Sequence.next();
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void run() {
+            delegate.run();
+        }
+
+        @Override
+        public int compareTo(PrioritizedRunnable other) {
+            int priorityComparison = Integer.compare(priority, other.priority);
+            return priorityComparison != 0
+                    ? priorityComparison
+                    : Long.compare(sequence, other.sequence);
+        }
+    }
+
+    private static final class Sequence {
+        private static long value;
+
+        private static synchronized long next() {
+            return value++;
         }
     }
 

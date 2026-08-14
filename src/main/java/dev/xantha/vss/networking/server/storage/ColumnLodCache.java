@@ -38,6 +38,14 @@ public final class ColumnLodCache {
     }
 
     public synchronized void put(ResourceKey<Level> dimension, EncodedColumnData columnData) {
+        put(dimension, columnData, false);
+    }
+
+    public synchronized void putPreloaded(ResourceKey<Level> dimension, EncodedColumnData columnData) {
+        put(dimension, columnData, true);
+    }
+
+    private void put(ResourceKey<Level> dimension, EncodedColumnData columnData, boolean preloaded) {
         if (!config.enableColumnCache || columnData == null || columnData.encodedBytes() == null || !columnData.completeColumn()) {
             return;
         }
@@ -67,7 +75,8 @@ public final class ColumnLodCache {
                 cachedSections,
                 sizeBytes,
                 columnData.schemaVersion(),
-                columnData.completeColumn()));
+                columnData.completeColumn(),
+                preloaded));
         this.cachedBytes += sizeBytes;
         puts++;
         evictOverflow();
@@ -131,7 +140,8 @@ public final class ColumnLodCache {
             byte[] encodedBytes,
             int sizeBytes,
             int schemaVersion,
-            boolean completeColumn) {
+            boolean completeColumn,
+            boolean preloaded) {
         public EncodedColumnData columnData() {
             return new EncodedColumnData(
                     chunkX,

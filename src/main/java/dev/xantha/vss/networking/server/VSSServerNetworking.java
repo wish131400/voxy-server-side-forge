@@ -9,6 +9,7 @@ import dev.xantha.vss.networking.server.request.ClientControlMessageHandler;
 import dev.xantha.vss.networking.server.request.ColumnRequestBatchHandler;
 import dev.xantha.vss.networking.server.request.ColumnStorageReadPipeline;
 import dev.xantha.vss.networking.server.runtime.DiskTaskRuntime;
+import dev.xantha.vss.networking.server.runtime.PersistentColumnReadCoordinator;
 import dev.xantha.vss.networking.server.runtime.ServerLifecycleGuard;
 import dev.xantha.vss.networking.server.runtime.ServerNetworkingLifecycle;
 import dev.xantha.vss.networking.server.sending.GeneratedColumnFlusher;
@@ -30,6 +31,7 @@ import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchResponseS2CPayload;
 import dev.xantha.vss.networking.payloads.CancelRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
+import dev.xantha.vss.networking.payloads.HandshakeRequestS2CPayload;
 import dev.xantha.vss.networking.payloads.RegionPresenceC2SPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
 import java.util.List;
@@ -59,12 +61,16 @@ public final class VSSServerNetworking {
             VSSServerConfig.MAX_DISK_READER_THREADS,
             () -> VSSServerConfig.CONFIG.diskReaderThreads,
             () -> !isServerStopping());
+    private static final PersistentColumnReadCoordinator COLUMN_READ_COORDINATOR = new PersistentColumnReadCoordinator(
+            PERSISTENT_COLUMN_STORE,
+            DISK_RUNTIME);
     private static final ExistingColumnPreloader EXISTING_COLUMN_PRELOADER = new ExistingColumnPreloader(
             PLAYER_REGISTRY,
             PERSISTENT_COLUMN_STORE,
             GENERATION_SERVICE,
             COLUMN_CACHE,
-            DISK_RUNTIME);
+            DISK_RUNTIME,
+            COLUMN_READ_COORDINATOR);
     private static final PersistentColumnWriter PERSISTENT_COLUMN_WRITER = new PersistentColumnWriter(
             PERSISTENT_COLUMN_STORE,
             DISK_RUNTIME);
@@ -75,7 +81,8 @@ public final class VSSServerNetworking {
             PERSISTENT_COLUMN_STORE,
             PERSISTENT_COLUMN_WRITER,
             REQUEST_STATS,
-            DISK_RUNTIME);
+            DISK_RUNTIME,
+            COLUMN_READ_COORDINATOR);
     private static final GeneratedColumnFlusher GENERATED_COLUMN_FLUSHER = new GeneratedColumnFlusher(
             PLAYER_REGISTRY,
             GENERATION_SERVICE,
@@ -98,7 +105,8 @@ public final class VSSServerNetworking {
             COLUMN_CACHE,
             PERSISTENT_COLUMN_STORE,
             REQUEST_STATS,
-            DISK_RUNTIME);
+            DISK_RUNTIME,
+            COLUMN_READ_COORDINATOR);
     private static final int PRIORITY_SEND_COLUMNS_PER_TICK = 8;
     private static final QueuedColumnSender QUEUED_COLUMN_SENDER = new QueuedColumnSender(
             PLAYER_REGISTRY,
@@ -112,6 +120,7 @@ public final class VSSServerNetworking {
             PERSISTENT_COLUMN_WRITER,
             SERVER_LIFECYCLE,
             DISK_RUNTIME,
+            COLUMN_READ_COORDINATOR,
             GENERATED_COLUMN_FLUSHER,
             EXISTING_COLUMN_PRELOADER,
             QUEUED_COLUMN_SENDER);
@@ -196,8 +205,8 @@ public final class VSSServerNetworking {
         return NETWORKING_DIAGNOSTICS.diagnostics();
     }
 
-    public static Component diagnosticsComponent() {
-        return NETWORKING_DIAGNOSTICS.diagnosticsComponent();
+    public static Component diagnosticsComponent(MinecraftServer server) {
+        return NETWORKING_DIAGNOSTICS.diagnosticsComponent(server);
     }
 
     public static void handleHandshake(HandshakeC2SPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -339,6 +348,13 @@ public final class VSSServerNetworking {
             return;
         }
         CONTROL_MESSAGE_HANDLER.handleRegionPresence(player, payload);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && !isServerStopping()) {
+            VSSNetworking.sendToPlayer(player, new HandshakeRequestS2CPayload());
+        }
     }
 
     @SubscribeEvent

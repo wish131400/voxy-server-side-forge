@@ -4,6 +4,7 @@ package dev.xantha.vss.networking.server.preload;
 import dev.xantha.vss.networking.server.dirty.DirtyColumnBroadcaster;
 import dev.xantha.vss.networking.server.generation.ChunkGenerationService;
 import dev.xantha.vss.networking.server.runtime.DiskTaskRuntime;
+import dev.xantha.vss.networking.server.runtime.PersistentColumnReadCoordinator;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
 import dev.xantha.vss.networking.server.storage.ColumnLodCache;
@@ -22,9 +23,9 @@ import net.minecraft.server.level.ServerPlayer;
 
 public final class ExistingColumnPreloader {
     private static final int PRELOAD_COLUMNS_PER_REGION = 1024;
-    private static final int PRELOAD_COLUMN_QUEUE_RESUME_THRESHOLD = 2048;
-    private static final int PRELOAD_FRONTIER_RING_SLACK = 1;
-    private static final int PRELOAD_PENDING_DISK_LIMIT = 256;
+    private static final int PRELOAD_COLUMN_QUEUE_RESUME_THRESHOLD = 256;
+    private static final int PRELOAD_FRONTIER_RING_SLACK = 8;
+    private static final int PRELOAD_PENDING_DISK_LIMIT = 32;
     private static final int MANUAL_DISK_READ_RESERVE = 32;
 
     private final PlayerRequestRegistry playerRegistry;
@@ -32,18 +33,21 @@ public final class ExistingColumnPreloader {
     private final ChunkGenerationService generationService;
     private final ColumnLodCache columnCache;
     private final DiskTaskRuntime diskRuntime;
+    private final PersistentColumnReadCoordinator readCoordinator;
 
     public ExistingColumnPreloader(
             PlayerRequestRegistry playerRegistry,
             PersistentColumnLodStore persistentStore,
             ChunkGenerationService generationService,
             ColumnLodCache columnCache,
-            DiskTaskRuntime diskRuntime) {
+            DiskTaskRuntime diskRuntime,
+            PersistentColumnReadCoordinator readCoordinator) {
         this.playerRegistry = playerRegistry;
         this.persistentStore = persistentStore;
         this.generationService = generationService;
         this.columnCache = columnCache;
         this.diskRuntime = diskRuntime;
+        this.readCoordinator = readCoordinator;
     }
 
     public void schedule(ServerPlayer player, PlayerRequestState state) {
@@ -225,15 +229,34 @@ public final class ExistingColumnPreloader {
         MinecraftServer server = player.server;
         long lifecycleEpoch = VSSServerNetworking.lifecycleEpoch();
         state.beginPreloadColumnRead();
-        diskRuntime.submitPreloadRead(preloadReadLimit(), manualReadReserve(), () -> {
-            PersistentColumnLodStore.Entry storedData = null;
-            if (!VSSServerNetworking.isLifecycleStale(lifecycleEpoch)) {
-                storedData = persistentStore.read(
-                        server,
-                        level.dimension(),
-                        preload.chunkX(),
-                        preload.chunkZ(),
-                        DirtyColumnBroadcaster.latestDirtyTimestamp(level.dimension(), preload.chunkX(), preload.chunkZ()));
+        boolean submitted = readCoordinator.submit(
+                level.dimension(),
+                preload.chunkX(),
+                preload.chunkZ(),
+                preloadReadLimit(),
+                true,
+                () -> {
+                    if (VSSServerNetworking.isLifecycleStale(lifecycleEpoch)) {
+                        return null;
+                    }
+                    long requiredTimestamp = DirtyColumnBroadcaster.latestDirtyTimestamp(
+                            level.dimension(), preload.chunkX(), preload.chunkZ());
+                    ColumnLodCache.Entry cached = columnCache.get(
+                            level.dimension(), preload.chunkX(), preload.chunkZ());
+                    if (cached != null && cached.completeColumn() && cached.timestamp() >= requiredTimestamp) {
+                        return new PersistentColumnLodStore.Entry(cached.columnData());
+                    }
+                    return persistentStore.read(
+                            server,
+                            level.dimension(),
+                            preload.chunkX(),
+                            preload.chunkZ(),
+                            requiredTimestamp);
+                },
+                storedData -> {
+            if (VSSServerNetworking.isLifecycleStale(lifecycleEpoch)) {
+                state.finishPreloadColumnRead();
+                return;
             }
             if (storedData == null
                     || storedData.columnData() == null
@@ -265,7 +288,7 @@ public final class ExistingColumnPreloader {
                         if (state.isClientKnownCurrent(level.dimension(), columnData.chunkX(), columnData.chunkZ(), requiredTimestamp)) {
                             return;
                         }
-                        columnCache.put(level.dimension(), columnData);
+                        columnCache.putPreloaded(level.dimension(), columnData);
                     } finally {
                         state.finishPreloadColumnRead();
                     }
@@ -274,7 +297,12 @@ public final class ExistingColumnPreloader {
                 state.finishPreloadColumnRead();
                 VSSLogger.debug("Existing LOD preload read handoff rejected: " + e.getMessage());
             }
-        }, e -> {
+                },
+                error -> {
+                    state.finishPreloadColumnRead();
+                    VSSLogger.debug("Existing LOD preload read failed: " + error.getMessage());
+                },
+                e -> {
             state.finishPreloadColumnRead();
             VSSLogger.debug("Existing LOD preload read rejected: " + e.getMessage());
         });

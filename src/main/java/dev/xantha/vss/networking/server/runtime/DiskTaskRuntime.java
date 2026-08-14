@@ -1,6 +1,7 @@
 package dev.xantha.vss.networking.server.runtime;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +52,52 @@ public final class DiskTaskRuntime {
         return readTasks.submit(limit, task, onRejected);
     }
 
+    public boolean submitPrioritizedRead(
+            int limit,
+            boolean preload,
+            Runnable task,
+            Consumer<RejectedExecutionException> onRejected) {
+        long queuedNanos = System.nanoTime();
+        if (preload) {
+            pendingPreloadReads.incrementAndGet();
+        }
+        boolean submitted = readTasks.submit(
+                limit,
+                preload ? 1 : 0,
+                () -> {
+                    try {
+                        recordReadWait(queuedNanos);
+                        task.run();
+                    } finally {
+                        if (preload) {
+                            preloadReadsCompleted.incrementAndGet();
+                            pendingPreloadReads.updateAndGet(value -> Math.max(0, value - 1));
+                        } else {
+                            manualReadsCompleted.incrementAndGet();
+                        }
+                    }
+                },
+                error -> {
+                    if (preload) {
+                        preloadReadsRejected.incrementAndGet();
+                        pendingPreloadReads.updateAndGet(value -> Math.max(0, value - 1));
+                    } else {
+                        manualReadsRejected.incrementAndGet();
+                    }
+                    if (onRejected != null) {
+                        onRejected.accept(error);
+                    }
+                });
+        if (submitted) {
+            if (preload) {
+                preloadReadsSubmitted.incrementAndGet();
+            } else {
+                manualReadsSubmitted.incrementAndGet();
+            }
+        }
+        return submitted;
+    }
+
     public boolean submitManualRead(
             int limit,
             Consumer<PendingDiskTask> task,
@@ -58,6 +105,7 @@ public final class DiskTaskRuntime {
         long queuedNanos = System.nanoTime();
         boolean submitted = readTasks.submitManual(
                 limit,
+                0,
                 pendingTask -> {
                     recordReadWait(queuedNanos);
                     MeasuredPendingDiskTask measured =
@@ -91,6 +139,7 @@ public final class DiskTaskRuntime {
         pendingPreloadReads.incrementAndGet();
         boolean submitted = readTasks.submit(
                 preloadLimit,
+                1,
                 () -> {
                     try {
                         recordReadWait(queuedNanos);
@@ -144,8 +193,8 @@ public final class DiskTaskRuntime {
         synchronized (executorLock) {
             oldRead = readExecutor;
             oldWrite = writeExecutor;
-            readExecutor = createDiskExecutor("VSS-DiskReader", readThreadSupplier.getAsInt());
-            writeExecutor = createDiskExecutor("VSS-DiskWriter", 1);
+            readExecutor = createDiskExecutor("VSS-DiskReader", readThreadSupplier.getAsInt(), true);
+            writeExecutor = createDiskExecutor("VSS-DiskWriter", 1, false);
         }
         shutdownExecutor(oldRead);
         shutdownExecutor(oldWrite);
@@ -237,8 +286,8 @@ public final class DiskTaskRuntime {
                 return executor;
             }
             ThreadPoolExecutor created = read
-                    ? createDiskExecutor("VSS-DiskReader", readThreadSupplier.getAsInt())
-                    : createDiskExecutor("VSS-DiskWriter", 1);
+                    ? createDiskExecutor("VSS-DiskReader", readThreadSupplier.getAsInt(), true)
+                    : createDiskExecutor("VSS-DiskWriter", 1, false);
             if (read) {
                 readExecutor = created;
             } else {
@@ -248,7 +297,7 @@ public final class DiskTaskRuntime {
         }
     }
 
-    private ThreadPoolExecutor createDiskExecutor(String threadName, int threads) {
+    private ThreadPoolExecutor createDiskExecutor(String threadName, int threads, boolean read) {
         int clampedThreads = Math.max(minThreads, Math.min(maxThreads, threads));
         AtomicInteger threadId = new AtomicInteger();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
@@ -256,7 +305,7 @@ public final class DiskTaskRuntime {
                 clampedThreads,
                 0L,
                 TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(),
+                read ? new PriorityBlockingQueue<>() : new LinkedBlockingQueue<>(),
                 task -> {
                     Thread thread = new Thread(task, threadName + "-" + threadId.incrementAndGet());
                     thread.setDaemon(true);

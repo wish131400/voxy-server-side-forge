@@ -4,12 +4,14 @@ import dev.xantha.vss.config.VSSServerConfig;
 import dev.xantha.vss.networking.server.dirty.DirtyColumnBroadcaster;
 import dev.xantha.vss.networking.server.generation.ChunkGenerationService;
 import dev.xantha.vss.networking.server.runtime.DiskTaskRuntime;
+import dev.xantha.vss.networking.server.runtime.PersistentColumnReadCoordinator;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
 import dev.xantha.vss.networking.server.storage.ColumnLodCache;
 import dev.xantha.vss.networking.server.storage.PersistentColumnLodStore;
 import java.util.Locale;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 
 public final class ServerNetworkingDiagnostics {
     private final PlayerRequestRegistry playerRegistry;
@@ -18,6 +20,7 @@ public final class ServerNetworkingDiagnostics {
     private final PersistentColumnLodStore persistentStore;
     private final ServerRequestStats requestStats;
     private final DiskTaskRuntime diskRuntime;
+    private final PersistentColumnReadCoordinator readCoordinator;
 
     public ServerNetworkingDiagnostics(
             PlayerRequestRegistry playerRegistry,
@@ -25,13 +28,15 @@ public final class ServerNetworkingDiagnostics {
             ColumnLodCache columnCache,
             PersistentColumnLodStore persistentStore,
             ServerRequestStats requestStats,
-            DiskTaskRuntime diskRuntime) {
+            DiskTaskRuntime diskRuntime,
+            PersistentColumnReadCoordinator readCoordinator) {
         this.playerRegistry = playerRegistry;
         this.generationService = generationService;
         this.columnCache = columnCache;
         this.persistentStore = persistentStore;
         this.requestStats = requestStats;
         this.diskRuntime = diskRuntime;
+        this.readCoordinator = readCoordinator;
     }
 
     public String generationDiagnostics() {
@@ -59,7 +64,7 @@ public final class ServerNetworkingDiagnostics {
         ServerRequestStats.Snapshot stats = requestStats.snapshot();
         QueueTotals queue = queueTotals();
         return String.format(
-                "players=%d, queuedColumns=%d, priorityQueuedColumns=%d, queuedBytes=%.2f MiB, generation={%s}, storage={requests=%d, duplicates=%d, distanceRejected=%d, upToDate=%d, cacheHits=%d, diskSubmitted=%d, diskPending=%d, diskHits=%d, diskMisses=%d, diskFailures=%d}, dirty={%s}, cache={%s}",
+                "vssSessions=%d, queuedColumns=%d, priorityQueuedColumns=%d, queuedBytes=%.2f MiB, generation={%s}, storage={requests=%d, duplicates=%d, distanceRejected=%d, upToDate=%d, cacheHits=%d, diskSubmitted=%d, diskPending=%d, diskHits=%d, diskMisses=%d, diskFailures=%d, coalescedReads=%d, preloadReused=%d, readInFlight=%d}, dirty={%s}, cache={%s}",
                 playerRegistry.size(),
                 queue.queuedPayloads(),
                 queue.priorityQueuedPayloads(),
@@ -75,20 +80,28 @@ public final class ServerNetworkingDiagnostics {
                 stats.diskReadHits(),
                 stats.diskReadMisses(),
                 stats.diskReadFailures(),
+                readCoordinator.duplicateReadSuppressed(),
+                readCoordinator.preloadLiveJoins(),
+                readCoordinator.inFlightCount(),
                 DirtyColumnBroadcaster.diagnostics(),
                 columnCache.diagnostics() + ", " + persistentStore.diagnostics()
                         + ", persistentWritePending=" + diskRuntime.pendingWrites());
     }
 
-    public Component diagnosticsComponent() {
+    public Component diagnosticsComponent(MinecraftServer server) {
         QueueTotals queue = queueTotals();
         return Component.translatable(
                 "vss.command.stats.details",
+                onlinePlayerCount(server),
                 playerRegistry.size(),
                 queue.queuedPayloads(),
                 String.format(Locale.ROOT, "%.2f", queue.queuedBytes() / (double) VSSServerConfig.BYTES_PER_MIB),
                 generationService.diagnosticsComponent(storageDiagnosticsComponent()),
                 DirtyColumnBroadcaster.diagnosticsComponent());
+    }
+
+    private static int onlinePlayerCount(MinecraftServer server) {
+        return server.getPlayerList().getPlayerCount();
     }
 
     private Component storageDiagnosticsComponent() {
@@ -109,7 +122,7 @@ public final class ServerNetworkingDiagnostics {
                 .append(diskRuntimeExtra(diskRuntime.snapshot()));
     }
 
-    private static Component diskRuntimeExtra(DiskTaskRuntime.Snapshot disk) {
+    private Component diskRuntimeExtra(DiskTaskRuntime.Snapshot disk) {
         double averageWaitMs = disk.readWaitSamples() == 0L
                 ? 0.0D
                 : disk.readWaitNanos() / 1_000_000.0D / disk.readWaitSamples();
@@ -123,7 +136,10 @@ public final class ServerNetworkingDiagnostics {
                 disk.preloadReadsCompleted(),
                 disk.preloadReadsRejected(),
                 String.format(Locale.ROOT, "%.1f", averageWaitMs),
-                String.format(Locale.ROOT, "%.1f", disk.maxReadWaitNanos() / 1_000_000.0D));
+                String.format(Locale.ROOT, "%.1f", disk.maxReadWaitNanos() / 1_000_000.0D))
+                .append(Component.literal("; coalesced=" + readCoordinator.duplicateReadSuppressed()
+                        + ", preloadReused=" + readCoordinator.preloadLiveJoins()
+                        + ", inFlight=" + readCoordinator.inFlightCount()));
     }
 
     private QueueTotals queueTotals() {

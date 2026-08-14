@@ -37,6 +37,20 @@ class VSSClientNetworkingTest {
         assertFalse(VSSClientNetworking.shouldReplaceMissingSections(freshColumn, emptyPayload(true)));
     }
 
+    @Test
+    void handshakeWaitsForConsumerAndBecomesEligibleWhenConsumerRegisters() {
+        assertFalse(VSSClientNetworking.shouldAttemptHandshake(true, false, true, true, false));
+        assertTrue(VSSClientNetworking.shouldAttemptHandshake(true, false, true, true, true));
+    }
+
+    @Test
+    void handshakeRequiresAnActivePendingClientSession() {
+        assertFalse(VSSClientNetworking.shouldAttemptHandshake(false, false, true, true, true));
+        assertFalse(VSSClientNetworking.shouldAttemptHandshake(true, true, true, true, true));
+        assertFalse(VSSClientNetworking.shouldAttemptHandshake(true, false, false, true, true));
+        assertFalse(VSSClientNetworking.shouldAttemptHandshake(true, false, true, false, true));
+    }
+
     private static VoxelColumnS2CPayload emptyPayload(boolean completesRequest) {
         return payload(completesRequest, new byte[] {0});
     }

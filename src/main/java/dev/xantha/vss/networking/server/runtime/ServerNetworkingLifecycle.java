@@ -23,6 +23,7 @@ public final class ServerNetworkingLifecycle {
     private final PersistentColumnWriter persistentColumnWriter;
     private final ServerLifecycleGuard lifecycleGuard;
     private final DiskTaskRuntime diskRuntime;
+    private final PersistentColumnReadCoordinator readCoordinator;
     private final GeneratedColumnFlusher generatedColumnFlusher;
     private final ExistingColumnPreloader existingColumnPreloader;
     private final QueuedColumnSender queuedColumnSender;
@@ -36,6 +37,7 @@ public final class ServerNetworkingLifecycle {
             PersistentColumnWriter persistentColumnWriter,
             ServerLifecycleGuard lifecycleGuard,
             DiskTaskRuntime diskRuntime,
+            PersistentColumnReadCoordinator readCoordinator,
             GeneratedColumnFlusher generatedColumnFlusher,
             ExistingColumnPreloader existingColumnPreloader,
             QueuedColumnSender queuedColumnSender) {
@@ -46,6 +48,7 @@ public final class ServerNetworkingLifecycle {
         this.persistentColumnWriter = persistentColumnWriter;
         this.lifecycleGuard = lifecycleGuard;
         this.diskRuntime = diskRuntime;
+        this.readCoordinator = readCoordinator;
         this.generatedColumnFlusher = generatedColumnFlusher;
         this.existingColumnPreloader = existingColumnPreloader;
         this.queuedColumnSender = queuedColumnSender;
@@ -107,6 +110,7 @@ public final class ServerNetworkingLifecycle {
     public void onServerStopping(MinecraftServer server) {
         persistentColumnWriter.flushInvalidationsBlocking(server);
         lifecycleGuard.stop();
+        readCoordinator.clear();
         queuedColumnSender.reset();
         diskRuntime.shutdown();
         diskRuntime.resetPendingCounts();
