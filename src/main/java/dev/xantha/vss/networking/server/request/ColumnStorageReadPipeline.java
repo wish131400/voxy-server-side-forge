@@ -51,6 +51,11 @@ public final class ColumnStorageReadPipeline {
     private final ConcurrentHashMap<NbtReadKey, NbtSharedRead> inFlightNbtReads = new ConcurrentHashMap<>();
     private final Object nbtGateLock = new Object();
     private final ArrayDeque<NbtGateWaiter> nbtGateWaiters = new ArrayDeque<>();
+    private final AtomicLong nbtReadsSubmitted = new AtomicLong();
+    private final AtomicLong nbtReadsCompleted = new AtomicLong();
+    private final AtomicLong nbtReadHits = new AtomicLong();
+    private final AtomicLong nbtReadMisses = new AtomicLong();
+    private final AtomicLong nbtReadFailures = new AtomicLong();
     private final AtomicLong nbtReadsCoalesced = new AtomicLong();
     private final AtomicLong nbtGateRejected = new AtomicLong();
     private int activeNbtReads;
@@ -76,9 +81,28 @@ public final class ColumnStorageReadPipeline {
     }
 
     public String nbtDiagnostics() {
+        NbtDiagnostics snapshot = nbtDiagnosticsSnapshot();
+        return String.format(
+                "submitted=%d, completed=%d, hits=%d, misses=%d, failures=%d, active=%d, queued=%d, coalesced=%d, rejected=%d",
+                snapshot.submitted(),
+                snapshot.completed(),
+                snapshot.hits(),
+                snapshot.misses(),
+                snapshot.failures(),
+                snapshot.active(),
+                snapshot.queued(),
+                snapshot.coalesced(),
+                snapshot.rejected());
+    }
+
+    public NbtDiagnostics nbtDiagnosticsSnapshot() {
         synchronized (nbtGateLock) {
-            return String.format(
-                    "active=%d, queued=%d, coalesced=%d, rejected=%d",
+            return new NbtDiagnostics(
+                    nbtReadsSubmitted.get(),
+                    nbtReadsCompleted.get(),
+                    nbtReadHits.get(),
+                    nbtReadMisses.get(),
+                    nbtReadFailures.get(),
                     activeNbtReads,
                     nbtGateWaiters.size(),
                     nbtReadsCoalesced.get(),
@@ -213,7 +237,7 @@ public final class ColumnStorageReadPipeline {
             readExistingChunkNbtAsync(readContext, storedData).whenComplete((diskNbtRead, error) -> {
                 DiskNbtReadResult completed = error == null && diskNbtRead != null
                         ? diskNbtRead
-                        : new DiskNbtReadResult(null, true);
+                        : DiskNbtReadResult.failure();
                 try {
                     server.execute(() -> finishDiskRead(
                             readContext,
@@ -255,11 +279,27 @@ public final class ColumnStorageReadPipeline {
         }
         created.result().whenComplete((ignored, error) -> inFlightNbtReads.remove(key, created));
         Runnable start = () -> startNbtRead(readContext, created);
+        nbtReadsSubmitted.incrementAndGet();
         if (!enqueueNbtRead(readContext.lifecycleEpoch(), start)) {
             nbtGateRejected.incrementAndGet();
-            created.result().complete(new DiskNbtReadResult(null, true));
+            created.result().complete(DiskNbtReadResult.failure());
+        } else {
+            created.result().whenComplete(this::recordNbtReadCompletion);
         }
         return created.result();
+    }
+
+    private void recordNbtReadCompletion(DiskNbtReadResult result, Throwable error) {
+        nbtReadsCompleted.incrementAndGet();
+        if (error != null || result == null || result.outcome() == NbtReadOutcome.FAILED) {
+            nbtReadFailures.incrementAndGet();
+            return;
+        }
+        if (result.outcome() == NbtReadOutcome.HIT) {
+            nbtReadHits.incrementAndGet();
+        } else if (result.outcome() == NbtReadOutcome.MISS) {
+            nbtReadMisses.incrementAndGet();
+        }
     }
 
     private boolean enqueueNbtRead(long lifecycleEpoch, Runnable start) {
@@ -320,13 +360,15 @@ public final class ColumnStorageReadPipeline {
                     .orTimeout(VSSServerConfig.CONFIG.diskReadTimeoutMillis, TimeUnit.MILLISECONDS);
         } catch (Throwable error) {
             releaseNbtGate(readContext.lifecycleEpoch());
-            result.complete(new DiskNbtReadResult(null, true));
+            result.complete(DiskNbtReadResult.failure());
             return;
         }
         ioFuture.whenComplete((optionalTag, ioError) -> {
             if (ioError != null || VSSServerNetworking.isLifecycleStale(readContext.lifecycleEpoch())) {
                 releaseNbtGate(readContext.lifecycleEpoch());
-                result.complete(new DiskNbtReadResult(null, ioError != null));
+                result.complete(ioError != null
+                        ? DiskNbtReadResult.failure()
+                        : DiskNbtReadResult.empty());
                 return;
             }
             boolean submitted = diskRuntime.submitManualRead(
@@ -344,11 +386,13 @@ public final class ColumnStorageReadPipeline {
                                             && rawDiskData.sizeBytes() > 0
                                     ? EncodedColumnData.encode(rawDiskData, 0L)
                                     : null;
-                            result.complete(new DiskNbtReadResult(encoded, false));
+                            result.complete(encoded == null
+                                    ? DiskNbtReadResult.miss()
+                                    : DiskNbtReadResult.hit(encoded));
                         } catch (Throwable error) {
                             VSSLogger.warn("Failed to parse chunk NBT from disk at "
                                     + readContext.cx() + ", " + readContext.cz() + ": " + error.getMessage());
-                            result.complete(new DiskNbtReadResult(null, true));
+                            result.complete(DiskNbtReadResult.failure());
                         } finally {
                             pendingTask.complete();
                             releaseNbtGate(readContext.lifecycleEpoch());
@@ -356,11 +400,11 @@ public final class ColumnStorageReadPipeline {
                     },
                     rejected -> {
                         releaseNbtGate(readContext.lifecycleEpoch());
-                        result.complete(new DiskNbtReadResult(null, true));
+                        result.complete(DiskNbtReadResult.failure());
                     });
             if (!submitted && !result.isDone()) {
                 releaseNbtGate(readContext.lifecycleEpoch());
-                result.complete(new DiskNbtReadResult(null, true));
+                result.complete(DiskNbtReadResult.failure());
             }
         });
     }
@@ -586,13 +630,48 @@ public final class ColumnStorageReadPipeline {
             boolean priority) {
     }
 
-    private record DiskNbtReadResult(EncodedColumnData columnData, boolean failed) {
+    private record DiskNbtReadResult(EncodedColumnData columnData, NbtReadOutcome outcome) {
         static DiskNbtReadResult empty() {
-            return new DiskNbtReadResult(null, false);
+            return new DiskNbtReadResult(null, NbtReadOutcome.CANCELLED);
+        }
+
+        static DiskNbtReadResult hit(EncodedColumnData columnData) {
+            return new DiskNbtReadResult(columnData, NbtReadOutcome.HIT);
+        }
+
+        static DiskNbtReadResult miss() {
+            return new DiskNbtReadResult(null, NbtReadOutcome.MISS);
+        }
+
+        static DiskNbtReadResult failure() {
+            return new DiskNbtReadResult(null, NbtReadOutcome.FAILED);
+        }
+
+        boolean failed() {
+            return outcome == NbtReadOutcome.FAILED;
         }
     }
 
+    private enum NbtReadOutcome {
+        HIT,
+        MISS,
+        FAILED,
+        CANCELLED
+    }
+
     private record NbtReadKey(long lifecycleEpoch, ResourceKey<Level> dimension, int chunkX, int chunkZ) {
+    }
+
+    public record NbtDiagnostics(
+            long submitted,
+            long completed,
+            long hits,
+            long misses,
+            long failures,
+            int active,
+            int queued,
+            long coalesced,
+            long rejected) {
     }
 
     private record NbtGateWaiter(long lifecycleEpoch, Runnable start) {

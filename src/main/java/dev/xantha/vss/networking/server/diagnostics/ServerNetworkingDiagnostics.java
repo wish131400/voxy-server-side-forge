@@ -131,6 +131,7 @@ public final class ServerNetworkingDiagnostics {
         double averageWaitMs = disk.readWaitSamples() == 0L
                 ? 0.0D
                 : disk.readWaitNanos() / 1_000_000.0D / disk.readWaitSamples();
+        ColumnStorageReadPipeline.NbtDiagnostics nbt = storageReadPipeline.nbtDiagnosticsSnapshot();
         return Component.translatable(
                 "vss.command.storage.runtime.extra",
                 disk.pendingPreloadReads(),
@@ -142,10 +143,21 @@ public final class ServerNetworkingDiagnostics {
                 disk.preloadReadsRejected(),
                 String.format(Locale.ROOT, "%.1f", averageWaitMs),
                 String.format(Locale.ROOT, "%.1f", disk.maxReadWaitNanos() / 1_000_000.0D))
-                .append(Component.literal("; coalesced=" + readCoordinator.duplicateReadSuppressed()
-                        + ", preloadReused=" + readCoordinator.preloadLiveJoins()
-                        + ", inFlight=" + readCoordinator.inFlightCount()
-                        + ", nbt=" + storageReadPipeline.nbtDiagnostics()));
+                .append(Component.literal("; "))
+                .append(Component.translatable(
+                        "vss.command.storage.coalescing.extra",
+                        readCoordinator.duplicateReadSuppressed(),
+                        readCoordinator.preloadLiveJoins(),
+                        readCoordinator.inFlightCount(),
+                        nbt.submitted(),
+                        nbt.completed(),
+                        nbt.hits(),
+                        nbt.misses(),
+                        nbt.failures(),
+                        nbt.active(),
+                        nbt.queued(),
+                        nbt.coalesced(),
+                        nbt.rejected()));
     }
 
     private QueueTotals queueTotals() {
