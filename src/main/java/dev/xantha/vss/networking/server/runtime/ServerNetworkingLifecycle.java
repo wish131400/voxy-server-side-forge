@@ -4,6 +4,7 @@ package dev.xantha.vss.networking.server.runtime;
 import dev.xantha.vss.networking.server.dirty.DirtyColumnBroadcaster;
 import dev.xantha.vss.networking.server.generation.ChunkGenerationService;
 import dev.xantha.vss.networking.server.preload.ExistingColumnPreloader;
+import dev.xantha.vss.networking.server.request.ColumnStorageReadPipeline;
 import dev.xantha.vss.networking.server.sending.GeneratedColumnFlusher;
 import dev.xantha.vss.networking.server.sending.QueuedColumnSender;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
@@ -24,6 +25,7 @@ public final class ServerNetworkingLifecycle {
     private final ServerLifecycleGuard lifecycleGuard;
     private final DiskTaskRuntime diskRuntime;
     private final PersistentColumnReadCoordinator readCoordinator;
+    private final ColumnStorageReadPipeline storageReadPipeline;
     private final GeneratedColumnFlusher generatedColumnFlusher;
     private final ExistingColumnPreloader existingColumnPreloader;
     private final QueuedColumnSender queuedColumnSender;
@@ -38,6 +40,7 @@ public final class ServerNetworkingLifecycle {
             ServerLifecycleGuard lifecycleGuard,
             DiskTaskRuntime diskRuntime,
             PersistentColumnReadCoordinator readCoordinator,
+            ColumnStorageReadPipeline storageReadPipeline,
             GeneratedColumnFlusher generatedColumnFlusher,
             ExistingColumnPreloader existingColumnPreloader,
             QueuedColumnSender queuedColumnSender) {
@@ -49,6 +52,7 @@ public final class ServerNetworkingLifecycle {
         this.lifecycleGuard = lifecycleGuard;
         this.diskRuntime = diskRuntime;
         this.readCoordinator = readCoordinator;
+        this.storageReadPipeline = storageReadPipeline;
         this.generatedColumnFlusher = generatedColumnFlusher;
         this.existingColumnPreloader = existingColumnPreloader;
         this.queuedColumnSender = queuedColumnSender;
@@ -82,6 +86,7 @@ public final class ServerNetworkingLifecycle {
         if (lifecycleGuard.isStopping()) {
             return;
         }
+        persistentStore.flushDirtyIndexes(server);
         if (playerRegistry.isEmpty()) {
             releaseIdleMemory();
             return;
@@ -95,6 +100,7 @@ public final class ServerNetworkingLifecycle {
     }
 
     public void onServerStarting() {
+        storageReadPipeline.resetNbtReads();
         lifecycleGuard.start();
         queuedColumnSender.reset();
         diskRuntime.restart();
@@ -109,10 +115,16 @@ public final class ServerNetworkingLifecycle {
 
     public void onServerStopping(MinecraftServer server) {
         persistentColumnWriter.flushInvalidationsBlocking(server);
+        if (!diskRuntime.awaitPendingWrites(5_000L)) {
+            VSSLogger.warn("Timed out waiting for pending VSS persistent-column writes during shutdown");
+        }
+        persistentStore.flushDirtyIndexesBlocking(server);
         lifecycleGuard.stop();
+        storageReadPipeline.resetNbtReads();
         readCoordinator.clear();
         queuedColumnSender.reset();
         diskRuntime.shutdown();
+        persistentStore.flushDirtyIndexesBlocking(server);
         diskRuntime.resetPendingCounts();
         for (PlayerRequestState state : playerRegistry.states()) {
             state.clearAll();

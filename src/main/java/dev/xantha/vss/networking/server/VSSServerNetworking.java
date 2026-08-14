@@ -106,7 +106,8 @@ public final class VSSServerNetworking {
             PERSISTENT_COLUMN_STORE,
             REQUEST_STATS,
             DISK_RUNTIME,
-            COLUMN_READ_COORDINATOR);
+            COLUMN_READ_COORDINATOR,
+            STORAGE_READ_PIPELINE);
     private static final int PRIORITY_SEND_COLUMNS_PER_TICK = 8;
     private static final QueuedColumnSender QUEUED_COLUMN_SENDER = new QueuedColumnSender(
             PLAYER_REGISTRY,
@@ -121,6 +122,7 @@ public final class VSSServerNetworking {
             SERVER_LIFECYCLE,
             DISK_RUNTIME,
             COLUMN_READ_COORDINATOR,
+            STORAGE_READ_PIPELINE,
             GENERATED_COLUMN_FLUSHER,
             EXISTING_COLUMN_PRELOADER,
             QUEUED_COLUMN_SENDER);

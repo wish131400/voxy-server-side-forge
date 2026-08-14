@@ -5,6 +5,7 @@ import dev.xantha.vss.networking.server.dirty.DirtyColumnBroadcaster;
 import dev.xantha.vss.networking.server.generation.ChunkGenerationService;
 import dev.xantha.vss.networking.server.runtime.DiskTaskRuntime;
 import dev.xantha.vss.networking.server.runtime.PersistentColumnReadCoordinator;
+import dev.xantha.vss.networking.server.request.ColumnStorageReadPipeline;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
 import dev.xantha.vss.networking.server.storage.ColumnLodCache;
@@ -21,6 +22,7 @@ public final class ServerNetworkingDiagnostics {
     private final ServerRequestStats requestStats;
     private final DiskTaskRuntime diskRuntime;
     private final PersistentColumnReadCoordinator readCoordinator;
+    private final ColumnStorageReadPipeline storageReadPipeline;
 
     public ServerNetworkingDiagnostics(
             PlayerRequestRegistry playerRegistry,
@@ -29,7 +31,8 @@ public final class ServerNetworkingDiagnostics {
             PersistentColumnLodStore persistentStore,
             ServerRequestStats requestStats,
             DiskTaskRuntime diskRuntime,
-            PersistentColumnReadCoordinator readCoordinator) {
+            PersistentColumnReadCoordinator readCoordinator,
+            ColumnStorageReadPipeline storageReadPipeline) {
         this.playerRegistry = playerRegistry;
         this.generationService = generationService;
         this.columnCache = columnCache;
@@ -37,6 +40,7 @@ public final class ServerNetworkingDiagnostics {
         this.requestStats = requestStats;
         this.diskRuntime = diskRuntime;
         this.readCoordinator = readCoordinator;
+        this.storageReadPipeline = storageReadPipeline;
     }
 
     public String generationDiagnostics() {
@@ -64,7 +68,7 @@ public final class ServerNetworkingDiagnostics {
         ServerRequestStats.Snapshot stats = requestStats.snapshot();
         QueueTotals queue = queueTotals();
         return String.format(
-                "vssSessions=%d, queuedColumns=%d, priorityQueuedColumns=%d, queuedBytes=%.2f MiB, generation={%s}, storage={requests=%d, duplicates=%d, distanceRejected=%d, upToDate=%d, cacheHits=%d, diskSubmitted=%d, diskPending=%d, diskHits=%d, diskMisses=%d, diskFailures=%d, coalescedReads=%d, preloadReused=%d, readInFlight=%d}, dirty={%s}, cache={%s}",
+                "vssSessions=%d, queuedColumns=%d, priorityQueuedColumns=%d, queuedBytes=%.2f MiB, generation={%s}, storage={requests=%d, duplicates=%d, distanceRejected=%d, upToDate=%d, cacheHits=%d, diskSubmitted=%d, diskPending=%d, diskHits=%d, diskMisses=%d, diskFailures=%d, coalescedReads=%d, preloadReused=%d, readInFlight=%d, nbt={%s}}, dirty={%s}, cache={%s}",
                 playerRegistry.size(),
                 queue.queuedPayloads(),
                 queue.priorityQueuedPayloads(),
@@ -83,6 +87,7 @@ public final class ServerNetworkingDiagnostics {
                 readCoordinator.duplicateReadSuppressed(),
                 readCoordinator.preloadLiveJoins(),
                 readCoordinator.inFlightCount(),
+                storageReadPipeline.nbtDiagnostics(),
                 DirtyColumnBroadcaster.diagnostics(),
                 columnCache.diagnostics() + ", " + persistentStore.diagnostics()
                         + ", persistentWritePending=" + diskRuntime.pendingWrites());
@@ -139,7 +144,8 @@ public final class ServerNetworkingDiagnostics {
                 String.format(Locale.ROOT, "%.1f", disk.maxReadWaitNanos() / 1_000_000.0D))
                 .append(Component.literal("; coalesced=" + readCoordinator.duplicateReadSuppressed()
                         + ", preloadReused=" + readCoordinator.preloadLiveJoins()
-                        + ", inFlight=" + readCoordinator.inFlightCount()));
+                        + ", inFlight=" + readCoordinator.inFlightCount()
+                        + ", nbt=" + storageReadPipeline.nbtDiagnostics()));
     }
 
     private QueueTotals queueTotals() {

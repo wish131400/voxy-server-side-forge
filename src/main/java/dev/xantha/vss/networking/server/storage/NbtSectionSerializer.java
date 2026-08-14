@@ -6,8 +6,7 @@ import dev.xantha.vss.common.processing.LoadedColumnData;
 import io.netty.buffer.Unpooled;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -24,36 +23,23 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.storage.ChunkSerializer;
-import net.minecraft.world.level.chunk.storage.ChunkStorage;
 
 public final class NbtSectionSerializer {
     private static final byte[] EMPTY = new byte[0];
+    private static final byte[] EMPTY_LIGHT_BYTES = new byte[2048];
 
     private NbtSectionSerializer() {
     }
 
-    public static LoadedColumnData readAndSerializeSections(ServerLevel level, ChunkStorage storage, int cx, int cz, long timeoutMillis) throws Exception {
-        Optional<CompoundTag> optionalTag;
-        try {
-            optionalTag = storage.read(new ChunkPos(cx, cz)).get(timeoutMillis, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException e) {
-            return null;
-        }
-        return serializeTag(level, cx, cz, optionalTag);
-    }
-
-    public static LoadedColumnData readAndSerializeSections(ServerLevel level, ChunkStorage storage, int cx, int cz) throws Exception {
-        Optional<CompoundTag> optionalTag = storage.read(new ChunkPos(cx, cz)).get(10L, TimeUnit.SECONDS);
-        return serializeTag(level, cx, cz, optionalTag);
-    }
-
-    private static LoadedColumnData serializeTag(ServerLevel level, int cx, int cz, Optional<CompoundTag> optionalTag) {
+    public static LoadedColumnData serializeTag(
+            ServerLevel level,
+            int cx,
+            int cz,
+            Optional<CompoundTag> optionalTag) {
         if (optionalTag.isEmpty()) {
             return null;
         }
@@ -87,6 +73,7 @@ public final class NbtSectionSerializer {
         int countWriterIndex = buf.writerIndex();
         buf.writeVarInt(0);
         int includedCount = 0;
+        int[] includedSectionYs = new int[sections.size()];
         int highestIncludedSectionY = Integer.MIN_VALUE;
         int minSectionY = level.getMinSection();
         int maxSectionY = minSectionY + level.getSectionsCount();
@@ -104,7 +91,7 @@ public final class NbtSectionSerializer {
                     continue;
                 }
 
-                LevelChunkSection section = parseSection(sectionTag, blockStateCodec, biomeCodec, ops, biomeRegistry, defaultBiome);
+                ParsedSection section = parseSection(sectionTag, blockStateCodec, biomeCodec, ops, biomeRegistry, defaultBiome);
                 if (section == null) {
                     if (sectionTag.contains("block_states", Tag.TAG_COMPOUND)) {
                         skippedUnserializableSection = true;
@@ -114,14 +101,14 @@ public final class NbtSectionSerializer {
 
                 byte[] blockLight = getByteArray(sectionTag, ChunkSerializer.BLOCK_LIGHT_TAG);
                 boolean hasBlockLight = blockLight.length == 2048 && hasNonZeroData(blockLight);
-                if (section.hasOnlyAir() && !hasBlockLight) {
+                if (section.nonEmptyBlockCount() == 0 && !hasBlockLight) {
                     continue;
                 }
 
                 byte[] skyLight = getByteArray(sectionTag, ChunkSerializer.SKY_LIGHT_TAG);
                 boolean hasSkyLight = skyLight.length == 2048 && hasNonZeroData(skyLight);
                 buf.writeByte(sectionY);
-                section.write(buf);
+                writeSection(buf, section);
                 buf.writeBoolean(hasBlockLight);
                 if (hasBlockLight) {
                     buf.writeBytes(blockLight);
@@ -130,7 +117,7 @@ public final class NbtSectionSerializer {
                 if (hasSkyLight) {
                     buf.writeBytes(skyLight);
                 }
-                includedCount++;
+                includedSectionYs[includedCount++] = sectionY;
                 highestIncludedSectionY = Math.max(highestIncludedSectionY, sectionY);
             }
 
@@ -147,7 +134,8 @@ public final class NbtSectionSerializer {
             buf.readBytes(serialized);
             boolean completeColumn = !skippedUnserializableSection
                     && isCompleteColumn(chunkNbt, highestIncludedSectionY);
-            return new LoadedColumnData(cx, cz, serialized, serialized.length, completeColumn);
+            int[] sectionYs = Arrays.copyOf(includedSectionYs, includedCount);
+            return new LoadedColumnData(cx, cz, serialized, serialized.length, completeColumn, sectionYs);
         } finally {
             buf.release();
         }
@@ -207,7 +195,7 @@ public final class NbtSectionSerializer {
         return new long[0];
     }
 
-    private static LevelChunkSection parseSection(
+    private static ParsedSection parseSection(
             CompoundTag sectionTag,
             Codec<PalettedContainer<BlockState>> blockStateCodec,
             Codec<PalettedContainerRO<Holder<Biome>>> biomeCodec,
@@ -228,9 +216,22 @@ public final class NbtSectionSerializer {
         PalettedContainerRO<Holder<Biome>> biomes = biomesTag != null
                 ? biomeCodec.parse(ops, biomesTag).result().orElseGet(() -> defaultBiomes(biomeRegistry, defaultBiome))
                 : defaultBiomes(biomeRegistry, defaultBiome);
-        LevelChunkSection section = new LevelChunkSection(blockStates.get(), biomes);
-        section.recalcBlockCounts();
-        return section;
+        int[] nonEmptyBlockCount = new int[1];
+        blockStates.get().count((state, count) -> {
+            if (!state.isAir()) {
+                nonEmptyBlockCount[0] += count;
+            }
+            if (!state.getFluidState().isEmpty()) {
+                nonEmptyBlockCount[0] += count;
+            }
+        });
+        return new ParsedSection(blockStates.get(), biomes, (short) nonEmptyBlockCount[0]);
+    }
+
+    static void writeSection(FriendlyByteBuf buf, ParsedSection section) {
+        buf.writeShort(section.nonEmptyBlockCount());
+        section.blockStates().write(buf);
+        section.biomes().write(buf);
     }
 
     private static PalettedContainerRO<Holder<Biome>> defaultBiomes(Registry<Biome> biomeRegistry, Holder<Biome> defaultBiome) {
@@ -242,11 +243,12 @@ public final class NbtSectionSerializer {
     }
 
     private static boolean hasNonZeroData(byte[] data) {
-        for (byte b : data) {
-            if (b != 0) {
-                return true;
-            }
-        }
-        return false;
+        return data.length != EMPTY_LIGHT_BYTES.length || !Arrays.equals(data, EMPTY_LIGHT_BYTES);
+    }
+
+    record ParsedSection(
+            PalettedContainer<BlockState> blockStates,
+            PalettedContainerRO<Holder<Biome>> biomes,
+            short nonEmptyBlockCount) {
     }
 }

@@ -26,6 +26,7 @@ public final class DiskTaskRuntime {
     private final AtomicInteger pendingReads = new AtomicInteger();
     private final AtomicInteger pendingPreloadReads = new AtomicInteger();
     private final AtomicInteger pendingWrites = new AtomicInteger();
+    private final AtomicInteger expensiveReads = new AtomicInteger();
     private final AtomicLong manualReadsSubmitted = new AtomicLong();
     private final AtomicLong manualReadsCompleted = new AtomicLong();
     private final AtomicLong manualReadsRejected = new AtomicLong();
@@ -183,7 +184,6 @@ public final class DiskTaskRuntime {
             executor.setCorePoolSize(desiredThreads);
             executor.setMaximumPoolSize(desiredThreads);
         }
-        executor.prestartAllCoreThreads();
         return desiredThreads;
     }
 
@@ -227,6 +227,19 @@ public final class DiskTaskRuntime {
         return pendingWrites.get();
     }
 
+    public boolean awaitPendingWrites(long timeoutMillis) {
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(Math.max(0L, timeoutMillis));
+        while (pendingWrites() > 0 && System.nanoTime() < deadline) {
+            try {
+                Thread.sleep(1L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+        }
+        return pendingWrites() == 0;
+    }
+
     public int pendingPreloadReads() {
         return pendingPreloadReads.get();
     }
@@ -236,7 +249,24 @@ public final class DiskTaskRuntime {
     }
 
     public boolean hasPreloadReadCapacity(int totalLimit, int reservedManualSlots) {
-        return pendingReads() < preloadLimit(totalLimit, reservedManualSlots);
+        return expensiveReads.get() == 0
+                && pendingReads() < preloadLimit(totalLimit, reservedManualSlots);
+    }
+
+    public void beginExpensiveRead() {
+        expensiveReads.incrementAndGet();
+    }
+
+    public void finishExpensiveRead() {
+        expensiveReads.updateAndGet(value -> Math.max(0, value - 1));
+    }
+
+    public int expensiveReads() {
+        return expensiveReads.get();
+    }
+
+    public void resetExpensiveReads() {
+        expensiveReads.set(0);
     }
 
     public boolean hasWriteCapacity(int limit) {
@@ -303,8 +333,8 @@ public final class DiskTaskRuntime {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 clampedThreads,
                 clampedThreads,
-                0L,
-                TimeUnit.MILLISECONDS,
+                60L,
+                TimeUnit.SECONDS,
                 read ? new PriorityBlockingQueue<>() : new LinkedBlockingQueue<>(),
                 task -> {
                     Thread thread = new Thread(task, threadName + "-" + threadId.incrementAndGet());
@@ -312,7 +342,7 @@ public final class DiskTaskRuntime {
                     return thread;
                 },
                 new ThreadPoolExecutor.AbortPolicy());
-        executor.prestartAllCoreThreads();
+        executor.allowCoreThreadTimeOut(true);
         return executor;
     }
 

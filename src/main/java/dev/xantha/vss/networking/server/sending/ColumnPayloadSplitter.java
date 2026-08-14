@@ -7,13 +7,9 @@ import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.DataLayer;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 
 public final class ColumnPayloadSplitter {
     private static final int MAX_SECTIONS_PER_GROUP = 8;
@@ -30,11 +26,7 @@ public final class ColumnPayloadSplitter {
             throw new IllegalArgumentException("LOD transfer id must be assigned before splitting");
         }
 
-        byte[] rawSections = payload.decompressedSections();
-        ParsedSections parsed = readSections(level, payload, rawSections);
-        int[] replacementSectionYs = payload.completeColumn() && parsed.valid()
-                ? replacementSectionYs(parsed.sections())
-                : payload.replacementSectionYs();
+        int[] replacementSectionYs = payload.replacementSectionYs();
         VoxelColumnS2CPayload normalized = payload.withTransferMetadata(
                 payload.transferId(),
                 0,
@@ -43,6 +35,17 @@ public final class ColumnPayloadSplitter {
         int targetWireBytes = targetWireBytes(effectiveBandwidthBytesPerSecond);
         if (normalized.estimatedWireBytes(networkCompressionEnabled) <= targetWireBytes) {
             return List.of(normalized);
+        }
+
+        byte[] rawSections = payload.decompressedSections();
+        ParsedSections parsed = readSections(level, payload, rawSections);
+        if (payload.completeColumn() && replacementSectionYs.length == 0 && parsed.valid()) {
+            replacementSectionYs = replacementSectionYs(parsed.sections());
+            normalized = payload.withTransferMetadata(
+                    payload.transferId(),
+                    0,
+                    1,
+                    replacementSectionYs);
         }
 
         if (!parsed.valid() || parsed.sections().size() <= 1) {
@@ -110,7 +113,6 @@ public final class ColumnPayloadSplitter {
                 return ParsedSections.invalid();
             }
 
-            Registry<Biome> biomeRegistry = level.registryAccess().registryOrThrow(Registries.BIOME);
             ArrayList<SerializedSection> sections = new ArrayList<>(sectionCount);
             for (int i = 0; i < sectionCount; i++) {
                 if (!buf.isReadable()) {
@@ -118,8 +120,9 @@ public final class ColumnPayloadSplitter {
                 }
                 int start = buf.readerIndex();
                 int sectionY = buf.readByte();
-                LevelChunkSection section = new LevelChunkSection(biomeRegistry);
-                section.read(buf);
+                buf.skipBytes(Short.BYTES);
+                skipPalettedContainer(buf, 8, 4096);
+                skipPalettedContainer(buf, 3, 64);
                 if (buf.readBoolean()) {
                     buf.skipBytes(DataLayer.SIZE);
                 }
@@ -143,6 +146,32 @@ public final class ColumnPayloadSplitter {
         } finally {
             buf.release();
         }
+    }
+
+    private static void skipPalettedContainer(
+            FriendlyByteBuf buf,
+            int maxLocalPaletteBits,
+            int valueCount) {
+        int bits = buf.readUnsignedByte();
+        if (bits > 32) {
+            throw new IllegalArgumentException("Invalid palette bit width: " + bits);
+        }
+        if (bits == 0) {
+            buf.readVarInt();
+        } else if (bits <= maxLocalPaletteBits) {
+            int paletteSize = buf.readVarInt();
+            if (paletteSize < 1 || paletteSize > 1 << bits) {
+                throw new IllegalArgumentException("Invalid local palette size: " + paletteSize);
+            }
+            for (int i = 0; i < paletteSize; i++) {
+                buf.readVarInt();
+            }
+        }
+        int longCount = buf.readVarInt();
+        if (longCount < 0 || longCount > valueCount) {
+            throw new IllegalArgumentException("Invalid palette storage length: " + longCount);
+        }
+        buf.skipBytes(Math.multiplyExact(longCount, Long.BYTES));
     }
 
     private static void addGroup(

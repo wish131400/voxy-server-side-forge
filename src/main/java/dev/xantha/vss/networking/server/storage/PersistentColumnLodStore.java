@@ -27,9 +27,9 @@ import net.minecraft.world.level.storage.LevelResource;
 
 public final class PersistentColumnLodStore {
     private static final int FILE_MAGIC = 0x5653534C;
-    private static final int FILE_VERSION_CURRENT = 6;
+    private static final int FILE_VERSION_CURRENT = 7;
     private static final int INDEX_MAGIC = 0x56535349;
-    private static final int INDEX_VERSION_CURRENT = 1;
+    private static final int INDEX_VERSION_CURRENT = 2;
     private static final int REGION_SIZE = 32;
     private static final int REGION_SLOT_COUNT = REGION_SIZE * REGION_SIZE;
     private static final int REGION_BITMAP_LONGS = REGION_SLOT_COUNT / Long.SIZE;
@@ -42,9 +42,11 @@ public final class PersistentColumnLodStore {
     private static final String CACHE_DIR = "vss-column-cache";
     private static final String COLUMN_EXTENSION = ".vcl";
     private static final String INDEX_FILE_NAME = "index.vci";
+    private static final long INDEX_FLUSH_INTERVAL_MILLIS = 500L;
 
     private final VSSServerConfig config;
     private final Map<RegionKey, RegionIndex> regionIndexes = new LinkedHashMap<>(128, 0.75F, true);
+    private final Map<RegionKey, RegionIndex> dirtyRegionIndexes = new LinkedHashMap<>();
     private final Object[] columnLocks = createLocks(COLUMN_LOCK_STRIPES);
     private final Object[] regionLocks = createLocks(REGION_LOCK_STRIPES);
     private long reads;
@@ -59,6 +61,8 @@ public final class PersistentColumnLodStore {
     private long indexScans;
     private long indexMissSkips;
     private long indexEvictions;
+    private long indexFlushes;
+    private long nextIndexFlushMillis;
     private long nextCleanupMillis;
     private long knownCacheBytes = -1L;
     private int knownCacheEntries = -1;
@@ -78,6 +82,9 @@ public final class PersistentColumnLodStore {
 
     public void clearMemory() {
         clearRegionIndexes();
+        synchronized (this) {
+            dirtyRegionIndexes.clear();
+        }
         nextCleanupMillis = 0L;
         knownCacheBytes = -1L;
         knownCacheEntries = -1;
@@ -144,14 +151,12 @@ public final class PersistentColumnLodStore {
                 return null;
             }
 
-            try {
-                decodeStoredBody(encodedBytes, header.method(), header.rawSize());
-            } catch (IOException e) {
+            if (EncodedColumnData.crc32c(encodedBytes) != header.encodedCrc32c()) {
                 misses++;
                 corruptions++;
                 deleteColumn(server, dimension, cx, cz);
                 VSSLogger.warn("Discarded corrupt persistent LOD column " + cx + "," + cz
-                        + ": " + e.getMessage());
+                        + ": compressed-frame CRC32C mismatch");
                 return null;
             }
 
@@ -165,7 +170,9 @@ public final class PersistentColumnLodStore {
                     encodedBytes,
                     header.timestamp(),
                     header.schemaVersion(),
-                    true));
+                    true,
+                    header.sectionYs(),
+                    header.encodedCrc32c()));
         } catch (Exception e) {
             misses++;
             deleteQuietly(path);
@@ -240,10 +247,17 @@ public final class PersistentColumnLodStore {
                     out.writeInt(columnData.compression());
                     out.writeInt(columnData.rawSize());
                     out.writeInt(columnData.schemaVersion());
+                    int[] sectionYs = columnData.sectionYs();
+                    out.writeInt(sectionYs.length);
+                    for (int sectionY : sectionYs) {
+                        out.writeByte(sectionY);
+                    }
+                    out.writeInt(columnData.encodedCrc32c());
                     out.writeInt(columnData.encodedBytes().length);
                     out.write(columnData.encodedBytes());
                 }
                 moveIntoPlace(tmp, path);
+                markRegionModified(path.getParent());
                 recordColumnWrite(previousSize, sizeIfRegular(path));
                 markIndexed(server, dimension, columnData.chunkX(), columnData.chunkZ(), IndexSlot.from(columnData));
                 writes++;
@@ -309,7 +323,7 @@ public final class PersistentColumnLodStore {
     public String diagnostics() {
         return String.format(
                 Locale.ROOT,
-                "persistent={enabled=%s, reads=%d, hits=%d, misses=%d, writes=%d, writeFailures=%d, invalidations=%d, corruptions=%d, cleanupRuns=%d, cleanupDeleted=%d, indexRegions=%d/%d, indexScans=%d, indexMissSkips=%d, indexEvictions=%d}",
+                "persistent={enabled=%s, reads=%d, hits=%d, misses=%d, writes=%d, writeFailures=%d, invalidations=%d, corruptions=%d, cleanupRuns=%d, cleanupDeleted=%d, indexRegions=%d/%d, indexScans=%d, indexMissSkips=%d, indexEvictions=%d, indexFlushes=%d, dirtyIndexes=%d}",
                 config.enablePersistentColumnCache,
                 reads,
                 hits,
@@ -324,7 +338,9 @@ public final class PersistentColumnLodStore {
                 maxRegionIndexCacheEntries(),
                 indexScans,
                 indexMissSkips,
-                indexEvictions);
+                indexEvictions,
+                indexFlushes,
+                dirtyRegionIndexCount());
     }
 
     static byte[] decodeStoredBody(byte[] encodedBytes, int method, int rawSize) throws IOException {
@@ -482,7 +498,37 @@ public final class PersistentColumnLodStore {
             RegionIndex index = regionIndex(server, key);
             boolean changed = slot == null ? index.remove(cx, cz) : index.put(cx, cz, slot);
             if (changed) {
-                saveIndex(server, key, index);
+                synchronized (this) {
+                    dirtyRegionIndexes.put(key, index);
+                }
+            }
+        }
+    }
+
+    public void flushDirtyIndexes(MinecraftServer server) {
+        flushDirtyIndexes(server, false);
+    }
+
+    public void flushDirtyIndexesBlocking(MinecraftServer server) {
+        flushDirtyIndexes(server, true);
+    }
+
+    private void flushDirtyIndexes(MinecraftServer server, boolean force) {
+        long now = System.currentTimeMillis();
+        Map<RegionKey, RegionIndex> pending;
+        synchronized (this) {
+            if (dirtyRegionIndexes.isEmpty() || !force && now < nextIndexFlushMillis) {
+                return;
+            }
+            pending = new LinkedHashMap<>(dirtyRegionIndexes);
+            dirtyRegionIndexes.clear();
+            nextIndexFlushMillis = now + INDEX_FLUSH_INTERVAL_MILLIS;
+        }
+        for (Map.Entry<RegionKey, RegionIndex> entry : pending.entrySet()) {
+            RegionKey key = entry.getKey();
+            synchronized (regionLock(key)) {
+                saveIndex(server, key, entry.getValue());
+                indexFlushes++;
             }
         }
     }
@@ -567,6 +613,10 @@ public final class PersistentColumnLodStore {
         return regionIndexes.size();
     }
 
+    private synchronized int dirtyRegionIndexCount() {
+        return dirtyRegionIndexes.size();
+    }
+
     private RegionIndex loadOrScanRegion(MinecraftServer server, RegionKey key) {
         RegionIndex loaded = loadIndex(server, key);
         if (loaded != null) {
@@ -618,7 +668,9 @@ public final class PersistentColumnLodStore {
                         in.readInt(),
                         in.readInt(),
                         in.readInt(),
-                        in.readInt());
+                        in.readInt(),
+                        in.readInt(),
+                        new int[0]);
                 if (!isPersistentSlot(slot)) {
                     deleteQuietly(path);
                     return null;
@@ -648,7 +700,7 @@ public final class PersistentColumnLodStore {
                 index.writeTo(out);
             }
             moveIntoPlace(tmp, path);
-            markIndexFresh(path);
+            markIndexFresh(path, path.getParent());
         } catch (IOException e) {
             deleteQuietly(tmp);
             VSSLogger.debug("Failed to write persistent LOD region index " + key.regionX() + ","
@@ -721,7 +773,9 @@ public final class PersistentColumnLodStore {
             synchronized (regionLock(key)) {
                 RegionIndex index = regionIndex(server, key);
                 if (index.remove(position.chunkX(), position.chunkZ())) {
-                    saveIndex(server, key, index);
+                    synchronized (this) {
+                        dirtyRegionIndexes.put(key, index);
+                    }
                 }
             }
         } catch (NumberFormatException ignored) {
@@ -749,11 +803,20 @@ public final class PersistentColumnLodStore {
         int method = in.readInt();
         int rawSize = in.readInt();
         int schemaVersion = in.readInt();
+        int sectionCount = in.readInt();
+        if (sectionCount < 0 || sectionCount > 64) {
+            return null;
+        }
+        int[] sectionYs = new int[sectionCount];
+        for (int i = 0; i < sectionCount; i++) {
+            sectionYs[i] = in.readByte();
+        }
+        int encodedCrc32c = in.readInt();
         int length = in.readInt();
         if (storedCx != cx || storedCz != cz || !completeColumn) {
             return null;
         }
-        IndexSlot slot = new IndexSlot(timestamp, method, rawSize, schemaVersion, length);
+        IndexSlot slot = new IndexSlot(timestamp, method, rawSize, schemaVersion, encodedCrc32c, length, sectionYs);
         return isPersistentSlot(slot) ? slot : null;
     }
 
@@ -835,8 +898,19 @@ public final class PersistentColumnLodStore {
         }
     }
 
-    private static void markIndexFresh(Path indexPath) throws IOException {
-        Files.setLastModifiedTime(indexPath, FileTime.fromMillis(System.currentTimeMillis()));
+    private static void markIndexFresh(Path indexPath, Path regionDir) throws IOException {
+        long timestamp = System.currentTimeMillis();
+        if (Files.isDirectory(regionDir)) {
+            timestamp = Math.max(timestamp, Files.getLastModifiedTime(regionDir).toMillis());
+        }
+        Files.setLastModifiedTime(indexPath, FileTime.fromMillis(timestamp));
+    }
+
+    private static void markRegionModified(Path regionDir) throws IOException {
+        long previous = Files.getLastModifiedTime(regionDir).toMillis();
+        Files.setLastModifiedTime(
+                regionDir,
+                FileTime.fromMillis(Math.max(System.currentTimeMillis(), previous + 1L)));
     }
 
     private record FileEntry(Path path, long sizeBytes, long lastAccessMillis) {
@@ -854,14 +928,28 @@ public final class PersistentColumnLodStore {
         }
     }
 
-    private record IndexSlot(long timestamp, int method, int rawSize, int schemaVersion, int length) {
+    private record IndexSlot(
+            long timestamp,
+            int method,
+            int rawSize,
+            int schemaVersion,
+            int encodedCrc32c,
+            int length,
+            int[] sectionYs) {
         static IndexSlot from(EncodedColumnData columnData) {
             return new IndexSlot(
                     columnData.columnStamp(),
                     columnData.compression(),
                     columnData.rawSize(),
                     columnData.schemaVersion(),
-                    columnData.encodedBytes().length);
+                    columnData.encodedCrc32c(),
+                    columnData.encodedBytes().length,
+                    columnData.sectionYs());
+        }
+
+        @Override
+        public int[] sectionYs() {
+            return sectionYs != null ? java.util.Arrays.copyOf(sectionYs, sectionYs.length) : new int[0];
         }
     }
 
@@ -883,12 +971,22 @@ public final class PersistentColumnLodStore {
 
         synchronized boolean putLocal(int localIndex, IndexSlot slot) {
             IndexSlot previous = hasBit(presentBitmap, localIndex) ? slots[localIndex] : null;
-            if (slot.equals(previous)) {
+            if (equivalent(slot, previous)) {
                 return false;
             }
             slots[localIndex] = slot;
             setBit(presentBitmap, localIndex);
             return true;
+        }
+
+        private static boolean equivalent(IndexSlot left, IndexSlot right) {
+            return left == right || left != null && right != null
+                    && left.timestamp() == right.timestamp()
+                    && left.method() == right.method()
+                    && left.rawSize() == right.rawSize()
+                    && left.schemaVersion() == right.schemaVersion()
+                    && left.encodedCrc32c() == right.encodedCrc32c()
+                    && left.length() == right.length();
         }
 
         synchronized boolean remove(int cx, int cz) {
@@ -914,6 +1012,7 @@ public final class PersistentColumnLodStore {
                 out.writeInt(slot.method());
                 out.writeInt(slot.rawSize());
                 out.writeInt(slot.schemaVersion());
+                out.writeInt(slot.encodedCrc32c());
                 out.writeInt(slot.length());
             }
         }

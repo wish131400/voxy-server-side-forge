@@ -2,7 +2,6 @@ package dev.xantha.vss.networking.server.storage;
 
 import dev.xantha.vss.config.VSSServerConfig;
 import dev.xantha.vss.common.processing.EncodedColumnData;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import net.minecraft.resources.ResourceKey;
@@ -18,6 +17,11 @@ public final class ColumnLodCache {
     private long puts;
     private long evictions;
     private long invalidations;
+    private long preloadBytes;
+    private int preloadEntries;
+    private long preloadPuts;
+    private long preloadUsefulHits;
+    private long preloadUnusedEvictions;
 
     public ColumnLodCache(VSSServerConfig config) {
         this.config = config;
@@ -33,6 +37,13 @@ public final class ColumnLodCache {
             misses++;
         } else {
             hits++;
+            if (entry.preloaded()) {
+                preloadUsefulHits++;
+                preloadBytes -= entry.sizeBytes();
+                preloadEntries--;
+                entry = entry.promoted();
+                entries.put(new Key(dimension.location(), cx, cz), entry);
+            }
         }
         return entry;
     }
@@ -57,28 +68,38 @@ public final class ColumnLodCache {
 
         Key key = new Key(dimension.location(), columnData.chunkX(), columnData.chunkZ());
         Entry previous = entries.remove(key);
+        boolean effectivePreloaded = preloaded;
         if (previous != null) {
             if (previous.timestamp() > columnData.columnStamp()) {
                 entries.put(key, previous);
                 return;
             }
+            effectivePreloaded = preloaded && previous.preloaded();
             cachedBytes -= previous.sizeBytes();
+            removePreloadAccounting(previous, false);
         }
 
-        byte[] cachedSections = Arrays.copyOf(columnData.encodedBytes(), columnData.encodedBytes().length);
         entries.put(key, new Entry(
                 columnData.chunkX(),
                 columnData.chunkZ(),
                 columnData.columnStamp(),
                 columnData.compression(),
                 columnData.rawSize(),
-                cachedSections,
+                columnData.encodedBytes(),
                 sizeBytes,
                 columnData.schemaVersion(),
                 columnData.completeColumn(),
-                preloaded));
+                columnData.sectionYs(),
+                columnData.encodedCrc32c(),
+                effectivePreloaded));
         this.cachedBytes += sizeBytes;
+        if (effectivePreloaded) {
+            preloadEntries++;
+            preloadBytes += sizeBytes;
+            preloadPuts++;
+        }
         puts++;
+        evictPreloadOverflow();
         evictOverflow();
     }
 
@@ -86,6 +107,7 @@ public final class ColumnLodCache {
         Entry removed = entries.remove(new Key(dimension.location(), cx, cz));
         if (removed != null) {
             cachedBytes -= removed.sizeBytes();
+            removePreloadAccounting(removed, false);
             invalidations++;
         }
     }
@@ -98,24 +120,53 @@ public final class ColumnLodCache {
         }
         entries.remove(key);
         cachedBytes -= entry.sizeBytes();
+        removePreloadAccounting(entry, false);
         invalidations++;
     }
 
     public synchronized void clear() {
         entries.clear();
         cachedBytes = 0L;
+        preloadBytes = 0L;
+        preloadEntries = 0;
     }
 
     public synchronized String diagnostics() {
         return String.format(
-                "entries=%d, bytes=%.2f MiB, hits=%d, misses=%d, puts=%d, evictions=%d, invalidations=%d",
+                "entries=%d, bytes=%.2f MiB, hits=%d, misses=%d, puts=%d, evictions=%d, invalidations=%d, preloadPuts=%d, preloadUsefulHits=%d, preloadUnusedEvictions=%d, preloadEntries=%d, preloadBytes=%.2f MiB",
                 entries.size(),
                 cachedBytes / (double) VSSServerConfig.BYTES_PER_MIB,
                 hits,
                 misses,
                 puts,
                 evictions,
-                invalidations);
+                invalidations,
+                preloadPuts,
+                preloadUsefulHits,
+                preloadUnusedEvictions,
+                preloadEntries,
+                preloadBytes / (double) VSSServerConfig.BYTES_PER_MIB);
+    }
+
+    private void evictPreloadOverflow() {
+        int maxEntries = Math.max(1, config.columnCacheMaxEntries / 4);
+        long maxBytes = Math.max(1L, config.columnCacheMaxBytes / 4L);
+        while (preloadEntries > maxEntries || preloadBytes > maxBytes) {
+            Map.Entry<Key, Entry> victim = null;
+            for (Map.Entry<Key, Entry> candidate : entries.entrySet()) {
+                if (candidate.getValue().preloaded()) {
+                    victim = candidate;
+                    break;
+                }
+            }
+            if (victim == null) {
+                break;
+            }
+            entries.remove(victim.getKey());
+            cachedBytes -= victim.getValue().sizeBytes();
+            removePreloadAccounting(victim.getValue(), true);
+            evictions++;
+        }
     }
 
     private void evictOverflow() {
@@ -123,8 +174,20 @@ public final class ColumnLodCache {
                 && !entries.isEmpty()) {
             Map.Entry<Key, Entry> eldest = entries.entrySet().iterator().next();
             cachedBytes -= eldest.getValue().sizeBytes();
+            removePreloadAccounting(eldest.getValue(), true);
             entries.remove(eldest.getKey());
             evictions++;
+        }
+    }
+
+    private void removePreloadAccounting(Entry entry, boolean eviction) {
+        if (!entry.preloaded()) {
+            return;
+        }
+        preloadEntries--;
+        preloadBytes -= entry.sizeBytes();
+        if (eviction) {
+            preloadUnusedEvictions++;
         }
     }
 
@@ -141,6 +204,8 @@ public final class ColumnLodCache {
             int sizeBytes,
             int schemaVersion,
             boolean completeColumn,
+            int[] sectionYs,
+            int encodedCrc32c,
             boolean preloaded) {
         public EncodedColumnData columnData() {
             return new EncodedColumnData(
@@ -151,7 +216,14 @@ public final class ColumnLodCache {
                     encodedBytes,
                     timestamp,
                     schemaVersion,
-                    completeColumn);
+                    completeColumn,
+                    sectionYs,
+                    encodedCrc32c);
+        }
+
+        Entry promoted() {
+            return new Entry(chunkX, chunkZ, timestamp, compression, rawSize, encodedBytes, sizeBytes,
+                    schemaVersion, completeColumn, sectionYs, encodedCrc32c, false);
         }
     }
 }

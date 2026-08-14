@@ -137,7 +137,10 @@ public final class VoxelColumnS2CPayload {
         this.encodedCompression = columnData.compression();
         this.encodedRawSize = columnData.rawSize();
         this.completeColumn = columnData.completeColumn();
-        this.replacementSectionYs = sanitizeReplacementSections(replacementSectionYs);
+        this.replacementSectionYs = sanitizeReplacementSections(
+                replacementSectionYs == null || replacementSectionYs.length == 0
+                        ? columnData.sectionYs()
+                        : replacementSectionYs);
     }
 
     VoxelColumnS2CPayload(
@@ -246,8 +249,9 @@ public final class VoxelColumnS2CPayload {
             int partIndex,
             int partCount,
             int[] replacementSectionYs) {
+        VoxelColumnS2CPayload payload;
         if (sectionBytes != null) {
-            return new VoxelColumnS2CPayload(
+            payload = new VoxelColumnS2CPayload(
                     requestId,
                     chunkX,
                     chunkZ,
@@ -259,21 +263,24 @@ public final class VoxelColumnS2CPayload {
                     partIndex,
                     partCount,
                     replacementSectionYs);
+        } else {
+            payload = new VoxelColumnS2CPayload(
+                    requestId,
+                    chunkX,
+                    chunkZ,
+                    dimension,
+                    columnTimestamp,
+                    encodedSectionBytes,
+                    encodedCompression,
+                    encodedRawSize,
+                    completeColumn,
+                    transferId,
+                    partIndex,
+                    partCount,
+                    replacementSectionYs);
         }
-        return new VoxelColumnS2CPayload(
-                requestId,
-                chunkX,
-                chunkZ,
-                dimension,
-                columnTimestamp,
-                encodedSectionBytes,
-                encodedCompression,
-                encodedRawSize,
-                completeColumn,
-                transferId,
-                partIndex,
-                partCount,
-                replacementSectionYs);
+        payload.setAllowZstdEncoding(allowZstdEncoding);
+        return payload;
     }
 
     public int[] replacementSectionYs() {

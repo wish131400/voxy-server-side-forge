@@ -24,6 +24,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 
 public final class SectionSerializer {
     private static final byte[] EMPTY_COLUMN_BYTES = new byte[] {0};
+    private static final byte[] EMPTY_LIGHT_BYTES = new byte[DataLayer.SIZE];
 
     private SectionSerializer() {
     }
@@ -109,7 +110,13 @@ public final class SectionSerializer {
 
             byte[] serialized = new byte[buf.readableBytes()];
             buf.readBytes(serialized);
-            return new LoadedColumnData(snapshot.chunkX(), snapshot.chunkZ(), serialized, serialized.length, snapshot.completeColumn());
+            return new LoadedColumnData(
+                    snapshot.chunkX(),
+                    snapshot.chunkZ(),
+                    serialized,
+                    serialized.length,
+                    snapshot.completeColumn(),
+                    sectionYs(sections));
         } finally {
             buf.release();
         }
@@ -173,7 +180,11 @@ public final class SectionSerializer {
             buf.readBytes(serialized);
             boolean completeColumn = hasCompleteRequiredLighting(requiresSkyLight, missingSkyLight)
                     && isCompleteColumn(level, chunk, highestIncludedSectionY, false);
-            return new LoadedColumnData(cx, cz, serialized, serialized.length, completeColumn);
+            int[] sectionYs = new int[includedSections.size()];
+            for (int i = 0; i < includedSections.size(); i++) {
+                sectionYs[i] = includedSections.get(i).sectionY();
+            }
+            return new LoadedColumnData(cx, cz, serialized, serialized.length, completeColumn, sectionYs);
         } finally {
             buf.release();
         }
@@ -205,12 +216,16 @@ public final class SectionSerializer {
     }
 
     private static boolean hasNonZeroData(DataLayer layer) {
-        for (byte b : layer.getData()) {
-            if (b != 0) {
-                return true;
-            }
+        byte[] data = layer.getData();
+        return data.length != EMPTY_LIGHT_BYTES.length || !Arrays.equals(data, EMPTY_LIGHT_BYTES);
+    }
+
+    private static int[] sectionYs(SectionSnapshot[] sections) {
+        int[] sectionYs = new int[sections.length];
+        for (int i = 0; i < sections.length; i++) {
+            sectionYs[i] = sections[i].sectionY();
         }
-        return false;
+        return sectionYs;
     }
 
     static boolean hasCompleteRequiredLighting(boolean requiresSkyLight, boolean missingSkyLight) {

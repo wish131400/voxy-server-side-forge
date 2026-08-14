@@ -26,6 +26,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -41,6 +42,8 @@ public final class ChunkGenerationService {
             TicketType.create("vss_generation", Comparator.comparingLong(ChunkPos::toLong));
     private static final int VSS_GEN_TICKET_DISTANCE = 0;
     private static final int PRIORITY_PACKING_QUEUE_EXTRA_LIMIT = 256;
+    private static final long SNAPSHOT_ESTIMATE_BYTES_PER_SECTION = 65536L;
+    private static final long PACKING_COMPLETION_BUDGET_NANOS = 2_000_000L;
 
     private final LinkedHashMap<PendingGenerationKey, PendingGeneration> active = new LinkedHashMap<>();
     private final LinkedHashMap<PendingGenerationKey, PendingGeneration> queued = new LinkedHashMap<>();
@@ -86,6 +89,8 @@ public final class ChunkGenerationService {
     private volatile long packingEpoch;
     private long nextPackingTaskSequence;
     private long nextQueuedSequence;
+    private final AtomicLong packingSnapshotBytes = new AtomicLong();
+    private final AtomicLong maxPackingSnapshotBytes = new AtomicLong();
     private boolean rebuildingQueuedPriority;
 
     public ChunkGenerationService(VSSServerConfig config) {
@@ -235,6 +240,10 @@ public final class ChunkGenerationService {
         }
 
         try {
+            if (!canSubmitPackingTask(priority, snapshot)) {
+                totalPackingRejected++;
+                return false;
+            }
             long taskEpoch = packingEpoch;
             long columnTimestamp = Math.max(VSSConstants.columnVersion(), minimumTimestamp);
             PendingPacking packing = new PendingPacking(
@@ -312,6 +321,10 @@ public final class ChunkGenerationService {
             try {
                 SectionSerializer.ColumnSnapshot snapshot = SectionSerializer.snapshotColumn(
                         generation.level, chunk, generation.pos.x, generation.pos.z);
+                if (!canSubmitPackingTask(generation.priority(), snapshot)) {
+                    totalPackingRejected++;
+                    continue;
+                }
                 handedOffPacking = submitPackingTask(generationKey, generation, snapshot);
             } catch (Exception e) {
                 if (e instanceof RejectedExecutionException) {
@@ -434,7 +447,11 @@ public final class ChunkGenerationService {
                 averagePackingWaitMs,
                 maxPackingWaitNanos / 1_000_000.0D,
                 startsThisTick)
-                + String.format(", livePackingSubmitted=%d, livePackingCompleted=%d", totalLivePackingSubmitted, totalLivePackingCompleted);
+                + String.format(", livePackingSubmitted=%d, livePackingCompleted=%d, packingSnapshotBytes=%d, packingSnapshotHighWaterBytes=%d",
+                        totalLivePackingSubmitted,
+                        totalLivePackingCompleted,
+                        packingSnapshotBytes.get(),
+                        maxPackingSnapshotBytes.get());
     }
 
     public synchronized Component diagnosticsComponent(Component storageDiagnostics) {
@@ -756,6 +773,15 @@ public final class ChunkGenerationService {
                 || executor.getQueue().size() < queueLimit;
     }
 
+    private boolean canSubmitPackingTask(boolean priority, SectionSerializer.ColumnSnapshot snapshot) {
+        if (!canSubmitPackingTask(priority)) {
+            return false;
+        }
+        long estimate = snapshot.sections().length * SNAPSHOT_ESTIMATE_BYTES_PER_SECTION;
+        return packingSnapshotBytes.get() + estimate
+                <= Math.max(SNAPSHOT_ESTIMATE_BYTES_PER_SECTION, config.packingQueueMaxBytes);
+    }
+
     private PendingPacking submitPackingTask(
             PendingGenerationKey key,
             PendingGeneration generation,
@@ -779,10 +805,28 @@ public final class ChunkGenerationService {
     }
 
     private void submitPackingRunnable(PendingPacking packing) {
-        packingExecutor().execute(new PackingTask(
-                packing.priority(),
-                nextPackingTaskSequence++,
-                () -> packSnapshot(packing)));
+        long snapshotBytes = packing.snapshotBytesEstimate();
+        long currentBytes = packingSnapshotBytes.addAndGet(snapshotBytes);
+        maxPackingSnapshotBytes.accumulateAndGet(currentBytes, Math::max);
+        try {
+            packingExecutor().execute(new PackingTask(
+                    packing.priority(),
+                    nextPackingTaskSequence++,
+                    () -> {
+                        try {
+                            packSnapshot(packing);
+                        } finally {
+                            releasePackingSnapshotBytes(snapshotBytes);
+                        }
+                    }));
+        } catch (RuntimeException e) {
+            releasePackingSnapshotBytes(snapshotBytes);
+            throw e;
+        }
+    }
+
+    private void releasePackingSnapshotBytes(long snapshotBytes) {
+        packingSnapshotBytes.updateAndGet(current -> Math.max(0L, current - snapshotBytes));
     }
 
     private void registerPacking(PendingPacking packing) {
@@ -853,7 +897,12 @@ public final class ChunkGenerationService {
 
     private void drainPackingResults(List<GenerationResult> results) {
         PackingResult packingResult;
-        while ((packingResult = completedPackingResults.poll()) != null) {
+        long deadline = System.nanoTime() + PACKING_COMPLETION_BUDGET_NANOS;
+        int drained = 0;
+        int maxCompletions = Math.max(1, config.automaticGenerationCompletionsPerTick());
+        while (drained++ < maxCompletions
+                && System.nanoTime() <= deadline
+                && (packingResult = completedPackingResults.poll()) != null) {
             PendingPacking packing = packingResult.packing();
             packingByColumn.remove(packing.key(), packing);
             for (CancelableTaskCallbacks.Token<GenerationCallback> callback : packingResult.callbacks()) {
@@ -898,8 +947,8 @@ public final class ChunkGenerationService {
         ThreadPoolExecutor created = new ThreadPoolExecutor(
                 threads,
                 threads,
-                0L,
-                TimeUnit.MILLISECONDS,
+                60L,
+                TimeUnit.SECONDS,
                 new PriorityBlockingQueue<>(),
                 task -> {
                     Thread thread = new Thread(task, "VSS-LOD-Packer");
@@ -907,7 +956,7 @@ public final class ChunkGenerationService {
                     return thread;
                 },
                 new ThreadPoolExecutor.AbortPolicy());
-        created.prestartAllCoreThreads();
+        created.allowCoreThreadTimeOut(true);
         this.packingExecutor = created;
         return created;
     }
@@ -931,6 +980,7 @@ public final class ChunkGenerationService {
             executor.shutdownNow();
             this.packingExecutor = null;
         }
+        packingSnapshotBytes.set(0L);
     }
 
     private void incrementCount(UUID playerUuid) {
@@ -1323,6 +1373,10 @@ public final class ChunkGenerationService {
         private final boolean priority;
         private final long queuedNanos;
         private final CancelableTaskCallbacks<GenerationCallback> callbacks = new CancelableTaskCallbacks<>();
+
+        private long snapshotBytesEstimate() {
+            return snapshot.sections().length * SNAPSHOT_ESTIMATE_BYTES_PER_SECTION;
+        }
 
         private PendingPacking(
                 PendingGenerationKey key,
