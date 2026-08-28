@@ -8,7 +8,7 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 | --- | --- |
 | Minecraft | `1.20.1` |
 | Loader | Forge `47.x` |
-| VSS | `0.2.11-forge-1.20.1` |
+| VSS | `0.2.12-forge-1.20.1` |
 
 - NeoForge 1.21.1 版本：[voxy-server-side-neoforge](https://github.com/wish131400/voxy-server-side-neoforge)
 - 下载：[CurseForge](https://www.curseforge.com/minecraft/mc-mods/voxy-server-side-forge-neoforge)
