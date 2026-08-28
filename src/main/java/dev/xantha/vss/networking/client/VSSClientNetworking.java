@@ -27,6 +27,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -64,6 +66,10 @@ public final class VSSClientNetworking {
 
     static int getQueuedColumnCount() {
         return COLUMN_PROCESSOR.getQueuedCount();
+    }
+
+    static boolean hasPendingColumnWork() {
+        return COLUMN_PROCESSOR.hasPendingWork();
     }
 
     public static long getColumnsReceived() {
@@ -298,8 +304,75 @@ public final class VSSClientNetworking {
         VSSLogger.info("VSS LOD resync requested: " + reason);
     }
 
+    public static int reloadXaeroMapData() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!minecraft.isSameThread()) {
+            minecraft.execute(VSSClientNetworking::reloadXaeroMapData);
+            return -1;
+        }
+        ClientLevel level = minecraft.level;
+        LodRequestManager manager = requestManager;
+        if (!serverEnabled || manager == null || level == null
+                || !ModCompat.isXaeroMapBridgeActive()) {
+            return -1;
+        }
+        ClientLodPresenceCache.ScopeClearResult cleared = ClientLodPresenceCache.clearScopeWithDimensions(
+                ClientLodPresenceCache.currentScope());
+        manager.forceResyncWithoutGeneration(cleared.dimensions(), level.dimension());
+        COLUMN_PROCESSOR.beginSession();
+        ClientLodPresenceCache.flush();
+        VSSLogger.info("Xaero map reload requested for current server: cleared " + cleared.columns()
+                + " cached column(s) across " + cleared.dimensions().size()
+                + " known dimension(s); cache-only replay started");
+        return cleared.columns();
+    }
+
+    public static int setXaeroMapBridge(boolean enabled) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!minecraft.isSameThread()) {
+            minecraft.execute(() -> setXaeroMapBridge(enabled));
+            return -1;
+        }
+        VSSClientConfig.CONFIG.enableXaeroMapBridge = enabled;
+        VSSClientConfig.CONFIG.normalizeAndSave();
+        return enabled ? 1 : 0;
+    }
+
+    @SubscribeEvent
+    public static void onRegisterClientCommands(RegisterClientCommandsEvent event) {
+        event.getDispatcher().register(net.minecraft.commands.Commands.literal("vssclient")
+                .then(net.minecraft.commands.Commands.literal("xaero")
+                        .then(net.minecraft.commands.Commands.literal("disable")
+                                .executes(context -> {
+                                    setXaeroMapBridge(false);
+                                    context.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.translatable(
+                                            "vss.command.xaero.disabled"), false);
+                                    return 1;
+                                }))
+                        .then(net.minecraft.commands.Commands.literal("enable")
+                                .executes(context -> {
+                                    setXaeroMapBridge(true);
+                                    context.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.translatable(
+                                            "vss.command.xaero.enabled"), false);
+                                    return 1;
+                                }))
+                        .then(net.minecraft.commands.Commands.literal("reload")
+                                .executes(context -> {
+                                    int cleared = reloadXaeroMapData();
+                                    if (cleared < 0) {
+                                        context.getSource().sendFailure(net.minecraft.network.chat.Component.translatable(
+                                                "vss.command.xaero_reload.no_session"));
+                                        return 0;
+                                    }
+                                    context.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.translatable(
+                                            "vss.command.xaero_reload.started", cleared), false);
+                                    return 1;
+                                }))));
+    }
+
     @SubscribeEvent
     public static void onClientLogin(ClientPlayerNetworkEvent.LoggingIn event) {
+        ModCompat.onDisconnect();
         serverEnabled = false;
         serverLodDistance = 0;
         waitingForHandshake = false;
@@ -332,6 +405,13 @@ public final class VSSClientNetworking {
         }
         COLUMN_PROCESSOR.scheduleProcessing(serverEnabled);
         ModCompat.clientTick();
+    }
+
+    @SubscribeEvent
+    public static void onRenderLevel(RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
+            ModCompat.renderFrame();
+        }
     }
 
     public static void sendBandwidthPreference() {
@@ -471,6 +551,7 @@ public final class VSSClientNetworking {
         }
         ClientLodPresenceCache.flush();
         FarPlayerClientRenderer.clear();
+        ModCompat.onDisconnect();
         COLUMN_PROCESSOR.shutdown();
         if (resetStats) {
             COLUMN_PROCESSOR.resetStats();

@@ -5,6 +5,7 @@ import net.minecraftforge.fml.ModList;
 
 public final class ModCompat {
     private static volatile boolean voxyLoaded;
+    private static volatile boolean xaeroInitialized;
     private static volatile long nextInitAttemptNanos;
     private static final long INIT_RETRY_INTERVAL_NANOS = 5_000_000_000L;
 
@@ -12,6 +13,10 @@ public final class ModCompat {
     }
 
     public static void init() {
+        if (!xaeroInitialized && ModList.get().isLoaded("xaeroworldmap")) {
+            xaeroInitialized = true;
+            XaeroMapCompat.init();
+        }
         if (voxyLoaded) {
             return;
         }
@@ -41,6 +46,31 @@ public final class ModCompat {
         if (voxyLoaded) {
             VoxyCompat.clientTick();
         }
+        XaeroMapCompat.clientTick();
+    }
+
+    public static void renderFrame() {
+        XaeroMapCompat.renderFrame();
+    }
+
+    public static void onDisconnect() {
+        XaeroMapCompat.onDisconnect();
+    }
+
+    public static String xaeroDiagnostics() {
+        return XaeroMapCompat.diagLine();
+    }
+
+    public static boolean isXaeroMapBridgeActive() {
+        return XaeroMapCompat.isActive();
+    }
+
+    public static boolean shouldBackpressureXaeroMapInput() {
+        return XaeroMapCompat.shouldBackpressureInput();
+    }
+
+    public static boolean hasPendingXaeroMapWork() {
+        return XaeroMapCompat.hasPendingWork();
     }
 
     private static boolean classExists(String name) {

@@ -149,6 +149,19 @@ class ClientRequestTrackerTest {
         assertEquals(1, tracker.generationSize());
     }
 
+    @Test
+    void cacheProbeHasIndependentInFlightAccounting() {
+        ClientRequestTracker tracker = newTracker();
+        int requestId = tracker.track(42L, false, true, false, 1_000_000_000L, System.nanoTime());
+
+        assertTrue(tracker.isCacheProbeRequest(requestId));
+        assertEquals(1, tracker.cacheProbeSize());
+        assertEquals(0, tracker.generationSize());
+
+        assertEquals(42L, tracker.remove(requestId));
+        assertEquals(0, tracker.cacheProbeSize());
+    }
+
     private static ClientRequestTracker newTracker() {
         return new ClientRequestTracker(ignored -> {
         });

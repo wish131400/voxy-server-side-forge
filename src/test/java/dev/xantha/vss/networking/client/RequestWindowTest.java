@@ -93,6 +93,20 @@ class RequestWindowTest {
     }
 
     @Test
+    void cacheProbeUsesIndependentBudget() {
+        RequestWindow window = new RequestWindow(0, 0, 0, 0, 0, 2, 0);
+
+        assertTrue(window.hasCacheProbeCapacity());
+        assertTrue(window.canSend(false, false, true, 0));
+        window.record(false, false, true, 0);
+        window.record(false, false, true, 0);
+
+        assertFalse(window.hasCacheProbeCapacity());
+        assertEquals(0, window.generationSent());
+        assertEquals(0, window.syncSent());
+    }
+
+    @Test
     void remainingNeverCountsNegativeBuckets() {
         RequestWindow window = new RequestWindow(0, 0, 0, 0, 0, 1);
 

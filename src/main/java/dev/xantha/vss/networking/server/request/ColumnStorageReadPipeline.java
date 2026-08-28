@@ -157,6 +157,7 @@ public final class ColumnStorageReadPipeline {
             long dirtyTimestamp,
             boolean preferLoadedColumn,
             boolean allowGeneration,
+            boolean cacheProbe,
             boolean priority) {
         if (VSSServerNetworking.isServerStopping()) {
             state.clearRequest(requestId);
@@ -176,6 +177,7 @@ public final class ColumnStorageReadPipeline {
                 columnTimestamp,
                 preferLoadedColumn,
                 allowGeneration,
+                cacheProbe,
                 priority);
         boolean submitted = readCoordinator.submit(
                 level.dimension(),
@@ -262,7 +264,11 @@ public final class ColumnStorageReadPipeline {
             PersistentColumnLodStore.Entry storedData) {
         if (storedData != null
                 || readContext.preferLoadedColumn()
-                || !shouldReadExistingChunkNbt(readContext.allowGeneration())) {
+                || !shouldReadExistingChunkNbt(
+                        VSSServerConfig.CONFIG.enableChunkNbtColumnSync,
+                        readContext.allowGeneration(),
+                        VSSServerConfig.CONFIG.enableChunkGeneration,
+                        readContext.cacheProbe())) {
             return CompletableFuture.completedFuture(DiskNbtReadResult.empty());
         }
         NbtReadKey key = new NbtReadKey(
@@ -439,6 +445,20 @@ public final class ColumnStorageReadPipeline {
         return enableChunkNbtColumnSync || !allowGeneration || !enableChunkGeneration;
     }
 
+    static boolean shouldReadExistingChunkNbt(
+            boolean enableChunkNbtColumnSync,
+            boolean allowGeneration,
+            boolean enableChunkGeneration,
+            boolean cacheProbe) {
+        if (cacheProbe) {
+            return false;
+        }
+        return shouldReadExistingChunkNbt(
+                enableChunkNbtColumnSync,
+                allowGeneration,
+                enableChunkGeneration);
+    }
+
     private void finishDiskRead(
             DiskReadContext readContext,
             PersistentColumnLodStore.Entry storedData,
@@ -518,7 +538,9 @@ public final class ColumnStorageReadPipeline {
 
     private void handleMissingDiskColumn(DiskReadContext readContext, ServerPlayer player, long minimumTimestamp) {
         requestStats.recordDiskReadMiss();
-        if (readContext.allowGeneration() && VSSServerConfig.CONFIG.enableChunkGeneration) {
+        if (!readContext.cacheProbe()
+                && readContext.allowGeneration()
+                && VSSServerConfig.CONFIG.enableChunkGeneration) {
             submitGeneration(
                     player,
                     readContext.requestState(),
@@ -627,6 +649,7 @@ public final class ColumnStorageReadPipeline {
             long columnTimestamp,
             boolean preferLoadedColumn,
             boolean allowGeneration,
+            boolean cacheProbe,
             boolean priority) {
     }
 

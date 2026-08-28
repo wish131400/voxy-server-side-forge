@@ -16,8 +16,14 @@ public final class VSSApi {
     }
 
     public static void registerColumnConsumer(VoxelColumnConsumer consumer) {
-        COLUMN_CONSUMERS.add(consumer);
+        if (!COLUMN_CONSUMERS.contains(consumer)) {
+            COLUMN_CONSUMERS.add(consumer);
+        }
         VSSLogger.info("Registered voxel column consumer: " + consumer.getClass().getName());
+    }
+
+    public static void removeColumnConsumer(VoxelColumnConsumer consumer) {
+        COLUMN_CONSUMERS.remove(consumer);
     }
 
     public static void registerColumnProcessingConsumer(VoxelColumnProcessingConsumer consumer) {

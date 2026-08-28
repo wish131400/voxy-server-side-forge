@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -271,6 +272,27 @@ final class ClientLodPresenceCache {
         if (snapshot != null) {
             writeSnapshot(snapshot);
         }
+    }
+
+    static synchronized ScopeClearResult clearScopeWithDimensions(String scopeKey) {
+        if (scopeKey == null) {
+            return ScopeClearResult.EMPTY;
+        }
+        ensureLoaded();
+        ScopeCache removed = scopes.remove(scopeKey);
+        if (removed == null) {
+            return ScopeClearResult.EMPTY;
+        }
+        int columns = 0;
+        for (DimensionCache dimension : removed.dimensions.values()) {
+            columns += dimension.columnCount;
+        }
+        markDirty();
+        return new ScopeClearResult(columns, Set.copyOf(removed.dimensions.keySet()));
+    }
+
+    record ScopeClearResult(int columns, Set<String> dimensions) {
+        private static final ScopeClearResult EMPTY = new ScopeClearResult(0, Set.of());
     }
 
     private static DimensionCache dimensionCache(String scopeKey, ResourceKey<Level> dimension, boolean create) {

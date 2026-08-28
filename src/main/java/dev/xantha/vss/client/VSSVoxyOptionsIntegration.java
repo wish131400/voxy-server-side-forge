@@ -142,6 +142,13 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding((config, value) -> config.offThreadSectionProcessing = value, config -> config.offThreadSectionProcessing)
                         .setImpact(OptionImpact.LOW)
                         .build())
+                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.xaero_map_bridge"))
+                        .setTooltip(Component.translatable("vss.voxy_options.xaero_map_bridge.tooltip"))
+                        .setControl(TickBoxControl::new)
+                        .setBinding((config, value) -> config.enableXaeroMapBridge = value, config -> config.enableXaeroMapBridge)
+                        .setImpact(OptionImpact.LOW)
+                        .build())
                 .build());
 
         groups.add(OptionGroup.createBuilder()
