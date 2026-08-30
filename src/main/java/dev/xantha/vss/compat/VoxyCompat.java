@@ -2,6 +2,7 @@ package dev.xantha.vss.compat;
 
 import dev.xantha.vss.api.VSSApi;
 import dev.xantha.vss.api.VoxelColumnData;
+import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.networking.client.VSSClientNetworking;
 import java.lang.invoke.MethodHandle;
@@ -277,6 +278,54 @@ final class VoxyCompat {
         }
     }
 
+    /**
+     * Enumerates the LOD0 columns known by Voxy's local section index.  This is
+     * deliberately an index-only query: no Voxy section is acquired and no raw
+     * block data is decoded here.  The caller can use the positions to request
+     * a stable server-side column representation (for example, for Xaero map
+     * backfill) without coupling the bridge to Voxy's raw serialization format.
+     *
+     * @return a non-negative number of emitted columns when the index is ready,
+     *         or {@code -1} while the asynchronous index build is still running
+     */
+    static int forEachLocalColumn(
+            Level level,
+            int centerChunkX,
+            int centerChunkZ,
+            int maxDistance,
+            int maxColumns,
+            LongConsumer consumer) {
+        if (level == null || consumer == null || maxDistance < 0 || maxColumns <= 0
+                || worldEngineNullable == null || getStorage == null
+                || iterateStoredSectionPositions == null) {
+            return 0;
+        }
+        try {
+            Object engine = worldEngineNullable.invoke(level);
+            if (engine == null) {
+                // Voxy creates the world engine lazily during level attach.
+                // Keep the seed pending so a join that races that attach still
+                // gets its local columns imported on a later tick.
+                return -1;
+            }
+            LocalSectionIndex index = localIndex(engine);
+            if (index.unavailable) {
+                return 0;
+            }
+            if (!index.ready) {
+                startLocalIndexBuild(engine, index);
+                return -1;
+            }
+            return index.forEachStoredColumn(centerChunkX, centerChunkZ, maxDistance, maxColumns, consumer);
+        } catch (Throwable e) {
+            if (!localIndexWarningLogged) {
+                localIndexWarningLogged = true;
+                VSSLogger.debug("Voxy local column enumeration failed: " + e.getMessage());
+            }
+            return 0;
+        }
+    }
+
     static ModCompat.LocalColumnState resolveLocalIndexState(boolean confirmed, boolean ready, boolean stored) {
         if (confirmed) {
             return ModCompat.LocalColumnState.PRESENT;
@@ -422,6 +471,42 @@ final class VoxyCompat {
 
         private boolean hasStored(int chunkX, int chunkZ) {
             return has(storedRegions, chunkX, chunkZ);
+        }
+
+        private int forEachStoredColumn(
+                int centerChunkX,
+                int centerChunkZ,
+                int maxDistance,
+                int maxColumns,
+                LongConsumer consumer) {
+            int emitted = 0;
+            for (Map.Entry<Long, long[]> entry : storedRegions.entrySet()) {
+                long region = entry.getKey();
+                int regionX = (int) (region >> 32);
+                int regionZ = (int) region;
+                long[] bitmap = entry.getValue();
+                if (bitmap == null) {
+                    continue;
+                }
+                for (int word = 0; word < bitmap.length; word++) {
+                    long bits = bitmap[word];
+                    while (bits != 0L) {
+                        int bit = Long.numberOfTrailingZeros(bits);
+                        int slot = (word << 6) + bit;
+                        int chunkX = (regionX << 5) + (slot & 31);
+                        int chunkZ = (regionZ << 5) + (slot >>> 5);
+                        if (PositionUtil.chebyshevDistance(chunkX, chunkZ, centerChunkX, centerChunkZ)
+                                <= maxDistance) {
+                            consumer.accept(PositionUtil.packPosition(chunkX, chunkZ));
+                            if (++emitted >= maxColumns) {
+                                return emitted;
+                            }
+                        }
+                        bits &= bits - 1L;
+                    }
+                }
+            }
+            return emitted;
         }
 
         private static boolean has(ConcurrentHashMap<Long, long[]> regions, int chunkX, int chunkZ) {

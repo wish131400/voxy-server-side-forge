@@ -15,7 +15,8 @@ public record EncodedColumnData(
         boolean completeColumn,
         int[] sectionYs,
         int encodedCrc32c) {
-    public static final int SCHEMA_VERSION = 3;
+    /** Bumped because older snapshots discarded the per-cell biome palette. */
+    public static final int SCHEMA_VERSION = 4;
 
     public EncodedColumnData(
             int chunkX, int chunkZ, int compression, int rawSize, byte[] encodedBytes,

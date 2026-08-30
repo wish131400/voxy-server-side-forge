@@ -1,6 +1,7 @@
 package dev.xantha.vss.compat;
 
 import java.util.OptionalInt;
+import java.util.function.LongConsumer;
 import net.minecraftforge.fml.ModList;
 
 public final class ModCompat {
@@ -40,6 +41,24 @@ public final class ModCompat {
 
     public static LocalColumnState getVoxyLocalColumnState(net.minecraft.world.level.Level level, int chunkX, int chunkZ) {
         return voxyLoaded ? VoxyCompat.getLocalColumnState(level, chunkX, chunkZ) : LocalColumnState.UNKNOWN;
+    }
+
+    /**
+     * Enumerates local Voxy LOD0 column positions without acquiring or decoding
+     * Voxy sections. A return value of {@code -1} means the index is still being
+     * built and should be retried on a later client tick.
+     */
+    public static int forEachVoxyLocalColumn(
+            net.minecraft.world.level.Level level,
+            int centerChunkX,
+            int centerChunkZ,
+            int maxDistance,
+            int maxColumns,
+            LongConsumer consumer) {
+        return voxyLoaded
+                ? VoxyCompat.forEachLocalColumn(
+                        level, centerChunkX, centerChunkZ, maxDistance, maxColumns, consumer)
+                : 0;
     }
 
     public static void clientTick() {

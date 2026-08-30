@@ -8,7 +8,7 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 | --- | --- |
 | Minecraft | `1.20.1` |
 | Loader | Forge `47.x` |
-| VSS | `0.2.12-forge-1.20.1` |
+| VSS | `0.2.13-forge-1.20.1` |
 
 - NeoForge 1.21.1 版本：[voxy-server-side-neoforge](https://github.com/wish131400/voxy-server-side-neoforge)
 - 下载：[CurseForge](https://www.curseforge.com/minecraft/mc-mods/voxy-server-side-forge-neoforge)
@@ -46,7 +46,9 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 
 客户端安装 [Xaero's World Map](https://modrinth.com/mod/xaeros-world-map) 后，VSS 会把服务端发送的远景列写入世界地图，使地图覆盖范围不再受原版渲染距离限制。桥接完全在客户端完成，不修改协议，也不要求安装 Voxy；原版已经加载的近处区块仍由 Xaero 自己绘制。
 
-该功能默认开启，可在 VSS 的 Embeddium/Sodium 设置页控制，需要临时关闭地图写入时执行 `/vssclient xaero disable`，恢复时执行 `/vssclient xaero enable`。执行 `/vssclient xaero reload` 会清除当前服务器所有维度的客户端列存在性记录并自动重新请求已有 LOD 缓存。
+该功能默认开启，可在 VSS 的 Embeddium/Sodium 设置页控制，需要临时关闭地图写入时执行 `/vssclient xaero disable`，恢复时执行 `/vssclient xaero enable`。进入服务器后，VSS 会自动扫描当前视距内的本地 Voxy LOD，并对这些列执行一次仅缓存回填：服务端有 VSS 缓存时会重新传输给 Xaero，服务端没有缓存时不会触发生成，也不会删除本地 Voxy 列。执行 `/vssclient xaero reload` 会清除当前服务器所有维度的客户端列存在性记录并自动重新请求已有 LOD 缓存。
+
+这里的“自动回填”只读取 Voxy 的本地位置索引，不读取或解码 Voxy 内部 raw section；地图像素仍由 VSS 的完整列数据生成。这样可以跨 Voxy 小版本工作，并避免在 Voxy 正在加载/释放 section 时产生线程和生命周期冲突。若服务端已经删除对应的 VSS 持久化缓存，旧 LOD 只能继续由 Voxy 本地渲染，Xaero 无法凭空恢复该列。
 
 Xaero `1.40.x`、`1.41.x`、`1.42.x`、`1.43.x`、`1.44.x` 和 `1.45.0` 已适配，低于 `1.40.0` 的版本不受支持，高于 `1.45.0` 的版本尚未验证。反射接口不兼容时，Xaero 桥接会自动停用，不影响 VSS/Voxy 的 LOD 功能。
 
@@ -125,7 +127,7 @@ Xaero 地图命令是客户端命令，不需要管理员权限：`/vssclient xa
 <世界>/data/vss-column-cache/<维度>/<regionX>_<regionZ>/
 ```
 
-`.vcl` 保存列数据，`index.vci` 保存 Region 索引。需要清空缓存时先关闭服务器，再删除 `vss-column-cache`；之后的 LOD 会重新读取或生成。
+`.vcl` 保存列数据，`index.vci` 保存 Region 索引。Biome 快照修复会自动提高缓存 schema，升级后旧格式列会被视为无效并重新读取或生成；不需要手动清理。需要手动清空缓存时先关闭服务器，再删除 `vss-column-cache`。
 
 排错建议：
 

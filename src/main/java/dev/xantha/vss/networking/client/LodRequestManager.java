@@ -49,6 +49,8 @@ public final class LodRequestManager {
     private static final int SCAN_BOOST_TICKS = 100;
     private static final int MAX_DEFERRED_CANDIDATES_PER_TICK = 2048;
     private static final int MAX_DEFERRED_COLUMNS = 65536;
+    /** Bound the one-time local-index walk used to seed Xaero cache replay. */
+    private static final int MAX_XAERO_LOCAL_REPLAY_COLUMNS = 65536;
     private static final int FAST_MOVE_CHUNK_THRESHOLD = 8;
     private static final int FAST_MOVE_KEEP_RADIUS_CHUNKS = 48;
     // Walk the whole active LOD window so stale cached entries cannot permanently
@@ -74,6 +76,8 @@ public final class LodRequestManager {
                     RATE_LIMIT_BACKOFF_MAX_SHIFT,
                     GENERATION_BACKOFF_MAX_SHIFT));
     private final LongOpenHashSet diskMissedColumns = new LongOpenHashSet();
+    /** Known local Voxy columns whose contents should be replayed into Xaero. */
+    private final LongOpenHashSet xaeroReplayColumns = new LongOpenHashSet();
     private final ClientPresenceReporter presenceReporter;
     private final Runnable transferReset;
     private final CacheOnlyReloadTracker cacheOnlyReload = new CacheOnlyReloadTracker();
@@ -96,6 +100,8 @@ public final class LodRequestManager {
     private long nextFullScanRetryNanos;
     private double dirtyRefreshBudget;
     private long lastRequestDiagnosticNanos;
+    private boolean xaeroReplayArmed;
+    private boolean xaeroLocalSeedComplete;
 
     private static class RequestBuffers {
         final int[] requestIds = new int[VSSConstants.MAX_BATCH_CHUNK_REQUESTS];
@@ -174,6 +180,12 @@ public final class LodRequestManager {
         ClientLevel level = mc.level;
         if (player == null || level == null || player.isRemoved()) {
             return;
+        }
+
+        if (ModCompat.isXaeroMapBridgeActive()) {
+            armXaeroBackfill(level, player.getBlockX() >> 4, player.getBlockZ() >> 4);
+        } else {
+            disarmXaeroBackfill();
         }
 
         boolean dimensionChanged = lastDimension != null && !lastDimension.equals(level.dimension());
@@ -321,6 +333,7 @@ public final class LodRequestManager {
             int[] replacementSectionYs) {
         long requiredTimestamp = dirtyColumnTimestamps.get(packed);
         columnTimestamps.put(packed, columnTimestamp);
+        xaeroReplayColumns.remove(packed);
         rememberKnownColumn(dimension, packed, columnTimestamp, replacementSectionYs);
         diskMissedColumns.remove(packed);
         deferredColumns.remove(packed);
@@ -381,6 +394,7 @@ public final class LodRequestManager {
         boolean cacheProbeRequest = requestTracker.isCacheProbeRequest(requestId);
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
+            boolean xaeroReplayRequest = cacheProbeRequest && xaeroReplayColumns.remove(packed);
             if (dirtyRefreshRequest && hasKnownColumn(packed)) {
                 if (hasDirtyTimestamp(packed)) {
                     markBackoff(packed, false);
@@ -401,7 +415,22 @@ public final class LodRequestManager {
                 deferredColumns.remove(packed);
                 deferColumn(packed);
             } else if (cacheProbeRequest) {
-                handleCacheProbeMiss(packed);
+                // A local-only Xaero replay miss must not evict VSS presence or
+                // make Voxy request the same column again. The local LOD remains
+                // valid; only the Xaero import is unavailable on this server.
+                if (xaeroReplayRequest) {
+                    // A position discovered only from Voxy has no VSS timestamp.
+                    // Keep an explicit no-data marker so the normal scanner does
+                    // not immediately turn this cache miss into another probe or
+                    // a generation candidate.
+                    if (columnTimestamps.get(packed) <= 0L) {
+                        columnTimestamps.put(packed, 0L);
+                    }
+                    deferredColumns.remove(packed);
+                    clearBackoff(packed);
+                } else {
+                    handleCacheProbeMiss(packed);
+                }
             } else if (generationAllowed()) {
                 columnTimestamps.remove(packed);
                 clearBackoff(packed);
@@ -428,6 +457,7 @@ public final class LodRequestManager {
     public synchronized void onColumnUpToDate(int requestId) {
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
+            xaeroReplayColumns.remove(packed);
             long requiredTimestamp = dirtyColumnTimestamps.get(packed);
             long localTimestamp = columnTimestamps.get(packed);
             if (localTimestamp <= 0L) {
@@ -514,6 +544,72 @@ public final class LodRequestManager {
     public synchronized void forceResync() {
         cacheOnlyReload.clear();
         resetRequestStateAfterConfigChange();
+    }
+
+    /**
+     * Arms the Xaero backfill without invalidating VSS presence state. Existing
+     * presence entries are deliberately requested with a synthetic stale
+     * timestamp and the cache-probe flag, so the server sends a cached column
+     * even though Voxy already has the same LOD locally. No world generation is
+     * permitted.
+     */
+    private void armXaeroBackfill(ClientLevel level, int playerCx, int playerCz) {
+        if (!xaeroReplayArmed) {
+            xaeroReplayArmed = true;
+            for (long packed : columnTimestamps.keySet()) {
+                queueXaeroReplay(packed);
+            }
+        }
+
+        if (xaeroLocalSeedComplete) {
+            return;
+        }
+        int distance = getEffectiveLodDistance();
+        if (distance <= 0) {
+            xaeroLocalSeedComplete = true;
+            return;
+        }
+        int result = ModCompat.forEachVoxyLocalColumn(
+                level,
+                playerCx,
+                playerCz,
+                distance + VSSConstants.LOD_DISTANCE_BUFFER,
+                MAX_XAERO_LOCAL_REPLAY_COLUMNS,
+                this::queueXaeroReplay);
+        if (result >= 0) {
+            xaeroLocalSeedComplete = true;
+            if (result > 0) {
+                VSSLogger.debug("Xaero local LOD backfill queued " + result + " Voxy columns");
+            }
+        }
+    }
+
+    private void disarmXaeroBackfill() {
+        if (!xaeroReplayArmed && xaeroReplayColumns.isEmpty()) {
+            return;
+        }
+        for (long packed : xaeroReplayColumns) {
+            if (requestTracker.contains(packed)) {
+                requestTracker.cancel(packed);
+            }
+            deferredColumns.remove(packed);
+        }
+        xaeroReplayColumns.clear();
+        xaeroReplayArmed = false;
+        xaeroLocalSeedComplete = false;
+    }
+
+    private void queueXaeroReplay(long packed) {
+        if (!xaeroReplayArmed || dirtyColumns.contains(packed)) {
+            return;
+        }
+        if (xaeroReplayColumns.add(packed)) {
+            deferredColumns.defer(packed);
+        }
+    }
+
+    private boolean isXaeroReplayCandidate(long packed) {
+        return xaeroReplayArmed && xaeroReplayColumns.contains(packed);
     }
 
     public synchronized void forceResyncWithoutGeneration(
@@ -984,7 +1080,7 @@ public final class LodRequestManager {
             boolean generationCandidate = !dirtyRefresh && isGenerationCandidate(packed);
             boolean cacheProbe = !dirtyRefresh
                     && !generationCandidate
-                    && requiresFirstPassCacheProbe(packed);
+                    && (isXaeroReplayCandidate(packed) || requiresFirstPassCacheProbe(packed));
             if (!dirtyRefresh
                     && !generationCandidate
                     && !cacheProbe
@@ -1195,7 +1291,8 @@ public final class LodRequestManager {
         }
         boolean generationCandidate = isGenerationCandidate(packed);
         boolean cacheProbe = !generationCandidate
-                && shouldUseFirstPassCacheProbe(packed, ring, requestWindow);
+                && (isXaeroReplayCandidate(packed)
+                        || shouldUseFirstPassCacheProbe(packed, ring, requestWindow));
         if (!requestWindow.canSend(false, generationCandidate, cacheProbe, ring)) {
             return count;
         }
@@ -1243,6 +1340,9 @@ public final class LodRequestManager {
         }
 
         long timestamp = columnTimestamps.get(packed);
+        if (isXaeroReplayCandidate(packed)) {
+            return true;
+        }
         if (timestamp > 0L && !dirty) {
             return false;
         }
@@ -1327,7 +1427,8 @@ public final class LodRequestManager {
         if (columnTimestamp > 0L) {
             columnTimestamps.put(packed, Math.max(columnTimestamps.get(packed), columnTimestamp));
             diskMissedColumns.remove(packed);
-            if (!dirtyColumns.contains(packed)) {
+            queueXaeroReplay(packed);
+            if (!dirtyColumns.contains(packed) && !isXaeroReplayCandidate(packed)) {
                 deferredColumns.remove(packed);
                 clearBackoff(packed);
             }
@@ -1336,6 +1437,10 @@ public final class LodRequestManager {
 
     boolean reconcileMissingColumn(long packed) {
         columnTimestamps.remove(packed);
+        // This column is no longer a local-only replay candidate: normal VSS
+        // reconciliation must be allowed to request it (and, when configured,
+        // generate it) again.
+        xaeroReplayColumns.remove(packed);
         if (lastDimension != null) {
             presenceReporter.removeKnownColumn(lastDimension, packed);
         }
@@ -1419,7 +1524,13 @@ public final class LodRequestManager {
                 now);
         requestIds[count] = requestId;
         positions[count] = packed;
-        timestamps[count] = requestTimestampFor(packed);
+        // A Xaero replay must force the server to return the cached body even
+        // when Voxy already reports the same timestamp locally. A positive,
+        // synthetic stale timestamp also keeps this replay on the server's
+        // priority path; the server-side known timestamp is never downgraded.
+        timestamps[count] = isXaeroReplayCandidate(packed) && !dirtyColumns.contains(packed)
+                ? 1L
+                : requestTimestampFor(packed);
         allowGeneration[count] = generationCandidate;
         cacheProbeFlags[count] = cacheProbeRequest;
         return count + 1;
@@ -1662,6 +1773,8 @@ public final class LodRequestManager {
         transferReset.run();
         deferredColumns.clear();
         diskMissedColumns.clear();
+        xaeroReplayColumns.clear();
+        xaeroLocalSeedComplete = false;
         retryBackoff.clearAll();
         lastPlayerChunkX = Integer.MIN_VALUE;
         lastPlayerChunkZ = Integer.MIN_VALUE;

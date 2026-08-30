@@ -18,6 +18,6 @@ class EncodedColumnDataTest {
 
         assertArrayEquals(new int[] {-4, 0, 12}, encoded.sectionYs());
         assertEquals(EncodedColumnData.crc32c(encoded.encodedBytes()), encoded.encodedCrc32c());
-        assertEquals(3, encoded.schemaVersion());
+        assertEquals(4, encoded.schemaVersion());
     }
 }
