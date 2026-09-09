@@ -33,6 +33,7 @@ public final class VSSMod {
             ModCompat.init();
             MinecraftForge.EVENT_BUS.register(VSSClientNetworking.class);
             MinecraftForge.EVENT_BUS.register(FarPlayerClientRenderer.class);
+            MinecraftForge.EVENT_BUS.register(dev.xantha.vss.networking.client.VSSClientCommands.class);
         }
 
         private static void registerEmbeddiumOptionsBridge() {

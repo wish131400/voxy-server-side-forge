@@ -1,6 +1,8 @@
 package dev.xantha.vss.networking;
 
 import dev.xantha.vss.common.VSSConstants;
+import dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload;
+import dev.xantha.vss.networking.payloads.WorldgenProfileFragmentS2CPayload;
 import dev.xantha.vss.networking.payloads.BandwidthUpdateC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchResponseS2CPayload;
@@ -36,6 +38,8 @@ public final class VSSNetworking {
 
     private VSSNetworking() {
     }
+
+    private static final java.util.concurrent.atomic.AtomicInteger WORLDGEN_TRANSFERS = new java.util.concurrent.atomic.AtomicInteger();
 
     public static void register() {
         int id = 0;
@@ -94,6 +98,12 @@ public final class VSSNetworking {
                 .decoder(HandshakeRequestS2CPayload::decode)
                 .consumerMainThread(VSSNetworking::handleHandshakeRequest)
                 .add();
+        CHANNEL.messageBuilder(WorldgenProfileFragmentS2CPayload.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(WorldgenProfileFragmentS2CPayload::encode)
+                .decoder(WorldgenProfileFragmentS2CPayload::decode)
+                .consumerMainThread((payload, context) -> DistExecutor.safeRunWhenOn(Dist.CLIENT,
+                        () -> () -> dev.xantha.vss.networking.client.VSSClientNetworking.handleWorldgenFragment(payload)))
+                .add();
         CHANNEL.messageBuilder(ServerIdentityS2CPayload.class, id++, NetworkDirection.LOGIN_TO_CLIENT)
                 .encoder(ServerIdentityS2CPayload::encode)
                 .decoder(ServerIdentityS2CPayload::decode)
@@ -111,7 +121,25 @@ public final class VSSNetworking {
     }
 
     public static void sendToPlayer(ServerPlayer player, Object payload) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), payload);
+        if (payload instanceof WorldgenProfileS2CPayload profile) {
+            var buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+            try {
+                WorldgenProfileS2CPayload.encode(profile, buf);
+                int total = buf.readableBytes();
+                if (total > WorldgenProfileFragmentS2CPayload.MAX_BYTES)
+                    throw new IllegalArgumentException("Worldgen snapshot exceeds transfer limit");
+                int transfer = WORLDGEN_TRANSFERS.incrementAndGet();
+                for (int offset = 0; offset < total;) {
+                    byte[] part = new byte[Math.min(WorldgenProfileFragmentS2CPayload.CHUNK_BYTES, total - offset)];
+                    buf.readBytes(part);
+                    CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+                            new WorldgenProfileFragmentS2CPayload(transfer, total, offset, part));
+                    offset += part.length;
+                }
+            } finally { buf.release(); }
+        } else {
+            CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), payload);
+        }
     }
 
     private static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
