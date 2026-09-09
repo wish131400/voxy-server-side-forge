@@ -1,3 +1,7 @@
+> **当前版本：0.3 / Forge 1.20.1 预测 LOD 移植版。** 基于 2026-09-10 保存的 NeoForge 1.21.1 工作区快照。使用 Java 17 构建。预测代码、Forge 分片同步、原生库及验证边界见 [移植记录](docs/PREDICTION_PORT_1.20.1.md)。下方较早版本的发布说明不代表本次已完成游戏内联机或光影验收。
+
+客户端统一通过 `/vssclient stats` 查看会话和预测状态。`/vssclient prediction capture` 用于导出参考数据；重复的 `/vssclient prediction` 状态入口已移除。Xaero 的 `enable`、`disable`、`reload` 命令保留。
+
 # Voxy Server Side Forge
 
 Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Voxy 远景 LOD。客户端只请求缺失或过期的列数据，再交给 Voxy 渲染，适合多人服务器、大型整合包和高速移动场景。
