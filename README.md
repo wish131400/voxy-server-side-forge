@@ -46,6 +46,14 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 
 方块发生变化时，服务端会广播脏列版本，客户端只刷新受影响的 LOD。
 
+## VSS 远处预测
+
+客户端收到服务端同步的世界生成信息后，用世界种子在本地预测并渲染远景地形，不必等服务端把远处的 Voxy 列全部传输完成，地平线附近即可显示地形、植被和地表建筑。该功能默认开启，可用客户端配置 `enablePrediction` 关闭。
+
+预测范围由 `predictionDistanceBlocks` 控制（默认 8192 方块），近处地形之外还会按 `predictionSurfaceDistanceBlocks`（默认 768 方块）细化地表内容，植被和建筑分别由 `predictionTrees`、`predictionStructures` 开关。地形采样优先使用随包的原生 Rust 后端，不可用时回退 Java；预测结果默认缓存在本地（`rememberTerrain=true`）。
+
+预测只是对世界生成的近似，不执行完整雕刻、装饰与结构地形融合，也不包含玩家改动，需要完全准确时以服务端下发的真实列为准。
+
 ## Xaero 世界地图加载
 
 客户端安装 [Xaero's World Map](https://modrinth.com/mod/xaeros-world-map) 后，VSS 会把服务端发送的远景列写入世界地图，使地图覆盖范围不再受原版渲染距离限制。桥接完全在客户端完成，不修改协议，也不要求安装 Voxy；原版已经加载的近处区块仍由 Xaero 自己绘制。
