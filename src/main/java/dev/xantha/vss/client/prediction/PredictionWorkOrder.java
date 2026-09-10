@@ -74,10 +74,8 @@ final class PredictionWorkOrder {
 
     static int priority(PredictionTileKey key, VssLodLayout layout, double distanceSquared,
                         int residentAxis, boolean surface, VssLodFocus focus) {
-        // Immediate terrain stays usable. Other regions reach medium before
-        // expensive final terrain and plants, without a global readiness gate.
+        // Medium terrain precedes final terrain and plants at every distance.
         int band = Math.min(65535, (int) (Math.sqrt(distanceSquared) / WORK_BAND_BLOCKS));
-        if (!surface && distanceSquared < 256D * 256) return band * 3 + (residentAxis < 32 ? 0 : 1);
         VssLodFocus patch = surfaceFocus(focus);
         int span = layout.tileBlocks(key.lod());
         if (patch != null && patch.intersects(key.tileX() * (double) span, key.tileZ() * (double) span,

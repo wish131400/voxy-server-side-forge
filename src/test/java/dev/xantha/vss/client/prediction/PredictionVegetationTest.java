@@ -311,7 +311,8 @@ class PredictionVegetationTest {
             assertTrue(initialKeys.stream().allMatch(key -> key.lod() == manager.layout().levelCount() - 1
                     || PredictionTileManager.coveredByAncestor(initialKeys, Set.of(), key.dimension(), manager.layout(), key)),
                     "initial children must retain their coarse parent coverage");
-            for (int cycle = 0; cycle < 30 && calls.get() == 0; cycle++) {
+            long mediumDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(15);
+            while (calls.get() == 0 && System.nanoTime() < mediumDeadline) {
                 for (int tick = 0; tick < 5; tick++) manager.tick(32, 80, 32, .01, null);
                 awaitManager(manager);
             }

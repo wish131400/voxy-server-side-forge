@@ -33,6 +33,10 @@ class PredictionBackgroundSchedulingTest {
         var budget=new PredictionMemoryBudget(2048L*PredictionMemoryBudget.MIB,0,()->Long.MAX_VALUE,System::nanoTime,4);
         try(var manager=new PredictionTileManager(profile.levelKey(),sampler,budget,null)) {
             manager.setWorkView(PredictionWorkView.of(0,80,0,1,0,0,70,16D/9));
+            var background=PredictionTileManager.class.getDeclaredMethod("backgroundWork",PredictionTileManager.PredictionTileKey.class);
+            background.setAccessible(true);
+            assertFalse((Boolean)background.invoke(manager,new PredictionTileManager.PredictionTileKey(
+                    profile.levelKey(),0,0,manager.layout().levelCount())),"shrinking the layout must tolerate old pending keys");
             var ready=(Map<PredictionTileManager.PredictionTileKey,PredictionTileManager.PredictionTile>)field(manager,"ready");
             var desired=(Set<Object>)field(manager,"desiredKeys");
             var leaves=(Set<Object>)field(manager,"terrainLeaves");

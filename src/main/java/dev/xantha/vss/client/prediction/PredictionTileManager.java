@@ -49,6 +49,9 @@ public final class PredictionTileManager implements AutoCloseable {
     private final java.util.concurrent.atomic.AtomicInteger activeSurfaceBuilds = new java.util.concurrent.atomic.AtomicInteger();
     private final java.util.concurrent.atomic.AtomicInteger activeDetailBuilds = new java.util.concurrent.atomic.AtomicInteger();
     private volatile boolean previewWorkPending;
+    private volatile PredictionMediumCoverage mediumCoverage = PredictionMediumCoverage.EMPTY;
+    private volatile boolean mediumCoveragePending;
+    private int mediumCoverageLevelBias;
     private static final int MEDIUM_BUILDS_PER_SURFACE_TURN = 16;
     private final java.util.concurrent.atomic.AtomicInteger mediumSinceSurface = new java.util.concurrent.atomic.AtomicInteger();
     private final java.util.concurrent.atomic.LongAdder samplingNanos = new java.util.concurrent.atomic.LongAdder();
@@ -70,6 +73,7 @@ public final class PredictionTileManager implements AutoCloseable {
     private volatile VssLodFocus buildFocus;
     private volatile PredictionWorkView workView;
     private final Set<PredictionTileKey> backgroundPending = ConcurrentHashMap.newKeySet();
+    private final Set<PredictionTileKey> refinementPending = ConcurrentHashMap.newKeySet();
     private RenderSnapshot renderSnapshot;
     private volatile int surfaceRadius = 768;
     private final Set<PredictionTileKey> pending = ConcurrentHashMap.newKeySet();
@@ -187,6 +191,8 @@ public final class PredictionTileManager implements AutoCloseable {
     void setWorkView(PredictionWorkView view) { this.workView = view; }
 
     private boolean backgroundWork(PredictionTileKey key) {
+        if (mediumCoveragePending && mediumCoverage.paths().contains(key)) return false;
+        if (key.lod() < 0 || key.lod() >= layout.levelCount()) return false;
         PredictionWorkView view = workView;
         return view != null && !view.foreground(key, layout, buildFocus,
                 sampler.profile().minY(), sampler.profile().minY() + sampler.profile().height());
@@ -195,6 +201,16 @@ public final class PredictionTileManager implements AutoCloseable {
     private int backgroundLimit() {
         return Math.min(executor.getCorePoolSize(), Math.max(1, Math.min(4,
                 VSSClientConfig.CONFIG.predictionBackgroundWorkers)));
+    }
+
+    private int refinementLimit() {
+        return Math.min(executor.getCorePoolSize(), Math.max(1, Math.min(6,
+                VSSClientConfig.CONFIG.predictionRefinementWorkers)));
+    }
+
+    private boolean ordinaryRefinement(PredictionTileKey key) {
+        return !(mediumCoveragePending && mediumCoverage.paths().contains(key))
+                && !PredictionWorkOrder.scoped(key, layout, buildFocus) && !dirtyTiles.contains(key);
     }
 
     public void tick(int centerChunkX, int centerChunkZ) {
@@ -263,6 +279,7 @@ public final class PredictionTileManager implements AutoCloseable {
         ready.forEach((key, tile) -> residentAxes.put(key, tile.cellAxis()));
         transitionTargets = PredictionTransitionPlan.exposedTargets(desiredKeys, terrainLeaves,
                 residentAxes, layout.levelCount(), terrainTargets);
+        refreshMediumCoverage(leaves);
         previewWorkPending = plan.stream().anyMatch(this::previewBuildNeeded);
         for (PredictionTileKey key : plan) {
             desiredGrace.put(key, now);
@@ -283,8 +300,8 @@ public final class PredictionTileManager implements AutoCloseable {
         for (PredictionTileKey key : plan) {
             work.add(buildRequest(key, false));
         }
-        // Refine each region as soon as its own parent is resident; unrelated
-        // horizon work (including failures/retries) must not stall nearby detail.
+        // Final detail follows the spatial medium pass; explicit telescope
+        // work can bypass that pass.
         surfaceDesired.stream().filter(this::surfaceBuildReady)
                 .forEach(key -> work.add(buildRequest(key, true)));
         work.sort(Comparator.comparingInt(BuildRequest::priority)
@@ -302,6 +319,19 @@ public final class PredictionTileManager implements AutoCloseable {
 
     private int workPriority(PredictionTileKey key, boolean surface) {
         PredictionTile tile = ready.get(key);
+        if (mediumCoveragePending && !surface && mediumCoverage.paths().contains(key)
+                && !PredictionWorkOrder.scoped(key, layout, buildFocus)) {
+            // Breadth first across the horizon, before descending locally.
+            return 10_000 + (tile == null ? 0 : 10_000)
+                    + (layout.levelCount() - 1 - key.lod()) * 100;
+        }
+        double nearby = PredictionWorkOrder.distanceSquared(key, layout, cameraBlockX, cameraBlockZ);
+        if (!mediumCoveragePending && nearby < 256D * 256) {
+            // Local work regains its budget only AFTER the spatial medium pass.
+            // Include plants so a constrained heap can finish useful local tiles.
+            int band = (int) (Math.sqrt(nearby) / 64);
+            return band * 3 + (surface ? 2 : tile == null || tile.cellAxis() < 32 ? 0 : 1);
+        }
         if (surface && surfaceTurnReady(key)) {
             return (backgroundWork(key) ? PredictionWorkOrder.BACKGROUND_PRIORITY : 0) + 90_000;
         }
@@ -314,6 +344,8 @@ public final class PredictionTileManager implements AutoCloseable {
         if (closed || paused) return;
         refreshQueuedWork(executor.getQueue(), pending,
                 key -> key.lod() >= 0 && key.lod() < layout.levelCount() && effectivelyDesired(key)
+                        && mediumWorkAllowed(key, false)
+                        && (!ordinaryRefinement(key) || refinementPending.contains(key))
                         && (!backgroundWork(key) || backgroundPending.contains(key)),
                 (key, surface) -> dirtyTiles.contains(key) ? Integer.MIN_VALUE + 1 + key.lod()
                         : workPriority(key, surface),
@@ -358,16 +390,31 @@ public final class PredictionTileManager implements AutoCloseable {
         // surfaces are ready too. Retire only less urgent, covered detail.
         PredictionTileKey target = desiredKeys.stream().filter(key -> !pending.contains(key))
                 .filter(this::retryReady)
+                .filter(this::terrainParentReady)
+                .filter(key -> mediumWorkAllowed(key, surfaceBuildReady(key)))
                 .filter(key -> terrainBuildNeeded(key) || surfaceBuildReady(key))
-                .min(this::compareBuildKeys).orElse(null);
+                .min(Comparator.<PredictionTileKey>comparingInt(key -> workPriority(key, surfaceBuildReady(key)))
+                        .thenComparingDouble(key -> PredictionWorkOrder.orderingDistance(key, layout, cameraBlockX, cameraBlockZ, buildFocus))
+                        .thenComparingInt(key -> -key.lod())).orElse(null);
         if (target == null) return true;
         List<PredictionTile> candidates = ready.values().stream().filter(tile ->
-                        compareBuildKeys(tile.key(), target) > 0)
+                        !mediumCoverage.paths().contains(tile.key())
+                                && (mediumCoveragePending || compareBuildKeys(tile.key(), target) > 0))
                 .sorted((a, b) -> compareBuildKeys(b.key(), a.key())).toList();
         for (PredictionTile tile : candidates) {
             if (memoryBudget.reclaimTargetBytes() == 0) break;
             if (!pending.contains(tile.key()) && coveredByAncestor(ready.keySet(), Set.of(), dimension, layout, tile.key()))
                 removeTile(tile.key());
+        }
+        if (mediumCoveragePending && memoryBudget.reclaimTargetBytes() > 0
+                && mediumCoverageLevelBias < layout.levelCount()-1) {
+            // If even the protected coverage cannot fit alongside one build,
+            // use the next wider spatial layer. Never deadlock by pinning a
+            // mandatory medium wave larger than the available heap.
+            mediumCoverageLevelBias++;
+            refreshMediumCoverage(List.copyOf(terrainLeaves));
+            refreshQueuedWork();
+            return false;
         }
         // Use the reclaimed headroom for its intended nearby upgrade. A
         // newly missing preview must not immediately refill that space.
@@ -651,8 +698,16 @@ public final class PredictionTileManager implements AutoCloseable {
                 + ",terrainRemaining=" + desiredKeys.stream().filter(this::terrainBuildNeeded).count()
                 + ",foregroundPending=" + pending.stream().filter(key -> !backgroundWork(key)).count()
                 + ",backgroundSlots=" + backgroundPending.stream().filter(pending::contains).count()
+                + ",refinementSlots=" + refinementPending.stream().filter(pending::contains).count()
+                + ",refinementLimit=" + refinementLimit()
                 + ",backgroundLimit=" + backgroundLimit()
                 + ",mediumSinceSurface=" + mediumSinceSurface.get()
+                + ",mediumCoveragePending=" + mediumCoveragePending
+                + ",mediumCoverageLevelBias=" + mediumCoverageLevelBias
+                + ",mediumCoverageRemaining=" + mediumCoverage.frontier().stream().filter(key -> {
+                    PredictionTile tile = ready.get(key);
+                    return tile == null || tile.cellAxis() < 32;
+                }).count()
                 + "," + memoryBudget.diagnostics()
                 + ",captureCancelledBuilds=" + captureCancelledBuilds.get()
                 + ",ignoredCaptureInvalidations=" + ignoredCaptureInvalidations.get()
@@ -988,9 +1043,40 @@ public final class PredictionTileManager implements AutoCloseable {
         }
     }
 
+    private void refreshMediumCoverage(List<PredictionTileKey> leaves) {
+        mediumCoverage = PredictionMediumCoverage.plan(leaves, layout, mediumCoverageLevelBias);
+        mediumCoveragePending = mediumCoverage.frontier().stream().anyMatch(key -> {
+            PredictionTile tile = ready.get(key);
+            if (tile != null && tile.cellAxis() >= 32) return false;
+            // A failed parent must not freeze all detail during its backoff.
+            for (var ancestor = key; ancestor.lod() < layout.levelCount(); ancestor =
+                    new PredictionTileKey(key.dimension(), ancestor.tileX() >> 1,
+                            ancestor.tileZ() >> 1, ancestor.lod() + 1)) {
+                if (!retryReady(ancestor)) return false;
+            }
+            return true;
+        });
+    }
+
+    private boolean terrainParentReady(PredictionTileKey key) {
+        return ready.containsKey(key) || key.lod() == layout.levelCount()-1
+                || ready.containsKey(new PredictionTileKey(key.dimension(), key.tileX() >> 1,
+                        key.tileZ() >> 1, key.lod() + 1));
+    }
+
+    private boolean mediumWorkAllowed(PredictionTileKey key, boolean surface) {
+        return !mediumCoveragePending || PredictionWorkOrder.scoped(key, layout, buildFocus)
+                || dirtyTiles.contains(key) || !surface && mediumCoverage.paths().contains(key);
+    }
+
     private int targetCellAxis(PredictionTileKey key) {
         int target = terrainLeaves.contains(key) ? terrainTargets.getOrDefault(key, layout.cellAxis(key.lod()))
                 : sampler.initialTerrainCellAxis(key.lod());
+        if (mediumCoverage.frontier().contains(key)) target = Math.max(32, target);
+        if (mediumCoveragePending && !PredictionWorkOrder.scoped(key, layout, buildFocus)
+                && mediumCoverage.paths().contains(key)) {
+            return mediumCoverage.frontier().contains(key) ? 32 : sampler.initialTerrainCellAxis(key.lod());
+        }
         return Math.max(target, transitionTargets.getOrDefault(key, target));
     }
 
@@ -998,6 +1084,7 @@ public final class PredictionTileManager implements AutoCloseable {
     // The renderer retains parent coverage and stitches the resident surfaces;
     // waiting for neighbours here lets distant sampling block useful detail.
     private synchronized void enqueue(PredictionTileKey key, int centerChunkX, int centerChunkZ, boolean surface) {
+        if (!mediumWorkAllowed(key, surface)) return;
         if (surface && !surfaceBuildReady(key)) return;
         if (surface && previewWorkPending && !PredictionWorkOrder.scoped(key, layout, buildFocus)
                 && activeSurfaceBuilds.get() >= 1) return;
@@ -1005,14 +1092,15 @@ public final class PredictionTileManager implements AutoCloseable {
                 || closed || paused || memoryBudget.exhausted()) {
             return;
         }
-        if (!surface && !ready.containsKey(key) && key.lod() < layout.levelCount() - 1
-                && !ready.containsKey(new PredictionTileKey(key.dimension(), key.tileX() >> 1,
-                key.tileZ() >> 1, key.lod() + 1))) return;
+        if (!surface && !terrainParentReady(key)) return;
         // Ingest is not render residency. Keep the selected detail instead
         // of replacing captured surfaces with enormous coarse fallback slabs.
         if (!retryReady(key)) return;
         if (pending.contains(key)) return;
         backgroundPending.retainAll(pending);
+        refinementPending.retainAll(pending);
+        boolean ordinary = ordinaryRefinement(key);
+        if (ordinary && refinementPending.size() >= refinementLimit()) return;
         boolean background = backgroundWork(key);
         if (background && backgroundPending.size() >= backgroundLimit()) return;
         boolean surfaceTurn = surface && surfaceTurnReady(key);
@@ -1027,6 +1115,7 @@ public final class PredictionTileManager implements AutoCloseable {
         long revision = meshRevision.get();
         long captureEpoch = captureEpochs.getOrDefault(key, 0L);
         if (background) backgroundPending.add(key);
+        if (ordinary) refinementPending.add(key);
         VssLodLayout tileLayout = layout;
         int buildSurfaceSettings = surfaceSettings;
         try {
@@ -1039,6 +1128,10 @@ public final class PredictionTileManager implements AutoCloseable {
             activeBuildThreads.add(Thread.currentThread());
             try {
                 if (closed || paused || revision != meshRevision.get() || !effectivelyDesired(key)) return;
+                // A queued coverage/scope task may have become ordinary work.
+                // Release it for bounded admission instead of filling the CPU.
+                if (ordinaryRefinement(key) && !refinementPending.contains(key)) return;
+                if (!mediumWorkAllowed(key, surface)) return;
                 if (!surface && !terrainBuildNeeded(key)) return;
                 if (surface && !surfaceBuildReady(key)) return;
                 // A promotion belongs to one bounded turn. Stale promoted
@@ -1257,11 +1350,13 @@ public final class PredictionTileManager implements AutoCloseable {
                 if (detailSlot) activeDetailBuilds.decrementAndGet();
                 if (reservation != null) reservation.close();
                 backgroundPending.remove(key);
+                refinementPending.remove(key);
                 pending.remove(key);
             }
             }));
         } catch (RejectedExecutionException rejected) {
             backgroundPending.remove(key);
+            refinementPending.remove(key);
             pending.remove(key);
             dev.xantha.vss.common.VSSLogger.debug("VSS prediction executor rejected tile " + key);
         }
@@ -1648,6 +1743,7 @@ public final class PredictionTileManager implements AutoCloseable {
         residentMemory.clear();
         pending.clear();
         backgroundPending.clear();
+        refinementPending.clear();
         pendingCaptures.clear();
         latestCaptures.clear();
         captureVersions.clear();
@@ -1658,6 +1754,9 @@ public final class PredictionTileManager implements AutoCloseable {
         deferredUntil.clear();
         terrainTargets = Map.of();
         transitionTargets = Map.of();
+        mediumCoverage = PredictionMediumCoverage.EMPTY;
+        mediumCoveragePending = false;
+        mediumCoverageLevelBias = 0;
         authoritativeCells.clear();
         captureEpochs.clear();
         dirtyTiles.clear();

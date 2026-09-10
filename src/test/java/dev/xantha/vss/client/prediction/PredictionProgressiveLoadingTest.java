@@ -22,7 +22,7 @@ class PredictionProgressiveLoadingTest {
 
     @BeforeAll static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }
 
-    @Test void nearbyGroundReachesBlockDetailWhileADistantRootIsStillBuilding() throws Exception {
+    @Test void nearbyGroundWaitsForMediumCoverageThenResumes() throws Exception {
         verifyLocalProgress(new ClientTerrainSampler(PROFILE.seed(), PROFILE) {
             @Override public ClientColumnSample sample(int x, int z) { return ground(); }
             @Override public ClientColumnSample sampleForLod(int x, int z, int step) { return ground(); }
@@ -87,7 +87,7 @@ class PredictionProgressiveLoadingTest {
         var entered = new CountDownLatch(1);
         var release = new CountDownLatch(1);
         var blockOnce = new AtomicBoolean(true);
-        config.predictionDistanceBlocks = 65536;
+        config.predictionDistanceBlocks = surface ? 65536 : 1024;
         config.predictionTrees = surface;
         config.predictionStructures = false;
         var sampler = new ClientTerrainSampler(PROFILE.seed(), PROFILE) {
@@ -96,7 +96,7 @@ class PredictionProgressiveLoadingTest {
             }
             @Override ClientTerrainSampler decorationContext() { return source; }
             @Override public ClientColumnSample sampleForLod(int x, int z, int step) {
-                if (step == 1024 && x > 65536 && blockOnce.compareAndSet(true, false)) {
+                if (step == (surface ? 1024 : 16) && x > (surface ? 65536 : 1024) && blockOnce.compareAndSet(true, false)) {
                     entered.countDown();
                     try {
                         if (!release.await(20, TimeUnit.SECONDS)) throw new IllegalStateException("blocked root timed out");
@@ -127,14 +127,19 @@ class PredictionProgressiveLoadingTest {
             }
             replan(manager,surface);
             assertTrue(entered.await(5, TimeUnit.SECONDS), "fixture must keep one far horizon job unfinished");
+            if (!surface) {
+                for (int i=0;i<20;i++) { replan(manager,false); Thread.sleep(10); }
+                assertFalse(hasNearDetail(manager,false), "ordinary local fine terrain waits for medium horizon coverage");
+                release.countDown();
+            }
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(12);
             while (!hasNearDetail(manager, surface) && System.nanoTime() < deadline) {
                 replan(manager,surface);
                 Thread.sleep(10);
             }
-            assertTrue(hasNearDetail(manager, surface), "nearby terrain/plants must refine through their own ancestors without waiting for the entire horizon: "
+            assertTrue(hasNearDetail(manager, surface), "detail resumes after medium coverage, or via explicit telescope priority: "
                     + manager.surfaceDiagnostics());
-            assertEquals(1, release.getCount(), "the distant root must still be blocked when near detail becomes ready");
+            if(surface) assertEquals(1, release.getCount(), "explicit telescope work bypasses the distant medium wave");
             assertEquals(0, manager.failedTileCount());
             release.countDown();
         } finally {
@@ -145,7 +150,7 @@ class PredictionProgressiveLoadingTest {
         }
     }
 
-    @Test void immediateGroundPrecedesTheHorizonButOrdinaryPlantsWaitForMediumTerrain() {
+    @Test void mediumHorizonPrecedesOrdinaryLocalTerrainAndPlants() {
         var layout = VssLodLayout.of(65536, 6, true, false);
         var near = key(1, 0);
         var far = key(2, layout.levelCount() - 1);
@@ -155,7 +160,7 @@ class PredictionProgressiveLoadingTest {
             int nearPriority = PredictionWorkOrder.priority(near, layout,
                     PredictionWorkOrder.distanceSquared(near, layout, 32, 32), 32, surface);
             if(surface) assertTrue(nearPriority > farPriority,"distant medium terrain precedes ordinary plants");
-            else assertTrue(nearPriority < farPriority,"immediate ground stays usable");
+            else assertTrue(nearPriority > farPriority,"local fine terrain waits for distant medium");
         }
     }
 
@@ -201,7 +206,7 @@ class PredictionProgressiveLoadingTest {
         queue.add(new PredictionTileManager.PredictionTask(key(511, 0), 999, farDistance, true, () -> completed.add("far-surface")));
         refresh(queue, layout, focus, Set.of(dirty));
         while (!queue.isEmpty()) queue.poll().run();
-        assertEquals(java.util.List.of("capture", "dirty", "near", "far-ground", "far-surface", "middle"), completed);
+        assertEquals(java.util.List.of("capture", "dirty", "far-ground", "far-surface", "near", "middle"), completed);
 
         completed.clear();
         queue.add(new PredictionTileManager.PredictionTask(far, 5, farDistance, () -> completed.add("far")));
@@ -266,7 +271,7 @@ class PredictionProgressiveLoadingTest {
         assertEquals(java.util.List.of("capture", "retained"), completed);
     }
 
-    @Test void mediumHorizonPrecedesPlantsWithoutBlockingImmediateGround() {
+    @Test void mediumHorizonPrecedesPlantsAndLocalFineTerrain() {
         var layout = VssLodLayout.of(65536, 2, true, false);
         var key = key(1, 0);
         int preview = PredictionWorkOrder.priority(key, layout, 48D * 48, 16, false);
@@ -275,7 +280,7 @@ class PredictionProgressiveLoadingTest {
         int farPreview = PredictionWorkOrder.priority(key, layout, 2048D * 2048, 0, false);
         assertTrue(preview < fine);
         assertTrue(fine < plants);
-        assertTrue(fine < farPreview);
+        assertTrue(farPreview < fine);
         assertTrue(farPreview < plants);
         int neighborPreview = PredictionWorkOrder.priority(key, layout, 64D * 64, 16, false);
         assertTrue(neighborPreview < plants, "medium terrain precedes ordinary decoration");
@@ -304,7 +309,7 @@ class PredictionProgressiveLoadingTest {
                         PredictionWorkOrder.distanceSquared(key, layout, 0, 0), key.equals(near) ? 32 : 16, surface),
                 key -> PredictionWorkOrder.distanceSquared(key, layout, 0, 0));
         while (!queue.isEmpty()) queue.poll().run();
-        assertEquals(java.util.List.of("fine", "preview", "plants"), completed);
+        assertEquals(java.util.List.of("preview", "fine", "plants"), completed);
     }
 
     private static ClientColumnSample ground() {

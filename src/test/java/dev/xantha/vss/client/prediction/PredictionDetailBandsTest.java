@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import dev.xantha.vss.client.prediction.PredictionTileManager.PredictionTileKey;
 
 class PredictionDetailBandsTest {
+    @org.junit.jupiter.api.BeforeAll static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }
     @Test void fineDistanceIsIndependentOfTheHorizonAndOuterTerrainReachesMedium() {
         for (int horizon : new int[]{1024, 8192, 10000, 65536}) {
             int fine=Math.min(1536,horizon);
@@ -69,7 +70,7 @@ class PredictionDetailBandsTest {
         }
     }
 
-    @Test void telescopeOverridesTheOuterBandAndKeepsNearWorkAhead() {
+    @Test void telescopeOverridesTheOuterBandAndOrdinaryLocalDetail() {
         var layout = VssLodLayout.of(65536,6,true,true);
         var target = new PredictionTileKey(Level.OVERWORLD,1000,0,0);
         var near = new PredictionTileKey(Level.OVERWORLD,1,0,0);
@@ -79,7 +80,7 @@ class PredictionDetailBandsTest {
         assertTrue(PredictionWorkOrder.surfaceEligible(target,layout,0,0,768,focus));
         assertFalse(PredictionWorkOrder.surfaceEligible(target,layout,0,0,768,null));
         assertTrue(PredictionWorkOrder.priority(near,layout,0,32,false,focus)
-                < PredictionWorkOrder.priority(target,layout,64000D*64000,0,false,focus));
+                > PredictionWorkOrder.priority(target,layout,64000D*64000,0,false,focus));
     }
 
     @Test void radialSkeletonDoesNotConsumeTheNearbySubdivisionAllowance() {
