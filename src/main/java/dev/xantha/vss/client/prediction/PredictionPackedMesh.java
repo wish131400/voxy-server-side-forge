@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *                  | uvYPos | bank/down | positive face | LOD texture scale
  * i7: corner 0 rgb (24) | skylight loss (bits 28-31)
  * i8: source cell index
- * i9: corner 1 rgb (24) | source-cell coverage (bit 24) | skylight loss (bits 28-31)
+ * i9: corner 1 rgb (24) | source-cell coverage (bit 24) | real boundary/lower (25/26) | skylight loss (bits 28-31)
  * i10: corner 2 rgb (24) + skylight loss     i11: corner 3 rgb (24) + skylight loss
  * </pre>
  *
@@ -329,8 +329,8 @@ final class PredictionPackedMesh {
             // on a tile edge. Each water block removes one skylight level.
             double x = src.x(quad, corner) - src.normalX(quad, corner) * .01;
             double z = src.z(quad, corner) - src.normalZ(quad, corner) * .01;
-            int cx = net.minecraft.util.Mth.clamp((int) Math.floor(x / tile.spacingBlocks()), 0, tile.cellAxis());
-            int cz = net.minecraft.util.Mth.clamp((int) Math.floor(z / tile.spacingBlocks()), 0, tile.cellAxis());
+            int cx = Math.max(0, Math.min(tile.cellAxis(), (int) Math.floor(x / tile.spacingBlocks())));
+            int cz = Math.max(0, Math.min(tile.cellAxis(), (int) Math.floor(z / tile.spacingBlocks())));
             int index = cz * (tile.cellAxis() + 1) + cx;
             if (index >= tile.samples().length) continue;
             ClientColumnSample sample = tile.samples()[index];
@@ -341,7 +341,7 @@ final class PredictionPackedMesh {
 
     static int waterLightLoss(ClientColumnSample sample, double y) {
         return sample != null && sample.fluid() == 1 && !sample.ice()
-                ? net.minecraft.util.Mth.clamp((int) Math.floor(sample.fluidY() - y), 0, 15) : 0;
+                ? Math.max(0, Math.min(15, (int) Math.floor(sample.fluidY() - y))) : 0;
     }
 
     private static int saturateUnsigned16(float value) {
