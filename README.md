@@ -52,6 +52,8 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 
 预测范围由 `predictionDistanceBlocks` 控制（默认 8192 方块），近处地形之外还会按 `predictionSurfaceDistanceBlocks`（默认 768 方块）细化地表内容，植被和建筑分别由 `predictionTrees`、`predictionStructures` 开关。地形采样优先使用随包的原生 Rust 后端，不可用时回退 Java；预测结果默认缓存在本地（`rememberTerrain=true`）。
 
+生物群系快照支持 TerraBlender 区域和 Blueprint 切片的嵌套组合，Java 与 Rust 都保留内部区域选择，避免石岸被预测为玄武岩悬崖。缺少必要快照时不启用该维度预测；生成快照变化后会使用独立的本地缓存。
+
 预测只是对世界生成的近似，不执行完整雕刻、装饰与结构地形融合，也不包含玩家改动，需要完全准确时以服务端下发的真实列为准。
 
 ## Xaero 世界地图加载
