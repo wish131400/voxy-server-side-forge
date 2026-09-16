@@ -27,6 +27,9 @@ public final class QueuedColumnSender {
     private final RoundRobinPlayerCursor roundRobinCursor = new RoundRobinPlayerCursor();
     private final Map<UUID, Boolean> priorityFirstByPlayer = new HashMap<>();
     private volatile long lastSendDiagnosticNanos;
+    private long wireReportBytes;
+    private long wireReportPayloads;
+    private long wireReportNanos = System.nanoTime();
 
     public QueuedColumnSender(
             PlayerRequestRegistry playerRegistry,
@@ -98,6 +101,8 @@ public final class QueuedColumnSender {
                     expiryLimit);
             if (result.sent) {
                 totalBandwidthLimiter.recordSend(result.wireBytes);
+                wireReportBytes += result.wireBytes;
+                wireReportPayloads++;
                 if (result.priority) {
                     prioritySentByPlayer.put(target.id, prioritySent + 1);
                 }
@@ -111,6 +116,31 @@ public final class QueuedColumnSender {
             roundRobinCursor.advance(playerOrder, index);
             index = (index + 1) % targets.size();
         }
+        reportWireUsage();
+    }
+
+    /**
+     * Bandwidth diagnostic: bytes that actually left the server for LOD columns,
+     * summarised on a fixed interval so a client joining can be measured.
+     */
+    private void reportWireUsage() {
+        if (wireReportPayloads == 0) {
+            return;
+        }
+        long now = System.nanoTime();
+        long elapsed = now - wireReportNanos;
+        if (elapsed < 5_000_000_000L) {
+            return;
+        }
+        double seconds = elapsed / 1e9;
+        double mib = wireReportBytes / 1048576.0;
+        VSSLogger.info("VSS LOD wire: " + wireReportPayloads + " payloads, " + wireReportBytes
+                + " B (" + String.format(java.util.Locale.ROOT, "%.2f", mib) + " MiB) in "
+                + String.format(java.util.Locale.ROOT, "%.1f", seconds) + " s = "
+                + String.format(java.util.Locale.ROOT, "%.2f", mib / seconds) + " MiB/s");
+        wireReportBytes = 0L;
+        wireReportPayloads = 0L;
+        wireReportNanos = now;
     }
 
     private long effectiveExpiryBandwidth(long totalBandwidth, PlayerRequestState state, int activePlayers) {

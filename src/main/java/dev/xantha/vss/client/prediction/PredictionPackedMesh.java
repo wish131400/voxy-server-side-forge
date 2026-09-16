@@ -87,6 +87,15 @@ final class PredictionPackedMesh {
     private final int[] waterRangeFirst;
     private final int[] waterRangeCount;
     private final boolean downFaces;
+    // Render-thread-only plans. No direct/native buffers retained per mesh.
+    private final PredictionDrawRanges[][] drawRanges = new PredictionDrawRanges[2][32];
+    PredictionDrawRanges drawRanges(boolean water, int visible) {
+        int pass=water?1:0;
+        var result=drawRanges[pass][visible];
+        if(result==null) drawRanges[pass][visible]=result=new PredictionDrawRanges(
+                water?waterRangeFirst:terrainRangeFirst,water?waterRangeCount:terrainRangeCount,visible);
+        return result;
+    }
 
     private PredictionPackedMesh(int[] quads, int cellAxis,
                                  int terrainQuadCount, int[] terrainFirst, int[] terrainCount,

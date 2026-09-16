@@ -106,8 +106,11 @@ final class PredictionLodPlanner {
         int centerTileZ = Math.floorDiv((int) Math.floor(cameraZ), topBlocks);
         int reach = layout.maxDistanceBlocks() / topBlocks + 2;
         java.util.Map<PredictionTileManager.PredictionTileKey, RuntimeNode> leaves = new java.util.HashMap<>();
+        double localFineRadius = PredictionDetailBands.fineRadius(layout.maxDistanceBlocks());
         var candidates = new java.util.PriorityQueue<RuntimeNode>(
-                Comparator.comparingInt((RuntimeNode node) -> node.distanceSquared() <= 256D * 256 ? 0 : node.scopedDetail() ? 1 : 2)
+                Comparator.comparingInt((RuntimeNode node) -> node.distanceSquared() <= 256D * 256 ? 0
+                        : node.scopedDetail() ? 1
+                        : node.distanceSquared() < localFineRadius * localFineRadius ? 2 : 3)
                         .thenComparingDouble(node -> node.scopedDetail() ? node.focusDistanceSquared() : 0)
                         .thenComparing(Comparator.comparingDouble(RuntimeNode::projected).reversed())
                         .thenComparingDouble(RuntimeNode::distanceSquared)
@@ -226,13 +229,12 @@ final class PredictionLodPlanner {
         // target alone forces distant terrain down to the same plant-capable grid.
         VssLodFocus surfaceFocus = PredictionWorkOrder.surfaceFocus(focus);
         boolean surfaceFocused = surfaceFocus != null && surfaceFocus.intersects(minX, minZ, maxX, maxZ);
-        // The spatial medium layer is the ordinary distant target. A larger
-        // screen footprint alone must not spawn another full descendant wave.
-        int mediumLevel = Math.max(0, layout.levelCount() - 4);
-        double localRadius = Math.max(PredictionDetailBands.fineRadius(layout.maxDistanceBlocks()), surfaceRadius);
-        if (!focused && !surfaceFocused && distance > localRadius && level <= mediumLevel) {
-            projected = Math.min(projected, layout.pixelThreshold());
-        }
+        // The horizon-wide medium grid is a bootstrap layer, not a final
+        // quality cap. Its tile span grows with the configured horizon (8192
+        // blocks at a 65536-block horizon); freezing subdivision there leaves
+        // 256-block cells even when they occupy dozens of screen pixels.
+        // Keep the real projected error so bounded ordinary planning can
+        // refine oversized cells after local medium coverage is ready.
         // Every target inside the horizon can reach block detail. Reserve the
         // bounded telescope patch before spending the remaining planning slots.
         if (level > 0 && surfaceFocused) projected = Math.max(projected, layout.pixelThreshold() * (32.0D + level));

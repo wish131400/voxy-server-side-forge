@@ -451,6 +451,7 @@ final class VoxyCompat {
             }
         }, "VSS Voxy local index");
         thread.setDaemon(true);
+        thread.setPriority(Thread.NORM_PRIORITY - 1);
         thread.start();
     }
 

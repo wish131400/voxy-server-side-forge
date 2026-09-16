@@ -79,15 +79,18 @@ pub struct PlacementContext<'a> {
     pub top_feature: &'a str,
     pub biome_allowed: &'a mut dyn FnMut(&str, Pos) -> bool,
     budget: usize,
-    noise: PerlinSimplexNoise,
+    noise: &'static PerlinSimplexNoise,
 }
 impl<'a> PlacementContext<'a> {
     pub fn new(top_feature: &'a str, biome_allowed: &'a mut dyn FnMut(&str, Pos) -> bool) -> Self {
+        // Vanilla's placement noise is immutable and uses a fixed seed, not
+        // the feature/world random stream. Share its permutation tables.
+        static NOISE: std::sync::OnceLock<PerlinSimplexNoise> = std::sync::OnceLock::new();
         Self {
             top_feature,
             biome_allowed,
             budget: 262144,
-            noise: PerlinSimplexNoise::new(&mut Random::new(2345, 2), &[0]).unwrap(),
+            noise: NOISE.get_or_init(|| PerlinSimplexNoise::new(&mut Random::new(2345, 2), &[0]).unwrap()),
         }
     }
     fn charge(&mut self) -> Result<()> {

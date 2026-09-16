@@ -31,6 +31,8 @@ public final class VSSMod {
             VSSClientConfigScreens.register();
             registerEmbeddiumOptionsBridge();
             ModCompat.init();
+            dev.xantha.vss.client.prediction.PredictionTerrainBackends.register(
+                    new dev.xantha.vss.client.prediction.TerraBlenderBackend());
             MinecraftForge.EVENT_BUS.register(VSSClientNetworking.class);
             MinecraftForge.EVENT_BUS.register(FarPlayerClientRenderer.class);
             MinecraftForge.EVENT_BUS.register(dev.xantha.vss.networking.client.VSSClientCommands.class);

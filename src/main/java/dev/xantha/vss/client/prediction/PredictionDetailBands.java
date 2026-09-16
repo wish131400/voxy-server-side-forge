@@ -26,6 +26,10 @@ final class PredictionDetailBands {
         double projected = VssLodProjection.projectedSize(span, Math.max(1, distance), pixelsPerBlock);
         // The planner limits projected tile size. Outside the local fine
         // sphere, tiny tiles need 16 cells and larger tiles need 32 cells.
+        // Keeping 64 inside the fine radius is still correct rather than
+        // merely traditional: the planner only subdivides down to LOD 1 there,
+        // so every tile in that band shares density cells and the extra columns
+        // do amortise. Widening the band is therefore not a free win.
         double pixelsPerCell = layout.pixelThreshold() / VssLodLayout.TILE_QUADS * 2;
         return projected <= 16 * pixelsPerCell ? 16 : 32;
     }

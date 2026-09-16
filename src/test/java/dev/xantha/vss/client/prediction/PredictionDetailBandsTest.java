@@ -30,6 +30,62 @@ class PredictionDetailBandsTest {
         assertEquals(64,PredictionDetailBands.cellAxis(tile,layout,0,40000,0,focus,1300,-64,320));
     }
 
+    @Test void largeHorizonMediumGridMustContinueRefiningVisibleOversizedCells() {
+        double x = 114.5, y = 4998, z = 125.5, pixels = 1300;
+        var layout = VssLodLayout.of(65536, 6, true, false);
+        var leaves = PredictionLodPlanner.plan(Level.OVERWORLD, x, y, z, layout, null, pixels);
+        double maxCellPixels = 0;
+        for (var key : leaves) {
+            int span = layout.tileBlocks(key.lod());
+            double vertical = y - 320;
+            double distance = Math.sqrt(PredictionWorkOrder.distanceSquared(key, layout, x, z)
+                    + vertical * vertical);
+            int axis = PredictionDetailBands.cellAxis(key, layout, x, y, z, null, pixels, -64, 320);
+            maxCellPixels = Math.max(maxCellPixels, span * pixels / distance / axis);
+        }
+        System.out.println("OUTER_MEDIUM horizon=65536 altitude=" + y + " leaves=" + leaves.size()
+                + " maxCellPixels=" + maxCellPixels);
+        assertTrue(maxCellPixels <= 12.0001,
+                "completed ordinary cells must fit the medium pixel budget, actual=" + maxCellPixels);
+        assertTrue(leaves.size() <= 1024 + PredictionLodPlanner.MAX_BAND_LEAVES
+                + PredictionTransitionPlan.MAX_EXTRA_LEAVES, "refinement remains bounded");
+    }
+
+    @Test void fineRadiusBandOnlyHoldsTilesThatStillShareDensityCells() {
+        var layout=VssLodLayout.of(8192,2,true,true);
+        double x=282,y=170,z=-85;
+        var leaves=PredictionLodPlanner.plan(Level.OVERWORLD,x,y,z,layout,null,771);
+        var byLod=new java.util.TreeMap<Integer,int[]>();
+        long before=0,after=0;
+        for(var key:leaves) {
+            int span=layout.tileBlocks(key.lod());
+            double horizontal=Math.hypot((key.tileX()+.5)*span-x,(key.tileZ()+.5)*span-z);
+            double vertical=Math.max(0,Math.max(-64-y,y-320));
+            boolean inFine=Math.hypot(horizontal,vertical)<PredictionDetailBands.fineRadius(8192);
+            int axis=PredictionDetailBands.cellAxis(key,layout,x,y,z,null,771,-64,320);
+            // Old behaviour: everything inside the fine radius was 64.
+            int oldAxis=inFine?64:axis;
+            before+=(long)(oldAxis+2)*(oldAxis+2);
+            after+=(long)(axis+2)*(axis+2);
+            if(inFine) byLod.computeIfAbsent(key.lod(),k->new int[2])
+                    [span/VssLodLayout.TILE_QUADS>=4?1:0]++;
+        }
+        System.out.println("FINE_RADIUS_LODS tiles="+leaves.size()
+                +" byLod="+byLod.entrySet().stream().map(e->e.getKey()+"(n="+e.getValue()[0]
+                +",degradable="+e.getValue()[1]+")").toList()
+                +" before="+before+" after="+after);
+        // Full resolution is only worth its columns while a tile still shares
+        // density cells across them. The planner is what makes that true: it
+        // only subdivides down to LOD 1 inside the fine radius, so no tile in
+        // that band is a standalone full-cost column. A planner change that
+        // subdivided less near the player would break this and should fail here
+        // rather than silently waste the whole band.
+        int degradable=byLod.values().stream().mapToInt(row->row[1]).sum();
+        assertEquals(0,degradable,
+                "every fine-radius tile must still share density cells: byLod="+byLod);
+        assertEquals(before,after,"no fine-radius tile may be downgraded");
+    }
+
     @Test void highAltitudeViewHasABoundedMediumBudgetInsteadOfTheOldFiveKilometreFineBand() {
         var layout=VssLodLayout.of(8192,2,true,true);
         double x=-709,y=5020,z=-718;

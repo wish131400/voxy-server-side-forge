@@ -13,9 +13,11 @@ import me.jellysquid.mods.sodium.client.gui.options.OptionGroup;
 import me.jellysquid.mods.sodium.client.gui.options.OptionImpact;
 import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
 import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
+import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
 import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
+import dev.xantha.vss.client.prediction.PredictionPerformanceProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -27,9 +29,20 @@ public final class VSSVoxyOptionsIntegration {
     public static Screen createSodiumConfigScreen(Screen parent) {
         try {
             Class<?> screenClass = Class.forName("me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI");
-            OptionPage page = createPage();
+            List<OptionPage> pages = createPages();
             Object screen = screenClass.getConstructor(Screen.class).newInstance(parent);
-            screenClass.getMethod("setPage", OptionPage.class).invoke(screen, page);
+            // Register both pages so the tab strip lists them, then open the sync page.
+            Field pagesField = findPagesField(screenClass);
+            if (pagesField != null) {
+                pagesField.setAccessible(true);
+                Object value = pagesField.get(screen);
+                if (value instanceof List<?> existing) {
+                    @SuppressWarnings("unchecked")
+                    List<OptionPage> typed = (List<OptionPage>) existing;
+                    addPages(typed, pages);
+                }
+            }
+            screenClass.getMethod("setPage", OptionPage.class).invoke(screen, pages.get(0));
             return screen instanceof Screen sodiumScreen ? sodiumScreen : null;
         } catch (Throwable ignored) {
             return null;
@@ -56,20 +69,28 @@ public final class VSSVoxyOptionsIntegration {
             return;
         }
         try {
-            OptionPage page = createPage();
-            if (containsPageNamed(pages, page.getName().getString())) {
-                return;
+            if (addPages(pages, createPages())) {
+                VSSLogger.info("Added Voxy Server Side options pages to Embeddium/Sodium options");
             }
+        } catch (Throwable e) {
+            VSSLogger.warn("Failed to build VSS options page; leaving video settings unchanged", e);
+        }
+    }
 
+    private static boolean addPages(List<OptionPage> pages, List<OptionPage> additions) {
+        boolean added = false;
+        for (OptionPage page : additions) {
+            if (containsPageNamed(pages, page.getName().getString())) {
+                continue;
+            }
             int insertAt = findVoxyPageIndex(pages) + 1;
             if (insertAt <= 0) {
                 insertAt = pages.size();
             }
             pages.add(insertAt, page);
-            VSSLogger.info("Added Voxy Server Side options page to Embeddium/Sodium options");
-        } catch (Throwable e) {
-            VSSLogger.warn("Failed to build VSS options page; leaving video settings unchanged", e);
+            added = true;
         }
+        return added;
     }
 
     private static boolean containsPageNamed(List<OptionPage> pages, String name) {
@@ -122,7 +143,11 @@ public final class VSSVoxyOptionsIntegration {
         return null;
     }
 
-    private static OptionPage createPage() {
+    private static List<OptionPage> createPages() {
+        return ImmutableList.of(createSyncPage(), createPredictionPage());
+    }
+
+    private static OptionPage createSyncPage() {
         List<OptionGroup> groups = new ArrayList<>();
         ClientStorage clientStorage = new ClientStorage();
         ServerStorage serverStorage = new ServerStorage();
@@ -174,39 +199,6 @@ public final class VSSVoxyOptionsIntegration {
                         }, config -> config.desiredBandwidthKbps)
                         .setImpact(OptionImpact.LOW)
                         .build())
-                .build());
-
-        groups.add(OptionGroup.createBuilder()
-                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction.tooltip"))
-                        .setControl(TickBoxControl::new)
-                        .setBinding((config, value) -> config.enablePrediction = value, config -> config.enablePrediction)
-                        .setImpact(OptionImpact.HIGH).build())
-                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_trees"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_trees.tooltip"))
-                        .setControl(TickBoxControl::new)
-                        .setBinding((config, value) -> config.predictionTrees = value, config -> config.predictionTrees)
-                        .setImpact(OptionImpact.HIGH).build())
-                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_structures"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_structures.tooltip"))
-                        .setControl(TickBoxControl::new)
-                        .setBinding((config, value) -> config.predictionStructures = value, config -> config.predictionStructures)
-                        .setImpact(OptionImpact.HIGH).build())
-                .add(OptionImpl.createBuilder(int.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_distance_blocks"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_distance_blocks.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1024, 65536, 1024, value -> Component.literal(value + " blocks")))
-                        .setBinding((config, value) -> config.predictionDistanceBlocks = value, config -> config.predictionDistanceBlocks)
-                        .setImpact(OptionImpact.HIGH).build())
-                .add(OptionImpl.createBuilder(int.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_surface_distance"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_surface_distance.tooltip"))
-                        .setControl(option -> new SliderControl(option, 128, 2048, 128, value -> Component.literal(value + " blocks")))
-                        .setBinding((config, value) -> config.predictionSurfaceDistanceBlocks = value, config -> config.predictionSurfaceDistanceBlocks)
-                        .setImpact(OptionImpact.HIGH).build())
                 .build());
 
         if (canEditLocalServerConfig()) {
@@ -373,9 +365,65 @@ public final class VSSVoxyOptionsIntegration {
                     .build());
         }
 
-        return new OptionPage(Component.translatable("vss.voxy_options.title"), ImmutableList.copyOf(groups));
+        return new OptionPage(Component.translatable("vss.voxy_options.sync_title"), ImmutableList.copyOf(groups));
     }
 
+    private static OptionPage createPredictionPage() {
+        List<OptionGroup> groups = new ArrayList<>();
+        ClientStorage clientStorage = new ClientStorage();
+
+        groups.add(OptionGroup.createBuilder()
+                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.prediction"))
+                        .setTooltip(Component.translatable("vss.voxy_options.prediction.tooltip"))
+                        .setControl(TickBoxControl::new)
+                        .setBinding((config, value) -> config.enablePrediction = value, config -> config.enablePrediction)
+                        .setImpact(OptionImpact.HIGH).build())
+                .add(OptionImpl.createBuilder(PredictionPerformanceProfile.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.performance_tier"))
+                        .setTooltip(Component.translatable("vss.voxy_options.performance_tier.tooltip"))
+                        .setControl(option -> new CyclingControl<>(option, PredictionPerformanceProfile.class,
+                                new Component[]{
+                                        Component.translatable("vss.voxy_options.tier_low"),
+                                        Component.translatable("vss.voxy_options.tier_medium"),
+                                        Component.translatable("vss.voxy_options.tier_high")}))
+                        .setBinding((config, value) -> config.performanceTier = value.configName(),
+                                config -> PredictionPerformanceProfile.fromName(config.performanceTier))
+                        .setImpact(OptionImpact.HIGH).build())
+                .build());
+
+        groups.add(OptionGroup.createBuilder()
+                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.prediction_trees"))
+                        .setTooltip(Component.translatable("vss.voxy_options.prediction_trees.tooltip"))
+                        .setControl(TickBoxControl::new)
+                        .setBinding((config, value) -> config.predictionTrees = value, config -> config.predictionTrees)
+                        .setImpact(OptionImpact.HIGH).build())
+                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.prediction_structures"))
+                        .setTooltip(Component.translatable("vss.voxy_options.prediction_structures.tooltip"))
+                        .setControl(TickBoxControl::new)
+                        .setBinding((config, value) -> config.predictionStructures = value, config -> config.predictionStructures)
+                        .setImpact(OptionImpact.HIGH).build())
+                .build());
+
+        groups.add(OptionGroup.createBuilder()
+                .add(OptionImpl.createBuilder(int.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.prediction_distance_blocks"))
+                        .setTooltip(Component.translatable("vss.voxy_options.prediction_distance_blocks.tooltip"))
+                        .setControl(option -> new SliderControl(option, 1024, 65536, 1024, value -> Component.literal(value + " blocks")))
+                        .setBinding((config, value) -> config.predictionDistanceBlocks = value, config -> config.predictionDistanceBlocks)
+                        .setImpact(OptionImpact.HIGH).build())
+                .add(OptionImpl.createBuilder(int.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.prediction_surface_distance"))
+                        .setTooltip(Component.translatable("vss.voxy_options.prediction_surface_distance.tooltip"))
+                        .setControl(option -> new SliderControl(option, 128, 2048, 128, value -> Component.literal(value + " blocks")))
+                        .setBinding((config, value) -> config.predictionSurfaceDistanceBlocks = value, config -> config.predictionSurfaceDistanceBlocks)
+                        .setImpact(OptionImpact.HIGH).build())
+                .build());
+
+        return new OptionPage(Component.translatable("vss.voxy_options.prediction_title"), ImmutableList.copyOf(groups));
+    }
     private static Component formatChunksAuto(int value) {
         return value == 0
                 ? Component.translatable("vss.voxy_options.auto")
