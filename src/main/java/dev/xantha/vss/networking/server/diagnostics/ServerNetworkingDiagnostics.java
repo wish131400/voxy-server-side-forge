@@ -148,7 +148,6 @@ public final class ServerNetworkingDiagnostics {
                         "vss.command.storage.coalescing.extra",
                         readCoordinator.duplicateReadSuppressed(),
                         readCoordinator.preloadLiveJoins(),
-                        readCoordinator.inFlightCount(),
                         nbt.submitted(),
                         nbt.completed(),
                         nbt.hits(),

@@ -12,8 +12,10 @@ import net.minecraft.world.level.Level;
 import org.junit.jupiter.api.Test;
 
 class PredictionCoverageCacheTest {
+    // Forge requires bootstrap before the static registry key is created.
+    static { ClientTerrainSamplerTest.bootstrapMinecraft(); }
     private static final ResourceKey<Level> DIMENSION = ResourceKey.create(
-            Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld"));
+            Registries.DIMENSION, new ResourceLocation("minecraft", "overworld"));
 
     @Test
     void neighbouringCoordinatesDoNotCollapseIntoXorCollisionTrees() {
@@ -32,7 +34,7 @@ class PredictionCoverageCacheTest {
     @Test
     void exactCoverageKeysStillSeparateCoordinatesAndDimensions() {
         var otherDimension = ResourceKey.<Level>create(Registries.DIMENSION,
-                ResourceLocation.withDefaultNamespace("the_nether"));
+                new ResourceLocation("minecraft", "the_nether"));
         var data = new ConcurrentHashMap<ClientPredictionState.CellKey, String>();
         data.put(key(-1, 1), "overworld");
         data.put(new ClientPredictionState.CellKey(otherDimension, PositionUtil.packPosition(-1, 1)), "nether");
@@ -64,7 +66,7 @@ class PredictionCoverageCacheTest {
     void backgroundPublicationCannotChangeTheCurrentFramesCoverageOrMeshIdentity() throws Exception {
         ClientTerrainSamplerTest.bootstrapMinecraft();
         var profile = new dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload.DimensionProfile(
-                ResourceLocation.withDefaultNamespace("overworld"), 42, -64, 384, "noise", "minecraft:overworld", 1);
+                new ResourceLocation("minecraft", "overworld"), 42, -64, 384, "noise", "minecraft:overworld", 1);
         var sampler = ClientTerrainSampler.custom(42, profile, (x, z) -> 64);
         try (var manager = new PredictionTileManager(DIMENSION, sampler,
                 new PredictionMemoryBudget(256 * PredictionMemoryBudget.MIB, 0, () -> Long.MAX_VALUE, System::nanoTime), null)) {
@@ -91,6 +93,39 @@ class PredictionCoverageCacheTest {
             ready.clear();
             manager.markCoverageDirty(child.key());
         }
+    }
+
+    @Test void ordinaryCoverageIsInvariantUnderMovementAndProjectionButNotPublicationOrScope() {
+        var parent = tile(2, 1);
+        var child = tile(0, 2);
+        var layout = VssLodLayout.of(8192, 6, true, true);
+        var snapshot = new PredictionTileManager.RenderSnapshot(DIMENSION, layout,
+                java.util.Map.of(parent.key(), parent, child.key(), child), java.util.Map.of());
+        assertFalse(snapshot.hasScopedTiles());
+        for (int x = -1; x < 17; x++) for (int z = -1; z < 17; z++) {
+            var finest = snapshot.coveringTileAtDetail(x, z, 0);
+            for (int lod = 1; lod < 20; lod++) assertSame(finest, snapshot.coveringTileAtDetail(x, z, lod));
+        }
+        var original = new PredictionRenderer.CoverageView(0, 0, 1400, null).ownership(false);
+        var coverage = new PredictionRenderer.CachedCoverage(1, 2, 0, original, null);
+        for (int step = 0; step < 1000; step++) {
+            var moved = new PredictionRenderer.CoverageView(step, -step, 1400 + step * .01,
+                    new VssLodFocus(step, step, 64));
+            assertTrue(coverage.matchesOwnership(1, 2, moved.ownership(false)));
+            assertFalse(coverage.matchesOwnership(1, 2, moved.ownership(true)));
+        }
+        assertFalse(coverage.matchesOwnership(2, 2, original));
+        assertFalse(coverage.matchesOwnership(1, 3, original));
+        var scoped = new PredictionTileManager.PredictionTile(child.key(), child.heights(), child.groundHeights(),
+                child.samples(), child.mesh(), child.depthBound(), 0, 3, 64, 1, true);
+        var distant = new PredictionTileManager.PredictionTile(new PredictionTileManager.PredictionTileKey(DIMENSION, 20, 20, 2),
+                parent.heights(), parent.groundHeights(), parent.samples(), null, parent.depthBound(), 0, 4, 64, 4);
+        var scopedSnapshot = new PredictionTileManager.RenderSnapshot(DIMENSION, layout,
+                java.util.Map.of(parent.key(), parent, scoped.key(), scoped, distant.key(), distant), java.util.Map.of());
+        assertTrue(scopedSnapshot.hasScopedTiles());
+        assertTrue(scopedSnapshot.scopeAffects(parent.key()));
+        assertTrue(scopedSnapshot.scopeAffects(scoped.key()));
+        assertFalse(scopedSnapshot.scopeAffects(distant.key()),"a telescope patch must not invalidate unrelated terrain on camera movement");
     }
 
     private static PredictionTileManager.PredictionTile tile(int lod, long revision) {

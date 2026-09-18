@@ -21,6 +21,10 @@ final class PredictionTerrainProgram implements AutoCloseable {
     private final GlProgram program;
     private final int modelView;
     private final int projection;
+    private final int viewOrigin;
+    private final int realCoverageBounds;
+    private final int exactCoverage, exactCoverageGrid;
+    private final int horizonDistance;
     private final int tileOffset;
     private final int spacing;
     private final int cellAxis;
@@ -45,6 +49,8 @@ final class PredictionTerrainProgram implements AutoCloseable {
     private final int lodColorScale;
     private final int lightEnabled;
     private final int useAverage;
+    private final int morph;
+    private final int morphBounds;
     private final int opaqueAlpha;
     private final int directionalTint;
     private final int sharedFog;
@@ -60,6 +66,11 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 vertex, fragment);
         this.modelView = program.uniform("ModelViewMat");
         this.projection = program.uniform("ProjMat");
+        this.viewOrigin = program.uniform("ViewOrigin");
+        this.realCoverageBounds = program.uniform("RealCoverageBounds");
+        this.exactCoverage = program.uniform("ExactCoverage");
+        this.exactCoverageGrid = program.uniform("ExactCoverageGrid");
+        this.horizonDistance = program.uniform("HorizonDistance");
         this.tileOffset = program.uniform("TileOffset");
         this.spacing = program.uniform("Spacing");
         this.cellAxis = program.uniform("CellAxis");
@@ -84,6 +95,8 @@ final class PredictionTerrainProgram implements AutoCloseable {
         this.lodColorScale = program.uniform("LodColorScale");
         this.lightEnabled = program.uniform("LodLightmap");
         this.useAverage = program.uniform("UseAverage");
+        this.morph = program.uniform("TerrainMorph");
+        this.morphBounds = program.uniform("MorphBounds");
         this.opaqueAlpha = program.uniform("OpaqueAlpha");
         this.directionalTint = program.uniform("DirectionalTint[0]");
         this.sharedFog = program.uniform("VssPredictionFog");
@@ -126,14 +139,50 @@ final class PredictionTerrainProgram implements AutoCloseable {
     void setCamera(Matrix4f modelView, Matrix4f projection) {
         GL20.glUniformMatrix4fv(this.modelView, false, modelView.get(new float[16]));
         GL20.glUniformMatrix4fv(this.projection, false, projection.get(new float[16]));
+        var origin = new Matrix4f(modelView).invert().transformPosition(new org.joml.Vector3f());
+        GL20.glUniform3f(viewOrigin, origin.x, origin.y, origin.z);
+    }
+
+    void setRealCoverage(float minX, float minZ, float maxX, float maxZ) {
+        GL20.glUniform4f(realCoverageBounds, minX, minZ, maxX, maxZ);
+    }
+
+    void setHorizon(float blocks) {
+        GL20.glUniform1f(horizonDistance, blocks);
+    }
+
+    void bindExactCoverage(PredictionExactCoverageMask mask, ClientLevel level,
+                           net.minecraft.world.phys.Vec3 camera, int radius) {
+        mask.bind(level, camera, radius, exactCoverage, exactCoverageGrid);
+    }
+
+    void bindRealCoverage(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
+                          net.minecraft.world.phys.Vec3 camera) {
+        var snapshot = dev.xantha.vss.compat.StrictLodVisibility.snapshot();
+        if (!dev.xantha.vss.compat.StrictLodVisibility.active() || !dimension.equals(snapshot.dimension())
+                || snapshot.visibleRing() < 0) {
+            setRealCoverage(0, 0, 0, 0);
+            return;
+        }
+        int ring = snapshot.visibleRing();
+        setRealCoverage((float)(((long)snapshot.x() - ring) * 16 - camera.x),
+                (float)(((long)snapshot.z() - ring) * 16 - camera.z),
+                (float)(((long)snapshot.x() + ring + 1) * 16 - camera.x),
+                (float)(((long)snapshot.z() + ring + 1) * 16 - camera.z));
     }
 
     void setTile(float offsetX, float offsetY, float offsetZ, float spacing, int cellAxis,
                  boolean useAverage) {
+        GL20.glUniform2f(morph, 0, 0);
         GL20.glUniform3f(tileOffset, offsetX, offsetY, offsetZ);
         GL20.glUniform1f(this.spacing, spacing);
         GL20.glUniform1i(this.cellAxis, cellAxis);
         GL20.glUniform1i(this.useAverage, useAverage ? 1 : 0);
+    }
+
+    void setMorph(PredictionPackedMesh mesh, float amount) {
+        GL20.glUniform2f(morph, mesh.quadCount() * 3, amount);
+        GL20.glUniform2f(morphBounds, mesh.morphMinY(), mesh.morphMaxY());
     }
 
     void setSamplers(int atlasUnit, int lightmapUnit, int spriteRectUnit, int yieldUnit,
@@ -144,6 +193,7 @@ final class PredictionTerrainProgram implements AutoCloseable {
         GL20.glUniform1i(yield, yieldUnit);
         GL20.glUniform1i(quads, quadUnit);
         GL20.glUniform1i(vanillaMaskSampler, 6);
+        GL20.glUniform1i(exactCoverage, 8);
     }
 
     void bindVanillaMask(PredictionVanillaMask mask, net.minecraft.world.phys.Vec3 camera) {
@@ -215,6 +265,8 @@ final class PredictionTerrainProgram implements AutoCloseable {
     private static final String TERRAIN_VERTEX = """
             #version 150
             uniform usamplerBuffer QuadPayload;
+            uniform vec2 TerrainMorph;
+            uniform vec2 MorphBounds;
             uniform sampler2D SpriteTable;
             uniform mat4 ModelViewMat;
             uniform mat4 ProjMat;
@@ -258,6 +310,20 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 return float((corner & 1) == 0 ? (word & 0xFFFFu) : (word >> 16u));
             }
 
+            float morphAt(ivec2 p) {
+                int axis = CellAxis + 1;
+                p = clamp(p, ivec2(0), ivec2(CellAxis));
+                int i = p.y * axis + p.x;
+                uvec4 value = texelFetch(QuadPayload, int(TerrainMorph.x) + i / 4);
+                return float(int(value[i % 4])) / 256.0;
+            }
+            float terrainDelta(vec2 xz) {
+                vec2 grid = clamp(xz / Spacing, vec2(0), vec2(CellAxis));
+                ivec2 p = ivec2(floor(grid));
+                vec2 t = fract(grid);
+                return mix(mix(morphAt(p), morphAt(p + ivec2(1,0)), t.x),
+                           mix(morphAt(p + ivec2(0,1)), morphAt(p + ivec2(1,1)), t.x), t.y);
+            }
             void main() {
                 int quad = gl_VertexID >> 2;
                 int corner = gl_VertexID & 3;
@@ -287,9 +353,12 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 int face = unshaded ? 6 : axis == 0u ? (down ? 0 : 1)
                         : axis == 1u ? (positive ? 5 : 4) : (positive ? 3 : 2);
                 vec3 materialPosition = local;
-                // Keep voxel tops and their connecting walls at sampled heights.
-                // Independent face deltas tear these shared edges apart, even
-                // with a one-block clamp. Coverage masks perform LOD handover.
+                // One continuous displacement field for every shared vertex.
+                // Boundary rows are fixed by the worker; water/plant tiles do
+                // not carry a field. No second overlapping terrain layer.
+                if (TerrainMorph.y > 0.0 && fluid == 0u)
+                    local.y = clamp(local.y + terrainDelta(local.xz) * TerrainMorph.y,
+                                    min(local.y, MorphBounds.x), max(local.y, MorphBounds.y));
                 bool uvYPos = (attr & (1u << 28)) != 0u;
                 // Regular X-facing walls use Z as U and regular Z-facing
                 // walls use X as U. Grass/flower crosses are diagonal, so
@@ -330,8 +399,9 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 #endif
                 // The triangle stream has mixed winding. Cull using its
                 // explicit outward normal instead, per face, not per tile.
-                // Crossed plants stay double-sided; terrain has no underside.
-                vec3 faceNormal = axis == 0u ? vec3(0.0, 1.0, 0.0)
+                // Only explicit cavity ceilings face down. Exterior tops
+                // remain one-sided and crossed plants remain double-sided.
+                vec3 faceNormal = axis == 0u ? vec3(0.0, down ? -1.0 : 1.0, 0.0)
                         : axis == 1u ? vec3(positive ? 1.0 : -1.0, 0.0, 0.0)
                         : vec3(0.0, 0.0, positive ? 1.0 : -1.0);
                 vFaceNormal = diagonal ? vec3(0.0) : faceNormal;
@@ -339,8 +409,7 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 // vertices outside clip space makes the rasterizer create a
                 // new clipping edge across an otherwise planar quad, which
                 // shows up as a thin see-through strip at the Voxy handoff.
-                bool surfaceVisible = !down
-                        && (diagonal || dot(faceNormal, relative) < 0.0);
+                bool surfaceVisible = diagonal || dot(faceNormal, relative) < 0.0;
                 vSurfaceVisible = surfaceVisible ? 1.0 : 0.0;
             }
             """;
@@ -358,6 +427,11 @@ final class PredictionTerrainProgram implements AutoCloseable {
             uniform sampler2D MainDepth;
             uniform vec2 MainDepthPlanes;
             uniform float DepthBias;
+            uniform vec3 ViewOrigin;
+            uniform vec4 RealCoverageBounds;
+            uniform sampler2D ExactCoverage;
+            uniform vec3 ExactCoverageGrid; // camera-relative origin X/Z and column count
+            uniform float HorizonDistance;
             """ + PredictionFogBridge.GLSL + """
             #ifndef VSS_IRIS
             uniform sampler2D VoxyDepth;
@@ -420,6 +494,27 @@ final class PredictionTerrainProgram implements AutoCloseable {
                  return rectMin + repeated * size;
              }
 
+             bool hasRealColumn(vec2 position) {
+                 ivec2 cell = ivec2(floor((position - ExactCoverageGrid.xy) / 16.0));
+                 return ExactCoverageGrid.z > 0.0 && all(greaterThanEqual(cell, ivec2(0)))
+                         && all(lessThan(cell, ivec2(ExactCoverageGrid.z)))
+                         && texelFetch(ExactCoverage, cell, 0).r > 0.5;
+             }
+
+             bool realCoverageOwnsSurface(float realDistance, float predictedDistance) {
+                 if (vWater > 0.5 || realDistance <= 0.0 || predictedDistance <= 0.0) return false;
+                 // Reproject along the actual camera ray, including view bob.
+                 // Both ends of the ray segment must belong to confirmed real
+                 // coverage. Readiness alone never removes a prediction tile;
+                 // missing real pixels retain their fallback this frame.
+                 vec3 realPosition = ViewOrigin + (relative - ViewOrigin) * (realDistance / predictedDistance);
+                 if (hasRealColumn(relative.xz) && hasRealColumn(realPosition.xz)) return true;
+                 return all(greaterThanEqual(relative.xz, RealCoverageBounds.xy))
+                         && all(lessThan(relative.xz, RealCoverageBounds.zw))
+                         && all(greaterThanEqual(realPosition.xz, RealCoverageBounds.xy))
+                         && all(lessThan(realPosition.xz, RealCoverageBounds.zw));
+             }
+
              void main() {
                 #ifndef VSS_IRIS
                 gl_FragDepth = gl_FragCoord.w;
@@ -431,6 +526,10 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 if (vSurfaceVisible < 0.5) {
                     discard;
                 }
+                // Parent meshes extend beyond the planned circle. Keep their
+                // useful interior, but never display unrefinable outer slabs.
+                if (HorizonDistance > 0.0 && dot(relative.xz, relative.xz)
+                        > HorizonDistance * HorizonDistance) discard;
                 // Compare in the main target's depth space. Equal/quantized
                 // depths belong to Voxy; a closer prediction still occludes
                 // distant cut faces. Sky must remain fillable at any distance.
@@ -441,6 +540,8 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 vec4 predictedView = VssInverseProjection * vec4(gl_FragCoord.xy / VssViewport * 2.0 - 1.0,
                         VssZeroToOne ? gl_FragCoord.z : gl_FragCoord.z * 2.0 - 1.0, 1.0);
                 float predictedDistance = abs(predictedView.z / predictedView.w);
+                if (mainDepth != VssClearDepth && abs(mainView.w) > 1e-10
+                        && realCoverageOwnsSurface(abs(mainView.z / mainView.w), predictedDistance)) discard;
                 float fluidTie = 0.02 * max(1.0, predictedDistance / max(abs(dot(vFaceNormal, relative)), 0.02));
                 // Prefer real geometry in the same surface neighbourhood.
                 // Far cut faces must still be occluded by closer predicted ground.
@@ -499,6 +600,7 @@ final class PredictionTerrainProgram implements AutoCloseable {
                 // a rendered real surface. Bound the preference so distant
                 // Voxy cut faces do not punch through foreground prediction.
                 if (vWater < 0.5 && mainDepth < 1.0 && abs(realDistance - distance) <= min(16.0, max(1.0, Spacing * 2.0))) discard;
+                if (mainDepth < 1.0 && realCoverageOwnsSurface(realDistance, distance - tieBias)) discard;
                 #endif
                 // Boundary faces belong to the solid on their inward side.
                 ivec3 section = ivec3(floor((relative - vFaceNormal * 0.01

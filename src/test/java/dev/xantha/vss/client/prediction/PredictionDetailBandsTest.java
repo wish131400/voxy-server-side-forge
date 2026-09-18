@@ -12,11 +12,28 @@ import dev.xantha.vss.client.prediction.PredictionTileManager.PredictionTileKey;
 class PredictionDetailBandsTest {
     @org.junit.jupiter.api.BeforeAll static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }
     @Test void fineDistanceIsIndependentOfTheHorizonAndOuterTerrainReachesMedium() {
-        for (int horizon : new int[]{1024, 8192, 10000, 65536}) {
-            int fine=Math.min(1536,horizon);
+        for (int horizon : new int[]{1024, 4096, 8192, 10000, 65536}) {
+            int fine=Math.min(dev.xantha.vss.config.VSSClientConfig.CONFIG.predictionFineDistanceBlocks,horizon);
             assertEquals(64, PredictionDetailBands.cellAxis(fine - .001, horizon));
             assertEquals(32, PredictionDetailBands.cellAxis(fine, horizon));
             assertEquals(32, PredictionDetailBands.cellAxis(horizon, horizon));
+        }
+    }
+
+    @Test void outerTenPercentUsesProjectedDetailWithoutACoarseCap() {
+        var layout = VssLodLayout.of(4096,6,true,true);
+        for (double fraction : new double[]{.89,.9,.91,.95,.99}) {
+            int span = layout.tileBlocks(1);
+            var tile = new PredictionTileKey(Level.OVERWORLD,(int)(4096*fraction)/span,0,1);
+            double distance = Math.sqrt(PredictionWorkOrder.distanceSquared(tile,layout,0,0));
+            for (double pixels : new double[]{700,1300,20000}) {
+                int expected = PredictionDetailBands.projectedCellAxis(span*pixels/distance,
+                        layout.pixelThreshold()/VssLodLayout.TILE_QUADS);
+                assertEquals(expected,PredictionDetailBands.cellAxis(tile,layout,0,64,0,null,pixels,-64,320),
+                        "outer distance must not override projected quality: fraction="+fraction);
+            }
+            assertEquals(64,PredictionDetailBands.cellAxis(tile,layout,0,64,0,null,20000,-64,320),
+                    "ordinary outer terrain can reach full grid detail without a telescope");
         }
     }
 
@@ -24,7 +41,7 @@ class PredictionDetailBandsTest {
         var layout=VssLodLayout.of(8192,2,true,true);
         var tile=new PredictionTileKey(Level.OVERWORLD,1,0,3);
         assertEquals(64,PredictionDetailBands.cellAxis(tile,layout,0,64,0,null,1300,-64,320));
-        assertEquals(32,PredictionDetailBands.cellAxis(tile,layout,0,5020,0,null,1300,-64,320));
+        assertEquals(64,PredictionDetailBands.cellAxis(tile,layout,0,5020,0,null,1300,-64,320));
         assertEquals(16,PredictionDetailBands.cellAxis(tile,layout,0,40000,0,null,1300,-64,320));
         var focus=new VssLodFocus(768,256,1024,10000);
         assertEquals(64,PredictionDetailBands.cellAxis(tile,layout,0,40000,0,focus,1300,-64,320));
@@ -45,7 +62,7 @@ class PredictionDetailBandsTest {
         }
         System.out.println("OUTER_MEDIUM horizon=65536 altitude=" + y + " leaves=" + leaves.size()
                 + " maxCellPixels=" + maxCellPixels);
-        assertTrue(maxCellPixels <= 12.0001,
+        assertTrue(maxCellPixels <= 6.0001,
                 "completed ordinary cells must fit the medium pixel budget, actual=" + maxCellPixels);
         assertTrue(leaves.size() <= 1024 + PredictionLodPlanner.MAX_BAND_LEAVES
                 + PredictionTransitionPlan.MAX_EXTRA_LEAVES, "refinement remains bounded");
@@ -96,12 +113,15 @@ class PredictionDetailBandsTest {
             double distance=Math.hypot((key.tileX()+.5)*span-x,(key.tileZ()+.5)*span-z);
             int oldAxis=distance<8192*.6 ? 64 : distance<8192*.9 ? 32 : 8;
             int axis=PredictionDetailBands.cellAxis(key,layout,x,y,z,null,1300,-64,320);
-            assertTrue(axis>=16 && axis<=32,"high-altitude terrain must advance beyond pure coarse coverage");
+            assertTrue(axis>=16 && axis<=64,"high-altitude terrain must advance beyond pure coarse coverage");
             previous+=(long)(oldAxis+2)*(oldAxis+2);
             current+=(long)(axis+2)*(axis+2);
         }
         System.out.println("HIGH_ALTITUDE_SAME_LEAVES tiles="+leaves.size()+",oldTargetPoints="+previous+",newTargetPoints="+current);
-        assertTrue(current<previous*.65,"screen-aware medium targets must materially reduce stationary work");
+        // Quality now matches actual cells rather than a half-density proxy.
+        // Planning remains bounded; do not impose the old lower-quality column budget.
+        assertTrue(current <= (long)leaves.size()*66*66);
+        assertTrue(leaves.size() <= 1024 + PredictionLodPlanner.MAX_BAND_LEAVES + PredictionTransitionPlan.MAX_EXTRA_LEAVES);
     }
 
     @Test void normalPlanKeepsMediumHorizonCoverageWithoutExpandingVegetation() {
