@@ -1,5 +1,7 @@
 > **当前版本：0.3 / Forge 1.20.1 预测 LOD 移植版。** 基于 2026-09-10 保存的 NeoForge 1.21.1 工作区快照。使用 Java 17 构建。预测代码、Forge 分片同步、原生库及验证边界见 [移植记录](docs/PREDICTION_PORT_1.20.1.md)。下方较早版本的发布说明不代表本次已完成游戏内联机或光影验收。
 
+[0.3 更新日志](CHANGELOG.md)
+
 客户端统一通过 `/vssclient stats` 查看会话和预测状态。`/vssclient prediction capture` 用于导出参考数据；重复的 `/vssclient prediction` 状态入口已移除。Xaero 的 `enable`、`disable`、`reload` 命令保留。
 
 # Voxy Server Side Forge
@@ -50,7 +52,7 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 
 客户端收到服务端同步的世界生成信息后，用世界种子在本地预测并渲染远景地形，不必等服务端把远处的 Voxy 列全部传输完成，地平线附近即可显示地形、植被和地表建筑。该功能默认开启，可用客户端配置 `enablePrediction` 关闭。
 
-预测范围由 `predictionDistanceBlocks` 控制（默认 8192 方块），近处地形之外还会按 `predictionSurfaceDistanceBlocks`（默认 768 方块）细化地表内容，植被和建筑分别由 `predictionTrees`、`predictionStructures` 开关。地形采样优先使用随包的原生 Rust 后端，不可用时回退 Java；预测结果默认缓存在本地（`rememberTerrain=true`）。
+预测范围由 `predictionDistanceBlocks` 控制（默认 4096 方块），普通精细地形距离由 `predictionFineDistanceBlocks` 控制（默认 512 方块）。最外层 10% 不强制锁定粗 LOD，仍按屏幕像素误差及可用预算渐进细化。近处地形之外还会按 `predictionSurfaceDistanceBlocks`（默认 768 方块）细化地表内容，植被和建筑分别由 `predictionTrees`、`predictionStructures` 开关。地形采样优先使用随包的原生 Rust 后端，不可用时回退 Java；预测结果默认缓存在本地（`rememberTerrain=true`）。
 
 生物群系快照支持 TerraBlender 区域和 Blueprint 切片的嵌套组合，Java 与 Rust 都保留内部区域选择，避免石岸被预测为玄武岩悬崖。缺少必要快照时不启用该维度预测；生成快照变化后会使用独立的本地缓存。
 
