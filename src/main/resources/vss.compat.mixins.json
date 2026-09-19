@@ -17,6 +17,8 @@
     "minecraft.TrackedEntitySeenByAccessor"
   ],
   "client": [
+    "client.SpyglassOverlayTimingMixin",
+    "client.ForgeSpyglassOverlayTimingMixin",
     "client.FreeTerraForgedPredictionFiltersMixin",
     "client.ClientPacketListenerServerIdentityMixin",
     "client.ClientLevelFarPlayerLeaveEventMixin",

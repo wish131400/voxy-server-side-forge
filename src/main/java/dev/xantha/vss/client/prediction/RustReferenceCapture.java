@@ -43,7 +43,7 @@ public final class RustReferenceCapture {
         JsonObject manifest = new JsonObject();
         manifest.addProperty("format", "vss-rust-reference-2");
         manifest.addProperty("minecraft", "1.20.1");
-        manifest.addProperty("vssVersion", "0.3-forge-1.20.1");
+        manifest.addProperty("vssVersion", "0.3.1-forge-1.20.1");
         manifest.addProperty("seed", Long.toString(profile.seed()));
         manifest.addProperty("dimension", profile.dimension().toString());
         manifest.addProperty("fingerprint", Long.toString(profile.fingerprint()));

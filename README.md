@@ -1,7 +1,7 @@
 
 # Voxy Server Side Forge
 
-[0.3 更新日志](CHANGELOG.md)
+[0.3.1 更新日志](CHANGELOG.md)
 
 Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Voxy 远景 LOD。客户端只请求缺失或过期的列数据，再交给 Voxy 渲染，适合多人服务器、大型整合包和高速移动场景。
 
@@ -11,10 +11,12 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 | --- | --- |
 | Minecraft | `1.20.1` |
 | Loader | Forge `47.x` |
-| VSS | `0.3-forge-1.20.1` |
+| VSS | `0.3.1-forge-1.20.1` |
 
 - NeoForge 1.21.1 版本：[voxy-server-side-neoforge](https://github.com/wish131400/voxy-server-side-neoforge)
 - 下载：[CurseForge](https://www.curseforge.com/minecraft/mc-mods/voxy-server-side-forge-neoforge)
+
+当前版本为 `0.3.1-forge-1.20.1`，输出文件为 `lib/vss-0.3.1-forge-1.20.1.jar`。
 
 客户端和服务端必须安装协议一致的 VSS，不要混用旧版 jar。
 
