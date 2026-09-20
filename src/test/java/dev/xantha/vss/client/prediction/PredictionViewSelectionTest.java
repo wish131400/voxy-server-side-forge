@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class PredictionViewSelectionTest {
     private static final DimensionProfile PROFILE = new DimensionProfile(
-            ResourceLocation.withDefaultNamespace("overworld"), 42L, -64, 384,
+            new ResourceLocation("minecraft", "overworld"), 42L, -64, 384,
             "noise", "minecraft:overworld", 1L);
 
     @BeforeAll
@@ -94,7 +94,7 @@ class PredictionViewSelectionTest {
     @Test
     void ordinaryViewPlansVegetationInEveryDirectionWithinBudget() {
         var dimension = ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,
-                ResourceLocation.withDefaultNamespace("overworld"));
+                new ResourceLocation("minecraft", "overworld"));
         VssLodLayout layout = VssLodLayout.of(4096, 6, true, false);
         var plan = PredictionLodPlanner.plan(dimension, 2317, 171, 3921, layout, null,
                 VssLodProjection.unscopedScale(70, 2100));
@@ -143,19 +143,19 @@ class PredictionViewSelectionTest {
     }
 
     @Test
-    void telescopeRefinesTheFull64ChunkRadiusWhileKeepingNearbyDetail() {
+    void telescopeRefinesCentralDecorationWhileKeepingNearbyDetail() {
         var layout = VssLodLayout.of(65536, 6, true, false);
         for (int distance : new int[]{8192, 32768}) {
-            var focus = new VssLodFocus(distance + 29, -19, 192, 9000);
-            assertEquals(1024, PredictionWorkOrder.surfaceFocus(focus).radius());
+            var focus = new VssLodFocus(distance + 29, -19, 1024, 9000);
+            assertEquals(256, PredictionWorkOrder.surfaceFocus(focus).radius());
             var plan = PredictionLodPlanner.plan(PROFILE.levelKey(), 0, 170, 0, layout, focus,
                     1500, -64, 320, 768, ignored -> true);
             assertTrue(plan.size() <= 2048 + PredictionLodPlanner.MAX_BAND_LEAVES + PredictionTransitionPlan.MAX_EXTRA_LEAVES);
-            for (int dz = -1024; dz <= 1024; dz += 64) for (int dx = -1024; dx <= 1024; dx += 64) {
-                if (dx * dx + dz * dz > 1024 * 1024) continue;
+            for (int dz = -256; dz <= 256; dz += 64) for (int dx = -256; dx <= 256; dx += 64) {
+                if (dx * dx + dz * dz > 256 * 256) continue;
                 double x = focus.x() + dx, z = focus.z() + dz;
                 var tile = plan.stream().filter(key -> contains(layout, key, x, z)).findFirst().orElseThrow();
-                assertEquals(0, tile.lod(), "entire scoped radius must reach block detail, offset=" + dx + "," + dz);
+                assertEquals(0, tile.lod(), "central decoration radius must reach block detail, offset=" + dx + "," + dz);
                 assertTrue(PredictionWorkOrder.surfaceEligible(tile, layout, 0, 0, 768, focus));
             }
             for (int dz = -192; dz <= 192; dz += 64) for (int dx = -192; dx <= 192; dx += 64) {

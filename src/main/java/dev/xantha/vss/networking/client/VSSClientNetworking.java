@@ -165,6 +165,7 @@ public final class VSSClientNetworking {
             return;
         }
 
+        WORLDGEN_ASSEMBLY.clear();
         boolean wasEnabled = serverEnabled;
         waitingForHandshake = false;
         handshakeSent = true;
@@ -351,12 +352,24 @@ public final class VSSClientNetworking {
     private static final WorldgenProfileAssembly WORLDGEN_ASSEMBLY = new WorldgenProfileAssembly();
 
     public static void handleWorldgenFragment(dev.xantha.vss.networking.payloads.WorldgenProfileFragmentS2CPayload part) {
-        if (!isClientWorldReady()) { WORLDGEN_ASSEMBLY.clear(); return; }
-        var profile = WORLDGEN_ASSEMBLY.accept(part);
+        if (!isClientWorldReady() || !serverEnabled
+                || (serverCapabilities & VSSConstants.CAPABILITY_PREDICTIVE_WORLDGEN) == 0) {
+            WORLDGEN_ASSEMBLY.clear();
+            return;
+        }
+        WorldgenProfileS2CPayload profile;
+        try {
+            profile = WORLDGEN_ASSEMBLY.accept(part);
+        } catch (RuntimeException exception) {
+            WORLDGEN_ASSEMBLY.clear();
+            VSSLogger.warn("VSS discarded an invalid worldgen profile transfer; keeping the connection alive", exception);
+            return;
+        }
         if (profile != null) handleWorldgenProfile(profile);
     }
 
     public static void handleWorldgenProfile(WorldgenProfileS2CPayload payload) {
+        WORLDGEN_ASSEMBLY.clear();
         if (!isClientWorldReady() || !serverEnabled
                 || (serverCapabilities & VSSConstants.CAPABILITY_PREDICTIVE_WORLDGEN) == 0) {
             return;
@@ -438,6 +451,7 @@ public final class VSSClientNetworking {
 
     @SubscribeEvent
     public static void onClientLogin(ClientPlayerNetworkEvent.LoggingIn event) {
+        WORLDGEN_ASSEMBLY.clear();
         dev.xantha.vss.compat.StrictLodVisibility.reset();
         ClientPredictionState.clear();
         ModCompat.onDisconnect();
@@ -466,6 +480,9 @@ public final class VSSClientNetworking {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
             return;
+        }
+        if (WORLDGEN_ASSEMBLY.expire()) {
+            VSSLogger.warn("VSS worldgen profile transfer timed out; discarded incomplete snapshot");
         }
         ModCompat.init();
         ensureHandshakePending();

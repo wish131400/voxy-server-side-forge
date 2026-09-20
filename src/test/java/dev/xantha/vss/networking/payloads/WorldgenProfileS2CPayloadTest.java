@@ -12,6 +12,18 @@ import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
 class WorldgenProfileS2CPayloadTest {
+    static {
+        // Reuse the Forge test harness (event bus + registry bootstrap) when
+        // running this payload test alone, without a ModLauncher process.
+        try {
+            var bootstrap = Class.forName("dev.xantha.vss.client.prediction.ClientTerrainSamplerTest")
+                    .getDeclaredMethod("bootstrapMinecraft");
+            bootstrap.setAccessible(true);
+            bootstrap.invoke(null);
+        } catch (ReflectiveOperationException exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
     @Test
     void generationToggleRevisionDoesNotInvalidateThePredictionWorld() {
         var a = new WorldgenProfileS2CPayload(3, 42L, 1L, 0, 2, new byte[]{1, 2}, List.of());

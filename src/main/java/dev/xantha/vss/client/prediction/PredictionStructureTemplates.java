@@ -21,6 +21,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 final class PredictionStructureTemplates extends StructureTemplateManager {
     private final JsonObject encoded;
     private final Map<ResourceLocation, StructureTemplate> decoded = new LinkedHashMap<>(32, .75F, true);
+    private final Map<ResourceLocation, Long> decodedWeights = new java.util.HashMap<>();
+    private long decodedBytes;
 
     static synchronized PredictionStructureTemplates open(JsonObject encoded) throws IOException {
         // Vanilla's constructor requires a generated-directory handle. This is a
@@ -43,22 +45,30 @@ final class PredictionStructureTemplates extends StructureTemplateManager {
         if (!encoded.has(id.toString())) return Optional.empty();
         try {
             byte[] bytes = java.util.Base64.getDecoder().decode(encoded.get(id.toString()).getAsString());
-            var tag = readTemplate(bytes);
+            var accounting = new NbtAccounter(32 * 1024 * 1024);
+            var tag = readTemplate(bytes, accounting);
             // Prediction has no entities, block entities, loot or ticking state.
             tag.remove("entities");
             stripEndCityEntityMarkers(id, tag);
             template = readStructure(tag);
+            long weight = accounting.getUsage();
+            while (!decoded.isEmpty() && (decoded.size() >= 256 || decodedBytes + weight > 64L * 1024 * 1024)) {
+                var oldest = decoded.keySet().iterator().next();
+                decoded.remove(oldest);
+                decodedBytes -= decodedWeights.remove(oldest);
+            }
             decoded.put(id, template);
-            if (decoded.size() > 256) decoded.remove(decoded.keySet().iterator().next());
+            decodedWeights.put(id, weight);
+            decodedBytes += weight;
             return Optional.of(template);
         } catch (IOException | IllegalArgumentException failure) {
             throw new IllegalStateException("Invalid synced structure template: " + id, failure);
         }
     }
 
-    private static net.minecraft.nbt.CompoundTag readTemplate(byte[] bytes) throws IOException {
+    private static net.minecraft.nbt.CompoundTag readTemplate(byte[] bytes, NbtAccounter accounting) throws IOException {
         try (var input = new java.io.DataInputStream(new java.util.zip.GZIPInputStream(new ByteArrayInputStream(bytes)))) {
-            return NbtIo.read(input, new NbtAccounter(8 * 1024 * 1024));
+            return NbtIo.read(input, accounting);
         }
     }
 

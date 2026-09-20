@@ -124,6 +124,12 @@ public final class QueuedColumnSender {
      * summarised on a fixed interval so a client joining can be measured.
      */
     private void reportWireUsage() {
+        if (!VSSServerConfig.CONFIG.debugLogging) {
+            wireReportBytes = 0L;
+            wireReportPayloads = 0L;
+            wireReportNanos = System.nanoTime();
+            return;
+        }
         if (wireReportPayloads == 0) {
             return;
         }
@@ -134,7 +140,7 @@ public final class QueuedColumnSender {
         }
         double seconds = elapsed / 1e9;
         double mib = wireReportBytes / 1048576.0;
-        VSSLogger.info("VSS LOD wire: " + wireReportPayloads + " payloads, " + wireReportBytes
+        VSSLogger.debug("VSS LOD wire: " + wireReportPayloads + " payloads, " + wireReportBytes
                 + " B (" + String.format(java.util.Locale.ROOT, "%.2f", mib) + " MiB) in "
                 + String.format(java.util.Locale.ROOT, "%.1f", seconds) + " s = "
                 + String.format(java.util.Locale.ROOT, "%.2f", mib / seconds) + " MiB/s");

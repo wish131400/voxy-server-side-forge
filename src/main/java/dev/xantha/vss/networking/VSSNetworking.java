@@ -39,7 +39,6 @@ public final class VSSNetworking {
     private VSSNetworking() {
     }
 
-    private static final java.util.concurrent.atomic.AtomicInteger WORLDGEN_TRANSFERS = new java.util.concurrent.atomic.AtomicInteger();
 
     public static void register() {
         int id = 0;
@@ -122,21 +121,8 @@ public final class VSSNetworking {
 
     public static void sendToPlayer(ServerPlayer player, Object payload) {
         if (payload instanceof WorldgenProfileS2CPayload profile) {
-            var buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
-            try {
-                WorldgenProfileS2CPayload.encode(profile, buf);
-                int total = buf.readableBytes();
-                if (total > WorldgenProfileFragmentS2CPayload.MAX_BYTES)
-                    throw new IllegalArgumentException("Worldgen snapshot exceeds transfer limit");
-                int transfer = WORLDGEN_TRANSFERS.incrementAndGet();
-                for (int offset = 0; offset < total;) {
-                    byte[] part = new byte[Math.min(WorldgenProfileFragmentS2CPayload.CHUNK_BYTES, total - offset)];
-                    buf.readBytes(part);
-                    CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                            new WorldgenProfileFragmentS2CPayload(transfer, total, offset, part));
-                    offset += part.length;
-                }
-            } finally { buf.release(); }
+            WorldgenProfileTransfer.send(profile, part ->
+                    CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), part));
         } else {
             CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), payload);
         }
