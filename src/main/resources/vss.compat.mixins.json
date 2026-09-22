@@ -20,6 +20,7 @@
     "client.IrisPredictionCaptureMixin",
     "client.IrisPredictionShaderCaptureMixin",
     "client.SpyglassOverlayTimingMixin",
+    "client.PredictionPauseLimitMixin",
     "client.ForgeSpyglassOverlayTimingMixin",
     "client.FreeTerraForgedPredictionFiltersMixin",
     "client.ClientPacketListenerServerIdentityMixin",

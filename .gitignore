@@ -7,6 +7,7 @@ crash-reports/
 
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+!src/main/jarjar/lz4-java-1.8.0.jar
 *.zip
 *.log
 *.log.gz
