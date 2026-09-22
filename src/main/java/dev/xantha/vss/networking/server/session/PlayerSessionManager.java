@@ -158,13 +158,6 @@ public final class PlayerSessionManager {
     private void sendWorldgenProfile(MinecraftServer server, ServerPlayer player) {
         try {
             WorldgenProfileS2CPayload payload = WorldgenProfileHolder.payloadFor(server, configRevision.get(), player.level().dimension());
-            long wireBytes = payload.registries().length;
-            for (WorldgenProfileS2CPayload.DimensionProfile dimension : payload.dimensions()) {
-                wireBytes += dimension.generatorData().length;
-            }
-            VSSLogger.info("VSS sending worldgen profile to " + player.getGameProfile().getName()
-                    + ": " + wireBytes + " B (" + (wireBytes / 1048576.0) + " MiB) payload, "
-                    + payload.dimensions().size() + " dimensions");
             VSSNetworking.sendToPlayer(player, payload);
         } catch (RuntimeException exception) {
             // A third-party generator may expose a density codec unavailable

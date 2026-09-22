@@ -372,6 +372,18 @@ public final class VSSVoxyOptionsIntegration {
         List<OptionGroup> groups = new ArrayList<>();
         ClientStorage clientStorage = new ClientStorage();
 
+        if (canEditLocalServerConfig()) {
+            ServerStorage serverStorage = new ServerStorage();
+            groups.add(OptionGroup.createBuilder()
+                    .add(OptionImpl.createBuilder(boolean.class, serverStorage)
+                            .setName(Component.translatable("vss.voxy_options.prediction_sync"))
+                            .setTooltip(Component.translatable("vss.voxy_options.prediction_sync.tooltip"))
+                            .setControl(TickBoxControl::new)
+                            .setBinding((config, value) -> config.enablePredictionSync = value, config -> config.enablePredictionSync)
+                            .setImpact(OptionImpact.HIGH).build())
+                    .build());
+        }
+
         groups.add(OptionGroup.createBuilder()
                 .add(OptionImpl.createBuilder(boolean.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.prediction"))
