@@ -365,15 +365,6 @@ impl ProxyBase {
         })
     }
 }
-// A decoration step contains several independent feature transactions. Keep
-// its rollback state private so dense and sparse storage cannot diverge.
-pub(crate) struct DecorationCheckpoint {
-    blocks: Vec<StateId>,
-    proxy_edits: HashMap<usize, StateId>,
-    published: BTreeMap<usize, StateId>,
-    entropy: Option<crate::random::Random>,
-    incomplete: bool,
-}
 pub struct Volume {
     pub origin: Pos,
     pub size: [usize; 3],
@@ -406,29 +397,6 @@ pub struct Volume {
     proxy_write_tops: std::collections::HashMap<usize, i32>,
 }
 impl Volume {
-    pub(crate) fn decoration_checkpoint(&self) -> Result<DecorationCheckpoint> {
-        if self.recording {
-            return Err("nested decoration transaction".into());
-        }
-        Ok(DecorationCheckpoint {
-            blocks: self.blocks.clone(),
-            proxy_edits: self.proxy_edits.clone(),
-            published: self.published.clone(),
-            entropy: self.decoration_entropy.clone(),
-            incomplete: self.incomplete,
-        })
-    }
-    pub(crate) fn restore_decoration(&mut self, checkpoint: DecorationCheckpoint) {
-        self.blocks = checkpoint.blocks;
-        self.proxy_edits = checkpoint.proxy_edits;
-        self.published = checkpoint.published;
-        self.decoration_entropy = checkpoint.entropy;
-        self.incomplete = checkpoint.incomplete;
-        self.height_cache.clear();
-        self.changes.clear();
-        self.recording = false;
-    }
-
     pub fn new(origin: Pos, size: [usize; 3], palette: Palette) -> Result<Self> {
         let cells = size
             .into_iter()

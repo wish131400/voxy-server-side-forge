@@ -32,6 +32,8 @@ import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.BatchResponseS2CPayload;
 import dev.xantha.vss.networking.payloads.CancelRequestC2SPayload;
 import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
+import dev.xantha.vss.networking.payloads.LostCityHintsC2SPayload;
+import dev.xantha.vss.networking.server.compat.LostCityHintService;
 import dev.xantha.vss.networking.payloads.HandshakeRequestS2CPayload;
 import dev.xantha.vss.networking.payloads.RegionPresenceC2SPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
@@ -357,6 +359,12 @@ public final class VSSServerNetworking {
         CONTROL_MESSAGE_HANDLER.handleRegionPresence(player, payload);
     }
 
+    public static void handleLostCityHints(LostCityHintsC2SPayload payload,
+                                           Supplier<NetworkEvent.Context> contextSupplier) {
+        ServerPlayer player = contextSupplier.get().getSender();
+        if (player != null && !isServerStopping()) LostCityHintService.handle(player, payload);
+    }
+
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && !isServerStopping()) {
@@ -372,6 +380,7 @@ public final class VSSServerNetworking {
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            LostCityHintService.forgetPlayer(player.getUUID());
             SERVER_RUNTIME.onPlayerLogout(player);
         }
     }
@@ -399,6 +408,7 @@ public final class VSSServerNetworking {
 
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
+        LostCityHintService.stop();
         SERVER_RUNTIME.onServerStopping(event.getServer());
         WorldgenProfileHolder.clear();
     }

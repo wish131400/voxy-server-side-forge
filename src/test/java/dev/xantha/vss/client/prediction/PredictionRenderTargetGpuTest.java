@@ -1497,6 +1497,23 @@ class PredictionRenderTargetGpuTest {
             var turned=scene.prepare(next,java.util.Set.of(),view,camera,4096,32,new Matrix4f().rotateY(.5F),matrix,null);
             assertSame(updated,turned,"a turn that keeps membership retains existing Draw objects and list");
             assertEquals(after,scene.worldVisits(),"rotation must not revisit ownership or seams");
+            var shifted=new net.minecraft.world.phys.Vec3(8,101,4);
+            var walking=scene.prepare(next,java.util.Set.of(),view,shifted,4096,32,
+                    new Matrix4f().rotateY(.5F),matrix,null);
+            assertEquals(2,walking.stream().filter(draw->!draw.seam()).count());
+            assertEquals(after,scene.worldVisits(),"walking within the same ownership view reuses coverage");
+            var smallHorizon=scene.prepare(next,java.util.Set.of(),view,camera,128,32,matrix,matrix,null);
+            assertEquals(2,smallHorizon.stream().filter(draw->!draw.seam()).count());
+            long beforeEdge=scene.worldVisits();
+            var edgeCamera=new net.minecraft.world.phys.Vec3(200,100,0);
+            var edge=scene.prepare(next,java.util.Set.of(),view,edgeCamera,128,32,matrix,matrix,null);
+            assertEquals(1,edge.stream().filter(draw->!draw.seam()).count(),
+                    "crossing the horizon must retire only the exiting tile");
+            assertEquals(beforeEdge+1,scene.worldVisits());
+            var returned=scene.prepare(next,java.util.Set.of(),view,camera,128,32,matrix,matrix,null);
+            assertEquals(2,returned.stream().filter(draw->!draw.seam()).count(),
+                    "a tile removed outside the horizon must reappear on return");
+            assertEquals(beforeEdge+2,scene.worldVisits());
             scene.clear();assertTrue(scene.prepare(new PredictionTileManager.RenderSnapshot(initial.dimension(),layout,
                     java.util.Map.of(),java.util.Map.of()),java.util.Set.of(),view,camera,4096,32,matrix,matrix,null).isEmpty());
             assertEquals(GL_NO_ERROR,glGetError());

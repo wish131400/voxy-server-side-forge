@@ -72,33 +72,53 @@ final class PredictionExteriorColumns {
             if (cliff) { queued[i] = true; queue.add(i); }
         }
         int changed = 0;
+        int[] pending = new int[8], xs = new int[8], zs = new int[8], bottoms = new int[8], tops = new int[8];
+        int[] requestIndex = new int[8];
         while (!queue.isEmpty()) {
             if (Thread.currentThread().isInterrupted() || !valid.getAsBoolean())
                 throw new java.util.concurrent.CancellationException();
-            int i = queue.removeFirst(), x = i % grid, z = i / grid;
-            var sample = samples[i];
-            // Captured columns are authoritative. Their occupancy is attached by the extractor;
-            // an older capture must never be replaced with generated holes.
-            if (((sample.flags() & CHECKED) == 0 || spacing(sample) != step)
-                    && !sample.captured()) {
-                int wx = baseX + (x - 1) * step, wz = baseZ + (z - 1) * step;
-                int min = sampler.profile().minY();
-                int floor = Math.max(min, Math.min(sampler.seaLevel() - 16, sample.surfaceY() - 1));
-                boolean[] occupied = sampler.exteriorFootprint(wx, wz, step, floor, sample.surfaceY(), valid);
-                if (occupied != null) {
-                    sample = capture(sample, min, floor, y -> occupied[y - floor]);
-                    sample = withProfile(sample, sample.volume(), floor, step);
-                    samples[i] = sample; changed++;
+            int count = 0, requests = 0;
+            while (count < pending.length && !queue.isEmpty()) {
+                int index = queue.removeFirst();
+                pending[count] = index;
+                var sample = samples[index];
+                if (((sample.flags() & CHECKED) == 0 || spacing(sample) != step) && !sample.captured()) {
+                    int x = index % grid, z = index / grid;
+                    xs[requests] = baseX + (x - 1) * step;
+                    zs[requests] = baseZ + (z - 1) * step;
+                    requestIndex[requests] = count;
+                    tops[requests] = sample.surfaceY();
+                    int min = sampler.profile().minY();
+                    bottoms[requests] = Math.max(min, Math.min(sampler.seaLevel() - 16, tops[requests] - 1));
+                    requests++;
                 }
+                count++;
             }
-            if (!profiled(sample)) continue;
-            for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
-                int xx = x + dx, zz = z + dz;
-                if (xx < 0 || zz < 0 || xx >= grid || zz >= grid) continue;
-                int next = zz * grid + xx;
-                var s = samples[next];
-                if (!queued[next] && s != null && s.hasSurface() && !interiorVolume(s)) {
-                    queued[next] = true; queue.add(next);
+            boolean[][] footprints = requests == 0 ? null
+                    : sampler.exteriorFootprints(xs, zs, step, bottoms, tops, requests, valid);
+            for (int request = 0; request < requests; request++) {
+                boolean[] occupied = footprints[request];
+                if (occupied == null) continue;
+                int index = pending[requestIndex[request]];
+                var sample = samples[index];
+                int min = sampler.profile().minY();
+                int floor = bottoms[request];
+                sample = capture(sample, min, floor, y -> occupied[y - floor]);
+                sample = withProfile(sample, sample.volume(), floor, step);
+                samples[index] = sample; changed++;
+            }
+            for (int pendingIndex = 0; pendingIndex < count; pendingIndex++) {
+                int i = pending[pendingIndex], x = i % grid, z = i / grid;
+                var sample = samples[i];
+                if (!profiled(sample)) continue;
+                for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
+                    int xx = x + dx, zz = z + dz;
+                    if (xx < 0 || zz < 0 || xx >= grid || zz >= grid) continue;
+                    int next = zz * grid + xx;
+                    var s = samples[next];
+                    if (!queued[next] && s != null && s.hasSurface() && !interiorVolume(s)) {
+                        queued[next] = true; queue.add(next);
+                    }
                 }
             }
         }

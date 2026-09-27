@@ -2,8 +2,10 @@ package dev.xantha.vss.client.prediction;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import java.util.zip.InflaterInputStream;
 
@@ -19,10 +21,12 @@ final class PredictionRegionStorage implements AutoCloseable {
     static final int MAX_RECORD_BYTES = 32 * 1024 * 1024;
     private static final int MAGIC = 0x56535052, VERSION = 1, MAX_OPEN = 32;
     private static final long COMPACT_MIN_WASTE = 4L * 1024 * 1024;
-    private static final long MAX_COMPACT_BYTES = 8L * 1024 * 1024;
+    private static final long MAX_COMPACT_BYTES = 256L * 1024 * 1024;
+    private static final int MAX_MAINTENANCE = 4096;
     private final Path root;
     private final LinkedHashMap<Path, Region> open = new LinkedHashMap<>(16, .75F, true);
     private final Set<Path> maintenance = new LinkedHashSet<>();
+    private long closeGeneration;
 
     record Record(byte[] bytes, boolean legacy) { }
     private record Entry(long offset, int length, byte[] header, boolean deleted) { }
@@ -207,34 +211,72 @@ final class PredictionRegionStorage implements AutoCloseable {
 
     private void considerMaintenance(Region region) throws IOException {
         long waste = region.file.length() - DATA_START - region.liveBytes;
-        if (waste >= COMPACT_MIN_WASTE && waste >= region.liveBytes
-                && region.liveBytes <= MAX_COMPACT_BYTES && maintenance.size() < MAX_OPEN) maintenance.add(region.path);
+        // Rewriting a large, mostly live region for a few obsolete records
+        // costs more IO than it saves. The relative threshold also prevents
+        // repeated compaction as a mesh region is incrementally updated.
+        if (waste >= COMPACT_MIN_WASTE && waste >= region.liveBytes / 4
+                && region.liveBytes <= MAX_COMPACT_BYTES && maintenance.size() < MAX_MAINTENANCE) maintenance.add(region.path);
     }
 
     synchronized boolean hasMaintenance() { return !maintenance.isEmpty(); }
 
-    /** One bounded region per idle commit-queue turn; atomic replacement preserves old readers. */
-    synchronized void compactOne() throws IOException {
-        if (maintenance.isEmpty()) return;
-        Path path = maintenance.iterator().next();
-        maintenance.remove(path);
-        Region region = region(path, false);
-        maintenance.remove(path);
-        if (region == null || region.liveBytes > MAX_COMPACT_BYTES) return;
+    /** Discover old append-only regions without delaying world startup or loading them all into memory. */
+    void discoverMaintenance() throws IOException {
+        if (!Files.isDirectory(root)) return;
+        long generation;
+        synchronized (this) { generation = closeGeneration; }
+        try (Stream<Path> files = Files.walk(root, 2)) {
+            for (Iterator<Path> paths = files.filter(path -> path.getFileName().toString().endsWith(".vpr")
+                    && Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)).iterator(); paths.hasNext();) {
+                Path path = paths.next();
+                synchronized (this) {
+                    if (generation != closeGeneration || maintenance.size() >= MAX_MAINTENANCE) return;
+                    try { region(path, false); } catch (IOException ignored) { /* A damaged region remains a cache miss. */ }
+                }
+            }
+        }
+    }
+
+    /** Copy outside the cache lock so builders can keep reading while a large region is reclaimed. */
+    void compactOne() throws IOException {
+        Path path;
+        Entry[] snapshot;
+        long fileSize, generation;
+        synchronized (this) {
+            if (maintenance.isEmpty()) return;
+            path = maintenance.iterator().next();
+            maintenance.remove(path);
+            Region region = region(path, false);
+            maintenance.remove(path);
+            if (region == null || region.liveBytes > MAX_COMPACT_BYTES) return;
+            long waste = region.file.length() - DATA_START - region.liveBytes;
+            if (waste < COMPACT_MIN_WASTE || waste < region.liveBytes / 4) return;
+            snapshot = region.entries.clone();
+            fileSize = region.file.length();
+            generation = closeGeneration;
+        }
         Path temp = Files.createTempFile(path.getParent(), "region-compact-", ".tmp");
         try {
-            try (var output = new RandomAccessFile(temp.toFile(), "rw")) {
+            try (var input = FileChannel.open(path, StandardOpenOption.READ);
+                 var output = new RandomAccessFile(temp.toFile(), "rw")) {
                 initialize(output);
+                var target = output.getChannel();
+                ByteBuffer buffer = ByteBuffer.allocateDirect(128 * 1024);
                 for (int slot = 0; slot < SLOTS; slot++) {
-                    Entry entry = region.entries[slot];
+                    Entry entry = snapshot[slot];
                     if (entry == null) continue;
                     if (!entry.deleted) {
                         long offset = output.length();
-                        output.seek(offset); region.file.seek(entry.offset);
-                        byte[] buffer = new byte[32 * 1024];
+                        long source = entry.offset, destination = offset;
                         for (int remaining = entry.length; remaining > 0;) {
-                            int n = Math.min(remaining, buffer.length);
-                            region.file.readFully(buffer, 0, n); output.write(buffer, 0, n); remaining -= n;
+                            buffer.clear();
+                            buffer.limit(Math.min(remaining, buffer.capacity()));
+                            int n = input.read(buffer, source);
+                            if (n <= 0) throw new EOFException("truncated prediction region during compaction");
+                            buffer.flip();
+                            while (buffer.hasRemaining()) destination += target.write(buffer, destination);
+                            source += n;
+                            remaining -= n;
                         }
                         entry = new Entry(offset, entry.length, entry.header, false);
                     }
@@ -242,9 +284,28 @@ final class PredictionRegionStorage implements AutoCloseable {
                 }
                 output.getChannel().force(true);
             }
-            discard(path); // Windows replacement requires our handle to be closed.
-            Files.move(temp, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            synchronized (this) {
+                if (generation != closeGeneration) return;
+                Region current = region(path, false);
+                maintenance.remove(path);
+                if (current == null) return;
+                if (current.file.length() != fileSize || !sameEntries(snapshot, current.entries)) {
+                    considerMaintenance(current);
+                    return;
+                }
+                discard(path); // Windows replacement requires our handle to be closed.
+                Files.move(temp, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            }
         } finally { Files.deleteIfExists(temp); }
+    }
+
+    private static boolean sameEntries(Entry[] expected, Entry[] actual) {
+        for (int i = 0; i < SLOTS; i++) {
+            Entry a = expected[i], b = actual[i];
+            if (a == null || b == null) { if (a != b) return false; }
+            else if (a.offset != b.offset || a.length != b.length || a.deleted != b.deleted) return false;
+        }
+        return true;
     }
 
     private void discard(Path path) throws IOException {
@@ -253,6 +314,7 @@ final class PredictionRegionStorage implements AutoCloseable {
     }
 
     @Override public synchronized void close() throws IOException {
+        closeGeneration++;
         IOException failure = null;
         for (Region region : open.values()) try { region.file.close(); } catch (IOException e) { failure = e; }
         open.clear(); maintenance.clear();

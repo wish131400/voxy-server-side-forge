@@ -45,8 +45,8 @@ class PredictionMemoryLifecycleTest {
                 var current = manager.readyTiles().stream().map(PredictionTileManager.PredictionTile::key)
                         .collect(java.util.stream.Collectors.toSet());
                 for (var key : leaves) {
-                    boolean covered = current.contains(key) || PredictionTileManager.coveredByAncestor(
-                            current, java.util.Set.of(), PROFILE.levelKey(), manager.layout(), key);
+                    boolean covered = current.contains(key) || PredictionTileResidencyPolicy.coveredByAncestor(
+                            current, manager.layout(), key);
                     if (previouslyCovered.contains(key)) assertTrue(covered, "memory pressure cannot open previously covered ground: " + key);
                     if (covered) previouslyCovered.add(key);
                 }

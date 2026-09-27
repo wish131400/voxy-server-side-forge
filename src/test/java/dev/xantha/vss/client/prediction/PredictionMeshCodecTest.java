@@ -67,6 +67,26 @@ class PredictionMeshCodecTest {
         }
     }
 
+    @Test void waterSpritesMayOutnumberTerrainQuads() throws Exception {
+        var source = fixture();
+        int[] words = new int[2 * PredictionPackedMesh.STRIDE_INTS];
+        int[] terrainFirst = new int[VssLodFaceGroup.COUNT];
+        int[] terrainCount = new int[VssLodFaceGroup.COUNT];
+        int[] waterFirst = new int[VssLodFaceGroup.COUNT];
+        int[] waterCount = new int[VssLodFaceGroup.COUNT];
+        terrainCount[VssLodFaceGroup.HORIZONTAL] = 1;
+        waterFirst[VssLodFaceGroup.HORIZONTAL] = 1;
+        waterCount[VssLodFaceGroup.HORIZONTAL] = 1;
+        var payload = new PredictionPackedMesh(words, source.cellAxis(), 1, terrainFirst, terrainCount,
+                waterFirst, waterCount, false, 2);
+        var mesh = PredictionMesh.restored(4, 4, payload, source.seamMesh());
+        byte[] identity = new byte[32];
+        var restored = PredictionMeshCodec.decode(PredictionMeshCodec.encode(mesh, identity), identity, mesh.cellAxis());
+        assertNotNull(restored);
+        assertEquals(2, restored.gpuPayload().spriteQuadCount());
+        assertEquals(1, restored.gpuPayload().terrainQuadCount());
+    }
+
     @Test void queuedSaveCannotResurrectGeometryAfterTerrainInvalidation()throws Exception {
         var field=PredictionDiskCache.class.getDeclaredField("MESH_WRITES");field.setAccessible(true);
         var executor=(java.util.concurrent.ExecutorService)field.get(null);
@@ -97,5 +117,43 @@ class PredictionMeshCodecTest {
         resources[0]=0;
         assertFalse(Arrays.equals(a,PredictionMeshCodec.signature(resources,samples,colors,colors,colors,63,0,2,false,plants,simple)));
         assertNull(PredictionMeshCodec.signature(null,samples,colors,colors,colors,63,0,1,false,plants,simple));
+    }
+
+    @Test void baseIdentityRestoresBeforeDecorationAndRejectsChangedTints() throws Exception {
+        var mesh = fixture();
+        int count = (mesh.cellAxis() + 2) * (mesh.cellAxis() + 2);
+        var sample = new ClientColumnSample(64, 64, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+                ClientColumnSample.NO_SPAN, ClientColumnSample.NO_SPAN,
+                ClientColumnSample.NO_SPAN, ClientColumnSample.NO_SPAN);
+        var samples = new ClientColumnSample[count];
+        Arrays.fill(samples, sample);
+        int[] tints = new int[count];
+        byte[] resources = new byte[32];
+        byte[] base = PredictionMeshCodec.baseSignature(resources, samples, tints, tints, tints,
+                63, 0xff509050, 1, false);
+        byte[] full = PredictionMeshCodec.signature(resources, samples, tints, tints, tints,
+                63, 0xff509050, 1, false, PredictionVegetation.Tile.EMPTY,
+                PredictionSimpleVegetation.Result.EMPTY);
+        byte[] bytes = PredictionMeshCodec.encode(mesh, full, base, true);
+        assertNotNull(PredictionMeshCodec.decodeBase(bytes, base, mesh.cellAxis()));
+        base[0] ^= 1;
+        assertNull(PredictionMeshCodec.decodeBase(bytes, base, mesh.cellAxis()));
+    }
+
+    @Test void finishedMeshBaseRecordSurvivesRegionReopen() throws Exception {
+        var mesh = fixture();
+        byte[] base = new byte[32];
+        byte[] full = base.clone(); full[0] = 9;
+        var key = PredictionDiskCache.Key.terrain(4, -3, 1);
+        try (var cache = new PredictionDiskCache(directory, 93); var lease = cache.lease(key)) {
+            cache.writeMeshLater(lease, full, mesh, base, true);
+            cache.flushMeshes(); cache.flush();
+            assertNotNull(cache.readMeshBase(lease, base, mesh.cellAxis()));
+        }
+        try (var cache = new PredictionDiskCache(directory, 93); var lease = cache.lease(key)) {
+            assertNotNull(cache.readMeshBase(lease, base, mesh.cellAxis()));
+            byte[] changed = base.clone(); changed[31] = 1;
+            assertNull(cache.readMeshBase(lease, changed, mesh.cellAxis()));
+        }
     }
 }

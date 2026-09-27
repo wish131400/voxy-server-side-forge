@@ -270,6 +270,14 @@ public class ClientTerrainSampler {
         return occupied;
     }
 
+    boolean[][] exteriorFootprints(int[] x, int[] z, int step, int[] bottom, int[] top, int count,
+                                   java.util.function.BooleanSupplier valid) {
+        boolean[][] result = new boolean[count][];
+        for (int index = 0; index < count; index++)
+            result[index] = exteriorFootprint(x[index], z[index], step, bottom[index], top[index], valid);
+        return result;
+    }
+
     ClientColumnSample resolveInterior(ClientColumnSample sample, int x, int z) {
         return surfaceMaterials == null ? sample : surfaceMaterials.resolveInterior(sample, x, z, this::surfaceY);
     }

@@ -743,7 +743,14 @@ impl Graph {
                         if values.iter().all(|v|v.is_finite()) {
                             let at=|y:i32| lerp((y-base_y) as f64/s.height as f64,values[0],values[1]);
                             let (a,b)=(at(bottom[1]),at(top));
-                            let error=(1.+magnitude)*1e-12;
+                            // `magnitude` above validates the unselected corners:
+                            // their differences remain finite when multiplied by
+                            // the zero X/Z weights. Only this vertical edge can
+                            // contribute to the value and its rounding error.
+                            // A global noise bound here can be orders of magnitude
+                            // wider than the actual edge and force a point scan.
+                            let edge_magnitude=values[0].abs().max(values[1].abs());
+                            let error=(1.+edge_magnitude)*1e-12;
                             return (a.min(b)-error,a.max(b)+error);
                         }
                     }

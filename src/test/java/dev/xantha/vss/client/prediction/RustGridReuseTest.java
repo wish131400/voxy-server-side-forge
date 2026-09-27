@@ -31,6 +31,29 @@ class RustGridReuseTest {
         } finally { RustWorldgenBackend.close(world); }
     }
 
+    @Test void adjacentExteriorFootprintsMatchScalarJniResults() throws Exception {
+        ClientTerrainSamplerTest.bootstrapMinecraft();
+        assertTrue(RustTerrainSampler.available());
+        long world = RustWorldgenBackend.create(917, 0, LithostitchedNativeTest.document().toString());
+        try {
+            var input = java.nio.ByteBuffer.allocateDirect(40).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+            var output = java.nio.ByteBuffer.allocateDirect(2 * (4 + 384)).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+            var scalar = java.nio.ByteBuffer.allocateDirect(384).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+            for (int index = 0; index < 2; index++) {
+                int offset = index * 20;
+                input.putInt(offset, -3 + index).putInt(offset + 4, -3)
+                        .putInt(offset + 8, 1).putInt(offset + 12, -64).putInt(offset + 16, 80);
+            }
+            assertEquals(2, RustWorldgenBackend.exteriorFootprints(world, input, output, 2));
+            for (int index = 0; index < 2; index++) {
+                int count = RustWorldgenBackend.exteriorFootprint(world, -3 + index, -3, 1, -64, 80, scalar);
+                int start = index * (4 + 384);
+                assertEquals(count, output.getInt(start));
+                for (int y = 0; y < count; y++) assertEquals(scalar.get(y), output.get(start + 4 + y));
+            }
+        } finally { RustWorldgenBackend.close(world); }
+    }
+
     @Test void displayRecordsNeverBecomeExactDecorationInput() throws Exception {
         ClientTerrainSamplerTest.bootstrapMinecraft();
         assertTrue(RustTerrainSampler.available());

@@ -33,6 +33,7 @@
     "voxy.IrisVoxyRenderPipelineDepthMaskMixin",
     "voxy.IrisVoxyPredictionMixin",
     "voxy.VoxyTranslucentPredictionMixin",
+    "voxy.VoxyBoundaryTerrainMixin",
     "voxy.NormalRenderPipelineDepthMaskMixin",
     "voxy.PredictionFogShaderMixin",
     "voxy.VoxyClientInstanceStoragePathMixin",

@@ -1,6 +1,7 @@
 package dev.xantha.vss.networking.client;
 
 import static org.junit.jupiter.api.Assertions.*;
+import dev.xantha.vss.api.VoxelColumnData;
 import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.compat.ModCompat;
 import dev.xantha.vss.compat.StrictLodVisibility;
@@ -45,6 +46,21 @@ class LodRequestManagerStrictOrderTest {
         field(VSSClientNetworking.class,"serverEnabled").setBoolean(null,oldEnabled);
         field(ModCompat.class,"voxyLoaded").setBoolean(null,oldVoxy);
         StrictLodVisibility.reset();
+    }
+    @Test void adjacentStrictColumnsRemainIndependentlyAddressable() throws Exception {
+        var empty = new VoxelColumnData(new VoxelColumnData.SectionData[0], 1L);
+        for (int x = -16; x < 16; x++) for (int z = -16; z < 16; z++) {
+            manager.recordStrictSections(x, z, empty);
+        }
+        for (int x = -16; x < 16; x++) for (int z = -16; z < 16; z++) {
+            assertTrue(manager.strictColumnReady(x, z));
+            assertTrue(manager.strictColumnRenderReady(x, z, ignored -> false));
+        }
+        field(LodRequestManager.class,"lastDimension").set(manager, null);
+        manager.reconcileMissingColumn(PositionUtil.packPosition(-7, 11));
+        assertFalse(manager.strictColumnReady(-7, 11));
+        assertTrue(manager.strictColumnReady(-7, 10));
+        assertTrue(manager.strictColumnReady(-8, 11));
     }
     @Test void distantReadyAndDirtyCandidatesCannotStealRequestsFromTheMissingCenter() throws Exception {
         long far = PositionUtil.packPosition(128,0);

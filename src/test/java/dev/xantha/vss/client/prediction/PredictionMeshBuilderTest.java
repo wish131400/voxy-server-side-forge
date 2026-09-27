@@ -36,6 +36,58 @@ class PredictionMeshBuilderTest {
     }
 
     @Test
+    void lostCityHintAddsBoundedBuildingSilhouette() {
+        int grid = 17;
+        ClientColumnSample[] samples = new ClientColumnSample[grid * grid];
+        ClientColumnSample ground = new ClientColumnSample(64, 63, 0,
+                ClientColumnSample.NO_BLOCK, 0, 0, 0, 0, 0, 0, 0,
+                ClientColumnSample.NO_BLOCK, ClientColumnSample.NO_BLOCK,
+                ClientColumnSample.NO_SPAN, ClientColumnSample.NO_SPAN,
+                ClientColumnSample.NO_SPAN, ClientColumnSample.NO_SPAN);
+        java.util.Arrays.fill(samples, ground);
+        int[] buildings = new int[16];
+        buildings[0] = 2 | 64 << 2 | 3 << 18;
+        PredictionMesh empty = PredictionMeshBuilder.build(samples, null, 63, 0, 4, grid,
+                false, null, null, null, 0, 0, PredictionVegetation.Tile.EMPTY,
+                PredictionSimpleVegetation.Result.EMPTY, null);
+        PredictionMesh city = PredictionMeshBuilder.build(samples, null, 63, 0, 4, grid,
+                false, null, null, null, 0, 0, PredictionVegetation.Tile.EMPTY,
+                PredictionSimpleVegetation.Result.EMPTY, buildings);
+        assertTrue(city.vertexCount() > empty.vertexCount());
+        assertTrue(city.vertexCount() - empty.vertexCount() < 500,
+                "one building should be a handful of clipped faces, not thousands of blocks");
+        assertTrue(java.util.stream.IntStream.range(0, city.vertexCount())
+                .anyMatch(vertex -> city.y(vertex) == 82.0F));
+
+        ClientColumnSample captured = new ClientColumnSample(64, 63, 0,
+                ClientColumnSample.NO_BLOCK, 0, 0, 0, 0, 0, ClientColumnSample.FLAG_CAPTURED, 0,
+                ClientColumnSample.NO_BLOCK, ClientColumnSample.NO_BLOCK,
+                ClientColumnSample.NO_SPAN, ClientColumnSample.NO_SPAN,
+                ClientColumnSample.NO_SPAN, ClientColumnSample.NO_SPAN);
+        for (int z = 0; z < 4; z++) for (int x = 0; x < 4; x++)
+            samples[z * grid + x] = captured;
+        PredictionMesh capturedEmpty = PredictionMeshBuilder.build(samples, null, 63, 0, 4, grid,
+                false, null, null, null, 0, 0, PredictionVegetation.Tile.EMPTY,
+                PredictionSimpleVegetation.Result.EMPTY, null);
+        PredictionMesh real = PredictionMeshBuilder.build(samples, null, 63, 0, 4, grid,
+                false, null, null, null, 0, 0, PredictionVegetation.Tile.EMPTY,
+                PredictionSimpleVegetation.Result.EMPTY, buildings);
+        assertEquals(capturedEmpty.vertexCount(), real.vertexCount(),
+                "captured terrain must replace the city silhouette");
+
+        java.util.Arrays.fill(samples, ground);
+        buildings[0] = 0;
+        buildings[15] = 2 | 64 << 2 | 3 << 18;
+        PredictionMesh edge = PredictionMeshBuilder.build(samples, null, 63, 0, 4, grid,
+                false, null, null, null, 0, 0, PredictionVegetation.Tile.EMPTY,
+                PredictionSimpleVegetation.Result.EMPTY, buildings);
+        assertTrue(java.util.stream.IntStream.range(0, edge.vertexCount())
+                .anyMatch(vertex -> edge.y(vertex) == 82.0F));
+        assertTrue(java.util.stream.IntStream.range(0, edge.vertexCount())
+                .allMatch(vertex -> edge.x(vertex) <= 64 && edge.z(vertex) <= 64));
+    }
+
+    @Test
     void perCornerLightingDarkensValleyCorners() {
         // One raised column surrounded by lower ground: the corners shared
         // with the spike must be darker than the fully open corner.

@@ -193,6 +193,33 @@ mod probe {
         assert_eq!(g.column_range(root,[20,0,20],7,&mut s),(f64::NEG_INFINITY,f64::INFINITY));
     }
     #[test]
+    fn lattice_proof_uses_selected_edge_not_unrelated_large_corners() {
+        for (x, edge, off_axis) in [(0,-0.078125_f64,1e12_f64), (-4,0.078125_f64,-1e12_f64)] {
+            let mut d=document();
+            d["settings"]["noise_router"]["final_density"]=serde_json::json!({
+                "type":"minecraft:interpolated",
+                "argument":{"type":"minecraft:range_choice",
+                    "input":{"type":"lithostitched:axis","axis":"x"},
+                    "min_inclusive":x as f64-0.5,"max_exclusive":x as f64+0.5,
+                    "when_in_range":edge,"when_out_of_range":off_axis}});
+            let g=Graph::from_document(917,&d).unwrap();
+            let root=g.root("final_density").unwrap();
+            let Node::Marker(_,child)=g.nodes[root] else {panic!()};
+            let (global_low,global_high)=g.column_plan.bounds[child];
+            assert!(global_low.abs().max(global_high.abs())>1e11);
+            let mut s=g.scratch(x,0,4,8).unwrap();
+            let (low,high)=g.column_range(root,[x,0,0],7,&mut s);
+            assert!(if edge<0. {high<0.} else {low>1e-12},"edge={edge} bound={low}..{high}");
+            assert_eq!(s.corners.len(),2);
+            let mut oracle=g.scratch(x,0,4,8).unwrap();
+            for y in 0..8 {
+                let v=g.compute(root,[x,y,0],super::super::Mode::Cell,&mut oracle);
+                assert!(v>=low && v<=high,"edge={edge} y={y} v={v} bound={low}..{high}");
+                assert_eq!(v.to_bits(),edge.to_bits());
+            }
+        }
+    }
+    #[test]
     fn unbounded_off_axis_corners_cannot_be_discarded() {
         let mut d=document();
         d["settings"]["noise_router"]["final_density"]=serde_json::json!({"type":"minecraft:interpolated",

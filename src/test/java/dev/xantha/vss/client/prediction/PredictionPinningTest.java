@@ -40,8 +40,8 @@ class PredictionPinningTest {
         var camera = 0;
         var pinned = key(1, 1, 0);
         var ancestor = key(0, 0, 3);
-        assertFalse(PredictionTileManager.shouldRetirePinned(pinned,
-                Set.of(ancestor, pinned), Set.of(), DIMENSION, LAYOUT, camera, camera));
+        assertFalse(PredictionTileResidencyPolicy.shouldRetirePinned(pinned,
+                Set.of(ancestor, pinned), Set.of(), LAYOUT, camera, camera));
     }
 
     @Test
@@ -53,15 +53,15 @@ class PredictionPinningTest {
         var distant = key(8, 8, 2);
         // Parent (4, 4, 3) spans blocks 2048..2560 and covers the tile.
         var parent = key(4, 4, 3);
-        assertFalse(PredictionTileManager.shouldRetirePinned(distant,
-                Set.of(parent, distant), Set.of(), DIMENSION, LAYOUT, camera, camera));
+        assertFalse(PredictionTileResidencyPolicy.shouldRetirePinned(distant,
+                Set.of(parent, distant), Set.of(), LAYOUT, camera, camera));
     }
 
     @Test
     void desiredTilesBeyondTheHorizonAreKept() {
         var far = key(50, 50, 0);
-        assertFalse(PredictionTileManager.shouldRetirePinned(far,
-                Set.of(far, key(6, 6, 3)), Set.of(far), DIMENSION, LAYOUT, 0, 0));
+        assertFalse(PredictionTileResidencyPolicy.shouldRetirePinned(far,
+                Set.of(far, key(6, 6, 3)), Set.of(far), LAYOUT, 0, 0));
     }
 
     @Test
@@ -69,12 +69,49 @@ class PredictionPinningTest {
         var far = key(50, 50, 0);
         // Ancestor chain: lod 0 tileX 50 -> chunk 200; lod 3 spans 32 chunks
         // -> ancestor tile (6, 6, 3).  Resident ancestor retires the tile.
-        assertTrue(PredictionTileManager.shouldRetirePinned(far,
-                Set.of(far, key(6, 6, 3)), Set.of(), DIMENSION, LAYOUT, 0, 0));
+        assertTrue(PredictionTileResidencyPolicy.shouldRetirePinned(far,
+                Set.of(far, key(6, 6, 3)), Set.of(), LAYOUT, 0, 0));
         // Without any resident ancestor the tile is the only coverage left
         // and must stay so the far field never opens a hole.
-        assertFalse(PredictionTileManager.shouldRetirePinned(far,
-                Set.of(far), Set.of(), DIMENSION, LAYOUT, 0, 0));
+        assertFalse(PredictionTileResidencyPolicy.shouldRetirePinned(far,
+                Set.of(far), Set.of(), LAYOUT, 0, 0));
+    }
+
+    @Test
+    void outermostTileCanRetireWithoutAnAncestor() {
+        var top = key(2, 2, LAYOUT.levelCount() - 1);
+        assertTrue(PredictionTileResidencyPolicy.shouldRetirePinned(top, Set.of(top), Set.of(),
+                LAYOUT, 0, 0),
+                "the outermost tile has no parent and must not pin the old route forever");
+    }
+
+    @Test
+    void missingFallbackAncestorIsTheImmediateParent() {
+        var child = key(13, -7, 0);
+        var parent = key(6, -4, 1);
+        assertTrue(PredictionTileResidencyPolicy.firstMissingAncestor(child, Set.of(), LAYOUT).equals(parent));
+        assertTrue(PredictionTileResidencyPolicy.firstMissingAncestor(child, Set.of(parent), LAYOUT) == null,
+                "a resident parent already provides a safe hand-off");
+    }
+
+    @Test
+    void queuedAncestorCannotRetireDetailBeforePublication() {
+        var child = key(50, -51, 0);
+        var parent = key(25, -26, 1);
+        assertFalse(PredictionTileResidencyPolicy.shouldRetirePinned(child, Set.of(child),
+                Set.of(parent), LAYOUT, 0, 0));
+        assertTrue(PredictionTileResidencyPolicy.shouldRetirePinned(child, Set.of(child, parent),
+                Set.of(parent), LAYOUT, 0, 0));
+    }
+
+    @Test
+    void fallbackSearchStopsAtTheRootAndRejectsStaleLevels() {
+        assertTrue(PredictionTileResidencyPolicy.firstMissingAncestor(
+                key(0, 0, LAYOUT.levelCount() - 1), Set.of(), LAYOUT) == null);
+        assertTrue(PredictionTileResidencyPolicy.firstMissingAncestor(
+                key(0, 0, LAYOUT.levelCount()), Set.of(), LAYOUT) == null);
+        assertTrue(PredictionTileResidencyPolicy.shouldRetirePinned(
+                key(0, 0, -1), Set.of(), Set.of(), LAYOUT, 0, 0));
     }
 
     @Test
@@ -83,8 +120,8 @@ class PredictionPinningTest {
         // the previous layout stay resident; the retirement walk must drop
         // them instead of reaching the layout's level validation.
         var stale = key(1, 1, 7);
-        assertTrue(PredictionTileManager.shouldRetirePinned(stale,
-                Set.of(stale), Set.of(), DIMENSION, LAYOUT, 0, 0));
+        assertTrue(PredictionTileResidencyPolicy.shouldRetirePinned(stale,
+                Set.of(stale), Set.of(), LAYOUT, 0, 0));
         // And the fully-authoritative guard must treat it as unknown, not
         // throw (covered through shouldRetirePinned's early exit above).
     }
@@ -92,26 +129,26 @@ class PredictionPinningTest {
     @Test
     void explicitDistanceReductionDropsFarTilesWithoutAncestorsOrPersistence() {
         var layout = VssLodLayout.of(4096, 6, true, false);
-        assertTrue(PredictionTileManager.retireAfterDistanceReduction(key(100, 0, 0), Set.of(), layout, 0, 0));
-        assertTrue(PredictionTileManager.retireAfterDistanceReduction(key(-101, 0, 0), Set.of(), layout, 0, 0));
-        assertTrue(PredictionTileManager.retireAfterDistanceReduction(key(0, 0, 10), Set.of(), layout, 0, 0));
-        assertFalse(PredictionTileManager.retireAfterDistanceReduction(key(1, 1, 0), Set.of(), layout, 0, 0));
-        assertFalse(PredictionTileManager.retireAfterDistanceReduction(key(63, 0, 0), Set.of(), layout, 0, 0),
+        assertTrue(PredictionTileResidencyPolicy.retireAfterDistanceReduction(key(100, 0, 0), Set.of(), layout, 0, 0));
+        assertTrue(PredictionTileResidencyPolicy.retireAfterDistanceReduction(key(-101, 0, 0), Set.of(), layout, 0, 0));
+        assertTrue(PredictionTileResidencyPolicy.retireAfterDistanceReduction(key(0, 0, 10), Set.of(), layout, 0, 0));
+        assertFalse(PredictionTileResidencyPolicy.retireAfterDistanceReduction(key(1, 1, 0), Set.of(), layout, 0, 0));
+        assertFalse(PredictionTileResidencyPolicy.retireAfterDistanceReduction(key(63, 0, 0), Set.of(), layout, 0, 0),
                 "tiles intersecting the new horizon still cover its edge");
         var desired = key(65, 0, 0);
-        assertFalse(PredictionTileManager.retireAfterDistanceReduction(desired, Set.of(desired), layout, 0, 0),
+        assertFalse(PredictionTileResidencyPolicy.retireAfterDistanceReduction(desired, Set.of(desired), layout, 0, 0),
                 "retain any coverage explicitly required by the new planner");
     }
 
     @Test
     void horizonGeometryHonoursTileSpanAndMargin() {
         // Tile containing the camera.
-        assertFalse(PredictionTileManager.beyondHorizon(0, 0, 64, 8, 8, 3072.0D));
+        assertFalse(PredictionTileResidencyPolicy.beyondHorizon(0, 0, 64, 8, 8, 3072.0D));
         // Tile overlapping the margin ring (nearest point 3000 blocks).
-        assertFalse(PredictionTileManager.beyondHorizon(3000, 0, 64, 0, 0, 3072.0D));
+        assertFalse(PredictionTileResidencyPolicy.beyondHorizon(3000, 0, 64, 0, 0, 3072.0D));
         // Tile fully past the horizon plus margin.
-        assertTrue(PredictionTileManager.beyondHorizon(3200, 3200, 64, 0, 0, 3072.0D));
+        assertTrue(PredictionTileResidencyPolicy.beyondHorizon(3200, 3200, 64, 0, 0, 3072.0D));
         // A big coarse tile counts as near while any part overlaps the ring.
-        assertFalse(PredictionTileManager.beyondHorizon(2000, 2000, 2048, 0, 0, 3072.0D));
+        assertFalse(PredictionTileResidencyPolicy.beyondHorizon(2000, 2000, 2048, 0, 0, 3072.0D));
     }
 }

@@ -14,6 +14,17 @@ class PredictionUploadHandoffTest {
     static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }
     private static final VssLodLayout LAYOUT = VssLodLayout.of(65536, 6, true, true);
 
+    @Test void existingGpuParentDefersFineUploadButMissingRegionDoesNot() {
+        var state = new PredictionRenderResidency();
+        var parent = tile(0, 0, 1, 1);
+        var source = source(Map.of(parent.key(), parent));
+        state.retain(source);
+        assertFalse(state.hasResidentCover(new PredictionTileKey(Level.OVERWORLD, 0, 0, 0), LAYOUT));
+        state.uploaded(parent);
+        assertTrue(state.hasResidentCover(new PredictionTileKey(Level.OVERWORLD, 0, 0, 0), LAYOUT));
+        assertFalse(state.hasResidentCover(new PredictionTileKey(Level.OVERWORLD, 2, 0, 0), LAYOUT));
+    }
+
     @Test void uploadCandidatesDrainAndRefreshForReplacementAndReset() {
         var state = new PredictionRenderResidency();
         var a = PredictionLodSeamsTest.tile(0, 0, 2, 64);

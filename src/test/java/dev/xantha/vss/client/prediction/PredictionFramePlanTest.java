@@ -41,4 +41,9 @@ class PredictionFramePlanTest {
         var moved = new PredictionRenderer.Frame(matrices.modelView(), matrices.projection(), new Vec3(1, 64, 0));
         assertNull(cache.get(view, level, snapshot, 10, 20, 30, 1920, 1080, moved));
     }
+    @Test void residencyChangesInvalidateStableOpaquePlans() {
+        cache.put(view, level, snapshot, 10, 20, 30, 7L, 1920, 1080, matrices, plan);
+        assertSame(plan, cache.getStable(view, level, snapshot, 20, 7L, 1920, 1080, matrices));
+        assertNull(cache.getStable(view, level, snapshot, 20, 8L, 1920, 1080, matrices));
+    }
 }

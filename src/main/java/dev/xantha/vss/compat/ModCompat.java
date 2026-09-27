@@ -78,6 +78,9 @@ public final class ModCompat {
     }
 
     public static void onDisconnect() {
+        if (voxyLoaded) {
+            VoxyCompat.onDisconnect();
+        }
         XaeroMapCompat.onDisconnect();
     }
 

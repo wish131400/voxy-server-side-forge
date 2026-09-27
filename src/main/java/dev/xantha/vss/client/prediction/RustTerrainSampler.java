@@ -351,6 +351,42 @@ final class RustTerrainSampler extends ClientTerrainSampler implements AutoClose
                 y -> states[output.getInt(16 + (y - min) * 4)].isAir() ? -1 : rock, ignored -> 0);
     }
     private volatile boolean legacyExteriorBackend;
+    private volatile boolean legacyExteriorBatch;
+    private final ThreadLocal<ByteBuffer> footprintRequests = ThreadLocal.withInitial(() ->
+            ByteBuffer.allocateDirect(8 * 20).order(ByteOrder.LITTLE_ENDIAN));
+    private final ThreadLocal<ByteBuffer> footprintResults = ThreadLocal.withInitial(() ->
+            ByteBuffer.allocateDirect(8 * (4 + profile().height())).order(ByteOrder.LITTLE_ENDIAN));
+    @Override boolean[][] exteriorFootprints(int[] x, int[] z, int step, int[] bottom, int[] top, int count,
+                                               java.util.function.BooleanSupplier valid) {
+        if (count < 2 || legacyExteriorBatch || legacyExteriorBackend)
+            return super.exteriorFootprints(x, z, step, bottom, top, count, valid);
+        if (!valid.getAsBoolean() || Thread.currentThread().isInterrupted()) throw new CancellationException();
+        ByteBuffer input = footprintRequests.get(), output = footprintResults.get();
+        for (int index = 0; index < count; index++) {
+            int offset = index * 20;
+            input.putInt(offset, x[index]).putInt(offset + 4, z[index]).putInt(offset + 8, step)
+                    .putInt(offset + 12, bottom[index]).putInt(offset + 16, top[index]);
+        }
+        final int result;
+        try { result = RustWorldgenBackend.exteriorFootprints(handle(), input, output, count); }
+        catch (UnsatisfiedLinkError olderLibrary) {
+            legacyExteriorBatch = true;
+            return super.exteriorFootprints(x, z, step, bottom, top, count, valid);
+        }
+        if (!valid.getAsBoolean() || Thread.currentThread().isInterrupted()) throw new CancellationException();
+        if (result == -2) return super.exteriorFootprints(x, z, step, bottom, top, count, valid);
+        if (result != count) throw new IllegalStateException("Incomplete native exterior batch");
+        boolean[][] footprints = new boolean[count][];
+        int stride = 4 + profile().height();
+        for (int index = 0; index < count; index++) {
+            int start = index * stride, length = output.getInt(start);
+            if (length == 0) continue;
+            if (length != top[index] - bottom[index]) throw new IllegalStateException("Exterior batch height mismatch");
+            footprints[index] = new boolean[length];
+            for (int height = 0; height < length; height++) footprints[index][height] = output.get(start + 4 + height) != 0;
+        }
+        return footprints;
+    }
     @Override boolean[] exteriorFootprint(int x, int z, int step, int bottom, int top,
                                           java.util.function.BooleanSupplier valid) {
         if (top <= bottom) return null;

@@ -324,6 +324,56 @@ impl Terrain {
         }}
         Ok(Some(occupied))
     }
+
+    /// Work remains local to one bounded batch; no proof survives the caller.
+    pub fn exterior_footprints(&self, requests: &[(i32, i32, i32, i32, i32)]) -> Result<Option<Vec<Option<Vec<u8>>>>> {
+        if requests.len() > 8 { return Err("exterior batch size".into()); }
+        if self.graph.requires_complete_column_order() || self.graph.has_stateful_queries() {
+            return Ok(None);
+        }
+        let mut cells = FxHashSet::default();
+        let mut overlap = false;
+        for &(x, z, step, bottom, top) in requests {
+            if ![1, 2, 4].contains(&step) || bottom < self.min_y || top > self.min_y + self.height || bottom >= top
+                || x < -30_000_000 || z < -30_000_000 || x > 30_000_000 - step || z > 30_000_000 - step {
+                return Err("exterior batch bounds".into());
+            }
+            let mut request_cells = FxHashSet::default();
+            for dz in 0..step { for dx in 0..step {
+                let cell = ((x + dx).div_euclid(self.cell_width), (z + dz).div_euclid(self.cell_width));
+                if request_cells.insert(cell) && !cells.insert(cell) { overlap = true; }
+                if cells.len() > 8 { return Ok(None); }
+            }}
+        }
+        if !overlap { return Ok(None); }
+        let mut jobs = HashMap::default();
+        let mut results = Vec::with_capacity(requests.len());
+        for &(x, z, step, bottom, top) in requests {
+            let mut occupied = vec![0; (top - bottom) as usize];
+            let mut missing = occupied.len();
+            let mut rejected = false;
+            for dz in 0..step { for dx in 0..step {
+                let (xx, zz) = (x + dx, z + dz);
+                let cell = (xx.div_euclid(self.cell_width), zz.div_euclid(self.cell_width));
+                if !jobs.contains_key(&cell) {
+                    jobs.insert(cell, self.job(xx, zz, true)?);
+                }
+                let job = jobs.get_mut(&cell).unwrap();
+                for y in (bottom..top).rev() {
+                    let index = (y - bottom) as usize;
+                    if occupied[index] != 0 { continue; }
+                    let solid = job.base_substance([xx, y, zz]) != Substance::Air;
+                    if dx == 0 && dz == 0 && y == top - 1 && !solid { rejected = true; break; }
+                    if solid { occupied[index] = 1; missing -= 1; }
+                }
+                if rejected || missing == 0 { break; }
+            }
+                if rejected || missing == 0 { break; }
+            }
+            results.push(if rejected { None } else { Some(occupied) });
+        }
+        Ok(Some(results))
+    }
     fn global(&self, y: i32) -> Fluid {
         if y < (-54).min(self.sea_level) {
             Fluid {
@@ -776,8 +826,10 @@ impl Job<'_> {
                 let base = [x.div_euclid(t.cell_width)*t.cell_width, bottom,
                     z.div_euclid(t.cell_width)*t.cell_width];
                 let empty = if let Some(&empty) = self.density_cells.get(&base) { empty } else {
-                    let empty = t.graph.surface_cell_sign(base, bottom+t.cell_height-1, &mut self.scratch)
-                        == crate::density::SurfaceSign::NonPositive;
+                    let sign = t.graph.surface_cell_sign(base, bottom+t.cell_height-1, &mut self.scratch);
+                    #[cfg(test)]
+                    exterior_batch_probe::record_cell(sign);
+                    let empty = sign == crate::density::SurfaceSign::NonPositive;
                     // Bound retained work even when a caller visits many cells.
                     if self.density_cells.len() < 16384 { self.density_cells.insert(base, empty); }
                     empty
@@ -803,7 +855,10 @@ impl Job<'_> {
             self.scratch.advance_block();
             return (self.compute(t.final_density,[x,top,z],Mode::Cell)>0.).then_some(top);
         }
-        match t.graph.surface_sign([x,bottom,z],top,&mut self.scratch) {
+        let sign = t.graph.surface_sign([x,bottom,z],top,&mut self.scratch);
+        #[cfg(test)]
+        exterior_batch_probe::record_range(sign);
+        match sign {
             crate::density::SurfaceSign::NonPositive=>return None,
             crate::density::SurfaceSign::Positive=>return Some(top),
             crate::density::SurfaceSign::Unknown=>{}
@@ -1226,6 +1281,230 @@ impl<'a> Job<'a> {
 }
 fn similarity(a: i32, b: i32) -> f64 {
     1. - (b - a).abs() as f64 / 25.
+}
+
+#[cfg(test)]
+mod exterior_batch_probe {
+    use super::*;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::time::{Duration, Instant};
+
+    type Request = (i32, i32, i32, i32, i32);
+    static CELL_COUNTS: [AtomicU64; 3] = [AtomicU64::new(0), AtomicU64::new(0), AtomicU64::new(0)];
+    static RANGE_COUNTS: [AtomicU64; 3] = [AtomicU64::new(0), AtomicU64::new(0), AtomicU64::new(0)];
+
+    fn index(sign: crate::density::SurfaceSign) -> usize {
+        match sign {
+            crate::density::SurfaceSign::NonPositive => 0,
+            crate::density::SurfaceSign::Positive => 1,
+            crate::density::SurfaceSign::Unknown => 2,
+        }
+    }
+
+    pub(super) fn record_cell(sign: crate::density::SurfaceSign) {
+        CELL_COUNTS[index(sign)].fetch_add(1, Ordering::Relaxed);
+    }
+
+    pub(super) fn record_range(sign: crate::density::SurfaceSign) {
+        RANGE_COUNTS[index(sign)].fetch_add(1, Ordering::Relaxed);
+    }
+
+    fn profile_bounds(terrain: &Terrain, requests: &[Request]) {
+        for slot in CELL_COUNTS.iter().chain(RANGE_COUNTS.iter()) {
+            slot.store(0, Ordering::Relaxed);
+        }
+        for &(x, z, _, _, _) in requests {
+            let mut job = terrain.job(x, z, true).unwrap();
+            job.reuse_density_cells = true;
+            std::hint::black_box(job.density_surface(x, z));
+        }
+        let cell: Vec<_> = CELL_COUNTS.iter().map(|count| count.load(Ordering::Relaxed)).collect();
+        let range: Vec<_> = RANGE_COUNTS.iter().map(|count| count.load(Ordering::Relaxed)).collect();
+        eprintln!("BOUND_COUNTS requests={} cell_nonpositive={} cell_positive={} cell_unknown={} interval_nonpositive={} interval_positive={} interval_unknown={}",
+            requests.len(), cell[0], cell[1], cell[2], range[0], range[1], range[2]);
+    }
+
+    fn shared_footprints(t: &Terrain, requests: &[Request]) -> Result<(Vec<Option<Vec<u8>>>, usize)> {
+        let mut jobs = HashMap::default();
+        let mut results = Vec::with_capacity(requests.len());
+        for &(x, z, step, bottom, top) in requests {
+            let mut occupied = vec![0; (top - bottom) as usize];
+            let mut remaining = occupied.len();
+            let mut rejected = false;
+            for dz in 0..step {
+                for dx in 0..step {
+                    let xx = x + dx;
+                    let zz = z + dz;
+                    let cell = (xx.div_euclid(t.cell_width), zz.div_euclid(t.cell_width));
+                    if !jobs.contains_key(&cell) {
+                        jobs.insert(cell, t.job(xx, zz, true)?);
+                    }
+                    let job = jobs.get_mut(&cell).unwrap();
+                    for y in (bottom..top).rev() {
+                        let index = (y - bottom) as usize;
+                        if occupied[index] != 0 {
+                            continue;
+                        }
+                        let solid = job.base_substance([xx, y, zz]) != Substance::Air;
+                        if dx == 0 && dz == 0 && y == top - 1 && !solid {
+                            rejected = true;
+                            break;
+                        }
+                        if solid {
+                            occupied[index] = 1;
+                            remaining -= 1;
+                        }
+                    }
+                    if rejected || remaining == 0 {
+                        break;
+                    }
+                }
+                if rejected || remaining == 0 {
+                    break;
+                }
+            }
+            results.push(if rejected { None } else { Some(occupied) });
+        }
+        let retained_scratch = jobs.values().map(|job: &Job<'_>| job.scratch.retained_bytes()).sum();
+        Ok((results, retained_scratch))
+    }
+
+    fn median(times: &mut [Duration]) -> f64 {
+        times.sort();
+        times[times.len() / 2].as_secs_f64() * 1000.
+    }
+
+    #[test]
+    fn production_batch_matches_exact_scalar_and_limits_workspace() {
+        let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/worldgen/overworld.json");
+        let document = serde_json::from_str(&std::fs::read_to_string(fixture).unwrap()).unwrap();
+        let terrain = Terrain::from_document(917, &document).unwrap();
+        assert!(!terrain.graph.has_stateful_queries());
+        for step in [1, 2, 4] {
+            let mut requests = Vec::new();
+            for x in -49..-41 {
+                let top = terrain.base_column(x, 33).unwrap().surface_height;
+                requests.push((x, 33, step, terrain.sea_level - 16, top));
+            }
+            let expected: Vec<_> = requests.iter().map(|&(x,z,step,bottom,top)|
+                terrain.exterior_footprint(x,z,step,bottom,top).unwrap()).collect();
+            assert_eq!(terrain.exterior_footprints(&requests).unwrap(), Some(expected));
+        }
+        let scattered: Vec<_> = (0..8).map(|index| (index * 64, 0, 1, 47, 64)).collect();
+        assert!(terrain.exterior_footprints(&scattered).unwrap().is_none());
+        let too_many = vec![(0, 0, 1, 47, 64); 9];
+        assert!(terrain.exterior_footprints(&too_many).is_err());
+    }
+
+    #[test]
+    #[ignore = "offline benchmark; optional VSS_SAMPLING_DOCUMENT and VSS_SAMPLING_SEED"]
+    fn adjacent_footprint_reuse() {
+        let (document, seed, centres) = match std::env::var("VSS_SAMPLING_DOCUMENT") {
+            Ok(path) => {
+                let value = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+                let seed = std::env::var("VSS_SAMPLING_SEED").ok().map(|value| value.parse().unwrap())
+                    .unwrap_or(5052304137288917019_i64);
+                (value, seed, [(-4588, -1531), (1605, -1456)])
+            }
+            Err(_) => {
+                let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("tests/fixtures/worldgen/overworld.json");
+                (serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap(), 917,
+                    [(-49, 33), (127, -65)])
+            }
+        };
+        let terrain = Terrain::from_document(seed, &document).unwrap();
+        assert!(!terrain.graph.requires_complete_column_order(), "full-column graph cannot share jobs");
+        for step in [1, 2, 4] {
+            let mut requests = Vec::new();
+            for &(center_x, center_z) in &centres {
+                for dz in -2..=2 {
+                    for dx in -2..=2 {
+                        let x = center_x + dx * step;
+                        let z = center_z + dz * step;
+                        let top = terrain.base_column(x, z).unwrap().surface_height;
+                        let bottom = terrain.sea_level - 16;
+                        if top > bottom && top <= terrain.min_y + terrain.height {
+                            requests.push((x, z, step, bottom, top));
+                        }
+                    }
+                }
+            }
+            assert!(!requests.is_empty());
+            let mut baseline_times = Vec::new();
+            let mut shared_times = Vec::new();
+            let mut baseline_counts = (0, 0, 0);
+            let mut shared_counts = (0, 0, 0);
+            let mut memory_bytes = 0;
+            for round in 0..6 {
+                let mut baseline = None;
+                let mut shared = None;
+                for candidate in if round % 2 == 0 { [false, true] } else { [true, false] } {
+                    crate::prof::reset();
+                    let start = Instant::now();
+                    if candidate {
+                        let (result, retained) = shared_footprints(&terrain, &requests).unwrap();
+                        shared_times.push(start.elapsed());
+                        shared_counts = (crate::prof::block_calls(), crate::prof::noise_evals(),
+                            crate::prof::evals().into_iter().sum());
+                        memory_bytes = retained;
+                        shared = Some(result);
+                    } else {
+                        let result: Vec<_> = requests.iter().map(|&(x, z, step, bottom, top)|
+                            terrain.exterior_footprint(x, z, step, bottom, top).unwrap()).collect();
+                        baseline_times.push(start.elapsed());
+                        baseline_counts = (crate::prof::block_calls(), crate::prof::noise_evals(),
+                            crate::prof::evals().into_iter().sum());
+                        baseline = Some(result);
+                    }
+                }
+                assert_eq!(baseline, shared, "footprint changed at step {step}, round {round}");
+            }
+            let baseline_ms = median(&mut baseline_times[1..]);
+            let shared_ms = median(&mut shared_times[1..]);
+            eprintln!("FOOTPRINT_COMPARE step={step} requests={} baseline_ms={baseline_ms:.3} shared_ms={shared_ms:.3} ratio={:.3} baseline_block={} shared_block={} baseline_noise={} shared_noise={} baseline_graph={} shared_graph={} shared_scratch_bytes={memory_bytes}",
+                requests.len(), baseline_ms / shared_ms, baseline_counts.0, shared_counts.0,
+                baseline_counts.1, shared_counts.1, baseline_counts.2, shared_counts.2);
+            let mut scalar_times = Vec::new();
+            let mut production_times = Vec::new();
+            let mut reused_batches = 0;
+            for round in 0..6 {
+                let mut scalar = None;
+                let mut batched = None;
+                for candidate in if round % 2 == 0 { [false, true] } else { [true, false] } {
+                    let start = Instant::now();
+                    if candidate {
+                        let mut result = Vec::with_capacity(requests.len());
+                        let mut hits = 0;
+                        for batch in requests.chunks(8) {
+                            if let Some(values) = terrain.exterior_footprints(batch).unwrap() {
+                                result.extend(values);
+                                hits += 1;
+                            } else {
+                                result.extend(batch.iter().map(|&(x, z, step, bottom, top)|
+                                    terrain.exterior_footprint(x, z, step, bottom, top).unwrap()));
+                            }
+                        }
+                        production_times.push(start.elapsed());
+                        reused_batches = hits;
+                        batched = Some(result);
+                    } else {
+                        let result: Vec<_> = requests.iter().map(|&(x, z, step, bottom, top)|
+                            terrain.exterior_footprint(x, z, step, bottom, top).unwrap()).collect();
+                        scalar_times.push(start.elapsed());
+                        scalar = Some(result);
+                    }
+                }
+                assert_eq!(scalar, batched, "production batch changed footprint at step {step}, round {round}");
+            }
+            let scalar_ms = median(&mut scalar_times[1..]);
+            let production_ms = median(&mut production_times[1..]);
+            eprintln!("FOOTPRINT_PRODUCTION step={step} requests={} reused_batches={reused_batches} total_batches={} scalar_ms={scalar_ms:.3} production_ms={production_ms:.3} ratio={:.3}",
+                requests.len(), requests.len().div_ceil(8), scalar_ms / production_ms);
+            profile_bounds(&terrain, &requests);
+        }
+    }
 }
 
 #[cfg(test)]

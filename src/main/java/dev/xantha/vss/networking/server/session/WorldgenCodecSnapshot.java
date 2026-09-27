@@ -85,7 +85,40 @@ final class WorldgenCodecSnapshot {
                 net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool.DIRECT_CODEC));
         if (resources != null) root.add("structure_templates", encodeTemplates(resources));
         root.add("custom_registries", dependencies.encode());
+        if (dev.xantha.vss.config.VSSClientConfig.CONFIG.debugLogging) {
+            var parts = new java.util.ArrayList<String>();
+            for (String key : root.keySet().stream().sorted().toList()) {
+                parts.add(key + "=" + snapshotHash(root.get(key)));
+            }
+            VSSLogger.debug("VSS worldgen registry sections: " + String.join(",", parts));
+            logEntryHashes("configured_features", root.getAsJsonObject("configured_features"));
+            logEntryHashes("processor_lists", root.getAsJsonObject("processor_lists"));
+        }
         return compress(root);
+    }
+
+    private static void logEntryHashes(String section, JsonObject entries) {
+        if (entries == null) return;
+        var line = new StringBuilder("VSS worldgen registry entries ").append(section).append(':');
+        int count = 0;
+        for (String id : entries.keySet().stream().sorted().toList()) {
+            if (count++ % 32 == 0 && count > 1) {
+                VSSLogger.debug(line.toString());
+                line = new StringBuilder("VSS worldgen registry entries ").append(section).append(':');
+            }
+            line.append(' ').append(id).append('=').append(snapshotHash(entries.get(id)));
+        }
+        if (count > 0) VSSLogger.debug(line.toString());
+    }
+
+    private static String snapshotHash(JsonElement value) {
+        try {
+            var hash = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(dev.xantha.vss.common.worldgen.WorldgenJson.bytes(value));
+            return java.util.HexFormat.of().formatHex(hash, 0, 8);
+        } catch (java.security.NoSuchAlgorithmException impossible) {
+            throw new AssertionError(impossible);
+        }
     }
 
     private static JsonObject encodeTemplates(net.minecraft.server.packs.resources.ResourceManager resources) {
@@ -326,16 +359,21 @@ final class WorldgenCodecSnapshot {
             Map.Entry<ResourceKey<Structure>, Structure> entry = Map.entry(registry.getResourceKey(structureValue).orElseThrow(), structureValue);
             JsonObject encoded = Structure.DIRECT_CODEC.encodeStart(ops, entry.getValue())
                     .getOrThrow(false, message -> { throw new IllegalArgumentException(message); }).getAsJsonObject();
-            JsonArray biomes = new JsonArray();
-            entry.getValue().biomes().stream()
-                    .map(holder -> holder.unwrapKey()
-                            .map(key -> key.location().toString()).orElse(""))
-                    .filter(value -> !value.isEmpty())
-                    .forEach(biomes::add);
-            encoded.add("biomes", biomes);
+            encoded.add("biomes", structureBiomeIds(entry.getValue().biomes().stream()));
             object.add(entry.getKey().location().toString(), encoded);
         }
         return object;
+    }
+
+    static JsonArray structureBiomeIds(java.util.stream.Stream<Holder<Biome>> holders) {
+        return sortedStructureBiomeIds(holders.map(holder -> holder.unwrapKey()
+                .map(key -> key.location().toString()).orElse("")));
+    }
+
+    static JsonArray sortedStructureBiomeIds(java.util.stream.Stream<String> ids) {
+        JsonArray biomes = new JsonArray();
+        ids.filter(value -> !value.isEmpty()).sorted().forEach(biomes::add);
+        return biomes;
     }
 
     private static <T> JsonObject encodeOptional(RegistryAccess access, RegistryOps<JsonElement> ops,

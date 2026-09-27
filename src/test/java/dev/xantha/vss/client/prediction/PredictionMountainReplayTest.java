@@ -34,6 +34,23 @@ class PredictionMountainReplayTest {
         var javaSampler=new ClientTerrainSampler(seed,profile,generator,random,
                 net.minecraft.world.level.LevelHeightAccessor.create(-64,384),63,List.of());
         try(var rust=new RustTerrainSampler(RustWorldgenBackend.create(seed,0,doc.toString()),profile,javaSampler)) {
+            var batchInput = java.nio.ByteBuffer.allocateDirect(40).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+            for (int index = 0; index < 2; index++) {
+                int offset = index * 20;
+                batchInput.putInt(offset, -4588 + index).putInt(offset + 4, -1531)
+                        .putInt(offset + 8, 1).putInt(offset + 12, 47).putInt(offset + 16, 100);
+            }
+            var batchOutput = java.nio.ByteBuffer.allocateDirect(2 * (4 + profile.height()))
+                    .order(java.nio.ByteOrder.LITTLE_ENDIAN);
+            assertEquals(2, RustWorldgenBackend.exteriorFootprints(rust.handle(), batchInput, batchOutput, 2),
+                    "known mountain density graph must enter the batched native path");
+            for (int index = 0; index < 2; index++) {
+                var scalar = rust.exteriorFootprint(-4588 + index, -1531, 1, 47, 100, () -> true);
+                int size = batchOutput.getInt(index * (4 + profile.height()));
+                assertEquals(scalar == null ? 0 : scalar.length, size);
+                for (int y = 0; y < size; y++)
+                    assertEquals(scalar[y], batchOutput.get(index * (4 + profile.height()) + 4 + y) != 0);
+            }
             var legacyRust = new ClientTerrainSampler(seed, profile) {
                 @Override PredictionColumnVolume exteriorColumn(int x, int z) { return rust.exteriorColumn(x, z); }
             };

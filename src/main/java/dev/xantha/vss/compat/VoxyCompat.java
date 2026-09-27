@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.LongConsumer;
@@ -32,6 +33,9 @@ final class VoxyCompat {
     private static MethodHandle worldEngineNullable;
     private static MethodHandle getStorage;
     private static MethodHandle iterateStoredSectionPositions;
+    private static MethodHandle acquireWorldRef;
+    private static MethodHandle releaseWorldRef;
+    private static volatile boolean trackIngestCompletion;
     private static volatile MethodHandle getVoxyConfig;
     private static volatile MethodHandle getSectionRenderDist;
     private static volatile MethodHandle getEnabled;
@@ -72,6 +76,10 @@ final class VoxyCompat {
                             Integer.TYPE,
                             DataLayer.class,
                             DataLayer.class));
+            trackIngestCompletion = hasProcessJobCompletionHook(ingestClass);
+            if (!trackIngestCompletion) {
+                VSSLogger.warn("Voxy ingest completion hook unavailable; near-first LOD will use mesh and GPU coverage");
+            }
 
             VSSApi.registerColumnProcessingConsumer((level, dimension, chunkX, chunkZ, columnData) -> {
                 ingestDiagnostics.record("columnsOffered");
@@ -160,11 +168,17 @@ final class VoxyCompat {
             getStorage = lookup
                     .findGetter(worldEngineClass, "storage", sectionStorageClass)
                     .asType(MethodType.methodType(Object.class, Object.class));
+            acquireWorldRef = lookup.findVirtual(worldEngineClass, "acquireRef", MethodType.methodType(Void.TYPE))
+                    .asType(MethodType.methodType(Void.TYPE, Object.class));
+            releaseWorldRef = lookup.findVirtual(worldEngineClass, "releaseRef", MethodType.methodType(Void.TYPE))
+                    .asType(MethodType.methodType(Void.TYPE, Object.class));
         } catch (Throwable e) {
             VSSLogger.debug("Voxy local section index query unavailable: " + e.getMessage());
             worldEngineNullable = null;
             getStorage = null;
             iterateStoredSectionPositions = null;
+            acquireWorldRef = null;
+            releaseWorldRef = null;
             return;
         }
 
@@ -234,16 +248,34 @@ final class VoxyCompat {
         lastIngestAvailable = ingestAvailable;
     }
 
+    static void onDisconnect() {
+        synchronized (localIndexes) {
+            for (LocalSectionIndex index : localIndexes.values()) {
+                index.cancelled = true;
+            }
+            localIndexes.clear();
+        }
+        lastLocalIndex = null;
+    }
+
     private static boolean trackedRawIngest(Object worldId, LevelChunkSection section,
                                             int cx, int sy, int cz, DataLayer block, DataLayer sky) throws Throwable {
-        StrictLodVisibility.beginIngest(section, cx, cz);
+        if (trackIngestCompletion) StrictLodVisibility.beginIngest(section, cx, cz);
         try {
             boolean accepted = (boolean) rawIngest.invoke(worldId, section, cx, sy, cz, block, sky);
-            if (!accepted) StrictLodVisibility.cancelIngest(section);
+            if (!accepted && trackIngestCompletion) StrictLodVisibility.cancelIngest(section);
             return accepted;
         } catch (Throwable failure) {
-            StrictLodVisibility.cancelIngest(section);
+            if (trackIngestCompletion) StrictLodVisibility.cancelIngest(section);
             throw failure;
+        }
+    }
+
+    static boolean hasProcessJobCompletionHook(Class<?> ingestClass) {
+        try {
+            return ingestClass.getDeclaredMethod("processJob").getReturnType() == Void.TYPE;
+        } catch (NoSuchMethodException failure) {
+            return false;
         }
     }
 
@@ -313,7 +345,8 @@ final class VoxyCompat {
             if (index.hasConfirmed(chunkX, chunkZ)) {
                 return ModCompat.LocalColumnState.PRESENT;
             }
-            if (getStorage == null || iterateStoredSectionPositions == null || index.unavailable) {
+            if (getStorage == null || iterateStoredSectionPositions == null
+                    || acquireWorldRef == null || releaseWorldRef == null || index.unavailable) {
                 return ModCompat.LocalColumnState.UNKNOWN;
             }
             // This index covers all stored sections. A distant query is not
@@ -421,55 +454,88 @@ final class VoxyCompat {
 
     private static void startLocalIndexBuild(Object engine, LocalSectionIndex index) {
         long now = System.nanoTime();
-        if (now - index.nextBuildAttemptNanos < 0L) {
+        if (index.cancelled || now - index.nextBuildAttemptNanos < 0L) {
             return;
         }
         if (!index.buildStarted.compareAndSet(false, true)) {
             return;
         }
-        index.refresh.startedBuild();
-        index.builds.incrementAndGet();
-        Thread thread = new Thread(() -> {
+        boolean acquired = false;
+        boolean handedOff = false;
+        try {
+            // Voxy's idle cleaner closes the RocksDB storage when no world refs
+            // remain. Pin the engine before handing its storage to a worker.
+            acquireWorldRef.invoke(engine);
+            acquired = true;
+            if (index.cancelled) return;
+            index.refresh.startedBuild();
+            index.builds.incrementAndGet();
+            Thread thread = new Thread(() -> runLocalIndexBuild(engine, index, now), "VSS Voxy local index");
+            thread.setDaemon(true);
+            thread.setPriority(Thread.NORM_PRIORITY - 1);
+            thread.start();
+            handedOff = true;
+        } catch (Throwable failure) {
+            index.nextBuildAttemptNanos = System.nanoTime() + LOCAL_INDEX_RETRY_NANOS;
+            VSSLogger.debug("Voxy local section scan could not start: " + failure.getMessage());
+        } finally {
+            if (!handedOff) {
+                try {
+                    if (acquired) releaseWorldRef.invoke(engine);
+                } catch (Throwable failure) {
+                    VSSLogger.warn("Failed to release Voxy world after local index startup", failure);
+                } finally {
+                    index.buildStarted.set(false);
+                }
+            }
+        }
+    }
+
+    private static void runLocalIndexBuild(Object engine, LocalSectionIndex index, long startedNanos) {
+        try {
+            if (index.cancelled) return;
+            // Build into shadow maps and swap atomically: clearing the live maps
+            // would make every query read MISSING during a long scan.
+            ConcurrentHashMap<Long, long[]> shadowStored = new ConcurrentHashMap<>();
+            Object storage = getStorage.invoke(engine);
+            if (storage == null) {
+                index.nextBuildAttemptNanos = System.nanoTime() + LOCAL_INDEX_RETRY_NANOS;
+                return;
+            }
+            LongConsumer consumer = sectionKey -> {
+                if (index.cancelled) throw new CancellationException("Voxy local index cancelled");
+                int level = (int) ((sectionKey >>> 60) & 15L);
+                if (level == VOXY_BASE_LOD_LEVEL) {
+                    index.markStoredWorldSection(shadowStored, unpackSectionX(sectionKey), unpackSectionZ(sectionKey));
+                }
+            };
+            iterateStoredSectionPositions.invoke(storage, consumer);
+            if (index.cancelled) return;
+            index.swapStored(shadowStored);
+            index.ready = true;
+            index.lastBuildCompletedNanos = System.nanoTime();
+            index.buildNanos.addAndGet(index.lastBuildCompletedNanos - startedNanos);
+        } catch (Throwable e) {
+            index.ready = false;
+            if (index.cancelled) return;
+            if (isUnsupportedLocalIndexQuery(e)) {
+                index.unavailable = true;
+            } else {
+                index.nextBuildAttemptNanos = System.nanoTime() + LOCAL_INDEX_RETRY_NANOS;
+            }
+            if (!localIndexWarningLogged) {
+                localIndexWarningLogged = true;
+                VSSLogger.debug("Voxy local section index build failed: " + e.getMessage());
+            }
+        } finally {
             try {
-                // Build into shadow maps and swap atomically: clearing the
-                // live maps left every query reading MISSING for the whole
-                // scan duration (seconds on large worlds), which dropped the
-                // yield and let prediction draw over Voxy's stored LOD.
-                ConcurrentHashMap<Long, long[]> shadowStored = new ConcurrentHashMap<>();
-                Object storage = getStorage.invoke(engine);
-                if (storage == null) {
-                    index.nextBuildAttemptNanos = System.nanoTime() + LOCAL_INDEX_RETRY_NANOS;
-                    return;
-                }
-                LongConsumer consumer = sectionKey -> {
-                    int level = (int) ((sectionKey >>> 60) & 15L);
-                    if (level == VOXY_BASE_LOD_LEVEL) {
-                        index.markStoredWorldSection(shadowStored, unpackSectionX(sectionKey), unpackSectionZ(sectionKey));
-                    }
-                };
-                iterateStoredSectionPositions.invoke(storage, consumer);
-                index.swapStored(shadowStored);
-                index.ready = true;
-                index.lastBuildCompletedNanos = System.nanoTime();
-                index.buildNanos.addAndGet(index.lastBuildCompletedNanos - now);
-            } catch (Throwable e) {
-                index.ready = false;
-                if (isUnsupportedLocalIndexQuery(e)) {
-                    index.unavailable = true;
-                } else {
-                    index.nextBuildAttemptNanos = System.nanoTime() + LOCAL_INDEX_RETRY_NANOS;
-                }
-                if (!localIndexWarningLogged) {
-                    localIndexWarningLogged = true;
-                    VSSLogger.debug("Voxy local section index build failed: " + e.getMessage());
-                }
+                releaseWorldRef.invoke(engine);
+            } catch (Throwable failure) {
+                VSSLogger.warn("Failed to release Voxy world after local index scan", failure);
             } finally {
                 index.buildStarted.set(false);
             }
-        }, "VSS Voxy local index");
-        thread.setDaemon(true);
-        thread.setPriority(Thread.NORM_PRIORITY - 1);
-        thread.start();
+        }
     }
 
     private static long regionKey(int regionX, int regionZ) {
@@ -509,6 +575,7 @@ final class VoxyCompat {
         private final AtomicBoolean buildStarted = new AtomicBoolean();
         private volatile boolean ready;
         private volatile boolean unavailable;
+        private volatile boolean cancelled;
         private volatile long nextBuildAttemptNanos;
         private volatile long lastBuildCompletedNanos;
         private final LocalIndexRefreshPolicy refresh = new LocalIndexRefreshPolicy();

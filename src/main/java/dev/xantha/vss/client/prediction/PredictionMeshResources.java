@@ -23,6 +23,12 @@ final class PredictionMeshResources {
         var job = current;
         return job == null || !job.isDone() || job.isCompletedExceptionally() ? null : job.getNow(null);
     }
+
+    /** True only while the current reload's identity is still being scanned. */
+    static boolean pending() {
+        var job = current;
+        return job != null && !job.isDone();
+    }
     private static byte[] fingerprint(ResourceManager resources) {
         try {
             var digest = MessageDigest.getInstance("SHA-256");

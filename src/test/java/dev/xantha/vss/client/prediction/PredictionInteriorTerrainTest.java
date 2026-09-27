@@ -16,6 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 class PredictionInteriorTerrainTest {
+    @org.junit.jupiter.api.AfterEach void finishBackgroundCloseBeforeTempCleanup() throws Exception {
+        PredictionCacheTestFiles.awaitBackgroundClose();
+    }
+
     @BeforeAll static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }
     private static int rock() { return BuiltInRegistries.BLOCK.getId(Blocks.NETHERRACK); }
     private static int lava() { return BuiltInRegistries.BLOCK.getId(Blocks.LAVA); }

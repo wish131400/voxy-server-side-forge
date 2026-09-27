@@ -31,6 +31,7 @@ final class PredictionSurfaceStructures {
     private final PredictionStructureTemplates templates;
     private final ChunkGeneratorStructureState state;
     private final List<Holder<StructureSet>> sets;
+    private final List<List<Holder<StructureSet>>> setsByStep;
     private final Map<Structure, Integer> indices = new HashMap<>();
     private final Map<Key, StructureStart> starts = new LinkedHashMap<>(64, .75F, true);
     private final java.util.Set<Structure> loggedFailures = java.util.concurrent.ConcurrentHashMap.newKeySet();
@@ -66,6 +67,14 @@ final class PredictionSurfaceStructures {
         this.templates = found;
         this.state = generation;
         this.sets = possible;
+        var byStep = new ArrayList<List<Holder<StructureSet>>>(GenerationStep.Decoration.values().length);
+        for (int step = 0; step < GenerationStep.Decoration.values().length; step++) {
+            int currentStep = step;
+            byStep.add(possible.stream().filter(holder -> holder.value().structures().stream()
+                    .anyMatch(entry -> supported(entry.structure().value())
+                            && entry.structure().value().step().ordinal() == currentStep)).toList());
+        }
+        this.setsByStep = List.copyOf(byStep);
     }
 
     static boolean surface(Structure structure) {
@@ -94,11 +103,10 @@ final class PredictionSurfaceStructures {
     }
 
     void place(PredictionDecorationLevel level, int chunkX, int chunkZ, long decorationSeed, int step) {
-        if (templates == null || !VSSClientConfig.CONFIG.predictionStructures) return;
+        if (templates == null || !VSSClientConfig.CONFIG.predictionStructures
+                || step < 0 || step >= setsByStep.size()) return;
         List<StructureStart> touching = new ArrayList<>();
-        for (var holder : sets) {
-            if (holder.value().structures().stream().noneMatch(entry -> supported(entry.structure().value())
-                    && entry.structure().value().step().ordinal() == step)) continue;
+        for (var holder : setsByStep.get(step)) {
             var placement = (RandomSpreadStructurePlacement) holder.value().placement();
             int spacing = placement.spacing();
             for (int rz = Math.floorDiv(chunkZ - 8, spacing); rz <= Math.floorDiv(chunkZ + 8, spacing); rz++) {

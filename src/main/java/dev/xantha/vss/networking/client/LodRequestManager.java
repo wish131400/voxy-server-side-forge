@@ -26,23 +26,30 @@ import net.minecraft.world.level.Level;
 public final class LodRequestManager {
     private final java.util.concurrent.ConcurrentHashMap<Long, int[]> strictSections =
             new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static long strictSectionsKey(long packed) {
+        // Long.hashCode of packed coordinates is chunkX ^ chunkZ; nearby columns
+        // otherwise form large collision trees in this concurrent index.
+        return it.unimi.dsi.fastutil.HashCommon.mix(packed);
+    }
+
     private int strictScanRing = -1;
     private int strictScanCursor;
 
     public boolean strictColumnReady(int cx, int cz) {
         long packed = PositionUtil.packPosition(cx, cz);
-        return strictSections.containsKey(packed);
+        return strictSections.containsKey(strictSectionsKey(packed));
     }
 
     public boolean strictColumnRenderReady(int cx, int cz, java.util.function.IntPredicate ready) {
-        int[] sections = strictSections.get(PositionUtil.packPosition(cx, cz));
+        int[] sections = strictSections.get(strictSectionsKey(PositionUtil.packPosition(cx, cz)));
         if (sections == null) return false;
         for (int y : sections) if (!ready.test(y)) return false;
         return true;
     }
 
     synchronized void recordStrictSections(int cx, int cz, dev.xantha.vss.api.VoxelColumnData data) {
-        strictSections.put(PositionUtil.packPosition(cx, cz), java.util.Arrays.stream(data.sections())
+        strictSections.put(strictSectionsKey(PositionUtil.packPosition(cx, cz)), java.util.Arrays.stream(data.sections())
                 .filter(section -> !section.section().hasOnlyAir()).mapToInt(section -> section.sectionY()).toArray());
         dev.xantha.vss.compat.StrictLodVisibility.workChanged();
     }
@@ -1502,7 +1509,7 @@ public final class LodRequestManager {
             return true;
         }
         boolean strict = dev.xantha.vss.compat.StrictLodVisibility.active();
-        if (timestamp > 0L && !dirty && (!strict || strictSections.containsKey(packed))) {
+        if (timestamp > 0L && !dirty && (!strict || strictSections.containsKey(strictSectionsKey(packed)))) {
             return false;
         }
         // VSS prediction owns the distant band once a tile is ready. Dirty
@@ -1594,12 +1601,12 @@ public final class LodRequestManager {
 
     void restoreKnownColumn(long packed, long columnTimestamp) {
         if (columnTimestamp > 0L) {
-            if (!strictSections.containsKey(packed)) {
+            if (!strictSections.containsKey(strictSectionsKey(packed))) {
                 byte[] manifest = presenceReporter.sectionManifest(lastDimension, packed);
                 if (manifest != null) {
                     int[] sections = new int[manifest.length];
                     for (int i = 0; i < manifest.length; i++) sections[i] = manifest[i];
-                    strictSections.put(packed, sections);
+                    strictSections.put(strictSectionsKey(packed), sections);
                     dev.xantha.vss.compat.StrictLodVisibility.workChanged();
                 }
             }
@@ -1614,7 +1621,7 @@ public final class LodRequestManager {
     }
 
     boolean reconcileMissingColumn(long packed) {
-        strictSections.remove(packed);
+        strictSections.remove(strictSectionsKey(packed));
         if (dev.xantha.vss.compat.StrictLodVisibility.completed(lastDimension,
                 PositionUtil.unpackX(packed), PositionUtil.unpackZ(packed))) {
             dev.xantha.vss.compat.StrictLodVisibility.invalidate();
@@ -1730,7 +1737,7 @@ public final class LodRequestManager {
     }
 
     long requestTimestampFor(long packed) {
-        if (dev.xantha.vss.compat.StrictLodVisibility.active() && !strictSections.containsKey(packed)) return -1L;
+        if (dev.xantha.vss.compat.StrictLodVisibility.active() && !strictSections.containsKey(strictSectionsKey(packed))) return -1L;
         long timestamp = columnTimestamps.get(packed);
         if (!dirtyColumns.contains(packed) || timestamp > 0L) {
             return timestamp;
@@ -1958,7 +1965,7 @@ public final class LodRequestManager {
             }
         }
         for (long packed : staleColumns) {
-            strictSections.remove(packed);
+            strictSections.remove(strictSectionsKey(packed));
             columnTimestamps.remove(packed);
             dirtyColumns.remove(packed);
             dirtyColumnTimestamps.remove(packed);

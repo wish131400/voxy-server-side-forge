@@ -17,4 +17,9 @@ class WorldgenSnapshotIdentityTest {
         b.getAsJsonArray("list").set(0,new JsonPrimitive(2));
         assertFalse(java.util.Arrays.equals(WorldgenJson.bytes(a),WorldgenJson.bytes(b)),"ordered data remains part of the identity");
     }
+    @Test void structureBiomeSetOrderCannotChangeProfileIdentity() {
+        var a=WorldgenCodecSnapshot.sortedStructureBiomeIds(java.util.stream.Stream.of("minecraft:plains","minecraft:desert"));
+        var b=WorldgenCodecSnapshot.sortedStructureBiomeIds(java.util.stream.Stream.of("minecraft:desert","minecraft:plains"));
+        assertArrayEquals(WorldgenJson.bytes(a),WorldgenJson.bytes(b));
+    }
 }

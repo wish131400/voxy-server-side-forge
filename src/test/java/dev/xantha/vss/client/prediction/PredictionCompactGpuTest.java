@@ -7,6 +7,7 @@ import java.nio.*;
 import java.util.*;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -39,7 +40,8 @@ class PredictionCompactGpuTest {
                     boolean[] allowed=new boolean[mesh.cellCount()];Arrays.fill(allowed,true);gpu.updateCoverage(allowed);
                     byte[] mask=new byte[allowed.length];for(int i=0;i<mask.length;i++)mask[i]=(byte)((i+t)%7==0?0:128);
                     gpu.updateBoundaryCoverage(mask);
-                    (encoding==0?rawEntries:entries).add(new PredictionRenderer.Draw(tile,gpu,allowed,false,VssLodFaceGroup.ALL,0.5f,null));max=Math.max(max,gpu.quadCount());
+                    (encoding==0?rawEntries:entries).add(new PredictionRenderer.Draw(tile,gpu,allowed,false,VssLodFaceGroup.ALL,0.5f,
+                            new AABB(tile.baseBlockX(),60,tile.baseBlockZ(),tile.baseBlockX()+tile.spanBlocks(),80,tile.baseBlockZ()+tile.spanBlocks())));max=Math.max(max,gpu.quadCount());
                 }
                 int[] indices=new int[max*6];int[] corners={0,1,2,0,2,3};
                 for(int q=0;q<max;q++)for(int c=0;c<6;c++)indices[q*6+c]=q*4+corners[c];
@@ -120,7 +122,8 @@ class PredictionCompactGpuTest {
                                 new PredictionDepthBound(-64,320),0,row,axis,1);
                         var gpu=new PredictionGpuTile(key);gpuTiles.add(gpu);assertTrue(gpu.ensureMesh(tile));
                         boolean[] allowed=new boolean[axis*axis];Arrays.fill(allowed,true);gpu.updateCoverage(allowed);
-                        (encoding==0?rawEntries:entries).add(new PredictionRenderer.Draw(tile,gpu,allowed,false,VssLodFaceGroup.ALL,0,null));
+                        (encoding==0?rawEntries:entries).add(new PredictionRenderer.Draw(tile,gpu,allowed,false,VssLodFaceGroup.ALL,0,
+                                new AABB(tile.baseBlockX(),60,tile.baseBlockZ(),tile.baseBlockX()+tile.spanBlocks(),80,tile.baseBlockZ()+tile.spanBlocks())));
                         max=Math.max(max,gpu.quadCount());
                     }
                     indices=new int[max*6];for(int q=0;q<max;q++)for(int c=0;c<6;c++)indices[q*6+c]=q*4+corners[c];

@@ -63,6 +63,48 @@ class PredictionIncrementalRenderTest {
         System.out.printf("SEAM_LOCALITY resident=1024 updated=%d%n",seams.updatedSurfaces()-before);
     }
 
+    @Test void parallelBoundaryMasksMatchSequentialMasks() {
+        var surfaces = new LinkedHashMap<PredictionTileKey, PredictionLodSeams.Surface>();
+        var source = PredictionLodSeamsTest.tile(0, 0, 1, 64);
+        for (int z = -16; z < 16; z++) for (int x = -16; x < 16; x++) {
+            var key = new PredictionTileKey(Level.OVERWORLD, x, z, 0);
+            var tile = new PredictionTile(key, source.heights(), source.groundHeights(), source.samples(),
+                    source.mesh(), source.depthBound(), 0, 1, 64, 1);
+            surfaces.put(key, PredictionLodSeamsTest.surface(tile));
+        }
+        var index = new PredictionLodSeams.Index(surfaces.values());
+        index.prepareReads();
+        var expected = new HashMap<PredictionTileKey, byte[]>();
+        for (var entry : surfaces.entrySet())
+            expected.put(entry.getKey(), PredictionBoundaryWalls.build(entry.getValue(), index));
+        var actual = PredictionSeamMasks.build(surfaces.keySet(), surfaces, index);
+        assertEquals(expected.keySet(), actual.keySet());
+        for (var key : expected.keySet()) assertArrayEquals(expected.get(key), actual.get(key), key.toString());
+
+        var keys = List.copyOf(surfaces.keySet());
+        for (int size : new int[]{32, 64, 128, 256, 1024}) {
+            var subset = keys.subList(0, size);
+            long[][] nanos = new long[2][7];
+            for (int round = -6; round < 7; round++) {
+                for (int mode : (round & 1) == 0 ? new int[]{0, 1} : new int[]{1, 0}) {
+                    var output = new HashMap<PredictionTileKey, byte[]>();
+                    long start = System.nanoTime();
+                    if (mode == 0) {
+                        for (var key : subset)
+                            output.put(key, PredictionBoundaryWalls.build(surfaces.get(key), index));
+                    } else {
+                        output.putAll(PredictionSeamMasks.build(subset, surfaces, index));
+                    }
+                    long elapsed = System.nanoTime() - start;
+                    if (round >= 0) nanos[mode][round] = elapsed;
+                }
+            }
+            for (var measurements : nanos) Arrays.sort(measurements);
+            System.out.printf(Locale.ROOT, "SEAM_MASKS resident=%d serialMedianMs=%.3f parallelMedianMs=%.3f%n",
+                    size, nanos[0][3] / 1e6, nanos[1][3] / 1e6);
+        }
+    }
+
     @Test void residencyJournalReportsOnlyOverlappingOwnersAndRemovesOldDimensions() {
         var layout=VssLodLayout.of(8192,6,true,true);
         var tiles=new HashMap<PredictionTileKey,PredictionTile>();
@@ -216,5 +258,72 @@ class PredictionIncrementalRenderTest {
         }
         plan.clear();assertTrue(plan.select(camera,view,projection,frustum).isEmpty());
         System.out.println("STATIC_PLAN resident=4900 frames=120 additionalVisibilityVisits=0 additionalOrderEdits=0");
+    }
+
+    @Test void visiblePlanCandidateBroadPhaseRemovesAndReaddsEntries() {
+        var plan = new PredictionVisiblePlan<Integer,AABB>(box -> box);
+        var near = new AABB(-4, 0, -4, 4, 8, 4);
+        var far = new AABB(64, 0, 64, 72, 8, 72);
+        plan.put(1, near);plan.put(2, far);
+        var camera = new Vec3(0, 4, 0);
+        var view = new Matrix4f();
+        var projection = new Matrix4f().perspective((float)Math.toRadians(70), 1.0F, .1F, 256);
+        assertEquals(2, plan.select(camera, view, projection, null).size());
+        long before = plan.visited();
+        var narrowed = plan.select(camera, new Matrix4f().rotateY(.1F), projection, null, Set.of(1));
+        assertEquals(List.of(near), narrowed);
+        assertEquals(1, plan.visited() - before, "a turn checks only the candidate, not every resident tile");
+        var moved = new Vec3(96, 4, 96);
+        var restored = plan.select(moved, view, projection, null, Set.of(1, 2));
+        assertEquals(2, restored.size(), "a culled tile reappears after movement");
+        assertSame(far, restored.get(0));
+    }
+
+    @Test void verticalCameraMotionUpdatesFrustumWithoutReorderingDistance() {
+        var plan = new PredictionVisiblePlan<Integer,AABB>(box -> box);
+        var box = new AABB(-2, -2, -18, 2, 2, -14);
+        plan.put(1, box);
+        var view = new Matrix4f();
+        var projection = new Matrix4f().perspective((float)Math.toRadians(70), 1.0F, .1F, 256);
+        var ground = new Vec3(0, 0, 0);
+        var groundFrustum = new Frustum(view, projection);
+        groundFrustum.prepare(ground.x, ground.y, ground.z);
+        assertEquals(List.of(box), plan.select(ground, view, projection, groundFrustum, Set.of(1)));
+        long orderEdits = plan.orderEdits();
+        var high = new Vec3(0, 100, 0);
+        var highFrustum = new Frustum(view, projection);
+        highFrustum.prepare(high.x, high.y, high.z);
+        assertTrue(plan.select(high, view, projection, highFrustum, Set.of(1)).isEmpty());
+        assertEquals(orderEdits, plan.orderEdits(), "vertical motion does not change horizontal order");
+        assertEquals(List.of(box), plan.select(ground, view, projection, groundFrustum, Set.of(1)));
+    }
+
+    @Test void spatialFrustumBroadPhaseKeepsEveryExactVisibleTile() {
+        var index = new PredictionSpatialIndex<PredictionTileKey>();
+        var keys = new HashSet<PredictionTileKey>();
+        var random = new Random(921);
+        for (int i = 0; i < 500; i++) {
+            var key = new PredictionTileKey(Level.OVERWORLD, random.nextInt(80)-40,
+                    random.nextInt(80)-40, random.nextInt(6));
+            keys.add(key);
+            index.put(key, key, -128, 384);
+        }
+        var camera = new Vec3(13, 95, -7);
+        var projection = new Matrix4f().perspective((float)Math.toRadians(75), 1.6F, .1F, 20000F);
+        for (int turn = 0; turn < 8; turn++) {
+            var view = new Matrix4f().rotateY(turn * .45F);
+            var frustum = new Frustum(view, projection);frustum.prepare(camera.x, camera.y, camera.z);
+            var actual = new HashSet<PredictionTileKey>();
+            index.intersectFrustum(frustum, camera, 4096, -128, 384, actual::add);
+            for (var key : keys) {
+                long span = 64L << key.lod(), bx = (long)key.tileX()*span, bz = (long)key.tileZ()*span;
+                var box = new AABB(bx, -128, bz, bx+span, 384, bz+span).inflate(2);
+                double dx = camera.x < bx ? bx-camera.x : camera.x > bx+span ? camera.x-(bx+span) : 0;
+                double dz = camera.z < bz ? bz-camera.z : camera.z > bz+span ? camera.z-(bz+span) : 0;
+                double margin = Math.sqrt(2) * span * .5;
+                if (dx*dx+dz*dz <= (4096+margin)*(4096+margin) && frustum.isVisible(box))
+                    assertTrue(actual.contains(key), "broad phase must retain exact-visible " + key);
+            }
+        }
     }
 }

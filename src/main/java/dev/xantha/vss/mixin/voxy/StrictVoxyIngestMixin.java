@@ -15,12 +15,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class StrictVoxyIngestMixin {
     @Unique private final ThreadLocal<Object> vss$currentIngest = new ThreadLocal<>();
 
+    // Some Voxy ports replace processJob entirely. Their ingest cannot be tracked
+    // here, so VoxyCompat falls back to mesh and GPU coverage readiness.
     @Redirect(method = "processJob()V", at = @At(value = "INVOKE",
-            target = "Ljava/util/concurrent/ConcurrentLinkedDeque;pop()Ljava/lang/Object;"), require = 1)
+            target = "Ljava/util/concurrent/ConcurrentLinkedDeque;pop()Ljava/lang/Object;"), require = 0)
     private Object vss$trackIngest(ConcurrentLinkedDeque<?> queue) {
         Object task = queue.pop(); vss$currentIngest.set(task); return task;
     }
-    @Inject(method = "processJob()V", at = @At("RETURN"), require = 1)
+    @Redirect(method = "processJob()V", at = @At(value = "INVOKE",
+            target = "Ljava/util/concurrent/ConcurrentLinkedDeque;poll()Ljava/lang/Object;"), require = 0)
+    private Object vss$trackPolledIngest(ConcurrentLinkedDeque<?> queue) {
+        Object task = queue.poll(); vss$currentIngest.set(task); return task;
+    }
+    @Inject(method = "processJob()V", at = @At("RETURN"), require = 0)
     private void vss$committedIngest(CallbackInfo ci) {
         StrictLodVisibility.ingestCompleted(vss$currentIngest.get());
         vss$currentIngest.remove();

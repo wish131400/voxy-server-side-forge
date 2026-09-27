@@ -11,6 +11,8 @@ import dev.xantha.vss.networking.payloads.DirtyColumnsS2CPayload;
 import dev.xantha.vss.networking.payloads.FarPlayersS2CPayload;
 import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
 import dev.xantha.vss.networking.payloads.HandshakeRequestS2CPayload;
+import dev.xantha.vss.networking.payloads.LostCityHintsC2SPayload;
+import dev.xantha.vss.networking.payloads.LostCityHintsS2CPayload;
 import dev.xantha.vss.networking.payloads.RegionPresenceC2SPayload;
 import dev.xantha.vss.networking.payloads.ServerIdentityS2CPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
@@ -113,6 +115,16 @@ public final class VSSNetworking {
                 .consumerNetworkThread(VSSNetworking::handleServerIdentity)
                 .noResponse()
                 .add();
+        CHANNEL.messageBuilder(LostCityHintsC2SPayload.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(LostCityHintsC2SPayload::encode)
+                .decoder(LostCityHintsC2SPayload::decode)
+                .consumerMainThread(VSSServerNetworking::handleLostCityHints)
+                .add();
+        CHANNEL.messageBuilder(LostCityHintsS2CPayload.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(LostCityHintsS2CPayload::encode)
+                .decoder(LostCityHintsS2CPayload::decode)
+                .consumerMainThread(VSSNetworking::handleLostCityHints)
+                .add();
     }
 
     public static void sendToServer(Object payload) {
@@ -152,6 +164,10 @@ public final class VSSNetworking {
         DistExecutor.safeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> ClientPacketHandlers.handleHandshakeRequest(payload, contextSupplier));
     }
 
+    private static void handleLostCityHints(LostCityHintsS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.handleLostCityHints(payload));
+    }
+
     private static boolean handleServerIdentity(ServerIdentityS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.handleServerIdentity(payload));
         return true;
@@ -184,6 +200,10 @@ public final class VSSNetworking {
 
         private static void handleServerIdentity(ServerIdentityS2CPayload payload) {
             dev.xantha.vss.networking.client.ClientConnectionIdentity.acceptServerIdentity(payload);
+        }
+
+        private static void handleLostCityHints(LostCityHintsS2CPayload payload) {
+            dev.xantha.vss.client.prediction.ClientPredictionState.onLostCityHints(payload);
         }
     }
 }

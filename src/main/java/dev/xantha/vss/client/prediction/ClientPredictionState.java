@@ -444,6 +444,9 @@ public final class ClientPredictionState {
                 Math.max(nearChunks, voxyRender));
         PredictionTileManager manager = MANAGERS.get(level.dimension());
         if (manager != null) {
+            PredictionMotionPace.record(level.dimension(), player.getX(), player.getZ(),
+                    player.isSprinting(), System.nanoTime());
+            manager.tickCityHints(player.getBlockX() >> 4, player.getBlockZ() >> 4);
             double pixelsPerBlock = PredictionRenderer.basePixelsPerBlock(minecraft);
             VssLodFocus focus = combinedFocus(minecraft, player);
             lastFocus = focus;
@@ -767,6 +770,13 @@ public final class ClientPredictionState {
                 // near Voxy field visibly swapping to prediction LOD.
             }
         }
+    }
+
+    public static void onLostCityHints(dev.xantha.vss.networking.payloads.LostCityHintsS2CPayload response) {
+        ResourceKey<Level> key = ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,
+                response.dimension());
+        PredictionTileManager manager = MANAGERS.get(key);
+        if (manager != null) manager.acceptCityHints(response);
     }
 
     static String surfaceDiagnostics(ResourceKey<Level> dimension) {

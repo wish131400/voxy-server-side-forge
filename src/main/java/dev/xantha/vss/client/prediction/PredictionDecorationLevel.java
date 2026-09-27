@@ -16,6 +16,10 @@ import net.minecraft.world.level.levelgen.Heightmap;
 /** Bounded decoration region at real world coordinates, with no live chunk access. */
 final class PredictionDecorationLevel extends FeatureStampLevel {
     private static final int MAX_WRITES = 65_536;
+    /** Keep the bounded job's nearby columns directly addressable. */
+    private static final int COLUMN_CACHE_AXIS = 80;
+    private static final int COLUMN_CACHE_SIZE = COLUMN_CACHE_AXIS * COLUMN_CACHE_AXIS;
+    private static final int BLOCK_QUERY_CACHE_SIZE = 64;
     private final ClientTerrainSampler terrain;
     private final ClientTerrainSampler context;
     private final int originX;
@@ -25,12 +29,18 @@ final class PredictionDecorationLevel extends FeatureStampLevel {
     // A job keeps its own exact answers even when concurrent regions churn the shared cache.
     private final Map<Quart, Holder<Biome>> jobBiomes = new HashMap<>();
     private final VssLodSampleCache sharedColumns;
-    private final Map<Long, ClientColumnSample> columns = new HashMap<>();
+    private ClientColumnSample[] columns;
     // State IDs are richer than ClientColumnSample's block IDs. Retain the
     // original immutable record for this bounded job instead of looking it up
     // in the shared sampler for every ground/heightmap/tree-space query.
-    private final Map<Long, int[]> nativeColumns = new HashMap<>();
-    private final Map<Long, int[]> displayColumns = new HashMap<>();
+    private int[][] nativeColumns;
+    private int[][] displayColumns;
+    private final int[] blockQueryXs = new int[BLOCK_QUERY_CACHE_SIZE];
+    private final int[] blockQueryYs = new int[BLOCK_QUERY_CACHE_SIZE];
+    private final int[] blockQueryZs = new int[BLOCK_QUERY_CACHE_SIZE];
+    private final long[] blockQueryEpochs = new long[BLOCK_QUERY_CACHE_SIZE];
+    private final BlockState[] blockQueryStates = new BlockState[BLOCK_QUERY_CACHE_SIZE];
+    private long blockQueryEpoch = 1L;
     private final java.util.Set<Long> exactEdits = new java.util.HashSet<>();
     private final java.util.Set<Long> displayEdits = new java.util.HashSet<>();
     private boolean displayTerrain;
@@ -87,39 +97,67 @@ final class PredictionDecorationLevel extends FeatureStampLevel {
 
     ClientColumnSample column(int x, int z) {
         checkColumnBounds(x, z);
-        if (interiorTerrain()) return columns.computeIfAbsent(key(x, z), packed -> sharedColumns == null
-                ? terrain.sampleInterior(x, z) : sharedColumns.getOrCompute(packed, ignored -> terrain.sampleInterior(x, z)));
+        if (interiorTerrain()) {
+            int slot = columnSlot(x, z);
+            if (columns == null) columns = new ClientColumnSample[COLUMN_CACHE_SIZE];
+            ClientColumnSample sample = columns[slot];
+            if (sample == null) {
+                long packed = key(x, z);
+                sample = sharedColumns == null ? terrain.sampleInterior(x, z)
+                        : sharedColumns.getOrCompute(packed, ignored -> terrain.sampleInterior(x, z));
+                columns[slot] = sample;
+            }
+            return sample;
+        }
         if (displayTerrain && terrain instanceof RustTerrainSampler rust)
             return rust.surfaceSample(nativeColumn(rust,x,z));
-        return columns.computeIfAbsent(key(x, z), packed -> {
+        int slot = columnSlot(x, z);
+        if (columns == null) columns = new ClientColumnSample[COLUMN_CACHE_SIZE];
+        ClientColumnSample sample = columns[slot];
+        if (sample == null) {
             if (terrain instanceof RustTerrainSampler rust) {
-                return rust.surfaceSample(nativeColumn(rust, x, z));
+                sample = rust.surfaceSample(nativeColumn(rust, x, z));
+            } else {
+                long packed = key(x, z);
+                sample = sharedColumns == null ? terrain.sampleSurface(x, z)
+                        : sharedColumns.getOrCompute(packed, ignored -> terrain.sampleSurface(x, z));
             }
-            return sharedColumns == null ? terrain.sampleSurface(x, z)
-                    : sharedColumns.getOrCompute(packed, ignored -> terrain.sampleSurface(x, z));
-        });
+            columns[slot] = sample;
+        }
+        return sample;
     }
 
     private int[] nativeColumn(RustTerrainSampler rust, int x, int z) {
         checkColumnBounds(x, z);
         rust.handle(); // Retained data must not keep a cancelled world usable.
-        long key = key(x, z);
+        int slot = columnSlot(x, z);
         if (displayTerrain) {
-            int[] record = displayColumns.get(key);
+            if (displayColumns == null) displayColumns = new int[COLUMN_CACHE_SIZE][];
+            int[] record = displayColumns[slot];
             if (record == null) {
                 int ox = Math.floorDiv(x,4)*4, oz = Math.floorDiv(z,4)*4;
                 int[][] rows = rust.decorationDisplayPage(ox,oz);
-                for (int i=0;i<16;i++) displayColumns.put(key(ox+i/4,oz+i%4),rows[i]);
-                record = displayColumns.get(key);
+                for (int i=0;i<16;i++) displayColumns[columnSlot(ox+i/4,oz+i%4)] = rows[i];
+                record = displayColumns[slot];
             }
             return record;
         }
-        int[] record = nativeColumns.get(key);
+        if (nativeColumns == null) nativeColumns = new int[COLUMN_CACHE_SIZE][];
+        int[] record = nativeColumns[slot];
         if (record == null) {
             record = rust.surfaceRecord(x, z);
-            nativeColumns.put(key, record);
+            nativeColumns[slot] = record;
         }
         return record;
+    }
+
+    private int columnSlot(int x, int z) {
+        int localX = x - (originX - 32);
+        int localZ = z - (originZ - 32);
+        if ((localX | localZ) < 0 || localX >= COLUMN_CACHE_AXIS || localZ >= COLUMN_CACHE_AXIS) {
+            throw new IllegalArgumentException("Decoration column outside cache window");
+        }
+        return localZ * COLUMN_CACHE_AXIS + localX;
     }
 
     void useDisplayTerrain(boolean display) { displayTerrain = display; }
@@ -135,6 +173,15 @@ final class PredictionDecorationLevel extends FeatureStampLevel {
     }
     boolean interiorTerrain() { return terrain.interiorTerrain(); }
     boolean usesDisplayTerrain() { return displayTerrain; }
+
+    @Override
+    protected void noteWrite(BlockPos pos, BlockState state) {
+        super.noteWrite(pos, state);
+        if (++blockQueryEpoch == 0L) {
+            java.util.Arrays.fill(blockQueryEpochs, 0L);
+            blockQueryEpoch = 1L;
+        }
+    }
 
     /** Structures/custom feature cuts retain their original extraction floor.
      * Pure visual plant columns use the same ground as their placement. */
@@ -181,7 +228,21 @@ final class PredictionDecorationLevel extends FeatureStampLevel {
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        BlockState placed = placed().get(pos);
+        BlockState placed;
+        int x = pos.getX(), y = pos.getY(), z = pos.getZ();
+        int querySlot = blockQuerySlot(x, y, z);
+        if (blockQueryEpochs[querySlot] == blockQueryEpoch
+                && blockQueryXs[querySlot] == x && blockQueryYs[querySlot] == y
+                && blockQueryZs[querySlot] == z) {
+            placed = blockQueryStates[querySlot];
+        } else {
+            placed = placed().get(pos);
+            blockQueryXs[querySlot] = x;
+            blockQueryYs[querySlot] = y;
+            blockQueryZs[querySlot] = z;
+            blockQueryStates[querySlot] = placed;
+            blockQueryEpochs[querySlot] = blockQueryEpoch;
+        }
         if (placed != null) return placed;
         if (pos.getY() < getMinBuildHeight() || pos.getY() >= getMaxBuildHeight()) {
             return Blocks.AIR.defaultBlockState();
@@ -292,4 +353,10 @@ final class PredictionDecorationLevel extends FeatureStampLevel {
     }
 
     private static long key(int x, int z) { return (long) x << 32 | z & 0xFFFFFFFFL; }
+
+    private static int blockQuerySlot(int x, int y, int z) {
+        int hash = x * 0x9E3779B9 ^ Integer.rotateLeft(y * 0x85EBCA6B, 11)
+                ^ Integer.rotateLeft(z * 0xC2B2AE35, 22);
+        return (hash ^ hash >>> 16) & (BLOCK_QUERY_CACHE_SIZE - 1);
+    }
 }

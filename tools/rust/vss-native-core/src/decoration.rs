@@ -100,20 +100,5 @@ impl Schedule {
             .get(biome)
             .is_some_and(|steps| steps.iter().flatten().any(|s| s == feature))
     }
-    pub fn indices(&self, step: usize, biomes: &BTreeSet<String>) -> Vec<usize> {
-        let Some(features) = self.steps.get(step) else {
-            return vec![];
-        };
-        let allowed: BTreeSet<_> = biomes
-            .iter()
-            .filter_map(|b| self.biome_steps.get(b))
-            .filter_map(|steps| steps.get(step))
-            .flatten()
-            .collect();
-        features
-            .iter()
-            .enumerate()
-            .filter_map(|(i, f)| allowed.contains(f).then_some(i))
-            .collect()
-    }
+
 }

@@ -27,6 +27,12 @@ final class PredictionDiskCache implements AutoCloseable {
         thread.setPriority(Thread.NORM_PRIORITY - 1);
         return thread;
     });
+    private static final ScheduledExecutorService COMPACTIONS = Executors.newSingleThreadScheduledExecutor(task -> {
+        Thread thread = new Thread(task, "vss-prediction-compaction");
+        thread.setDaemon(true);
+        thread.setPriority(Thread.NORM_PRIORITY - 1);
+        return thread;
+    });
     private static final ConcurrentMap<Path, Shared> ROOTS = new ConcurrentHashMap<>();
     private static final class Shared {
         volatile PredictionDiskCache owner;
@@ -99,11 +105,41 @@ final class PredictionDiskCache implements AutoCloseable {
         }
     }
 
+    /**
+     * Restores finished geometry after the terrain record has been decoded,
+     * before feature replay. The base identity is independent of vegetation;
+     * dirty captures and resource fingerprints still invalidate it.
+     */
+    PredictionMesh readMeshBase(Lease terrain, byte[] baseIdentity, int axis) {
+        if (baseIdentity == null || !terrain.valid() || !terrain.readable) return null;
+        try (var lease = lease(Key.mesh(terrain.key))) {
+            var mesh = read(lease, (input, version) -> {
+                int length = bounded(input.readInt(), PredictionMeshCodec.MAX_BYTES);
+                byte[] bytes = input.readNBytes(length);
+                if (bytes.length != length) throw new EOFException("mesh payload");
+                return PredictionMeshCodec.decodeBase(bytes, baseIdentity, axis);
+            });
+            if (!terrain.valid()) return null;
+            if (mesh == null) meshMisses.increment(); else meshHits.increment();
+            return mesh;
+        }
+    }
+
     /** Bounded detached bytes only; never retain a tile/vegetation graph in an IO queue. */
     void writeMeshLater(Lease terrain, byte[] identity, PredictionMesh mesh) {
-        if (identity == null || !terrain.valid() || MESH_WRITES.getQueue().remainingCapacity() == 0) return;
+        writeMeshLater(terrain, identity, mesh, identity, true);
+    }
+
+    void writeMeshLater(Lease terrain, byte[] identity, PredictionMesh mesh, byte[] baseIdentity) {
+        writeMeshLater(terrain, identity, mesh, baseIdentity, true);
+    }
+
+    void writeMeshLater(Lease terrain, byte[] identity, PredictionMesh mesh, byte[] baseIdentity,
+                        boolean baseSafe) {
+        if (identity == null || baseIdentity == null || !terrain.valid()
+                || MESH_WRITES.getQueue().remainingCapacity() == 0) return;
         byte[] bytes;
-        try { bytes = PredictionMeshCodec.encode(mesh, identity); }
+        try { bytes = PredictionMeshCodec.encode(mesh, identity, baseIdentity, baseSafe); }
         catch (IOException | RuntimeException unavailable) { return; }
         if (MESH_QUEUED.addAndGet(bytes.length) > 32L * 1024 * 1024) { MESH_QUEUED.addAndGet(-bytes.length); return; }
         Lease owned;
@@ -206,6 +242,13 @@ final class PredictionDiskCache implements AutoCloseable {
             shared.active.clear();
             shared.owner = this;
         }
+        // Inspect existing regions after the initial world load, without adding to login latency.
+        COMPACTIONS.schedule(() -> {
+            if (closed || shared.owner != this) return;
+            try { shared.regions.discoverMaintenance(); }
+            catch (IOException | RuntimeException failure) { error(failure); }
+            scheduleMaintenance();
+        }, 30, TimeUnit.SECONDS);
     }
 
     Lease lease(Key key) {
@@ -220,7 +263,10 @@ final class PredictionDiskCache implements AutoCloseable {
                        int[] surfaceTints, int[] foliageTints, int[] waterTints) {
         int cellAxis() { return (int) Math.sqrt(samples.length) - VssLodLayout.SAMPLE_MARGIN * 2; }
         boolean colorsMatch(long fingerprint) {
-            return fingerprint != Long.MIN_VALUE && fingerprint == colorFingerprint && surfaceTints != null;
+            return fingerprint != Long.MIN_VALUE && fingerprint == colorFingerprint
+                    && surfaceTints != null && foliageTints != null && waterTints != null
+                    && surfaceTints.length == samples.length && foliageTints.length == samples.length
+                    && waterTints.length == samples.length;
         }
     }
 
@@ -531,12 +577,16 @@ final class PredictionDiskCache implements AutoCloseable {
         synchronized (shared) {
             if (shared.maintenanceQueued || closed || shared.owner != this) return;
             shared.maintenanceQueued = true;
-            COMMITS.execute(() -> {
+            COMPACTIONS.schedule(() -> {
                 try {
-                    if (!closed && shared.owner == this && COMMITS.getQueue().isEmpty()) shared.regions.compactOne();
-                } catch (IOException failure) { error(failure); }
-                finally { synchronized (shared) { shared.maintenanceQueued = false; } }
-            });
+                    if (!closed && shared.owner == this && COMMITS.getActiveCount() == 0
+                            && COMMITS.getQueue().isEmpty()) shared.regions.compactOne();
+                } catch (IOException | RuntimeException failure) { error(failure); }
+                finally {
+                    synchronized (shared) { shared.maintenanceQueued = false; }
+                    if (!closed && shared.owner == this) scheduleMaintenance();
+                }
+            }, 1, TimeUnit.SECONDS);
         }
     }
 

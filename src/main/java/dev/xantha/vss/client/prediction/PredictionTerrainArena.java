@@ -7,7 +7,25 @@ import static org.lwjgl.opengl.GL43C.*;
 /** Bounded shared geometry pages. Retired slices are reusable only after a zero-timeout fence succeeds. */
 final class PredictionTerrainArena {
     static final PredictionTerrainArena SHARED = new PredictionTerrainArena();
-    static final int PAGE_BYTES = 8 * 1024 * 1024, MAX_PAGES = 16;
+    // Larger pages keep opaque tiles together, reducing texture switches and
+    // MDI submissions. This remains a lazy allocation, not a startup reserve.
+    static final int PAGE_BYTES = configuredPageMiB() * 1024 * 1024;
+    private static int configuredPageMiB() {
+        int requested = Integer.getInteger("vss.indirectPageMiB", 64);
+        return requested == 8 || requested == 16 || requested == 32 || requested == 64
+                ? requested : 64;
+    }
+    /** Shared pages replace the same bytes that would otherwise live in one
+     * texture buffer per tile. They are allocated lazily, so this is a ceiling
+     * rather than an eager VRAM reservation. A JVM property is provided for
+     * low-VRAM systems and deterministic GPU tests. */
+    static final int MAX_PAGES = configuredMaxPages();
+
+    private static int configuredMaxPages() {
+        int mib = Integer.getInteger("vss.indirectArenaMiB", 2048);
+        mib = Math.max(128, Math.min(2048, mib));
+        return Math.max(1, (int) ((long) mib * 1024L * 1024L / PAGE_BYTES));
+    }
     private final List<Page> pages = new ArrayList<>();
     private final ArrayDeque<Slice> retired = new ArrayDeque<>();
     private int alignment;
@@ -90,5 +108,6 @@ final class PredictionTerrainArena {
         for(Slice slice:retired)glDeleteSync(slice.fence);retired.clear();
         for(Page page:pages)page.close();pages.clear();alignment=0;
     }
-    String diagnostics(){return "arena={pages="+pages.size()+",bytes="+(long)pages.size()*PAGE_BYTES+",retired="+retired.size()+"}";}
+    String diagnostics(){return "arena={pages="+pages.size()+",bytes="+(long)pages.size()*PAGE_BYTES
+            +",budgetBytes="+(long)MAX_PAGES*PAGE_BYTES+",retired="+retired.size()+"}";}
 }

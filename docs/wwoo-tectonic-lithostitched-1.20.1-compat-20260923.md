@@ -1,0 +1,9 @@
+# Forge 1.20.1: WWOO, Tectonic and Lithostitched compatibility
+
+The NeoForge 1.21.1 Mechanomania 1.1.12.0 pack cannot itself run on Forge 1.20.1. This port covers the corresponding 1.20.1 mod resources and the existing worldgen registry/sampling pipeline, not the pack's 1.21.1-only KubeJS data files.
+
+- **WWOO 2.0.0 for 1.20.1**: audited the released JAR's 108 biome files and their placed-feature stage references. Prediction now looks up placed-feature registry IDs and admits exposed WWOO terrain, trees, flowers and ocean corals in stages that the surface-only pass otherwise skips. 1.20.1-specific snow spread, red sand, savanna mud, grass-to-mycelium and dead-coral surface edits are included. The sea-level packed-mud-to-moss edit is recognized by its configured target; ordinary ores and cave disks remain excluded. Vegetation features still honor the tree/vegetation switch.
+- **Tectonic 3.0.17 for Forge 1.20.1**: the released data resources include the 1.20.1 Overworld noise settings, 94 density functions and 34 noises. The resource-only test verifies that VSS accepts the referenced Tectonic density graph and traverses its definitions. Unsupported future codecs still select the Java compatibility sampler rather than an approximate native graph.
+- **Lithostitched 1.4.11 for Forge 1.20.1**: the existing native codec whitelist and Java fallback remain in place. This release differs from the 1.21.1 library; do not treat the 1.21.1 class-level parity tests as tests of the Forge JAR.
+
+The release WWOO feature-stage test, Tectonic resource-graph test and existing vegetation suite pass. Full game-in-pack visual parity has not been checked. Existing tests that load a Forge release's obfuscated Java classes directly without a Forge runtime remapper can fail with `NoSuchFieldError` or `ClassNotFoundException`; that test-harness limitation is separate from the resource-graph and WWOO stage checks above.

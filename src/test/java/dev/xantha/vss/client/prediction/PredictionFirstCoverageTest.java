@@ -27,8 +27,9 @@ class PredictionFirstCoverageTest {
         VSSClientConfig.CONFIG.predictionDistanceBlocks = 8192;
     }
 
-    @org.junit.jupiter.api.AfterEach void restoreLayoutFixture() {
+    @org.junit.jupiter.api.AfterEach void restoreLayoutFixture() throws Exception {
         VSSClientConfig.CONFIG.predictionDistanceBlocks = previousDistance;
+        PredictionCacheTestFiles.awaitBackgroundClose();
     }
 
     @BeforeAll static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }

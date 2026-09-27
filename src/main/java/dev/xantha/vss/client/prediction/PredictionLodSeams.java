@@ -99,7 +99,9 @@ final class PredictionLodSeams {
         localReuses+=Math.max(0,cache.size()-affected.stream().filter(cache::containsKey).count());
         // Publish all changed masks before rebuilding any seam that consults a neighbor.
         index.boundaryMasks=boundaryMasks;
-        for(var key:affected) {
+        if(PredictionSeamMasks.shouldParallel(affected.size()))
+            boundaryMasks.putAll(PredictionSeamMasks.build(affected,previous,index));
+        else for(var key:affected) {
             var surface=previous.get(key);
             if(surface!=null) boundaryMasks.put(key,PredictionBoundaryWalls.build(surface,index));
         }
@@ -354,6 +356,7 @@ final class PredictionLodSeams {
             levelTables=levels.values().toArray(new Long2ObjectOpenHashMap[0]);
             levelsChanged=false;
         }
+        void prepareReads() { refreshLevels(); }
         Surface at(int x, int z) {
             refreshLevels();
             for (int i = 0; i < spans.length; i++) {

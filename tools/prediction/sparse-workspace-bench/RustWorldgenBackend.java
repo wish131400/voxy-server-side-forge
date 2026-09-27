@@ -58,8 +58,6 @@ public final class RustWorldgenBackend {
     public static native String schedule(long world);
     /** Rust derives decoration/feature seeds, checks biome membership and applies modifiers lazily. */
     public static native String placedFeature(long result, String name, int chunkX, int chunkZ, int globalIndex, int step);
-    /** Selects the 3x3 biome neighbourhood and atomically executes one fully supported decoration step. */
-    public static native String decorateStep(long result, int chunkX, int chunkZ, int step);
     /** 256 X,Z records of ten int32: floor, fluid top/kind, flags, three material states, grass/leaf/water RGB. */
     public static native int surfaceColumns(long world, int chunkX, int chunkZ, ByteBuffer output);
     /** Sparse XZ int32 input, at most 64 records, same ten-int32 output as surfaceColumns. */

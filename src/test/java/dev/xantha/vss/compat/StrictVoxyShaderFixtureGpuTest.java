@@ -29,8 +29,8 @@ class StrictVoxyShaderFixtureGpuTest {
         } finally { glfwDestroyWindow(window);glfwTerminate(); }
     }
     private static void check(ZipFile jar,Path root) throws Exception {
-        String vertex=dev.xantha.vss.client.prediction.PredictionFogBridge.patch("voxy:lod/gl46/quads3.vert",load(jar,root,"voxy:lod/gl46/quads3.vert"));
-        String fragment=dev.xantha.vss.client.prediction.PredictionFogBridge.patch("voxy:lod/gl46/quads.frag",load(jar,root,"voxy:lod/gl46/quads.frag"));
+        String vertex=dev.xantha.vss.client.prediction.PredictionVoxyBoundaryBridge.patch("voxy:lod/gl46/quads3.vert",load(jar,root,"voxy:lod/gl46/quads3.vert"));
+        String fragment=dev.xantha.vss.client.prediction.PredictionVoxyBoundaryBridge.patch("voxy:lod/gl46/quads.frag",load(jar,root,"voxy:lod/gl46/quads.frag"));
         for(String mode:new String[]{"", "#define TRANSLUCENT\n", "#define PATCHED_SHADER\n"}) {
             String defines=mode+"#define UP_FACE_TINT 1.0\n#define DOWN_FACE_TINT 0.5\n#define Z_AXIS_FACE_TINT 0.8\n#define X_AXIS_FACE_TINT 0.6\n#define NO_SHADE_FACE_TINT 1.0\n";
             int vs=compile(GL_VERTEX_SHADER,vertex.replaceFirst("\n","\n"+defines));
@@ -41,6 +41,8 @@ class StrictVoxyShaderFixtureGpuTest {
             assertEquals(GL_TRUE,glGetProgrami(p,GL_LINK_STATUS),glGetProgramInfoLog(p));
             assertEquals(-1,glGetUniformLocation(p,"VssStrictEnabled"));
             assertEquals(-1,glGetUniformLocation(p,"VssStrictFrontier"));
+            assertNotEquals(-1,glGetUniformLocation(p,"VssBoundaryEnabled"));
+            assertNotEquals(-1,glGetUniformLocation(p,"VssBoundaryCoverage"));
             glDeleteProgram(p);glDeleteShader(vs);glDeleteShader(fs);
         }
     }

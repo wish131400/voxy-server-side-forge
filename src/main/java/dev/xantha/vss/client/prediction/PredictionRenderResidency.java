@@ -26,6 +26,14 @@ final class PredictionRenderResidency {
     private RenderSnapshot pendingSource;
     private final java.util.ArrayList<PredictionTile> pendingUploads = new java.util.ArrayList<>();
 
+    long revision() { return revision; }
+
+    boolean hasPendingUploads(RenderSnapshot source,
+                              java.util.function.Predicate<PredictionTile> relevant) {
+        for (PredictionTile tile : pendingUploads(source)) if (relevant.test(tile)) return true;
+        return false;
+    }
+
     void retain(RenderSnapshot source) {
         if (source == retainedSource && revision == retainedRevision) return;
         boolean distanceReduced = layout != null && source.layout().maxDistanceBlocks() < layout.maxDistanceBlocks();
@@ -77,6 +85,14 @@ final class PredictionRenderResidency {
     }
 
     boolean contains(PredictionTile tile) { return tiles.get(tile.key()) == tile; }
+
+    boolean hasResidentCover(PredictionTileKey key, VssLodLayout layout) {
+        for (var owner = key; owner.lod() < layout.levelCount(); owner = new PredictionTileKey(
+                key.dimension(), owner.tileX() >> 1, owner.tileZ() >> 1, owner.lod() + 1)) {
+            if (tiles.containsKey(owner)) return true;
+        }
+        return false;
+    }
 
     java.util.List<PredictionTile> pendingUploads(RenderSnapshot source) {
         if (source != pendingSource) {

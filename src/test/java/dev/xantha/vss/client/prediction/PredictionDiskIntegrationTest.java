@@ -18,9 +18,7 @@ class PredictionDiskIntegrationTest {
             42L, -64, 384, "noise", "minecraft:overworld", 123L);
     @BeforeAll static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }
     @org.junit.jupiter.api.AfterEach void finishBackgroundCloseBeforeTempCleanup() throws Exception {
-        var field = PredictionResources.class.getDeclaredField("DISPOSER");
-        field.setAccessible(true);
-        ((java.util.concurrent.ExecutorService) field.get(null)).submit(() -> { }).get(15, TimeUnit.SECONDS);
+        PredictionCacheTestFiles.awaitBackgroundClose();
     }
 
     @Test void reopenedManagerUsesStoredGroundWithoutTerrainSamplingAndDirtyRebuildsIt() throws Exception {
@@ -137,19 +135,18 @@ class PredictionDiskIntegrationTest {
         } finally { release.countDown(); }
     }
 
-    @Test void coldStoredDetailReleasesOnlyWithReadyAncestorAndAfterGrace() {
+    @Test void coldStoredDetailReleasesOnlyOutsideTheHorizonAndAfterGrace() {
         var layout = VssLodLayout.of(1024, 2, true, true);
         var key = new PredictionTileManager.PredictionTileKey(PROFILE.levelKey(), -2, 2, 0);
-        var parent = new PredictionTileManager.PredictionTileKey(PROFILE.levelKey(), -1, 1, 1);
         long cold = TimeUnit.SECONDS.toNanos(31);
-        assertFalse(PredictionTileManager.canRetireStored(key, cold, false, true, Set.of(parent), PROFILE.levelKey(), layout),
+        assertFalse(PredictionTileResidencyPolicy.canRetireStored(key, cold, false, true, layout, false),
                 "Looking away must not discard loaded detail inside the prediction horizon");
-        assertFalse(PredictionTileManager.canRetireStored(key, cold, true, true, Set.of(parent), PROFILE.levelKey(), layout));
-        assertFalse(PredictionTileManager.canRetireStored(key, cold, false, false, Set.of(parent), PROFILE.levelKey(), layout));
-        assertFalse(PredictionTileManager.canRetireStored(key, cold, false, true, Set.of(), PROFILE.levelKey(), layout));
-        assertFalse(PredictionTileManager.canRetireStored(key, TimeUnit.SECONDS.toNanos(29), false, true, Set.of(parent), PROFILE.levelKey(), layout));
+        assertFalse(PredictionTileResidencyPolicy.canRetireStored(key, cold, true, true, layout, true));
+        assertFalse(PredictionTileResidencyPolicy.canRetireStored(key, cold, false, false, layout, true));
+        assertFalse(PredictionTileResidencyPolicy.canRetireStored(key, TimeUnit.SECONDS.toNanos(29), false, true, layout, true));
+        assertTrue(PredictionTileResidencyPolicy.canRetireStored(key, TimeUnit.SECONDS.toNanos(30), false, true, layout, true));
         var root = new PredictionTileManager.PredictionTileKey(PROFILE.levelKey(), -100, 100, layout.levelCount() - 1);
-        assertTrue(PredictionTileManager.canRetireStored(root, cold, false, true, Set.of(), PROFILE.levelKey(), layout, true),
+        assertTrue(PredictionTileResidencyPolicy.canRetireStored(root, cold, false, true, layout, true),
                 "stored roots beyond the horizon cannot accumulate forever merely because they have no parent");
     }
 

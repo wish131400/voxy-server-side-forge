@@ -111,6 +111,30 @@ class PredictionExteriorColumnsTest {
                 ()->PredictionExteriorColumns.enrich(samples,grid,1,0,0,sampler,()->false));
     }
 
+    @Test void adjacentFloodRequestsUseBoundedBatchAndKeepScalarOccupancy() {
+        var profile = sampler((x, z) -> runs(-64, 64, 173, 180)).profile();
+        var batchedCalls = new AtomicInteger();
+        var batched = new ClientTerrainSampler(5052304137288917019L, profile) {
+            @Override PredictionColumnVolume exteriorColumn(int x, int z) { return runs(-64, 64, 173, 180); }
+            @Override boolean[][] exteriorFootprints(int[] x, int[] z, int step, int[] bottom,
+                                                       int[] top, int count, java.util.function.BooleanSupplier valid) {
+                assertTrue(count > 0 && count <= 8);
+                if (count > 1) batchedCalls.incrementAndGet();
+                return super.exteriorFootprints(x, z, step, bottom, top, count, valid);
+            }
+        };
+        var scalar = sampler((x, z) -> runs(-64, 64, 173, 180));
+        int grid = 12;
+        var expected = new ClientColumnSample[grid * grid];
+        Arrays.fill(expected, surface(180));
+        expected[0] = surface(64);
+        var actual = expected.clone();
+        PredictionExteriorColumns.enrich(expected, grid, 1, 0, 0, scalar, () -> true);
+        PredictionExteriorColumns.enrich(actual, grid, 1, 0, 0, batched, () -> true);
+        assertTrue(batchedCalls.get() > 0);
+        assertArrayEquals(expected, actual);
+    }
+
     @Test void inconsistentOrUnsupportedGeneratorDoesNotPunchHoles() {
         var s=surface(180);
         assertSame(s,PredictionExteriorColumns.capture(s,-64,47,y->y<160));

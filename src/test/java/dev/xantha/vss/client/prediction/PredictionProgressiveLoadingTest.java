@@ -123,7 +123,7 @@ class PredictionProgressiveLoadingTest {
                 ((java.util.ArrayDeque<PredictionTileManager.PredictionTileKey>)field.get(manager)).addAll(keys);
                 var restore=PredictionTileManager.class.getDeclaredMethod("restoreCached",int.class,int.class);
                 restore.setAccessible(true); restore.invoke(manager,0,0);
-                assertEquals(2,manager.pendingCount(),"restoration must not queue the entire warm world");
+                assertEquals(4,manager.pendingCount(),"restoration must keep only the bounded warm-cache window");
                 gate.countDown();
                 long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(10);
                 while ((manager.readyTiles().size()<8 || manager.pendingCount()>0) && System.nanoTime()<deadline) Thread.sleep(5);

@@ -63,7 +63,8 @@ class PredictionVegetationTest {
         var grids = new java.util.ArrayList<Map<BlockPos,BlockState>>();
         for (int x=0;x<32;x++) grids.add(generated.chunk(x,7));
         long[][] times = new long[2][7];
-        try (var disk = new PredictionDiskCache(diskDirectory,77)) {
+        var disk = new PredictionDiskCache(diskDirectory,77);
+        try (disk) {
             for (int x=0;x<32;x++) try (var lease=disk.lease(PredictionDiskCache.Key.surface(x,7,31))) {
                 assertTrue(disk.writeSurface(lease,grids.get(x),true));
             }
@@ -77,6 +78,7 @@ class PredictionVegetationTest {
                 if (round>=0) times[mode][round]=System.nanoTime()-start;
             }
         }
+        disk.flush();
         for (var series:times) java.util.Arrays.sort(series);
         System.out.printf(java.util.Locale.ROOT,"SURFACE_RESTORE chunks=32 blocks=%d repeatedRepairMs=%.3f canonicalMs=%.3f speedup=%.3f%n",
                 grids.stream().mapToInt(Map::size).sum(),times[0][3]/1e6,times[1][3]/1e6,(double)times[0][3]/times[1][3]);
@@ -356,6 +358,30 @@ class PredictionVegetationTest {
     }
 
     @Test
+    void unfilteredFeaturesReuseOnlyTheirOwnGroundModeBiomes() {
+        var first = placed(new ConfiguredFeature<>(Feature.SIMPLE_BLOCK,
+                new SimpleBlockConfiguration(BlockStateProvider.simple(Blocks.GRASS))), 1);
+        var second = tree();
+        var absent = placed(new ConfiguredFeature<>(Feature.SIMPLE_BLOCK,
+                new SimpleBlockConfiguration(BlockStateProvider.simple(Blocks.DANDELION))), 1);
+        var sampler = sampler(1834, Blocks.GRASS_BLOCK, List.of(first, second));
+        var vegetation = new PredictionVegetation(sampler);
+        var level = new PredictionDecorationLevel(sampler, sampler, RegistryAccess.EMPTY, -17, 23);
+        var origin = new BlockPos(-17 * 16, sampler.profile().minY(), 23 * 16);
+        var eligible = new HashMap<Boolean, List<Holder<Biome>>>();
+        for (boolean visual : new boolean[] {false, true}) {
+            level.useDisplayTerrain(visual);
+            assertTrue(vegetation.belongsToColumn(level, first, origin, eligible));
+            var initial = eligible.get(visual);
+            assertNotNull(initial);
+            assertTrue(vegetation.belongsToColumn(level, second, origin, eligible));
+            assertFalse(vegetation.belongsToColumn(level, absent, origin, eligible));
+            assertSame(initial, eligible.get(visual), "subsequent features keep the initial immutable biome footprint");
+        }
+        assertEquals(2, eligible.size(), "visual and exact terrain keep independent footprints");
+    }
+
+    @Test
     void groundPredicatesAndAbsentBiomeFeaturesDoNotCreateFallbackTrees() {
         assertTrue(new PredictionVegetation(sampler(17, Blocks.RED_SAND, List.of(tree())))
                 .chunk(0, 0).isEmpty(), "trees rejected by real soil predicates stay absent");
@@ -439,7 +465,7 @@ class PredictionVegetationTest {
             var initialKeys = manager.readyTiles().stream().map(tile -> tile.key())
                     .collect(java.util.stream.Collectors.toSet());
             assertTrue(initialKeys.stream().allMatch(key -> key.lod() == manager.layout().levelCount() - 1
-                    || PredictionTileManager.coveredByAncestor(initialKeys, Set.of(), key.dimension(), manager.layout(), key)),
+                    || PredictionTileResidencyPolicy.coveredByAncestor(initialKeys, manager.layout(), key)),
                     "initial children must retain their coarse parent coverage");
             long mediumDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(15);
             while (calls.get() == 0 && System.nanoTime() < mediumDeadline) {
@@ -572,7 +598,7 @@ class PredictionVegetationTest {
             var resident = manager.readyTiles().stream().map(PredictionTileManager.PredictionTile::key)
                     .collect(Collectors.toSet());
             for (var key : previousKeys) assertTrue(resident.contains(key)
-                    || PredictionTileManager.coveredByAncestor(resident, Set.of(), key.dimension(), manager.layout(), key),
+                    || PredictionTileResidencyPolicy.coveredByAncestor(resident, manager.layout(), key),
                     "reclaiming detail must preserve complete parent coverage");
             assertTrue(budget.usedBytes() <= budget.limitBytes());
         } finally {

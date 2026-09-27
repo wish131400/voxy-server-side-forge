@@ -435,6 +435,41 @@ pub extern "system" fn Java_dev_xantha_vss_client_prediction_RustWorldgenBackend
     match result { Ok(n) => n, Err(err) => { fail(&mut e, err); -1 } }
 }
 #[no_mangle]
+pub extern "system" fn Java_dev_xantha_vss_client_prediction_RustWorldgenBackend_exteriorFootprints(
+    mut e: JNIEnv, _c: JClass, id: jlong, input: JByteBuffer, out: JByteBuffer, count: jint,
+) -> jint {
+    let result = guarded(|| {
+        if !(2..=8).contains(&count) { return Err("exterior batch count".into()); }
+        let w = world(id)?;
+        w.check_active()?;
+        let stride = 4 + w.terrain.height as usize;
+        let ptr = buffer(&mut e, &input, count as usize * 20, false)?;
+        buffer(&mut e, &out, count as usize * stride, true)?;
+        let bytes = unsafe { std::slice::from_raw_parts(ptr, count as usize * 20) };
+        let requests: Vec<_> = bytes.chunks_exact(20).map(|row| {
+            let integer = |offset| i32::from_le_bytes(row[offset..offset + 4].try_into().unwrap());
+            (integer(0), integer(4), integer(8), integer(12), integer(16))
+        }).collect();
+        if w.palette.is_air(w.base_ids[crate::terrain::Substance::Default as usize]) { return Ok(-2); }
+        let Some(footprints) = w.terrain.exterior_footprints(&requests)? else { return Ok(-2); };
+        w.check_active()?;
+        let mut data = vec![0; count as usize * stride];
+        for (index, result) in footprints.into_iter().enumerate() {
+            let start = index * stride;
+            match result {
+                Some(mask) => {
+                    data[start..start + 4].copy_from_slice(&(mask.len() as i32).to_le_bytes());
+                    data[start + 4..start + 4 + mask.len()].copy_from_slice(&mask);
+                }
+                None => data[start..start + 4].copy_from_slice(&0_i32.to_le_bytes()),
+            }
+        }
+        put(&mut e, &out, &data)?;
+        Ok(count)
+    });
+    match result { Ok(n) => n, Err(err) => { fail(&mut e, err); -1 } }
+}
+#[no_mangle]
 pub extern "system" fn Java_dev_xantha_vss_client_prediction_RustWorldgenBackend_interiorColumns(
     mut e: JNIEnv,
     _c: JClass,
@@ -696,23 +731,6 @@ pub extern "system" fn Java_dev_xantha_vss_client_prediction_RustWorldgenBackend
         let owner = v.owner.clone();
         let (placed, after) = owner.placed(&mut v.volume, &name, chunk_x, chunk_z, index, step)?;
         Ok(json!({"placed":placed,"after":after.to_string()}))
-    });
-    output(&mut e, result)
-}
-#[no_mangle]
-pub extern "system" fn Java_dev_xantha_vss_client_prediction_RustWorldgenBackend_decorateStep(
-    mut e: JNIEnv,
-    _c: JClass,
-    id: jlong,
-    x: jint,
-    z: jint,
-    step: jint,
-) -> jstring {
-    let result = guarded(|| {
-        let v = volume(id)?;
-        let mut v = v.lock().map_err(|_| "volume lock")?;
-        let owner = v.owner.clone();
-        owner.decorate_step(&mut v.volume, x, z, step as usize)
     });
     output(&mut e, result)
 }

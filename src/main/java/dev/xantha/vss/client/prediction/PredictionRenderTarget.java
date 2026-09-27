@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.joml.Matrix4f;
 
 /**
  * Small offscreen render target used by the predictive terrain pass.
@@ -47,12 +48,52 @@ final class PredictionRenderTarget implements AutoCloseable {
                 fragColor = vec4(0.0);
             }
             """;
+    private static final String COPY_MAIN_DEPTH_FRAGMENT = """
+            #version 150
+            uniform sampler2D MainDepth;
+            uniform sampler2D VoxyDepth;
+            uniform bool VoxyDepthAvailable;
+            uniform vec2 VanillaPlanes;
+            uniform vec3 VoxyDepthTransform;
+            uniform vec4 VoxyDistanceNumerator;
+            uniform vec4 VoxyDistanceDenominator;
+            void main() {
+                float depth = texelFetch(MainDepth, ivec2(gl_FragCoord.xy), 0).r;
+                // Minecraft's clear value and Voxy's far-plane clamp cannot
+                // establish a finite occluder.  Keep those pixels at the
+                // reversed-depth clear value so prediction remains visible;
+                // the fragment shader still consults the borrowed Voxy depth
+                // texture when it is available.
+                float reversedDepth = 0.0;
+                if (depth < 1.0 - 2.0 / 16777215.0) {
+                    float denominator = depth * 2.0 - 1.0 + VanillaPlanes.x;
+                    float distance = VanillaPlanes.y / denominator;
+                    if (distance > 0.0) reversedDepth = clamp(1.0 / distance, 0.0, 1.0);
+                }
+                if (VoxyDepthAvailable) {
+                    float raw = texelFetch(VoxyDepth, ivec2(gl_FragCoord.xy), 0).r;
+                    if (raw > 0.0 && raw < 1.0) {
+                        vec2 uv = gl_FragCoord.xy / vec2(textureSize(VoxyDepth, 0));
+                        vec4 clip = vec4(uv * 2.0 - 1.0,
+                                raw * VoxyDepthTransform.x + VoxyDepthTransform.y, 1.0);
+                        float denominator = dot(VoxyDistanceDenominator, clip);
+                        if (abs(denominator) > 1e-10) {
+                            float distance = dot(VoxyDistanceNumerator, clip) / denominator;
+                            if (distance > 0.0 && distance < 1e30)
+                                reversedDepth = max(reversedDepth, clamp(1.0 / distance, 0.0, 1.0));
+                        }
+                    }
+                }
+                gl_FragDepth = reversedDepth;
+            }
+            """;
 
     private int framebuffer = -1;
     private int depthTexture = -1;
     private int colorTexture = -1;
     private int fullscreenVertexArray = -1;
     private GlProgram writeDepth;
+    private GlProgram copyDepth;
     private int width;
     private int height;
 
@@ -124,10 +165,71 @@ final class PredictionRenderTarget implements AutoCloseable {
         RenderSystem.viewport(0, 0, width, height);
         RenderSystem.depthMask(true);
         GL11.glDisable(GL11.GL_STENCIL_TEST);
+        // Kept for callers that only need the clear/restore contract.  The
+        // renderer uses the projection-aware overload below.
         GlStateManager._clearDepth(0.0D);
         RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, false);
-        GlStateManager._clearDepth(1.0D);
         RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_GEQUAL);
+    }
+
+    /** Same conversion as above with the current vanilla projection. */
+    void beginOpaque(RenderTarget main, VssLodProjection.MatrixData projection) {
+        beginOpaque(main, projection, null, null);
+    }
+
+    /** Seeds prediction depth from the vanilla target and, when available, Voxy's unclamped depth. */
+    void beginOpaque(RenderTarget main, VssLodProjection.MatrixData projection,
+                     PredictionVoxyDepth.Frame voxy, Matrix4f mainMvp) {
+        if (!available() || main == null) {
+            return;
+        }
+        GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, framebuffer);
+        RenderSystem.viewport(0, 0, width, height);
+        RenderSystem.depthMask(true);
+        GL11.glDisable(GL11.GL_STENCIL_TEST);
+        ensurePrograms();
+        RenderSystem.activeTexture(GL13.GL_TEXTURE0);
+        RenderSystem.bindTexture(main.getDepthTextureId());
+        copyDepth.use();
+        GL20.glUniform1i(copyDepth.uniform("MainDepth"), 0);
+        GL20.glUniform1i(copyDepth.uniform("VoxyDepth"), 5);
+        boolean voxyAvailable = voxy != null && voxy.texture() > 0
+                && voxy.width() == width && voxy.height() == height && mainMvp != null;
+        GL20.glUniform1i(copyDepth.uniform("VoxyDepthAvailable"), voxyAvailable ? 1 : 0);
+        GL20.glUniform2f(copyDepth.uniform("VanillaPlanes"),
+                projection.vanillaA(), projection.vanillaB());
+        if (voxyAvailable) {
+            org.joml.Vector4f numerator = new Matrix4f(mainMvp).mul(voxy.inverseMvp())
+                    .getRow(3, new org.joml.Vector4f());
+            org.joml.Vector4f denominator = voxy.inverseMvp().getRow(3, new org.joml.Vector4f());
+            GL20.glUniform3f(copyDepth.uniform("VoxyDepthTransform"), voxy.zeroToOne() ? 1 : 2,
+                    voxy.zeroToOne() ? 0 : -1, voxy.reverseZ() ? 1 : -1);
+            GL20.glUniform4f(copyDepth.uniform("VoxyDistanceNumerator"),
+                    numerator.x, numerator.y, numerator.z, numerator.w);
+            GL20.glUniform4f(copyDepth.uniform("VoxyDistanceDenominator"),
+                    denominator.x, denominator.y, denominator.z, denominator.w);
+            RenderSystem.activeTexture(GL13.GL_TEXTURE5);
+            RenderSystem.bindTexture(voxy.texture());
+            RenderSystem.activeTexture(GL13.GL_TEXTURE0);
+        }
+        RenderSystem.colorMask(false, false, false, false);
+        // The fullscreen pass must write every pixel into the depth
+        // attachment.  Disabling depth testing here is harmless for colour,
+        // but on some drivers it also prevents a depth-only fragment from
+        // updating the attachment when the target was just cleared.
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_ALWAYS);
+        RenderSystem.depthMask(true);
+        drawFullscreen();
+        RenderSystem.colorMask(true, true, true, true);
+        if (voxyAvailable) {
+            RenderSystem.activeTexture(GL13.GL_TEXTURE5);
+            RenderSystem.bindTexture(0);
+            RenderSystem.activeTexture(GL13.GL_TEXTURE0);
+        }
+        RenderSystem.bindTexture(0);
+        GlProgram.unuse();
         RenderSystem.depthFunc(GL11.GL_GEQUAL);
     }
 
@@ -182,12 +284,20 @@ final class PredictionRenderTarget implements AutoCloseable {
     }
 
     private void ensurePrograms() {
-        if (writeDepth != null) {
+        if (writeDepth != null && copyDepth != null) {
             return;
         }
-        writeDepth = GlProgram.link("vss_prediction_write_depth",
-                FULLSCREEN_VERTEX, WRITE_DEPTH_FRAGMENT);
-        fullscreenVertexArray = GlStateManager._glGenVertexArrays();
+        if (writeDepth == null) {
+            writeDepth = GlProgram.link("vss_prediction_write_depth",
+                    FULLSCREEN_VERTEX, WRITE_DEPTH_FRAGMENT);
+        }
+        if (copyDepth == null) {
+            copyDepth = GlProgram.link("vss_prediction_copy_main_depth",
+                    FULLSCREEN_VERTEX, COPY_MAIN_DEPTH_FRAGMENT);
+        }
+        if (fullscreenVertexArray == -1) {
+            fullscreenVertexArray = GlStateManager._glGenVertexArrays();
+        }
     }
 
     private void drawFullscreen() {
@@ -210,6 +320,10 @@ final class PredictionRenderTarget implements AutoCloseable {
         if (writeDepth != null) {
             writeDepth.close();
             writeDepth = null;
+        }
+        if (copyDepth != null) {
+            copyDepth.close();
+            copyDepth = null;
         }
         if (fullscreenVertexArray != -1) {
             GlStateManager._glDeleteVertexArrays(fullscreenVertexArray);

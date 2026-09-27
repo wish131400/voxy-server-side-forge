@@ -18,6 +18,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 
 class PredictionNetherDecorationTest {
+    @AfterEach void finishBackgroundCloseBeforeTempCleanup() throws Exception {
+        PredictionCacheTestFiles.awaitBackgroundClose();
+    }
+
     static HolderLookup.Provider lookup;
     static Registry<Biome> biomes;
     static RegistryAccess access;

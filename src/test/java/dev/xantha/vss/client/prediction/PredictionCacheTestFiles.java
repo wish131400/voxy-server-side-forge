@@ -5,6 +5,18 @@ import java.nio.file.*;
 
 /** Fixture mutations bypass the normal encoder to exercise persisted invalid data. */
 final class PredictionCacheTestFiles {
+    static void awaitBackgroundClose() throws Exception {
+        awaitQueue(PredictionResources.class, "DISPOSER");
+        awaitQueue(PredictionDiskCache.class, "COMMITS");
+    }
+
+    private static void awaitQueue(Class<?> owner, String name) throws Exception {
+        var field = owner.getDeclaredField(name);
+        field.setAccessible(true);
+        ((java.util.concurrent.ExecutorService) field.get(null)).submit(() -> { })
+                .get(30, java.util.concurrent.TimeUnit.SECONDS);
+    }
+
     static PredictionRegionStorage storage(PredictionDiskCache cache) throws Exception {
         var sharedField = PredictionDiskCache.class.getDeclaredField("shared");
         sharedField.setAccessible(true);

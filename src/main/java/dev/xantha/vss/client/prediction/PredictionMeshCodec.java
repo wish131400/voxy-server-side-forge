@@ -10,17 +10,76 @@ import net.minecraft.world.level.block.Block;
 final class PredictionMeshCodec {
     // Rebuild walls where a surface replacement consumed the complete suspended roof.
     // Terrain and decoration sample caches remain valid.
-    static final int VERSION = 7, MAX_BYTES = 16 * 1024 * 1024;
+    /** Version 8 adds a cheap pre-decoration identity for early mesh restore. */
+    static final int VERSION = 8, MAX_BYTES = 16 * 1024 * 1024;
+
+    static byte[] withCityBuildings(byte[] signature, int[] buildings) {
+        if (signature == null || buildings == null) return signature;
+        try {
+            var digest = MessageDigest.getInstance("SHA-256");
+            digest.update(signature);
+            var data = ByteBuffer.allocate((buildings.length + 2) * Integer.BYTES);
+            data.putInt(0x4C430001).putInt(buildings.length);
+            for (int hint : buildings) data.putInt(hint);
+            return digest.digest(data.array());
+        } catch (NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
+    }
 
     static byte[] signature(byte[] resources, ClientColumnSample[] samples, int[] colors, int[] foliage,
                             int[] water, int sea, int fluid, int step, boolean trees,
                             PredictionVegetation.Tile plants, PredictionSimpleVegetation.Result simple) {
+        return signature(resources, samples, colors, foliage, water, sea, fluid, step, trees, plants, simple, true);
+    }
+
+    static byte[] signature(byte[] resources, ClientColumnSample[] samples, int[] colors, int[] foliage,
+                            int[] water, int sea, int fluid, int step, boolean trees,
+                            int decorationSettings, PredictionVegetation.Tile plants,
+                            PredictionSimpleVegetation.Result simple) {
+        return signature(resources, samples, colors, foliage, water, sea, fluid, step, trees,
+                plants, simple, true, decorationSettings);
+    }
+
+    /**
+     * Identity for the part of a mesh that is available before feature replay.
+     * The arrays are the persisted surface, foliage and water tints. World
+     * edits invalidate the terrain/mesh record, while the resource fingerprint
+     * and colour fingerprint invalidate palette changes without replaying the
+     * expensive decoration stage.
+     */
+    static byte[] baseSignature(byte[] resources, ClientColumnSample[] samples, int[] colors, int[] foliage,
+                                int[] water, int sea, int fluid, int step, boolean trees) {
+        return signature(resources, samples, colors, foliage, water, sea, fluid, step, trees,
+                PredictionVegetation.Tile.EMPTY, PredictionSimpleVegetation.Result.EMPTY, false,
+                trees ? 1 : 0);
+    }
+
+    /** Includes the enabled surface/structure switches in the pre-decoration identity. */
+    static byte[] baseSignature(byte[] resources, ClientColumnSample[] samples, int[] colors, int[] foliage,
+                                int[] water, int sea, int fluid, int step, boolean trees,
+                                int decorationSettings) {
+        return signature(resources, samples, colors, foliage, water, sea, fluid, step, trees,
+                PredictionVegetation.Tile.EMPTY, PredictionSimpleVegetation.Result.EMPTY, false,
+                decorationSettings);
+    }
+
+    private static byte[] signature(byte[] resources, ClientColumnSample[] samples, int[] colors, int[] foliage,
+                                    int[] water, int sea, int fluid, int step, boolean trees,
+                                    PredictionVegetation.Tile plants, PredictionSimpleVegetation.Result simple,
+                                    boolean includeDecoration) {
+        return signature(resources, samples, colors, foliage, water, sea, fluid, step, trees,
+                plants, simple, includeDecoration, trees ? 1 : 0);
+    }
+
+    private static byte[] signature(byte[] resources, ClientColumnSample[] samples, int[] colors, int[] foliage,
+                                    int[] water, int sea, int fluid, int step, boolean trees,
+                                    PredictionVegetation.Tile plants, PredictionSimpleVegetation.Result simple,
+                                    boolean includeDecoration, int decorationSettings) {
         if (resources == null) return null;
         try {
             var digest = MessageDigest.getInstance("SHA-256");
             try (var out = new DataOutputStream(new BufferedOutputStream(new DigestOutputStream(OutputStream.nullOutputStream(), digest)))) {
                 out.write(resources); out.writeInt(VERSION); out.writeInt(sea); out.writeInt(fluid);
-                out.writeInt(step); out.writeBoolean(trees); out.writeInt(samples.length);
+                out.writeInt(step); out.writeBoolean(trees); out.writeInt(decorationSettings); out.writeInt(samples.length);
                 for (var s : samples) {
                     for (int v : new int[]{s.surfaceY(),s.fluidY(),s.biomeIndex(),s.topBlockIndex(),s.structureIndex(),
                             s.treeKind(),s.treeDensity(),s.treeHeight(),s.fluid(),s.flags(),s.groundFeatureKind(),
@@ -33,6 +92,7 @@ final class PredictionMeshCodec {
                 for (int[] array : new int[][]{colors,foliage,water}) {
                     out.writeInt(array.length); for (int color : array) out.writeInt(color & 0xffffff);
                 }
+                if (!includeDecoration) return digest.digest();
                 out.writeInt(plants.baseX());out.writeInt(plants.baseZ());out.writeInt(plants.voxelSize());
                 var cells = new TreeMap<>(plants.cells()); out.writeInt(cells.size());
                 for (var cell : cells.entrySet()) {
@@ -61,11 +121,22 @@ final class PredictionMeshCodec {
     }
 
     static byte[] encode(PredictionMesh mesh, byte[] signature) throws IOException {
+        return encode(mesh, signature, signature, true);
+    }
+
+    static byte[] encode(PredictionMesh mesh, byte[] signature, byte[] baseSignature) throws IOException {
+        return encode(mesh, signature, baseSignature, true);
+    }
+
+    static byte[] encode(PredictionMesh mesh, byte[] signature, byte[] baseSignature,
+                         boolean baseSafe) throws IOException {
         var payload=mesh.gpuPayload();
-        if(payload==null || mesh.retainedHeapBytes()>MAX_BYTES)throw new IOException("mesh record too large");
+        if(payload==null || signature == null || baseSignature == null
+                || signature.length != 32 || baseSignature.length != 32
+                || mesh.retainedHeapBytes()>MAX_BYTES)throw new IOException("mesh record too large");
         var bytes=new ByteArrayOutputStream();
         try(var out=new DataOutputStream(bytes)) {
-            out.writeInt(VERSION);out.write(signature);out.writeInt(mesh.cellAxis());
+            out.writeInt(VERSION);out.write(signature);out.write(baseSignature);out.writeBoolean(baseSafe);out.writeInt(mesh.cellAxis());
             out.writeInt(mesh.vertexCount());out.writeInt(mesh.waterVertexCount());
             out.writeInt(payload.terrainQuadCount());out.writeInt(payload.spriteQuadCount());out.writeBoolean(payload.downFaces());
             out.writeInt(payload.morphMinY());out.writeInt(payload.morphMaxY());
@@ -87,10 +158,24 @@ final class PredictionMeshCodec {
     }
 
     static PredictionMesh decode(byte[] bytes, byte[] signature, int expectedAxis) throws IOException {
+        return decode(bytes, signature, null, expectedAxis);
+    }
+
+    static PredictionMesh decodeBase(byte[] bytes, byte[] baseSignature, int expectedAxis) throws IOException {
+        return decode(bytes, null, baseSignature, expectedAxis);
+    }
+
+    private static PredictionMesh decode(byte[] bytes, byte[] signature, byte[] baseSignature,
+                                         int expectedAxis) throws IOException {
         if(bytes.length>MAX_BYTES)throw new IOException("mesh record too large");
         try {
             var stream=new ByteArrayInputStream(bytes);var header=new DataInputStream(stream);
-            if(header.readInt()!=VERSION || !Arrays.equals(header.readNBytes(32),signature))return null;
+            if(header.readInt()!=VERSION)return null;
+            byte[] fullIdentity=header.readNBytes(32), storedBase=header.readNBytes(32);
+            boolean storedBaseSafe=header.readBoolean();
+            if(fullIdentity.length != 32 || storedBase.length != 32
+                    || signature != null && !Arrays.equals(fullIdentity,signature)
+                    || baseSignature != null && (!storedBaseSafe || !Arrays.equals(storedBase,baseSignature)))return null;
             int axis=header.readInt(),vertices=header.readInt(),waterVertices=header.readInt();
             int terrain=header.readInt(),sprites=header.readInt();boolean down=header.readBoolean();
             int min=header.readInt(),max=header.readInt();
@@ -103,7 +188,7 @@ final class PredictionMeshCodec {
                 rows[old]=VssLodSpriteTable.readMaterial(header);
             }
             var in=ByteBuffer.wrap(bytes);in.position(bytes.length-stream.available());
-            int[] words=ints(in);if(words.length%12!=0 || terrain>words.length/12 || sprites>terrain)throw new IOException("mesh quads");
+            int[] words=ints(in);if(words.length%12!=0 || terrain>words.length/12 || sprites>words.length/12)throw new IOException("mesh quads");
             for(int i=6;i<words.length;i+=12){int old=words[i]&0xffff;if(old>=256||rows[old]<0)throw new IOException("mesh unresolved material");words[i]=(words[i]&0xffff0000)|rows[old];}
             int count=VssLodFaceGroup.COUNT;
             int[] tf=new int[count],tc=new int[count],wf=new int[count],wc=new int[count];

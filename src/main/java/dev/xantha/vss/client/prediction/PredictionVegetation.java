@@ -33,6 +33,7 @@ final class PredictionVegetation {
     private final ClientTerrainSampler context;
     private final RegistryAccess access;
     private final List<List<PlacedFeature>> featureSteps;
+    private final Map<PlacedFeature, net.minecraft.resources.ResourceLocation> featureIds;
     private final PredictionSurfaceStructures structures;
     private final PredictionTreeModels treeModels;
     private final PredictionDiskCache diskCache;
@@ -102,6 +103,15 @@ final class PredictionVegetation {
             }
         }
         this.featureSteps = List.copyOf(found);
+        var ids = new java.util.IdentityHashMap<PlacedFeature, net.minecraft.resources.ResourceLocation>();
+        if (access != null) access.registry(net.minecraft.core.registries.Registries.PLACED_FEATURE)
+                .ifPresent(registry -> {
+                    for (var step : featureSteps) for (var feature : step) {
+                        var id = registry.getKey(feature);
+                        if (id != null) ids.put(feature, id);
+                    }
+                });
+        this.featureIds = ids;
         this.structures = new PredictionSurfaceStructures(context);
     }
 
@@ -475,6 +485,9 @@ final class PredictionVegetation {
         var random = new WorldgenRandom(new XoroshiroRandomSource(0));
         BlockPos origin = new BlockPos(chunkX * 16, terrain.profile().minY(), chunkZ * 16);
         long seed = random.setDecorationSeed(terrain.profile().seed(), origin.getX(), origin.getZ());
+        // Biomes and ground runs are immutable for this decoration job. Keep the
+        // exact and visual column footprints separate for unfiltered features.
+        Map<Boolean, List<net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>>> columnBiomes = null;
         // Native and Java placements share complete cave columns and ordered edits.
         try (var nativeStage = terrain instanceof RustTerrainSampler rust
                 ? new RustVegetationStage(rust, level, chunkX, chunkZ, treeModels != null) : null) {
@@ -495,7 +508,8 @@ final class PredictionVegetation {
                     if (feature.placement().stream().noneMatch(
                             modifier -> modifier instanceof net.minecraft.world.level.levelgen.placement.BiomeFilter)) {
                         // Unfiltered modded features must still belong to a local biome.
-                        if (!belongsToColumn(level, feature, origin)) continue;
+                        if (columnBiomes == null) columnBiomes = new HashMap<>();
+                        if (!belongsToColumn(level, feature, origin, columnBiomes)) continue;
                     }
                     if (!reusableTree && nativeStage != null && nativeStage.place(index)) continue;
                     if (nativeStage != null) nativeStage.beforeJava();
@@ -532,35 +546,119 @@ final class PredictionVegetation {
 
     private boolean enabled(int step, PlacedFeature feature) {
         return surfaceFeature(step,feature,context.profile().dimension().equals(net.minecraft.world.level.Level.NETHER.location()),
-                VSSClientConfig.CONFIG.predictionTrees,VSSClientConfig.CONFIG.predictionStructures);
+                VSSClientConfig.CONFIG.predictionTrees,VSSClientConfig.CONFIG.predictionStructures,featureIds.get(feature));
     }
 
     private boolean belongsToColumn(PredictionDecorationLevel level, PlacedFeature feature, BlockPos origin) {
-        var column = level.column(origin.getX(), origin.getZ());
-        if (column.volume() != null) {
-            var volume = column.volume();
-            for (int i = 0; i < volume.size(); i++) {
-                int y = volume.top(i);
-                if (!volume.occupied(y, false) && context.generatorContext().getBiomeGenerationSettings(
-                        level.getBiome(new BlockPos(origin.getX(), y, origin.getZ()))).hasFeature(feature)) return true;
+        return belongsToColumn(level, feature, origin, new HashMap<>());
+    }
+
+    boolean belongsToColumn(PredictionDecorationLevel level, PlacedFeature feature, BlockPos origin,
+            Map<Boolean, List<net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>>> columnBiomes) {
+        boolean visual = level.usesDisplayTerrain();
+        var biomes = columnBiomes.computeIfAbsent(visual, ignored -> {
+            var column = level.column(origin.getX(), origin.getZ());
+            var found = new java.util.LinkedHashSet<net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>>();
+            if (column.volume() != null) {
+                var volume = column.volume();
+                for (int i = 0; i < volume.size(); i++) {
+                    int y = volume.top(i);
+                    if (!volume.occupied(y, false))
+                        found.add(level.getBiome(new BlockPos(origin.getX(), y, origin.getZ())));
+                }
+            } else {
+                found.add(level.getBiome(new BlockPos(origin.getX(), column.surfaceY(), origin.getZ())));
             }
-            return false;
+            return List.copyOf(found);
+        });
+        for (var biome : biomes) {
+            if (context.generatorContext().getBiomeGenerationSettings(biome).hasFeature(feature)) return true;
         }
-        return context.generatorContext().getBiomeGenerationSettings(
-                level.getBiome(new BlockPos(origin.getX(), column.surfaceY(), origin.getZ()))).hasFeature(feature);
+        return false;
     }
 
     static boolean surfaceFeature(int step, PlacedFeature feature, boolean nether, boolean trees, boolean structures) {
+        return surfaceFeature(step, feature, nether, trees, structures, null);
+    }
+
+    static boolean surfaceFeature(int step, PlacedFeature feature, boolean nether, boolean trees, boolean structures,
+                                  net.minecraft.resources.ResourceLocation id) {
         if (step < 0 || step >= GenerationStep.Decoration.values().length) return false;
         var stage = GenerationStep.Decoration.values()[step];
         return switch (stage) {
             case RAW_GENERATION, LAKES, LOCAL_MODIFICATIONS, TOP_LAYER_MODIFICATION -> true;
-            case SURFACE_STRUCTURES -> structures;
+            case SURFACE_STRUCTURES -> structures || wythersSurfaceFeature(stage, id, trees);
             case VEGETAL_DECORATION -> trees;
-            case UNDERGROUND_ORES -> feature.feature().value().feature() == net.minecraft.world.level.levelgen.feature.Feature.DISK;
-            case UNDERGROUND_DECORATION -> nether;
+            case UNDERGROUND_ORES -> feature.feature().value().feature() == net.minecraft.world.level.levelgen.feature.Feature.DISK
+                    || surfaceMudReplacement(feature)
+                    || wythersOreStageSurfaceEdit(id)
+                    || trees && wythersOreStageVegetation(id);
+            case UNDERGROUND_DECORATION -> nether || wythersSurfaceFeature(stage, id, trees);
+            default -> wythersSurfaceFeature(stage, id, trees);
+        };
+    }
+
+    /** WWOO 2.0.0 places exposed terrain and trees in normally underground stages.
+     * Registered IDs keep unrelated cave and ore features out of surface prediction. */
+    private static boolean wythersSurfaceFeature(GenerationStep.Decoration stage,
+            net.minecraft.resources.ResourceLocation id, boolean trees) {
+        if (id == null || !id.getNamespace().equals("wythers")) return false;
+        String path = id.getPath();
+        return switch (stage) {
+            case SURFACE_STRUCTURES -> path.equals("terrain/feature/tuff_spikes")
+                    || path.equals("terrain/local/swamp_pools")
+                    || path.equals("terrain/local/volcanic_pools")
+                    || path.equals("terrain/feature/tepui_falls")
+                    || path.equals("terrain/feature/tepui_terrain");
+            case UNDERGROUND_STRUCTURES -> path.equals("terrain/extended/sandify_rooted_dirt")
+                    || path.equals("terrain/extended/red_sandify_rooted_dirt");
+            case STRONGHOLDS -> path.equals("terrain/extended/base_windswept_gravelly_hills")
+                    || path.equals("terrain/local/base_dark_forest")
+                    || path.equals("terrain/local/volcanic_basalt_cliffs")
+                    || path.equals("terrain/extended/volcanic_fallout")
+                    || path.equals("terrain/extended/volcanic_flows")
+                    || path.equals("terrain/feature/tepui_surface")
+                    || path.equals("terrain/feature/tepui_lakes")
+                    || trees && path.startsWith("vegetation/") && path.contains("/trees/");
+            case UNDERGROUND_DECORATION -> trees && (path.equals("terrain/local/grass_spread")
+                    || path.startsWith("vegetation/") && (path.contains("/trees/")
+                    || path.contains("/patch/flower_bluebells")));
+            case FLUID_SPRINGS -> path.startsWith("terrain/local/thermal_savanna_")
+                    || path.equals("terrain/local/thermal_taiga_white")
+                    || path.equals("terrain/feature/thermal_savanna_block_spikes");
             default -> false;
         };
+    }
+
+    private static boolean wythersOreStageVegetation(net.minecraft.resources.ResourceLocation id) {
+        return id != null && id.getNamespace().equals("wythers")
+                && (id.getPath().equals("vegetation/local/other/coral_disks")
+                || id.getPath().equals("vegetation/local/patch/dead_corals_on_gravel"));
+    }
+
+    /** WWOO 1.20.1 uses surface-height patches and a grass-to-mycelium ore replacement. */
+    private static boolean wythersOreStageSurfaceEdit(net.minecraft.resources.ResourceLocation id) {
+        if (id == null || !id.getNamespace().equals("wythers")) return false;
+        return switch (id.getPath()) {
+            case "terrain/local/red_sand_spread", "terrain/local/savanna_packed_mud",
+                    "terrain/local/snow_spread", "terrain/local/replace_grass_to_mycelium" -> true;
+            default -> false;
+        };
+    }
+
+    /** WWOO also uses the ore stage for a sea-level packed-mud-to-moss surface replacement. */
+    private static boolean surfaceMudReplacement(PlacedFeature feature) {
+        var configured = feature.feature().value();
+        if (configured.feature() != net.minecraft.world.level.levelgen.feature.Feature.ORE
+                || !(configured.config() instanceof net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration ore)
+                || ore.targetStates.size() != 1
+                || feature.placement().stream().noneMatch(modifier ->
+                        modifier instanceof net.minecraft.world.level.levelgen.placement.HeightRangePlacement)) return false;
+        var target = ore.targetStates.get(0);
+        return target.state.is(Blocks.MOSS_BLOCK)
+                && target.target instanceof net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest
+                && target.target.test(Blocks.PACKED_MUD.defaultBlockState(), net.minecraft.util.RandomSource.create(0))
+                && !target.target.test(Blocks.STONE.defaultBlockState(), net.minecraft.util.RandomSource.create(0));
     }
 
     /** Keep surface replacements and contiguous cuts, including air and irrigation water.

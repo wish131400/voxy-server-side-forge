@@ -18,11 +18,17 @@ allprojects {
         if (providers.gradleProperty('vssLithostitchedJar').isPresent()) {
             systemProperty 'vss.lithostitchedJar', providers.gradleProperty('vssLithostitchedJar').get()
         }
+        if (providers.gradleProperty('vssWwooJar').isPresent()) {
+            systemProperty 'vss.wwooJar', providers.gradleProperty('vssWwooJar').get()
+        }
         if (providers.gradleProperty('vssTectonicJar').isPresent()) {
             systemProperty 'vss.tectonicJar', providers.gradleProperty('vssTectonicJar').get()
         }
         if (providers.gradleProperty('vssVoxyJar').isPresent()) {
             systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+        }
+        if (providers.gradleProperty('vssLostCitiesJar').isPresent()) {
+            systemProperty 'vss.lostCitiesJar', providers.gradleProperty('vssLostCitiesJar').get()
         }
     }
 }

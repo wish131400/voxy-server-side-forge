@@ -7,6 +7,7 @@ import java.nio.*;
 import java.util.*;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -20,6 +21,7 @@ class PredictionProductionBatchGpuTest {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,4);glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,6);
         long window=glfwCreateWindow(128,128,"production batch",0,0);assertNotEquals(0,window);
         var gpuTiles=new ArrayList<PredictionGpuTile>();var textures=new ArrayList<Integer>();
+        String oldIndirect=System.getProperty("vss.disableIndirect");
         try {
             glfwMakeContextCurrent(window);GL.createCapabilities();RenderSystem.initRenderThread();
             PredictionMeshCodecTest.bootstrap();
@@ -32,11 +34,16 @@ class PredictionProductionBatchGpuTest {
                     var key=new PredictionTileManager.PredictionTileKey(net.minecraft.world.level.Level.OVERWORLD,t%4,t/4,0);
                     var tile=new PredictionTileManager.PredictionTile(key,new int[n],new int[n],new ClientColumnSample[n],mesh,
                             new PredictionDepthBound(60,80),0,t+1,mesh.cellAxis(),1);
-                    var gpu=new PredictionGpuTile(key);gpuTiles.add(gpu);assertTrue(gpu.ensureMesh(tile));assertNotNull(gpu.arenaSlice());
+                    var gpu=new PredictionGpuTile(key);gpuTiles.add(gpu);
+                    if(t%3==1)System.setProperty("vss.disableIndirect","true");
+                    else System.clearProperty("vss.disableIndirect");
+                    assertTrue(gpu.ensureMesh(tile));
+                    if(t%3==1)assertNull(gpu.arenaSlice());else assertNotNull(gpu.arenaSlice());
                     boolean[] allowed=new boolean[mesh.cellCount()];Arrays.fill(allowed,true);gpu.updateCoverage(allowed);
                     byte[] mask=new byte[allowed.length];for(int i=0;i<mask.length;i++)mask[i]=(byte)((i+t)%7==0?0:128);
                     gpu.updateBoundaryCoverage(mask);
-                    entries.add(new PredictionRenderer.Draw(tile,gpu,allowed,false,VssLodFaceGroup.ALL,0,null));max=Math.max(max,gpu.quadCount());
+                    entries.add(new PredictionRenderer.Draw(tile,gpu,allowed,false,VssLodFaceGroup.ALL,0,
+                            new AABB(tile.baseBlockX(),60,tile.baseBlockZ(),tile.baseBlockX()+tile.spanBlocks(),80,tile.baseBlockZ()+tile.spanBlocks())));max=Math.max(max,gpu.quadCount());
                 }
                 int[] indices=new int[max*6];int[] corners={0,1,2,0,2,3};
                 for(int q=0;q<max;q++)for(int c=0;c<6;c++)indices[q*6+c]=q*4+corners[c];
@@ -79,10 +86,24 @@ class PredictionProductionBatchGpuTest {
                         int sentinel=glGenBuffers();glBindBuffer(GL_SHADER_STORAGE_BUFFER,sentinel);glBufferData(GL_SHADER_STORAGE_BUFFER,256,GL_STATIC_DRAW);
                         glBindBufferRange(GL_SHADER_STORAGE_BUFFER,7,sentinel,0,128);glBindBuffer(GL_DRAW_INDIRECT_BUFFER,sentinel);
                         if(mode==1)batch.begin(program);
+                        List<PredictionRenderer.Draw> ordered = entries;
+                        if (mode == 1 && !water) {
+                            var groups = new PredictionOpaqueBatches();
+                            var grouped = new ArrayList<PredictionRenderer.Draw>();
+                            int count = groups.prepare(entries);
+                            for (int b = 0; b < count; b++) {
+                                var bucket = groups.bucket(b);
+                                for (var page : bucket.pages) grouped.addAll(page.draws);
+                                grouped.addAll(bucket.fallback);
+                            }
+                            assertEquals(new HashSet<>(entries), new HashSet<>(grouped));
+                            assertEquals(entries.size(), grouped.size());
+                            ordered = grouped;
+                        }
                         for(int i=0;i<entries.size();i++) {
-                            var draw=entries.get(water?entries.size()-1-i:i);var p=draw.gpu().packed();
+                            var draw=ordered.get(water?ordered.size()-1-i:i);var p=draw.gpu().packed();
                             var ranges=p.drawRanges(water,split?5:VssLodFaceGroup.ALL);if(ranges.quads==0)continue;
-                            if(mode==1 && i%3!=1){assertTrue(batch.add(draw,ranges,camera,water,true,Long.MAX_VALUE));continue;}
+                            if(mode==1 && batch.add(draw,ranges,camera,water,true,Long.MAX_VALUE))continue;
                             if(mode==1)batch.flush();
                             draw.gpu().bindTerrain(activeProgram);draw.gpu().bindYield(3);
                             activeProgram.setTile((float)(draw.tile().baseBlockX()-camera.x),(float)-camera.y,(float)(draw.tile().baseBlockZ()-camera.z),1,p.cellAxis(),true);
@@ -98,11 +119,46 @@ class PredictionProductionBatchGpuTest {
                     assertArrayEquals(pixels[0],pixels[1],"colors water="+water+" split="+split);assertArrayEquals(depths[0],depths[1]);
                     if(!water&&!split){int visible=0;for(int i=0;i<pixels[0].length;i+=4)if(pixels[0][i]!=0||pixels[0][i+1]!=0||pixels[0][i+2]!=0)visible++;assertTrue(visible>100);}
                 }
+                var groups = new PredictionOpaqueBatches();
+                var expanded = new ArrayList<PredictionRenderer.Draw>();
+                for (int i = 0; i < 8; i++) expanded.addAll(entries);
+                int groupCount = groups.prepare(expanded);
+                assertTrue(groupCount > 1);
+                var oldBucket = groups.bucket(groupCount - 1);
+                var oldPages = List.copyOf(oldBucket.pages);
+                assertFalse(oldPages.isEmpty());
+                groups.prepare(entries.subList(0, 1));
+                assertTrue(oldBucket.pages.isEmpty());
+                assertTrue(oldBucket.fallback.isEmpty());
+                for (var oldPage : oldPages) assertTrue(oldPage.draws.isEmpty(),
+                        "shrinking visibility must release obsolete tile references");
+                groups.clear();
+                assertTrue(groups.bucket(0).pages.isEmpty());
+                assertTrue(groups.bucket(0).fallback.isEmpty());
+                assertEquals(0, groups.prepare(List.of()));
                 benchmark(program,legacy,batch,entries,camera,VssLodFaceGroup.ALL);
                 benchmark(program,legacy,batch,entries,camera,5);
+                glEnable(GL_RASTERIZER_DISCARD);
+                try {
+                    program.use();
+                    batch.begin(program);
+                    for (var draw : entries) batch.add(draw, draw.gpu().packed().drawRanges(false, 5),
+                            camera, false, true, Long.MAX_VALUE);
+                    batch.end();
+                    assertTrue(batch.reusedBatches() > 0, "unchanged camera should reuse command buffers");
+                    batch.begin(program);
+                    Vec3 moved = camera.add(1, 0, 0);
+                    for (var draw : entries) batch.add(draw, draw.gpu().packed().drawRanges(false, 5),
+                            moved, false, true, Long.MAX_VALUE);
+                    batch.end();
+                    assertTrue(batch.uploadedBatches() > 0, "camera movement must refresh tile records");
+                } finally {
+                    glDisable(GL_RASTERIZER_DISCARD);
+                }
                 glDeleteBuffers(ebo);glDeleteVertexArrays(vao);
             }
         } finally {
+            if(oldIndirect==null)System.clearProperty("vss.disableIndirect");else System.setProperty("vss.disableIndirect",oldIndirect);
             for(var gpu:gpuTiles)gpu.close();glFinish();PredictionTerrainArena.SHARED.reap();PredictionTerrainArena.SHARED.close();
             for(int texture:textures)glDeleteTextures(texture);glfwDestroyWindow(window);glfwTerminate();
         }
@@ -115,23 +171,30 @@ class PredictionProductionBatchGpuTest {
             for(int round=-30;round<31;round++)for(int order=0;order<2;order++) {
                 int mode=Math.floorMod(round+order,2);glFinish();glBeginQuery(GL_TIME_ELAPSED,query);
                 long start=System.nanoTime();
-                var active=mode==1?program:legacy;active.use();active.setOpaqueAlpha(1);
-                if(mode==1)batch.begin(program);else legacy.batch(false);
+                var active=mode==0?legacy:program;active.use();active.setOpaqueAlpha(1);
+                if(mode!=0)batch.begin(program);else legacy.batch(false);
                 for(var draw:entries) {
                     var packed=draw.gpu().packed();var ranges=packed.drawRanges(false,faces);
-                    if(mode==1){batch.add(draw,ranges,camera,false,true,Long.MAX_VALUE);continue;}
+                    if(mode!=0){batch.add(draw,ranges,camera,false,true,Long.MAX_VALUE);continue;}
                     draw.gpu().bindTerrain(legacy);draw.gpu().bindYield(3);
                     legacy.setTile((float)(draw.tile().baseBlockX()-camera.x),(float)-camera.y,
                             (float)(draw.tile().baseBlockZ()-camera.z),1,packed.cellAxis(),true);
                     legacy.setBoundaryReplacement(true);PredictionRenderer.submitRanges(ranges);
                 }
-                if(mode==1)batch.end();long elapsed=System.nanoTime()-start;glEndQuery(GL_TIME_ELAPSED);
+                if(mode!=0) {
+                    batch.end();
+                    if (mode==1 && round > 2) assertTrue(batch.reusedBatches() > 0,
+                            "unchanged batch commands should remain resident");
+                }
+                long elapsed=System.nanoTime()-start;glEndQuery(GL_TIME_ELAPSED);
                 long device=glGetQueryObjectui64(query,GL_QUERY_RESULT);
                 if(round>=0){cpu[mode][round]=elapsed;gpu[mode][round]=device;}
             }
             for(var values:cpu)Arrays.sort(values);for(var values:gpu)Arrays.sort(values);
-            System.out.printf(Locale.ROOT,"PRODUCTION_BATCH faces=%d tiles=%d quads=%d cpuMs=%.6f->%.6f gpuMs=%.6f->%.6f%n",
-                    faces,entries.size(),entries.stream().mapToInt(d->d.gpu().quadCount()).sum(),cpu[0][15]/1e6,cpu[1][15]/1e6,gpu[0][15]/1e6,gpu[1][15]/1e6);
+            System.out.printf(Locale.ROOT,"PRODUCTION_BATCH faces=%d tiles=%d quads=%d cpuMs=legacy %.6f cached %.6f gpuMs=legacy %.6f cached %.6f%n",
+                    faces,entries.size(),entries.stream().mapToInt(d->d.gpu().quadCount()).sum(),
+                    cpu[0][15]/1e6,cpu[1][15]/1e6,
+                    gpu[0][15]/1e6,gpu[1][15]/1e6);
         }finally{glDisable(GL_RASTERIZER_DISCARD);glDeleteQueries(query);}
     }
     private static int tex(List<Integer> textures,int unit,int w,int h,int format,int channels,float[] data){
