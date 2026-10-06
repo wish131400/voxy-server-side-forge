@@ -47,3 +47,9 @@ __pycache__/
 /tools/prediction/*.md
 /tools/rust/*_20[0-9][0-9]-*.md
 /docs/PORT_*_SYNC_20[0-9][0-9]-*.md
+
+# Local packaged JAR archives, manifests and sampling screenshots.
+/lib/
+/minecraft-window.png
+/sampling-current.png
+/screen-now.png
