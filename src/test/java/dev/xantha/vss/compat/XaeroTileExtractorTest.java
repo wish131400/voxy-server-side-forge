@@ -28,9 +28,17 @@ class XaeroTileExtractorTest {
 
     @BeforeAll
     static void bootstrapMinecraft() {
+        if (net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get() == null) {
+            net.minecraftforge.fml.loading.FMLPaths.loadAbsolutePaths(
+                    java.nio.file.Path.of("build", "tmp", "xaero-tests"));
+        }
         LoadingModList.of(java.util.List.of(), java.util.List.of(), null);
+        dev.xantha.vss.client.prediction.ForgeTestBootstrap.prepare();
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            for (var state : block.getStateDefinition().getPossibleStates()) state.initCache();
+        }
         HolderLookup.RegistryLookup<net.minecraft.world.level.biome.Biome> lookup =
                 VanillaRegistries.createLookup().lookupOrThrow(Registries.BIOME);
         MappedRegistry<net.minecraft.world.level.biome.Biome> registry =

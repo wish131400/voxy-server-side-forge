@@ -41,6 +41,26 @@ public final class PersistentColumnWriter {
         }, e -> VSSLogger.debug("Persistent LOD write rejected: " + e.getMessage()));
     }
 
+    /** Unlike opportunistic writes, explicit pre-generation waits for disk acknowledgement. */
+    public boolean writeConfirmed(MinecraftServer server, ResourceKey<Level> dimension,
+            EncodedColumnData columnData, java.util.function.Consumer<Boolean> completion) {
+        if (VSSServerNetworking.isServerStopping() || !persistentStore.enabled()
+                || columnData == null || !isWriteFresh(dimension, columnData)) {
+            completion.accept(false);
+            return true;
+        }
+        long epoch = VSSServerNetworking.lifecycleEpoch();
+        return diskRuntime.submitWriteUnrestricted(() -> {
+            boolean saved = false;
+            try {
+                saved = !VSSServerNetworking.isLifecycleStale(epoch) && isWriteFresh(dimension, columnData)
+                        && persistentStore.writeConfirmed(server, dimension, columnData);
+            } finally {
+                completion.accept(saved);
+            }
+        }, error -> { });
+    }
+
     public synchronized void invalidate(ResourceKey<Level> dimension, int cx, int cz, long dirtyTimestamp) {
         if (VSSServerNetworking.isServerStopping() || !persistentStore.enabled()) {
             return;

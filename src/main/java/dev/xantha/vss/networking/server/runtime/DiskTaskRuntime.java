@@ -41,12 +41,44 @@ public final class DiskTaskRuntime {
     private final Object executorLock = new Object();
     private volatile ThreadPoolExecutor readExecutor;
     private volatile ThreadPoolExecutor writeExecutor;
+    private volatile boolean unrestrictedMode;
 
     public DiskTaskRuntime(int minThreads, int maxThreads, IntSupplier readThreadSupplier, BooleanSupplier acceptingTasks) {
         this.minThreads = minThreads;
         this.maxThreads = maxThreads;
         this.readThreadSupplier = readThreadSupplier;
         this.acceptingTasks = acceptingTasks;
+    }
+
+    public boolean submitReadUnrestricted(Runnable task, Consumer<RejectedExecutionException> onRejected) {
+        return readTasks.submitUnrestricted(task, onRejected);
+    }
+
+    public boolean submitWriteUnrestricted(Runnable task, Consumer<RejectedExecutionException> onRejected) {
+        return writeTasks.submitUnrestricted(task, onRejected);
+    }
+
+    public void setUnrestrictedMode(boolean unrestricted) {
+        synchronized (executorLock) {
+            unrestrictedMode = unrestricted;
+            if (isExecutorRunning(readExecutor)) resizeExecutor(readExecutor, desiredReadThreads());
+            if (isExecutorRunning(writeExecutor))
+                resizeExecutor(writeExecutor, unrestricted ? hardwareThreads() : 1);
+        }
+    }
+
+    private static int hardwareThreads() {
+        return Math.max(1, Runtime.getRuntime().availableProcessors());
+    }
+
+    private static void resizeExecutor(ThreadPoolExecutor executor, int threads) {
+        if (threads > executor.getMaximumPoolSize()) {
+            executor.setMaximumPoolSize(threads);
+            executor.setCorePoolSize(threads);
+        } else {
+            executor.setCorePoolSize(threads);
+            executor.setMaximumPoolSize(threads);
+        }
     }
 
     public boolean submitRead(int limit, Runnable task, Consumer<RejectedExecutionException> onRejected) {
@@ -188,6 +220,7 @@ public final class DiskTaskRuntime {
     }
 
     public void restart() {
+        unrestrictedMode = false;
         ThreadPoolExecutor oldRead;
         ThreadPoolExecutor oldWrite;
         synchronized (executorLock) {
@@ -201,6 +234,7 @@ public final class DiskTaskRuntime {
     }
 
     public void shutdown() {
+        unrestrictedMode = false;
         ThreadPoolExecutor oldRead;
         ThreadPoolExecutor oldWrite;
         synchronized (executorLock) {
@@ -328,7 +362,7 @@ public final class DiskTaskRuntime {
     }
 
     private ThreadPoolExecutor createDiskExecutor(String threadName, int threads, boolean read) {
-        int clampedThreads = Math.max(minThreads, Math.min(maxThreads, threads));
+        int clampedThreads = unrestrictedMode ? hardwareThreads() : Math.max(minThreads, Math.min(maxThreads, threads));
         AtomicInteger threadId = new AtomicInteger();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 clampedThreads,
@@ -347,7 +381,7 @@ public final class DiskTaskRuntime {
     }
 
     private int desiredReadThreads() {
-        return Math.max(minThreads, Math.min(maxThreads, readThreadSupplier.getAsInt()));
+        return unrestrictedMode ? hardwareThreads() : Math.max(minThreads, Math.min(maxThreads, readThreadSupplier.getAsInt()));
     }
 
     private static int preloadLimit(int totalLimit, int reservedManualSlots) {

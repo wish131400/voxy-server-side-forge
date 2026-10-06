@@ -10,6 +10,14 @@ import java.lang.reflect.Field;
 import org.junit.jupiter.api.Test;
 
 class LodRequestManagerXaeroBackfillTest {
+    @org.junit.jupiter.api.BeforeAll
+    static void initializeConfigDirectory() throws Exception {
+        if (net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get() == null) {
+            net.minecraftforge.fml.loading.FMLPaths.loadAbsolutePaths(
+                    java.nio.file.Files.createTempDirectory("vss-xaero-backfill-test"));
+        }
+    }
+
     @Test
     void cacheMissKeepsKnownVssPresence() throws Exception {
         ClientRequestTracker tracker = new ClientRequestTracker(ignored -> {

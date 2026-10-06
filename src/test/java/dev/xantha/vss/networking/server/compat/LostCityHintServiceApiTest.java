@@ -1,6 +1,7 @@
 package dev.xantha.vss.networking.server.compat;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.lang.reflect.Proxy;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -25,20 +26,22 @@ class LostCityHintServiceApiTest {
                 count.incrementAndGet();
                 boolean building = x == -8 && z == -16;
                 return Proxy.newProxyInstance(loader, new Class<?>[] {chunkType}, (p, m, a) -> switch (m.getName()) {
-                    case "getBuildingId" -> building ? ResourceLocation.parse("lostcities:building1") : null;
+                    case "getBuildingId" -> building ? new ResourceLocation("lostcities:building1") : null;
                     case "isCity" -> building;
                     case "getCityLevel" -> 2;
                     case "getNumFloors" -> 4;
+                    case "getCityStyle" -> null;
                     default -> throw new AssertionError(m.getName());
                 });
             });
-            int[] summary = LostCityHintService.query(info, -1, -2);
+            var summary = LostCityHintService.query(info, -1, -2);
             assertEquals(64, count.get());
-            assertEquals(64, summary.length);
-            assertEquals(2, summary[0] & 3);
-            assertEquals(76, (short) (summary[0] >>> 2));
-            assertEquals(4, summary[0] >>> 18 & 127);
-            for (int i = 1; i < summary.length; i++) assertEquals(0, summary[i]);
+            assertEquals(64, summary.size());
+            assertEquals(2, summary.get(0).kind());
+            assertEquals(76, summary.get(0).ground());
+            assertTrue(summary.get(0).floors().isEmpty(),
+                    "the API proxy has no BuildingInfo template methods, so it should use the bounded surface summary");
+            for (int i = 1; i < summary.size(); i++) assertEquals(0, summary.get(i).kind());
         }
     }
 }

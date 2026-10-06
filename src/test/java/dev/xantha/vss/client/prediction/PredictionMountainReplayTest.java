@@ -32,7 +32,7 @@ class PredictionMountainReplayTest {
         var profile=new dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload.DimensionProfile(
                 new net.minecraft.resources.ResourceLocation("minecraft", "overworld"),-64,384,"noise","minecraft:overworld",0);
         var javaSampler=new ClientTerrainSampler(seed,profile,generator,random,
-                net.minecraft.world.level.LevelHeightAccessor.create(-64,384),63,List.of());
+                net.minecraft.world.level.LevelHeightAccessor.create(-64,384),63);
         try(var rust=new RustTerrainSampler(RustWorldgenBackend.create(seed,0,doc.toString()),profile,javaSampler)) {
             var batchInput = java.nio.ByteBuffer.allocateDirect(40).order(java.nio.ByteOrder.LITTLE_ENDIAN);
             for (int index = 0; index < 2; index++) {

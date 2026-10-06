@@ -291,6 +291,12 @@ public final class VoxelColumnS2CPayload {
         return sectionBytes != null ? sectionBytes.length : encodedRawSize;
     }
 
+    public boolean sameSectionData(VoxelColumnS2CPayload other) {
+        return encodedCompression == other.encodedCompression && encodedRawSize == other.encodedRawSize
+                && Arrays.equals(sectionBytes, other.sectionBytes)
+                && Arrays.equals(encodedSectionBytes, other.encodedSectionBytes);
+    }
+
     public int rawEstimatedBytes() {
         return rawSectionBytesLength() + VSSConstants.ESTIMATED_COLUMN_OVERHEAD_BYTES;
     }

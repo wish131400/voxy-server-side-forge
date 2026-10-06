@@ -74,6 +74,7 @@ sourceSets {
             include 'icon.png'
             include 'vss.compat.mixins.json'
             include 'vss.strict.mixins.json'
+            include 'vss.lostcities.mixins.json'
             include 'vss.refmap.json'
             include 'assets/vss/**'
         }
@@ -111,6 +112,7 @@ mixin {
     add sourceSets.main, 'vss.refmap.json'
     config 'vss.compat.mixins.json'
     config 'vss.strict.mixins.json'
+    config 'vss.lostcities.mixins.json'
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -140,7 +142,7 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : mod_authors,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'MixinConfigs'            : 'vss.compat.mixins.json,vss.strict.mixins.json'
+                'MixinConfigs'            : 'vss.compat.mixins.json,vss.strict.mixins.json,vss.lostcities.mixins.json'
         ])
     }
 

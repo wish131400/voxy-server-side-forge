@@ -55,6 +55,7 @@ public final class ChunkGenerationService {
     private final Map<UUID, Integer> perPlayerQueuedCount = new HashMap<>();
     private final Map<RequestKey, GenerationLocation> requestIndex = new HashMap<>();
     private final Map<UUID, Set<RequestKey>> playerRequestIndex = new HashMap<>();
+    private final Set<UUID> backgroundOwners = new HashSet<>();
     private final Map<UUID, PlayerGenerationView> playerGenerationViews = new HashMap<>();
     private final Map<UUID, PlayerGenerationView> lastPrunedPlayerViews = new HashMap<>();
     private final ConcurrentLinkedQueue<PackingResult> completedPackingResults = new ConcurrentLinkedQueue<>();
@@ -114,7 +115,7 @@ public final class ChunkGenerationService {
         }
         ThreadPoolExecutor executor = this.packingExecutor;
         if (executor != null && !executor.isShutdown()) {
-            resizePackingExecutor(executor, config.automaticGenerationPackingThreads());
+            resizePackingExecutor(executor, packingThreadCount());
         }
     }
 
@@ -165,8 +166,9 @@ public final class ChunkGenerationService {
 
         PendingGeneration existing = active.get(key);
         if (existing != null) {
-            if (perPlayerActiveCount.getOrDefault(playerUuid, 0)
-                    >= config.generationConcurrencyLimitPerPlayer) {
+            if (!backgroundOwners.contains(playerUuid)
+                    && (perPlayerActiveCount.getOrDefault(playerUuid, 0) >= config.generationConcurrencyLimitPerPlayer
+                    || (!hasRegularCallback(existing) && regularActiveCount() >= config.generationConcurrencyLimitGlobal))) {
                 totalQueueRejected++;
                 return false;
             }
@@ -179,9 +181,9 @@ public final class ChunkGenerationService {
 
         PendingGeneration queuedGeneration = queued.get(key);
         if (queuedGeneration != null) {
-            if (callbackCountForPlayer(queuedGeneration, playerUuid)
-                    >= config.generationConcurrencyLimitPerPlayer
-                    || !ensureQueueCapacityFor(playerUuid, queuedGeneration)) {
+            if (!backgroundOwners.contains(playerUuid)
+                    && (callbackCountForPlayer(queuedGeneration, playerUuid) >= config.generationConcurrencyLimitPerPlayer
+                    || !ensureQueueCapacityFor(playerUuid, queuedGeneration))) {
                 totalQueueRejected++;
                 return false;
             }
@@ -327,10 +329,10 @@ public final class ChunkGenerationService {
                 continue;
             }
 
-            if (processedThisTick >= config.automaticGenerationCompletionsPerTick()) {
+            if (backgroundOwners.isEmpty() && processedThisTick >= config.automaticGenerationCompletionsPerTick()) {
                 continue;
             }
-            if (!canSubmitPackingTask(generation.priority())) {
+            if (!hasBackgroundCallback(generation) && !canSubmitPackingTask(generation.priority())) {
                 continue;
             }
 
@@ -339,7 +341,7 @@ public final class ChunkGenerationService {
             try {
                 SectionSerializer.ColumnSnapshot snapshot = SectionSerializer.snapshotColumn(
                         generation.level, chunk, generation.pos.x, generation.pos.z);
-                if (!canSubmitPackingTask(generation.priority(), snapshot)) {
+                if (!hasBackgroundCallback(generation) && !canSubmitPackingTask(generation.priority(), snapshot)) {
                     totalPackingRejected++;
                     continue;
                 }
@@ -352,6 +354,9 @@ public final class ChunkGenerationService {
             } catch (Exception e) {
                 if (e instanceof RejectedExecutionException) {
                     totalPackingRejected++;
+                    // Capacity pressure keeps the FULL ticket; retry without regenerating or failing the column.
+                    if (backgroundOwners.isEmpty()) break;
+                    continue;
                 }
                 VSSLogger.error("Failed to snapshot generated chunk at " + generation.pos.x + ", " + generation.pos.z, e);
                 for (GenerationCallback callback : generation.callbacks) {
@@ -436,6 +441,18 @@ public final class ChunkGenerationService {
         cancelIndexedRequest(new RequestKey(playerUuid, requestId), true);
     }
 
+    /** Explicit pre-generation bypasses admission quotas and survives movement/logout. */
+    public synchronized void registerBackgroundOwner(UUID ownerUuid) {
+        backgroundOwners.add(ownerUuid);
+        applyRuntimeConfig();
+    }
+
+    public synchronized void removeBackgroundOwner(UUID ownerUuid) {
+        backgroundOwners.remove(ownerUuid);
+        removePlayer(ownerUuid);
+        applyRuntimeConfig();
+    }
+
     public synchronized void removePlayer(UUID playerUuid) {
         Set<RequestKey> indexedRequests = playerRequestIndex.get(playerUuid);
         if (indexedRequests != null) {
@@ -470,6 +487,7 @@ public final class ChunkGenerationService {
         perPlayerQueuedCount.clear();
         requestIndex.clear();
         playerRequestIndex.clear();
+        backgroundOwners.clear();
         playerGenerationViews.clear();
         lastPrunedPlayerViews.clear();
     }
@@ -574,14 +592,13 @@ public final class ChunkGenerationService {
     }
 
     private void promoteQueued() {
-        if (!config.enableChunkGeneration || queued.isEmpty() || startsThisTick >= config.automaticGenerationStartsPerTick()) {
+        if (!config.enableChunkGeneration || queued.isEmpty() || !startsAvailableThisTick()) {
             return;
         }
 
         ArrayList<QueuedGenerationEntry> blocked = new ArrayList<>();
         try {
-            while (active.size() < config.generationConcurrencyLimitGlobal
-                    && startsThisTick < config.automaticGenerationStartsPerTick()) {
+            while (startsAvailableThisTick()) {
                 QueuedSelection selection = selectNearestStartableQueuedGeneration(blocked);
                 if (selection == null) {
                     break;
@@ -631,21 +648,36 @@ public final class ChunkGenerationService {
     }
 
     private boolean canStart(PendingGeneration generation) {
-        if (active.size() >= config.generationConcurrencyLimitGlobal) {
+        if (!hasRegularCallback(generation)) return true;
+        if (regularActiveCount() >= config.generationConcurrencyLimitGlobal)
             return false;
-        }
-        return GenerationSchedulingPolicy.hasPerPlayerCapacity(
-                perPlayerActiveCount,
-                generation.callbacks.stream()
-                        .map(GenerationCallback::playerUuid)
-                        .toList(),
-                config.generationConcurrencyLimitPerPlayer);
+        return GenerationSchedulingPolicy.hasPerPlayerCapacity(perPlayerActiveCount,
+                generation.callbacks.stream().map(GenerationCallback::playerUuid).toList(),
+                config.generationConcurrencyLimitPerPlayer, backgroundOwners);
+    }
+
+    private boolean hasBackgroundCallback(PendingGeneration generation) {
+        for (GenerationCallback callback : generation.callbacks)
+            if (backgroundOwners.contains(callback.playerUuid())) return true;
+        return false;
+    }
+
+    private boolean hasRegularCallback(PendingGeneration generation) {
+        for (GenerationCallback callback : generation.callbacks)
+            if (!backgroundOwners.contains(callback.playerUuid())) return true;
+        return false;
+    }
+
+    private int regularActiveCount() {
+        if (backgroundOwners.isEmpty()) return active.size();
+        int count = 0;
+        for (PendingGeneration generation : active.values()) if (hasRegularCallback(generation)) count++;
+        return count;
     }
 
     private boolean canQueue(UUID playerUuid) {
-        int queuedForPlayer = perPlayerQueuedCount.getOrDefault(playerUuid, 0);
-        int maxQueuedForPlayer = Math.max(1, config.generationConcurrencyLimitPerPlayer);
-        return queuedForPlayer < maxQueuedForPlayer;
+        return backgroundOwners.contains(playerUuid)
+                || perPlayerQueuedCount.getOrDefault(playerUuid, 0) < Math.max(1, config.generationConcurrencyLimitPerPlayer);
     }
 
     private static int callbackCountForPlayer(PendingGeneration generation, UUID playerUuid) {
@@ -749,6 +781,7 @@ public final class ChunkGenerationService {
     }
 
     private PlayerGenerationView currentGenerationView(UUID playerUuid, ServerLevel level) {
+        if (backgroundOwners.contains(playerUuid)) return null;
         ServerPlayer player = level.getServer().getPlayerList().getPlayer(playerUuid);
         if (player != null) {
             PlayerGenerationView view = PlayerGenerationView.from(player);
@@ -780,8 +813,12 @@ public final class ChunkGenerationService {
         return PositionUtil.chebyshevDistance(generation.pos.x, generation.pos.z, view.chunkX(), view.chunkZ());
     }
 
+    private boolean startsAvailableThisTick() {
+        return !backgroundOwners.isEmpty() || startsThisTick < config.automaticGenerationStartsPerTick();
+    }
+
     private boolean tryStartThisTick() {
-        if (startsThisTick >= config.automaticGenerationStartsPerTick()) {
+        if (!startsAvailableThisTick()) {
             return false;
         }
         startsThisTick++;
@@ -839,6 +876,8 @@ public final class ChunkGenerationService {
     }
 
     private boolean canSubmitPackingTask(boolean priority) {
+        if (packingSnapshotBytes.get() >= Math.max(SNAPSHOT_ESTIMATE_BYTES_PER_SECTION, config.packingQueueMaxBytes))
+            return false;
         ThreadPoolExecutor executor = packingExecutor();
         int queueLimit = config.automaticGenerationPackingQueueLimit();
         if (priority) {
@@ -972,9 +1011,10 @@ public final class ChunkGenerationService {
 
     private void drainPackingResults(List<GenerationResult> results) {
         PackingResult packingResult;
-        long deadline = System.nanoTime() + PACKING_COMPLETION_BUDGET_NANOS;
+        long deadline = backgroundOwners.isEmpty() ? System.nanoTime() + PACKING_COMPLETION_BUDGET_NANOS : Long.MAX_VALUE;
         int drained = 0;
-        int maxCompletions = Math.max(1, config.automaticGenerationCompletionsPerTick());
+        int maxCompletions = backgroundOwners.isEmpty()
+                ? Math.max(1, config.automaticGenerationCompletionsPerTick()) : Integer.MAX_VALUE;
         while (drained++ < maxCompletions
                 && System.nanoTime() <= deadline
                 && (packingResult = completedPackingResults.poll()) != null) {
@@ -1011,14 +1051,19 @@ public final class ChunkGenerationService {
         }
     }
 
+    private int packingThreadCount() {
+        return backgroundOwners.isEmpty() ? config.automaticGenerationPackingThreads()
+                : Math.max(1, Runtime.getRuntime().availableProcessors());
+    }
+
     private ThreadPoolExecutor packingExecutor() {
         ThreadPoolExecutor executor = this.packingExecutor;
         if (executor != null && !executor.isShutdown()) {
-            resizePackingExecutor(executor, config.automaticGenerationPackingThreads());
+            resizePackingExecutor(executor, packingThreadCount());
             return executor;
         }
 
-        int threads = config.automaticGenerationPackingThreads();
+        int threads = packingThreadCount();
         ThreadPoolExecutor created = new ThreadPoolExecutor(
                 threads,
                 threads,
@@ -1127,6 +1172,7 @@ public final class ChunkGenerationService {
 
         boolean rebuildPriority = false;
         for (UUID playerUuid : List.copyOf(playerRequestIndex.keySet())) {
+            if (backgroundOwners.contains(playerUuid)) continue;
             ServerPlayer player = server.getPlayerList().getPlayer(playerUuid);
             if (player == null) {
                 pruneAllRequestsForPlayer(playerUuid, results);

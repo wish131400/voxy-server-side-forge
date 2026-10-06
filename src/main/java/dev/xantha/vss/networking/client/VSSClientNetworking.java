@@ -46,6 +46,8 @@ public final class VSSClientNetworking {
     private static volatile boolean waitingForHandshake;
     private static volatile boolean handshakeSent;
     private static int handshakeRetryTicks;
+    private static boolean predictionOptionKnown;
+    private static boolean lastPredictionActive;
     private static final PredictionCapabilitySync PREDICTION_CAPABILITY_SYNC = new PredictionCapabilitySync();
     private static volatile LodRequestManager requestManager;
     private static final ClientColumnProcessor COLUMN_PROCESSOR = new ClientColumnProcessor();
@@ -88,7 +90,7 @@ public final class VSSClientNetworking {
         return serverLodDistance;
     }
 
-    /** Returns the authoritative VSS radius after server, client and Voxy limits. */
+    /** Returns the VSS request radius; Voxy's own render distance is independent. */
     public static int getEffectiveLodDistanceChunks() {
         LodRequestManager manager = requestManager;
         if (manager != null) {
@@ -102,8 +104,7 @@ public final class VSSClientNetworking {
         if (clientDistance > 0) {
             return Math.min(Math.min(clientDistance, serverLodDistance), hardClientLimit);
         }
-        int voxyDistance = ModCompat.getVoxyViewDistanceChunks().orElse(hardClientLimit);
-        return Math.min(Math.min(serverLodDistance, voxyDistance), hardClientLimit);
+        return Math.min(serverLodDistance, hardClientLimit);
     }
 
     public static int getServerCapabilities() {
@@ -193,6 +194,12 @@ public final class VSSClientNetworking {
                 COLUMN_PROCESSOR.beginSession();
             }
             requestManager = manager;
+            if (newSession) {
+                predictionOptionKnown = true;
+                lastPredictionActive = isPredictionActive();
+            } else {
+                syncPredictionOption(manager);
+            }
             sendBandwidthPreference();
 
             boolean hasConsumers = VSSApi.hasVoxelConsumers();
@@ -207,6 +214,8 @@ public final class VSSClientNetworking {
                     + ", reset=" + requestStateReset
                     + ", consumers=" + hasConsumers);
         } else {
+            predictionOptionKnown = false;
+            lastPredictionActive = false;
             LodRequestManager manager = requestManager;
             requestManager = null;
             if (manager != null) {
@@ -250,6 +259,10 @@ public final class VSSClientNetworking {
                 case VSSConstants.RESPONSE_UP_TO_DATE -> manager.onColumnUpToDate(requestId);
                 case VSSConstants.RESPONSE_NOT_GENERATED -> manager.onColumnNotGenerated(requestId);
                 case VSSConstants.RESPONSE_GENERATION_QUEUED -> manager.onGenerationQueued(requestId);
+                case VSSConstants.RESPONSE_COLUMN_QUEUED -> {
+                    manager.onColumnQueued(requestId);
+                    COLUMN_PROCESSOR.onColumnQueued(requestId);
+                }
                 default -> VSSLogger.warn("Unknown batch response type: " + payload.responseTypes()[i]);
             }
         }
@@ -264,11 +277,11 @@ public final class VSSClientNetworking {
         }
         LodRequestManager manager = requestManager;
         if (manager != null) {
-            manager.onDirtyColumns(payload.dirtyPositions(), payload.dirtyTimestamps());
+            long[] changed = manager.onDirtyColumns(payload.dirtyPositions(), payload.dirtyTimestamps());
             ClientLevel level = Minecraft.getInstance().level;
-            if (level != null) {
-                COLUMN_PROCESSOR.invalidatePositions(level.dimension(), payload.dirtyPositions());
-                ClientPredictionState.onDirtyColumns(level.dimension(), payload.dirtyPositions());
+            if (level != null && changed.length > 0) {
+                COLUMN_PROCESSOR.invalidatePositions(level.dimension(), changed);
+                ClientPredictionState.onDirtyColumns(level.dimension(), changed);
             }
         }
     }
@@ -463,6 +476,8 @@ public final class VSSClientNetworking {
         handshakeSent = false;
         handshakeRetryTicks = 0;
         PREDICTION_CAPABILITY_SYNC.reset();
+        predictionOptionKnown = false;
+        lastPredictionActive = false;
         requestManager = null;
         if (!VSSClientConfig.CONFIG.receiveServerLods) {
             return;
@@ -474,6 +489,12 @@ public final class VSSClientNetworking {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         stopClientSessionForWorldShutdown();
+    }
+
+    @SubscribeEvent
+    public static void onTagsUpdated(net.minecraftforge.event.TagsUpdatedEvent event) {
+        if (event.getUpdateCause() == net.minecraftforge.event.TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED)
+            Minecraft.getInstance().execute(ClientPredictionState::tagsChanged);
     }
 
     @SubscribeEvent
@@ -494,6 +515,7 @@ public final class VSSClientNetworking {
                 () -> sendHandshake("Prediction capability update failed: "));
         LodRequestManager manager = requestManager;
         if (manager != null && serverEnabled) {
+            syncPredictionOption(manager);
             manager.tick();
         }
         ClientPredictionState.tick();
@@ -607,6 +629,7 @@ public final class VSSClientNetworking {
 
     private static int clientCapabilities() {
         int clientCaps = VSSApi.hasVoxelConsumers() ? VSSConstants.CAPABILITY_VOXEL_COLUMNS : 0;
+        clientCaps |= VSSConstants.CAPABILITY_QUEUED_ACKNOWLEDGEMENTS;
         if (ModCompat.isVoxyLoaded()) clientCaps |= VSSConstants.CAPABILITY_STRICT_LOD_ORDER;
         if (VSSClientConfig.CONFIG.enablePrediction) {
             clientCaps |= VSSConstants.CAPABILITY_PREDICTIVE_WORLDGEN;
@@ -652,6 +675,8 @@ public final class VSSClientNetworking {
 
     private static void stopClientSession(boolean resetStats) {
         PREDICTION_CAPABILITY_SYNC.reset();
+        predictionOptionKnown = false;
+        lastPredictionActive = false;
         WORLDGEN_ASSEMBLY.clear();
         dev.xantha.vss.compat.StrictLodVisibility.reset();
         ClientPredictionState.clear();
@@ -678,6 +703,22 @@ public final class VSSClientNetworking {
             bytesReceived.set(0);
             lastColumnReceiveDiagnosticNanos = 0L;
         }
+    }
+
+    private static void syncPredictionOption(LodRequestManager manager) {
+        boolean active = isPredictionActive();
+        if (!predictionOptionKnown) {
+            predictionOptionKnown = true;
+            lastPredictionActive = active;
+            return;
+        }
+        if (active == lastPredictionActive) {
+            return;
+        }
+        lastPredictionActive = active;
+        manager.onPredictionOptionChanged(active);
+        VSSLogger.debug("VSS prediction option changed at runtime: "
+                + (active ? "enabled; generation priority reset" : "disabled; near generation resumed"));
     }
 
     private static void logColumnReceive(VoxelColumnS2CPayload payload) {

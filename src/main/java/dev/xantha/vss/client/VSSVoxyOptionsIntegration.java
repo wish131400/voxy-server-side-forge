@@ -3,6 +3,7 @@ package dev.xantha.vss.client;
 import com.google.common.collect.ImmutableList;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.config.VSSClientConfig;
+import dev.xantha.vss.config.PredictionVegetationDensity;
 import dev.xantha.vss.config.VSSServerConfig;
 import dev.xantha.vss.networking.client.VSSClientNetworking;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
@@ -405,11 +406,23 @@ public final class VSSVoxyOptionsIntegration {
                 .build());
 
         groups.add(OptionGroup.createBuilder()
-                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
+                .add(OptionImpl.createBuilder(PredictionVegetationDensity.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.prediction_trees"))
                         .setTooltip(Component.translatable("vss.voxy_options.prediction_trees.tooltip"))
+                        .setControl(option -> new CyclingControl<>(option, PredictionVegetationDensity.class,
+                                new Component[]{
+                                        Component.translatable("vss.voxy_options.vegetation_low"),
+                                        Component.translatable("vss.voxy_options.vegetation_medium"),
+                                        Component.translatable("vss.voxy_options.vegetation_high")}))
+                        .setBinding((config, value) -> config.predictionVegetationDensity = value.configName(),
+                                config -> PredictionVegetationDensity.fromName(config.predictionVegetationDensity))
+                        .setImpact(OptionImpact.HIGH).build())
+                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
+                        .setName(Component.translatable("vss.voxy_options.prediction_spyglass_loading"))
+                        .setTooltip(Component.translatable("vss.voxy_options.prediction_spyglass_loading.tooltip"))
                         .setControl(TickBoxControl::new)
-                        .setBinding((config, value) -> config.predictionTrees = value, config -> config.predictionTrees)
+                        .setBinding((config, value) -> config.predictionSpyglassLoading = value,
+                                config -> config.predictionSpyglassLoading)
                         .setImpact(OptionImpact.HIGH).build())
                 .add(OptionImpl.createBuilder(boolean.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.prediction_antialiasing"))

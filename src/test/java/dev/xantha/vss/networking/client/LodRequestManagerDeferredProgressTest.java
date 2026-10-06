@@ -89,13 +89,15 @@ class LodRequestManagerDeferredProgressTest {
     }
 
     @Test
-    void outsideFrontierIsStillDeferred() throws Exception {
+    void distantDeferredGenerationIsNotBlockedByOldPredictionFrontier() throws Exception {
         Fixture f = new Fixture();
         field("softFrontierRadius").setInt(f.manager, 16);
         long far = f.defer(40, true);
-        assertEquals(0, f.drain(window(2, 0), 96));
-        assertTrue(f.queue.contains(far));
-        assertEquals(0, f.tracker.size());
+        assertEquals(1, f.drain(window(2, 0), 96));
+        assertEquals(far, f.positions[0]);
+        assertTrue(f.allowGeneration[0]);
+        assertFalse(f.queue.contains(far));
+        assertEquals(1, f.tracker.size());
     }
 
     @Test
@@ -310,15 +312,13 @@ class LodRequestManagerDeferredProgressTest {
         @SuppressWarnings({"unchecked", "rawtypes"})
         int drain(RequestWindow window, int limit, LodRequestManager.ScanBudget budget) throws Exception {
             Class<?> budgetClass = LodRequestManager.ScanBudget.class;
-            Class<?> modeClass = Class.forName(LodRequestManager.class.getName() + "$DeferredDrainMode");
-            Object mode = Enum.valueOf((Class) modeClass, "ALL");
             Method drain = LodRequestManager.class.getDeclaredMethod("drainDeferredColumns",
                     int.class, int.class, int.class, int.class, int[].class, long[].class, long[].class,
                     boolean[].class, boolean[].class, int.class, int.class, RequestWindow.class,
-                    long.class, int.class, budgetClass, modeClass);
+                    long.class, budgetClass);
             drain.setAccessible(true);
             return (int) drain.invoke(manager, 0, 0, 128, 0, new int[96], positions, new long[96],
-                    allowGeneration, probes, 0, limit, window, now, 128, budget, mode);
+                    allowGeneration, probes, 0, limit, window, now, budget);
         }
     }
 }

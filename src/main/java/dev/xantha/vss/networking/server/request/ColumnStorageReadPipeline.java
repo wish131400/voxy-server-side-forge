@@ -238,6 +238,10 @@ public final class ColumnStorageReadPipeline {
             DiskReadContext readContext,
             PersistentColumnLodStore.Entry storedData,
             long dirtyTimestamp) {
+        if (readContext.requestState().consumeCancelled(readContext.requestId())
+                || !readContext.requestState().isActiveRequest(readContext.requestId())) {
+            return;
+        }
         try {
             if (VSSServerNetworking.isLifecycleStale(readContext.lifecycleEpoch())) {
                 return;
@@ -484,7 +488,7 @@ public final class ColumnStorageReadPipeline {
         long columnTimestamp = readContext.columnTimestamp();
         ServerPlayer player = level.getServer().getPlayerList().getPlayer(readContext.playerId());
         if (player == null || !playerRegistry.isCurrent(readContext.playerId(), requestState)
-                || requestState.consumeCancelled(requestId)) {
+                || requestState.consumeCancelled(requestId) || !requestState.isActiveRequest(requestId)) {
             return;
         }
         if (!player.serverLevel().dimension().equals(level.dimension())) {

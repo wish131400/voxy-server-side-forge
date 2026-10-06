@@ -50,6 +50,16 @@ public final class TrackedTaskExecutor {
             reject(onRejected, "VSS disk task queue is full");
             return false;
         }
+        return submitTracked(pendingTask, task, onRejected, priority);
+    }
+
+    boolean submitUnrestricted(Runnable task, Consumer<RejectedExecutionException> onRejected) {
+        Objects.requireNonNull(task, "task");
+        return submitTracked(beginTask(), task, onRejected, 0);
+    }
+
+    private boolean submitTracked(PendingTask pendingTask, Runnable task,
+            Consumer<RejectedExecutionException> onRejected, int priority) {
         try {
             executorSupplier.get().execute(new PrioritizedRunnable(priority, () -> {
                 try {

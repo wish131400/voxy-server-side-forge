@@ -47,23 +47,17 @@ class PredictionSamplingWorkTest {
             @Override public double maxValue() { return 1; }
         });
         var full = sampler.sample(-64, -64);
-        int fullCalls = calls.getAndSet(0);
-        assertTrue(fullCalls > 0, "fixture must exercise the old underground scan");
+        assertEquals(0, calls.get(), "the public entry point must use the same surface pipeline");
         for (int step : new int[]{1, 2, 4, 8, 16, 128}) {
             var surface = sampler.sampleForLod(-64, -64, step);
-            assertEquals(full.surfaceY(), surface.surfaceY());
-            assertEquals(full.topBlockIndex(), surface.topBlockIndex());
-            assertEquals(full.fluidY(), surface.fluidY());
-            assertEquals(full.fluid(), surface.fluid());
-            assertEquals(full.snow(), surface.snow());
-            assertEquals(full.ice(), surface.ice());
+            assertEquals(full, surface);
             assertTrue(surface.surfaceOnly());
             assertFalse(surface.floating());
         }
         var level = new PredictionDecorationLevel(sampler, sampler, RegistryAccess.EMPTY, -4, -4);
         assertEquals(160, level.column(-64, -64).surfaceY());
         assertEquals(0, calls.get(), "surface tiles and decoration must not scan underground at any LOD");
-        System.out.println("Underground density evaluations per fixture column: old=" + fullCalls + ", surface=0");
+        assertEquals(full, sampler.sampleSurface(-64, -64));
     }
 
     @Test void grassFoliageWaterAndDecorationReuseExactBiomeCoordinates() {
@@ -158,10 +152,7 @@ class PredictionSamplingWorkTest {
         sampler.waterTint(0, surface.surfaceY(), 0);
         assertEquals(before, source.calls.get(), "surface weather already looked up the tint biome");
         var full = sampler.sample(0, 0);
-        assertEquals(full.topBlockIndex(), surface.topBlockIndex());
-        assertEquals(full.underBlockIndex(), surface.underBlockIndex());
-        assertEquals(full.deepBlockIndex(), surface.deepBlockIndex());
-        assertEquals(full.flags(), surface.flags() & ~ClientColumnSample.FLAG_SURFACE_ONLY);
+        assertEquals(full, surface);
     }
 
     @Test void surfaceEntryPointPreservesCustomBackendSamples() {
@@ -174,6 +165,34 @@ class PredictionSamplingWorkTest {
         assertSame(expected, custom.sampleForLod(10, 20, 128));
         var override = ClientTerrainSampler.withSurfaceOverride(sampler(new CountingSource(), false), (x, z) -> 70);
         assertEquals(70, override.sampleSurface(10, 20).surfaceY());
+        assertEquals(override.sampleSurface(10, 20), override.sample(10, 20));
+    }
+
+    @Test void decorationBlockQueryCacheInvalidatesAcrossFeatureRollback() {
+        var sampler = sampler(new FixedBiomeSource(lookup.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS)), false);
+        var level = new PredictionDecorationLevel(sampler, sampler, RegistryAccess.EMPTY, -4, -4);
+        var position = new net.minecraft.core.BlockPos(-64, 64, -64);
+        var original = level.getBlockState(position);
+        // Prime the hit/miss cache, then write and roll back through the same
+        // transaction path used by feature placement.
+        assertSame(original, level.getBlockState(position));
+        level.beginFeature();
+        level.setBlock(position, net.minecraft.world.level.block.Blocks.DIAMOND_BLOCK.defaultBlockState(), 0, 0);
+        assertEquals(net.minecraft.world.level.block.Blocks.DIAMOND_BLOCK, level.getBlockState(position).getBlock());
+        level.endFeature(false);
+        assertEquals(original, level.getBlockState(position), "rollback must invalidate cached placed-block reads");
+    }
+
+    @Test void decorationColumnWindowKeepsNegativeCornersDistinct() {
+        var sampler = sampler(new FixedBiomeSource(lookup.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS)), false);
+        var level = new PredictionDecorationLevel(sampler, sampler, RegistryAccess.EMPTY, -4, -4);
+        var first = level.column(-96, -96);
+        var opposite = level.column(-17, -17);
+        assertSame(first, level.column(-96, -96));
+        assertSame(opposite, level.column(-17, -17));
+        assertNotSame(first, opposite, "opposite corners must not alias in the bounded cache");
+        assertThrows(UnsupportedOperationException.class, () -> level.column(-97, -96));
+        assertThrows(UnsupportedOperationException.class, () -> level.column(-17, -16));
     }
 
     private static ClientTerrainSampler sampler(BiomeSource source, boolean surfaceRules) {
@@ -189,7 +208,7 @@ class PredictionSamplingWorkTest {
             access = new RegistryAccess.ImmutableRegistryAccess(List.of(biomes));
         }
         return new ClientTerrainSampler(SEED, PROFILE, generator, state,
-                LevelHeightAccessor.create(-64, 384), 63, List.of(), null, access) {
+                LevelHeightAccessor.create(-64, 384), 63, null, access) {
             @Override public int surfaceY(int x, int z) { return 160; }
         };
     }

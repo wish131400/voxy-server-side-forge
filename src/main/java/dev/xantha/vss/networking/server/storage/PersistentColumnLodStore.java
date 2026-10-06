@@ -213,6 +213,10 @@ public final class PersistentColumnLodStore {
     }
 
     public void write(MinecraftServer server, ResourceKey<Level> dimension, EncodedColumnData columnData) {
+        writeConfirmed(server, dimension, columnData);
+    }
+
+    public boolean writeConfirmed(MinecraftServer server, ResourceKey<Level> dimension, EncodedColumnData columnData) {
         if (!config.enablePersistentColumnCache
                 || columnData == null
                 || columnData.encodedBytes() == null
@@ -223,14 +227,14 @@ public final class PersistentColumnLodStore {
                 || columnData.encodedBytes().length <= 0
                 || columnData.encodedBytes().length > MAX_ENCODED_COLUMN_BYTES
                 || columnData.schemaVersion() != EncodedColumnData.SCHEMA_VERSION) {
-            return;
+            return false;
         }
 
         synchronized (columnLock(dimension, columnData.chunkX(), columnData.chunkZ())) {
             Path path = columnPath(server, dimension, columnData.chunkX(), columnData.chunkZ());
             IndexSlot existingSlot = readColumnHeader(path, columnData.chunkX(), columnData.chunkZ());
             if (existingSlot != null && existingSlot.timestamp() > columnData.columnStamp()) {
-                return;
+                return true;
             }
             Path tmp = path.resolveSibling(path.getFileName() + ".tmp");
             long previousSize = sizeIfRegular(path);
@@ -262,11 +266,13 @@ public final class PersistentColumnLodStore {
                 markIndexed(server, dimension, columnData.chunkX(), columnData.chunkZ(), IndexSlot.from(columnData));
                 writes++;
                 cleanupIfNeeded(server);
+                return true;
             } catch (Exception e) {
                 writeFailures++;
                 deleteQuietly(tmp);
                 VSSLogger.debug("Failed to write persistent LOD column " + columnData.chunkX() + ","
                         + columnData.chunkZ() + ": " + e.getMessage());
+                return false;
             }
         }
     }
@@ -783,6 +789,7 @@ public final class PersistentColumnLodStore {
     }
 
     private IndexSlot readColumnHeader(Path path, int cx, int cz) {
+        if (!Files.isRegularFile(path)) return null;
         try (InputStream fileIn = Files.newInputStream(path);
              DataInputStream in = new DataInputStream(fileIn)) {
             return readColumnHeader(in, cx, cz);
@@ -874,6 +881,7 @@ public final class PersistentColumnLodStore {
     }
 
     private static boolean deleteQuietly(Path path) {
+        if (!Files.exists(path, java.nio.file.LinkOption.NOFOLLOW_LINKS)) return false;
         try {
             return Files.deleteIfExists(path);
         } catch (IOException ignored) {

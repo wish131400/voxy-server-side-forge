@@ -18,6 +18,8 @@ import dev.xantha.vss.networking.payloads.ServerIdentityS2CPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
+import dev.xantha.vss.compat.BandwidthOptimizerCompat;
+import io.netty.channel.Channel;
 import java.util.function.Supplier;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -137,6 +139,24 @@ public final class VSSNetworking {
                     CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), part));
         } else {
             CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), payload);
+        }
+    }
+
+    public static boolean canSendQueuedToPlayer(ServerPlayer player) {
+        Channel channel = player.connection.connection.channel();
+        return channel != null && channel.isActive() && channel.isWritable()
+                && !BandwidthOptimizerCompat.isWaitingForClient(channel);
+    }
+
+    public static void sendQueuedToPlayer(ServerPlayer player, Object payload, Runnable encoded) {
+        try {
+            sendToPlayer(player, payload);
+            // Connection schedules encoding on this event loop. Release our
+            // reservation only after that work, without changing BO's batching.
+            player.connection.connection.channel().eventLoop().execute(encoded);
+        } catch (RuntimeException | Error e) {
+            encoded.run();
+            throw e;
         }
     }
 

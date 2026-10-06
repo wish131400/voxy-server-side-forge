@@ -23,6 +23,7 @@
     "client.PredictionPauseLimitMixin",
     "client.ForgeSpyglassOverlayTimingMixin",
     "client.FreeTerraForgedPredictionFiltersMixin",
+    "client.ByePregenPredictionPredicateMixin",
     "client.ClientPacketListenerServerIdentityMixin",
     "client.ClientLevelFarPlayerLeaveEventMixin",
     "client.EntityFallFlyingFlagAccessorMixin",

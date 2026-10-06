@@ -3,7 +3,7 @@ package dev.xantha.vss.client.prediction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-/** Keeps expensive upgrades behind new coverage during fast travel. */
+/** Limits cold upgrades during fast travel without stopping cached or incremental progress. */
 final class PredictionMotionPace {
     private static final long SETTLE_NANOS = 800_000_000L;
     private static ResourceKey<Level> lastDimension;
@@ -22,11 +22,13 @@ final class PredictionMotionPace {
             fastUntil = 0;
             return;
         }
-        if (lastAt != 0 && now - lastAt <= 500_000_000L) {
+        long elapsed = now - lastAt;
+        if (lastAt != 0 && elapsed >= 20_000_000L && elapsed <= 500_000_000L) {
             double dx = x - lastX;
             double dz = z - lastZ;
             double distanceSquared = dx * dx + dz * dz;
-            if (distanceSquared >= 0.24D * 0.24D || sprinting && distanceSquared >= 0.08D * 0.08D) {
+            double minimumDistance = (sprinting ? 5.5D : 6.0D) * elapsed / 1_000_000_000D;
+            if (distanceSquared >= minimumDistance * minimumDistance) {
                 fastUntil = now + SETTLE_NANOS;
             }
         }
@@ -43,12 +45,7 @@ final class PredictionMotionPace {
         return now < fastUntil && now >= fastUntil - SETTLE_NANOS;
     }
 
-    static boolean deferUpgrade(boolean moving, boolean residentCover, boolean surface,
-                                boolean dirty, boolean scoped) {
-        return moving && !dirty && !scoped && (surface || residentCover);
-    }
-
-    static int coverageBuildLimit(int workers) {
+    static int upgradeBuildLimit(int workers) {
         return Math.max(1, Math.min(2, workers / 3));
     }
 }

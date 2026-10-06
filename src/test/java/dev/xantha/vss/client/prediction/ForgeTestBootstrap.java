@@ -1,8 +1,8 @@
 package dev.xantha.vss.client.prediction;
 
 /** Populate Forge listener lists that ModLauncher normally initializes in game. */
-final class ForgeTestBootstrap {
-    static void prepare() {
+public final class ForgeTestBootstrap {
+    public static void prepare() {
         try {
             net.minecraftforge.fml.loading.LoadingModList.get().setBrokenFiles(java.util.List.of());
             prepareEvent(net.minecraftforge.network.NetworkEvent.class);

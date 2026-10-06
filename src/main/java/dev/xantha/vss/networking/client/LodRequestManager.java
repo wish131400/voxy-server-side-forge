@@ -7,6 +7,7 @@ import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.common.DiagnosticCounters;
 import dev.xantha.vss.compat.ModCompat;
 import dev.xantha.vss.client.prediction.ClientPredictionState;
+import dev.xantha.vss.client.prediction.PredictionCpuBudget;
 import dev.xantha.vss.config.VSSClientConfig;
 import dev.xantha.vss.config.VSSServerConfig;
 import dev.xantha.vss.networking.payloads.BatchChunkRequestC2SPayload;
@@ -28,32 +29,41 @@ public final class LodRequestManager {
             new java.util.concurrent.ConcurrentHashMap<>();
 
     private static long strictSectionsKey(long packed) {
-        // Long.hashCode of packed coordinates is chunkX ^ chunkZ; nearby columns
-        // otherwise form large collision trees in this concurrent index.
+        // This full 64-bit mix is a reversible permutation, so coordinates
+        // remain distinct. It also avoids Long.hashCode = X xor Z turning a
+        // nearby grid into a few large ConcurrentHashMap collision trees.
         return it.unimi.dsi.fastutil.HashCommon.mix(packed);
     }
-
-    private int strictScanRing = -1;
-    private int strictScanCursor;
-
+    /**
+     * Columns the server explicitly reported as unavailable.  A strict ring
+     * must be able to pass such a hole; a later generation retry can replace
+     * the marker with real section data.
+     */
+    private final java.util.Set<Long> strictUnavailableColumns =
+            java.util.concurrent.ConcurrentHashMap.newKeySet();
     public boolean strictColumnReady(int cx, int cz) {
         long packed = PositionUtil.packPosition(cx, cz);
-        return strictSections.containsKey(strictSectionsKey(packed));
+        return strictSections.containsKey(strictSectionsKey(packed)) || strictUnavailableColumns.contains(packed);
     }
 
     public boolean strictColumnRenderReady(int cx, int cz, java.util.function.IntPredicate ready) {
-        int[] sections = strictSections.get(strictSectionsKey(PositionUtil.packPosition(cx, cz)));
-        if (sections == null) return false;
+        long packed = PositionUtil.packPosition(cx, cz);
+        int[] sections = strictSections.get(strictSectionsKey(packed));
+        if (sections == null) return strictUnavailableColumns.contains(packed);
         for (int y : sections) if (!ready.test(y)) return false;
         return true;
     }
 
     synchronized void recordStrictSections(int cx, int cz, dev.xantha.vss.api.VoxelColumnData data) {
-        strictSections.put(strictSectionsKey(PositionUtil.packPosition(cx, cz)), java.util.Arrays.stream(data.sections())
+        long packed = PositionUtil.packPosition(cx, cz);
+        strictSections.put(strictSectionsKey(packed), java.util.Arrays.stream(data.sections())
                 .filter(section -> !section.section().hasOnlyAir()).mapToInt(section -> section.sectionY()).toArray());
+        strictUnavailableColumns.remove(packed);
         dev.xantha.vss.compat.StrictLodVisibility.workChanged();
+        requestScanPending = true;
     }
-    private static final int SCAN_INTERVAL_TICKS = 0;
+    // Unchanged discovery runs at 10 Hz; responses and dirty notifications wake it immediately.
+    private static final int SCAN_INTERVAL_TICKS = 2;
     private static final long SYNC_REQUEST_TIMEOUT_NANOS = 30_000_000_000L;
     private static final long GENERATION_REQUEST_TIMEOUT_NANOS = 300_000_000_000L;
     private static final long MAX_REQUEST_TIMEOUT_NANOS = 600_000_000_000L;
@@ -82,13 +92,14 @@ public final class LodRequestManager {
     private static final int SCAN_BOOST_TICKS = 100;
     private static final int MAX_DEFERRED_CANDIDATES_PER_TICK = 2048;
     private static final int MAX_DEFERRED_COLUMNS = 65536;
-    /** Bound the one-time local-index walk used to seed Xaero cache replay. */
     private static final int MAX_XAERO_LOCAL_REPLAY_COLUMNS = 65536;
     private static final int FAST_MOVE_CHUNK_THRESHOLD = 8;
     private static final int FAST_MOVE_KEEP_RADIUS_CHUNKS = 48;
     // Walk the whole active LOD window so stale cached entries cannot permanently
     // suppress requests outside the near ring. The Voxy query itself is asynchronous.
+    private static final int PRESENCE_AUDIT_INTERVAL_TICKS = 4;
     private static final int PRESENCE_AUDIT_CANDIDATES_PER_TICK = 256;
+    private static final long PRESENCE_AUDIT_MAX_NANOS = 250_000L;
     private static final long FULL_SCAN_RETRY_INTERVAL_NANOS = 15_000_000_000L;
     private static final int ESTIMATED_SYNC_COLUMN_BYTES = 48 * 1024;
     private static final long REQUEST_DIAGNOSTIC_INTERVAL_NANOS = 5_000_000_000L;
@@ -111,6 +122,8 @@ public final class LodRequestManager {
     private final LongOpenHashSet diskMissedColumns = new LongOpenHashSet();
     /** Known local Voxy columns whose contents should be replayed into Xaero. */
     private final LongOpenHashSet xaeroReplayColumns = new LongOpenHashSet();
+    /** Responses from requests cancelled during a prediction toggle are stale. */
+    private final LongOpenHashSet suppressedResponses = new LongOpenHashSet();
     private final ClientPresenceReporter presenceReporter;
     private final Runnable transferReset;
     private final CacheOnlyReloadTracker cacheOnlyReload = new CacheOnlyReloadTracker();
@@ -120,12 +133,14 @@ public final class LodRequestManager {
     private int lastPlayerChunkX = Integer.MIN_VALUE;
     private int lastPlayerChunkZ = Integer.MIN_VALUE;
     private int scanTickCounter = SCAN_INTERVAL_TICKS - 1;
+    private boolean requestScanPending = true;
     private int orderedOffsetDistance = -1;
     private int orderedOffsetCount;
     private int scanOffsetIndex;
     private int nearScanOffsetIndex;
     private int presenceAuditOffsetIndex;
     private int scanBoostTicks;
+    private int presenceAuditTickCounter;
     private int softFrontierRadius;
     private int lastEffectiveLodDistance = -1;
     private boolean scanCompletedForCurrentOffsets;
@@ -211,6 +226,91 @@ public final class LodRequestManager {
         return shouldReset;
     }
 
+    /**
+     * Reconcile the request scheduler with the client-side prediction option.
+     *
+     * The option can change without a new server session.  In that case the
+     * generation quota changes immediately, but the old scan cursor and
+     * deferred queue would otherwise keep the previous prediction turn alive.
+     * Recentring here makes disabling prediction resume generation from the
+     * player's current near rings instead of draining stale distant work.
+     */
+    public synchronized void onPredictionOptionChanged(boolean enabled) {
+        if (sessionConfig == null || !sessionConfig.enabled()) {
+            return;
+        }
+
+        predictionPriority.reset();
+        requestScanPending = true;
+        scanTickCounter = SCAN_INTERVAL_TICKS - 1;
+        armScanBoost();
+
+        Minecraft minecraft = Minecraft.getInstance();
+        LocalPlayer player = minecraft != null ? minecraft.player : null;
+        ClientLevel level = minecraft != null ? minecraft.level : null;
+        if (player == null || level == null || player.isRemoved()) {
+            return;
+        }
+
+        int playerCx = player.getBlockX() >> 4;
+        int playerCz = player.getBlockZ() >> 4;
+        int lodDistance = getEffectiveLodDistance();
+        deferredColumns.recenter(playerCx, playerCz);
+        restartPredictionOrder(enabled, level.dimension(), playerCx, playerCz);
+
+        if (!enabled) {
+            resetSchedulerForPredictionDisable();
+        } else {
+            resetScanCursorPastProtectedSyncWindow(lodDistance);
+        }
+        lastPlayerChunkX = playerCx;
+        lastPlayerChunkZ = playerCz;
+    }
+
+    /**
+     * Restart discovery from the player after a toggle. Keep valid cache state
+     * and dirty refreshes, but rediscover ordinary work in distance order.
+     */
+    private void resetSchedulerForPredictionDisable() {
+        LongOpenHashSet staleRequests = new LongOpenHashSet();
+        requestTracker.forEachInFlight(packed -> {
+            if (!dirtyColumns.contains(packed)) staleRequests.add(packed);
+        });
+        for (long packed : staleRequests) {
+            suppressedResponses.add(packed);
+            requestTracker.cancel(packed);
+            ClientPredictionState.releaseRequested(lastDimension,
+                    PositionUtil.unpackX(packed), PositionUtil.unpackZ(packed));
+            deferredColumns.remove(packed);
+            // Preserve an established generation miss. Unknown cache probes
+            // will be discovered again by the reset scan and probed normally.
+            clearBackoff(packed);
+        }
+
+        LongOpenHashSet staleDeferred = new LongOpenHashSet();
+        for (long packed : deferredColumns) {
+            if (!dirtyColumns.contains(packed)) staleDeferred.add(packed);
+        }
+        for (long packed : staleDeferred) deferredColumns.remove(packed);
+        if (!staleDeferred.isEmpty()) deferredColumns.compact();
+
+        // Revisit the center and its rings from the new cursor. Do not prune
+        // valid Voxy presence or disk-miss markers; those are cache state.
+        resetScanCursor();
+        softFrontierRadius = 0;
+        requestScanPending = true;
+        scanBoostTicks = SCAN_BOOST_TICKS;
+    }
+
+    void restartPredictionOrder(boolean enabled, ResourceKey<Level> dimension, int playerCx, int playerCz) {
+        if (enabled) return;
+        // A settled cache/generation miss is not loaded terrain. Recheck these
+        // holes before opening distant rings when generation resumes.
+        for (long packed : strictUnavailableColumns) clearBackoff(packed);
+        strictUnavailableColumns.clear();
+        dev.xantha.vss.compat.StrictLodVisibility.restartOrdering(dimension, playerCx, playerCz);
+    }
+
     public synchronized void tick() {
         if (sessionConfig == null || !sessionConfig.enabled()) {
             return;
@@ -222,12 +322,6 @@ public final class LodRequestManager {
         ClientLevel level = mc.level;
         if (player == null || level == null || player.isRemoved()) {
             return;
-        }
-
-        if (ModCompat.isXaeroMapBridgeActive()) {
-            armXaeroBackfill(level, player.getBlockX() >> 4, player.getBlockZ() >> 4);
-        } else {
-            disarmXaeroBackfill();
         }
 
         boolean dimensionChanged = lastDimension != null && !lastDimension.equals(level.dimension());
@@ -275,19 +369,34 @@ public final class LodRequestManager {
             lastPlayerChunkX = playerCx;
             lastPlayerChunkZ = playerCz;
         }
+        if (ModCompat.isXaeroMapBridgeActive()) armXaeroBackfill(level, playerCx, playerCz);
+        else disarmXaeroBackfill();
         presenceReporter.updateWindow(level, level.dimension(), playerCx, playerCz, lodDistance);
         boolean allowPresenceZstd = (sessionConfig.serverCapabilities() & VSSConstants.CAPABILITY_ZSTD_COLUMNS) != 0;
         presenceReporter.drain(level, level.dimension(), allowPresenceZstd);
-        auditKnownPresence(level, playerCx, playerCz, lodDistance);
+        if (++presenceAuditTickCounter >= PRESENCE_AUDIT_INTERVAL_TICKS) {
+            presenceAuditTickCounter = 0;
+            auditKnownPresence(level, playerCx, playerCz, lodDistance);
+        }
         timeoutSweep();
+        PredictionCpuBudget.SHARED.observeLocalGeneration(isIntegratedServer(), requestTracker.generationSize());
+        dirtyRefreshBudget = Math.min(DIRTY_REFRESH_RATE_LIMIT, dirtyRefreshBudget + DIRTY_REFRESH_RATE_LIMIT / 20.0D);
 
-        if (++scanTickCounter < SCAN_INTERVAL_TICKS) {
+        if (!shouldScanRequests()) {
             return;
         }
-        scanTickCounter = 0;
         scanAndSend(level, player);
         finishCacheOnlyReloadPassIfReady();
         logGenerationDiagnostics(playerCx, playerCz, lodDistance);
+    }
+
+    boolean shouldScanRequests() {
+        if (++scanTickCounter < SCAN_INTERVAL_TICKS && !requestScanPending) {
+            return false;
+        }
+        scanTickCounter = 0;
+        requestScanPending = false;
+        return true;
     }
 
     public synchronized ColumnReceiveResult onColumnTransferPart(
@@ -301,11 +410,9 @@ public final class LodRequestManager {
         }
 
         long packed = PositionUtil.packPosition(cx, cz);
-        if (!cacheOnlyReload.isActive() && !dev.xantha.vss.compat.StrictLodVisibility.requestable(dimension, cx, cz)) {
-            // A retracted frontier must not leave an already rejected response in flight
-            // until its network timeout. The retry remains subject to the same frontier.
-            failTrackedRequest(requestId, packed);
-            generationDiagnostics.record("strictAdmissionDeferred");
+        if (requestId >= 0 && !requestTracker.matches(requestId, packed)
+                && suppressedResponses.remove(packed)) {
+            generationDiagnostics.record("suppressedStaleResponse");
             return new ColumnReceiveResult(false, false, false, packed);
         }
         if (!isWithinCurrentLodWindow(packed)) {
@@ -343,8 +450,8 @@ public final class LodRequestManager {
         }
         long packed = PositionUtil.packPosition(cx, cz);
         boolean activeRequest = requestId >= 0 && requestTracker.matches(requestId, packed);
-        if (!cacheOnlyReload.isActive() && !dev.xantha.vss.compat.StrictLodVisibility.requestable(dimension, cx, cz)) {
-            failTrackedRequest(requestId, packed);
+        if (!activeRequest && suppressedResponses.remove(packed)) {
+            generationDiagnostics.record("suppressedStaleResponse");
             return ColumnProcessingResult.STALE;
         }
         if (!activeRequest && (requestTracker.contains(packed)
@@ -389,6 +496,8 @@ public final class LodRequestManager {
         long requiredTimestamp = dirtyColumnTimestamps.get(packed);
         columnTimestamps.put(packed, columnTimestamp);
         xaeroReplayColumns.remove(packed);
+        strictUnavailableColumns.remove(packed);
+        requestScanPending = true;
         rememberKnownColumn(dimension, packed, columnTimestamp, replacementSectionYs);
         diskMissedColumns.remove(packed);
         deferredColumns.remove(packed);
@@ -422,7 +531,8 @@ public final class LodRequestManager {
         // Vanilla chunk lifetime is independent from Voxy's persisted LOD lifetime.
     }
 
-    public synchronized void onDirtyColumns(long[] dirtyPositions, long[] dirtyTimestamps) {
+    public synchronized long[] onDirtyColumns(long[] dirtyPositions, long[] dirtyTimestamps) {
+        var changed = new it.unimi.dsi.fastutil.longs.LongArrayList();
         for (int i = 0; i < dirtyPositions.length; i++) {
             long packed = dirtyPositions[i];
             long dirtyTimestamp = i < dirtyTimestamps.length ? dirtyTimestamps[i] : VSSConstants.epochMillis();
@@ -430,17 +540,26 @@ public final class LodRequestManager {
                 dirtyTimestamp = VSSConstants.epochMillis();
             }
             long existingTimestamp = dirtyColumnTimestamps.get(packed);
-            boolean newerDirtyVersion = dirtyTimestamp > existingTimestamp;
-            if (newerDirtyVersion) {
-                dirtyColumnTimestamps.put(packed, dirtyTimestamp);
+            if (dirtyTimestamp <= Math.max(existingTimestamp, columnTimestamps.get(packed))) continue;
+            if (strictUnavailableColumns.remove(packed)) {
+                if (dev.xantha.vss.compat.StrictLodVisibility.completed(lastDimension,
+                        PositionUtil.unpackX(packed), PositionUtil.unpackZ(packed))) {
+                    dev.xantha.vss.compat.StrictLodVisibility.invalidate();
+                } else {
+                    dev.xantha.vss.compat.StrictLodVisibility.workChanged();
+                }
             }
+            dirtyColumnTimestamps.put(packed, dirtyTimestamp);
+            changed.add(packed);
             clearBackoff(packed);
             dirtyColumns.add(packed);
-            if (newerDirtyVersion && requestTracker.contains(packed)) {
+            if (requestTracker.contains(packed)) {
                 requestTracker.cancel(packed);
             }
             deferColumn(packed, true);
         }
+        if (!changed.isEmpty()) requestScanPending = true;
+        return changed.toLongArray();
     }
 
     public synchronized void onColumnNotGenerated(int requestId) {
@@ -449,6 +568,7 @@ public final class LodRequestManager {
         boolean cacheProbeRequest = requestTracker.isCacheProbeRequest(requestId);
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
+            requestScanPending = true;
             boolean xaeroReplayRequest = cacheProbeRequest && xaeroReplayColumns.remove(packed);
             if (dirtyRefreshRequest && hasKnownColumn(packed)) {
                 if (hasDirtyTimestamp(packed)) {
@@ -462,6 +582,14 @@ public final class LodRequestManager {
                 return;
             }
 
+            if ((generationRequest || sessionConfig != null && !sessionConfig.generationEnabled())
+                    && !strictSections.containsKey(strictSectionsKey(packed))) {
+                // A cache miss alone still needs near-first generation. Only
+                // an unavailable generation result (or generation disabled)
+                // settles the hole; retries can later supply its real data.
+                strictUnavailableColumns.add(packed);
+                dev.xantha.vss.compat.StrictLodVisibility.workChanged();
+            }
             dirtyColumns.remove(packed);
             if (generationRequest) {
                 columnTimestamps.remove(packed);
@@ -470,23 +598,14 @@ public final class LodRequestManager {
                 deferredColumns.remove(packed);
                 deferColumn(packed);
             } else if (cacheProbeRequest) {
-                // A local-only Xaero replay miss must not evict VSS presence or
-                // make Voxy request the same column again. The local LOD remains
-                // valid; only the Xaero import is unavailable on this server.
                 if (xaeroReplayRequest) {
+                    // A map-only miss cannot discard valid VSS/Voxy presence
+                    // or promote a local cache replay into world generation.
                     generationDiagnostics.record("xaeroReplayProbeMiss");
-                    // A position discovered only from Voxy has no VSS timestamp.
-                    // Keep an explicit no-data marker so the normal scanner does
-                    // not immediately turn this cache miss into another probe or
-                    // a generation candidate.
-                    if (columnTimestamps.get(packed) <= 0L) {
-                        columnTimestamps.put(packed, 0L);
-                    }
+                    if (columnTimestamps.get(packed) <= 0L) columnTimestamps.put(packed, 0L);
                     deferredColumns.remove(packed);
                     clearBackoff(packed);
-                } else {
-                    handleCacheProbeMiss(packed);
-                }
+                } else handleCacheProbeMiss(packed);
             } else if (generationAllowed()) {
                 columnTimestamps.remove(packed);
                 clearBackoff(packed);
@@ -513,6 +632,7 @@ public final class LodRequestManager {
     public synchronized void onColumnUpToDate(int requestId) {
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
+            requestScanPending = true;
             xaeroReplayColumns.remove(packed);
             long requiredTimestamp = dirtyColumnTimestamps.get(packed);
             long localTimestamp = columnTimestamps.get(packed);
@@ -538,6 +658,7 @@ public final class LodRequestManager {
             }
 
             boolean dirtySatisfied = requiredTimestamp <= 0L || localTimestamp >= requiredTimestamp;
+            strictUnavailableColumns.remove(packed);
             if (dirtySatisfied) {
                 dirtyColumns.remove(packed);
                 dirtyColumnTimestamps.remove(packed);
@@ -560,6 +681,7 @@ public final class LodRequestManager {
         generationDiagnostics.record("rateLimitedResponse");
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
+            requestScanPending = true;
             markRateLimited(packed);
             deferredColumns.remove(packed);
             deferColumn(packed, dirtyColumns.contains(packed));
@@ -586,17 +708,13 @@ public final class LodRequestManager {
         generationDiagnostics.record(cacheOnlyReload.isActive() ? "probeBlockedCacheOnly"
                 : !generationAllowed() ? "probeBlockedGenerationDisabled" : "probeBlockedFrontierOrPlayer");
         clearMissState(packed);
-        if (dev.xantha.vss.compat.StrictLodVisibility.active() && !cacheOnlyReload.isActive()) {
-            // A strict frontier can wait here indefinitely. Do not turn a
-            // generation-disabled hole into a cache probe every client tick.
-            markBackoff(packed, false);
-        }
     }
 
     public synchronized void onBackpressured(int requestId) {
         generationDiagnostics.record("backpressureResponse");
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
+            requestScanPending = true;
             markBackpressure(packed);
             deferredColumns.remove(packed);
             deferColumn(packed, dirtyColumns.contains(packed));
@@ -614,13 +732,6 @@ public final class LodRequestManager {
         resetRequestStateAfterConfigChange();
     }
 
-    /**
-     * Arms the Xaero backfill without invalidating VSS presence state. Existing
-     * presence entries are deliberately requested with a synthetic stale
-     * timestamp and the cache-probe flag, so the server sends a cached column
-     * even though Voxy already has the same LOD locally. No world generation is
-     * permitted.
-     */
     private void armXaeroBackfill(ClientLevel level, int playerCx, int playerCz) {
         if (!xaeroReplayArmed) {
             xaeroReplayArmed = true;
@@ -752,6 +863,15 @@ public final class LodRequestManager {
                 System.nanoTime());
     }
 
+    public synchronized void onColumnQueued(int requestId) {
+        long packed = requestTracker.positionFor(requestId);
+        if (packed == Long.MIN_VALUE) return;
+        generationDiagnostics.record("columnQueuedResponse");
+        requestTracker.refreshDeadline(requestId,
+                Math.max(VSSConstants.COLUMN_QUEUE_IDLE_TIMEOUT_NANOS, timeoutFor(packed, requestTracker.size())),
+                System.nanoTime());
+    }
+
     static boolean transitionToGenerationWaiting(
             ClientRequestTracker tracker,
             int requestId,
@@ -850,6 +970,15 @@ public final class LodRequestManager {
     }
 
     private void scanAndSend(ClientLevel level, LocalPlayer player) {
+        try {
+            scanAndSendWithBudget(level, player);
+        } finally {
+            // Release unused scan reservations even on early returns or send failure.
+            PredictionCpuBudget.SHARED.observeLocalGeneration(isIntegratedServer(), requestTracker.generationSize());
+        }
+    }
+
+    private void scanAndSendWithBudget(ClientLevel level, LocalPlayer player) {
         int playerCx = player.getBlockX() >> 4;
         int playerCz = player.getBlockZ() >> 4;
         int lodDistance = getEffectiveLodDistance();
@@ -915,14 +1044,10 @@ public final class LodRequestManager {
                                 int[] requestIds, long[] positions, long[] timestamps,
                                 boolean[] allowGeneration, boolean[] cacheProbe, int maxCount,
                                 RequestWindow requestWindow, long now, ScanBudget scanBudget) {
-        if (dev.xantha.vss.compat.StrictLodVisibility.active() && !cacheOnlyReload.isActive()) {
-            return collectStrictRequests(playerCx, playerCz, lodDistance, protectedSyncDistance,
-                    requestIds, positions, timestamps, allowGeneration, cacheProbe, maxCount, requestWindow, now, scanBudget);
-        }
         int deferredLimit = Math.max(1, maxCount / 2);
         int count = drainDeferredColumns(playerCx, playerCz, lodDistance, protectedSyncDistance,
                 requestIds, positions, timestamps, allowGeneration, cacheProbe, 0,
-                deferredLimit, requestWindow, now, lodDistance, scanBudget.slice(3), DeferredDrainMode.ALL);
+                deferredLimit, requestWindow, now, scanBudget.slice(3));
         count = scanNearSyncColumns(playerCx, playerCz, lodDistance, protectedSyncDistance,
                 requestIds, positions, timestamps, allowGeneration, cacheProbe, count,
                 maxCount, requestWindow, now, nearScanCompletedOnce ? scanBudget.slice(2) : scanBudget);
@@ -941,32 +1066,6 @@ public final class LodRequestManager {
         return count;
     }
 
-    private int collectStrictRequests(int playerCx, int playerCz, int lodDistance, int protectedSyncDistance,
-                                     int[] requestIds, long[] positions, long[] timestamps,
-                                     boolean[] allowGeneration, boolean[] cacheProbe, int maxCount,
-                                     RequestWindow window, long now, ScanBudget budget) {
-        var frontier = dev.xantha.vss.compat.StrictLodVisibility.snapshot();
-        if (frontier.x() != playerCx || frontier.z() != playerCz || !java.util.Objects.equals(frontier.dimension(), lastDimension)) return 0;
-        int ring = Math.min(lodDistance, frontier.requestRing());
-        softFrontierRadius = ring;
-        if (strictScanRing != ring) { strictScanRing = ring; strictScanCursor = ChebyshevRingOffsets.firstIndexForRing(ring); }
-        int count = drainDeferredColumns(playerCx, playerCz, lodDistance, protectedSyncDistance,
-                requestIds, positions, timestamps, allowGeneration, cacheProbe, 0, maxCount,
-                window, now, ring, budget.slice(2), DeferredDrainMode.ALL);
-        int start = ChebyshevRingOffsets.firstIndexForRing(ring);
-        int end = ChebyshevRingOffsets.firstIndexForRing(ring + 1);
-        for (int scanned = 0; scanned < end - start && count < maxCount && budget.canScanMore(); scanned++) {
-            if (strictScanCursor < start || strictScanCursor >= end) strictScanCursor = start;
-            long offset = ChebyshevRingOffsets.offsetAt(strictScanCursor++);
-            long packed = PositionUtil.packPosition(playerCx + decodeOffsetX(offset), playerCz + decodeOffsetZ(offset));
-            budget.recordCandidate();
-            if (requeueGenerationCandidate(packed)) continue;
-            count = appendClusterCandidate(packed, playerCx, playerCz, lodDistance, protectedSyncDistance,
-                    requestIds, positions, timestamps, allowGeneration, cacheProbe, count, maxCount, window, now, ring);
-        }
-        return count;
-    }
-
     private RequestWindow createRequestWindow() {
         int dirtyInFlightCount = requestTracker.dirtyRefreshSize();
         int generationInFlightCount = requestTracker.generationSize();
@@ -975,15 +1074,20 @@ public final class LodRequestManager {
                 ? Math.max(1, sessionConfig.generationConcurrencyLimitPerPlayer())
                 : 0;
 
+        boolean predictionActive = VSSClientNetworking.isPredictionActive();
+        int availableBudget = isIntegratedServer()
+                ? PredictionCpuBudget.SHARED.localGenerationLimit(generationConcurrencyLimit, predictionActive)
+                : generationConcurrencyLimit;
         generationConcurrencyLimit = predictionPriority.limit(generationConcurrencyLimit,
-                VSSClientNetworking.isPredictionActive(),
-                ClientPredictionState.loadingProgress(lastDimension), System.nanoTime());
+                predictionActive, ClientPredictionState.loadingProgress(lastDimension), availableBudget, System.nanoTime());
+        if (isIntegratedServer()) {
+            generationConcurrencyLimit = PredictionCpuBudget.SHARED.reserveLocalGeneration(
+                    generationConcurrencyLimit, predictionActive, generationInFlightCount);
+        }
         diagnosticGenerationLimit = generationConcurrencyLimit;
 
         int generationSlots = Math.max(0, generationConcurrencyLimit - generationInFlightCount);
         int dirtySlots = Math.max(0, DIRTY_REFRESH_CONCURRENCY_LIMIT - dirtyInFlightCount);
-
-        dirtyRefreshBudget = Math.min(DIRTY_REFRESH_RATE_LIMIT, dirtyRefreshBudget + DIRTY_REFRESH_RATE_LIMIT / 20.0D);
 
         return new RequestWindow(
                 syncBucketLimit(sessionConfig.nearSyncRateLimitPerTick(), true),
@@ -1099,7 +1203,11 @@ public final class LodRequestManager {
             return;
         }
 
+        long deadline = System.nanoTime() + PRESENCE_AUDIT_MAX_NANOS;
         for (int checked = 0; checked < PRESENCE_AUDIT_CANDIDATES_PER_TICK; checked++) {
+            if ((checked & 7) == 0 && System.nanoTime() >= deadline) {
+                break;
+            }
             if (presenceAuditOffsetIndex >= candidateCount) {
                 presenceAuditOffsetIndex = 0;
             }
@@ -1131,23 +1239,16 @@ public final class LodRequestManager {
             int maxCount,
             RequestWindow requestWindow,
             long now,
-            int maxAllowedRing,
-            ScanBudget scanBudget,
-            DeferredDrainMode mode) {
+            ScanBudget scanBudget) {
         if (count >= maxCount) {
-            generationDiagnostics.record(mode == DeferredDrainMode.ALL
-                    ? "deferredAllBatchFull" : "deferredDirtyBatchFull");
+            generationDiagnostics.record("deferredAllBatchFull");
             return count;
         }
         if (deferredColumns.queuedEntries() <= 0) {
             return count;
         }
         if (!scanBudget.canScanMore()) {
-            generationDiagnostics.record(mode == DeferredDrainMode.ALL
-                    ? "deferredAllBudgetExhausted" : "deferredDirtyBudgetExhausted");
-            return count;
-        }
-        if (mode == DeferredDrainMode.DIRTY_ONLY && dirtyColumns.isEmpty()) {
+            generationDiagnostics.record("deferredAllBudgetExhausted");
             return count;
         }
 
@@ -1161,21 +1262,14 @@ public final class LodRequestManager {
                 // small batches instead of removing/sorting/reinserting 2,048
                 // entries even when only one request slot remains.
                 LongList candidates = deferredColumns.pollClosestCandidates(
-                        Math.min(32, Math.min(attempts, scanBudget.remainingCandidates())),
-                        mode == DeferredDrainMode.DIRTY_ONLY);
+                        Math.min(32, Math.min(attempts, scanBudget.remainingCandidates())));
                 if (candidates.isEmpty()) break;
                 attempts -= candidates.size();
-                generationDiagnostics.add(mode == DeferredDrainMode.ALL
-                        ? "deferredAllPolled" : "deferredDirtyPolled", candidates.size());
+                generationDiagnostics.add("deferredAllPolled", candidates.size());
                 LongIterator candidateIterator = candidates.longIterator();
                 while (candidateIterator.hasNext()) {
                     long packed = candidateIterator.nextLong();
                     boolean dirtyRefresh = dirtyColumns.contains(packed);
-                    if (!mode.accepts(dirtyRefresh)) {
-                        generationDiagnostics.record("deferredWrongMode");
-                        postponed.add(packed);
-                        continue;
-                    }
                     if (!scanBudget.canScanMore()) {
                         generationDiagnostics.record("deferredCandidateBudgetExhausted");
                         postponed.add(packed);
@@ -1196,25 +1290,12 @@ public final class LodRequestManager {
                     int cz = PositionUtil.unpackZ(packed);
                     int ring = PositionUtil.chebyshevDistance(cx, cz, playerCx, playerCz);
 
-                    if (!cacheOnlyReload.isActive() && !dev.xantha.vss.compat.StrictLodVisibility.requestable(lastDimension, cx, cz)) {
-                        postponed.add(packed);
-                        continue;
-                    }
-
                     if (ring > lodDistance) {
                         generationDiagnostics.record("deferredOutsideDistance");
                         if (!dirtyRefresh) {
                             clearMissState(packed);
                         }
                         continue;
-                    }
-
-                    if (ring > maxAllowedRing) {
-                        if (!dirtyRefresh || ring > maxAllowedRing + 10) {
-                            generationDiagnostics.record("deferredOutsideAllowedRing");
-                            postponed.add(packed);
-                            continue;
-                        }
                     }
 
                     if (isCoolingDown(packed, now)) {
@@ -1238,11 +1319,6 @@ public final class LodRequestManager {
                         generationDiagnostics.record("deferredProtectedWindow");
                         continue;
                     }
-                    if (!dirtyRefresh && !isWithinSoftFrontier(packed, playerCx, playerCz)) {
-                        generationDiagnostics.record("deferredOutsideFrontier");
-                        postponed.add(packed);
-                        continue;
-                    }
                     if (!requestWindow.canSend(dirtyRefresh, generationCandidate, cacheProbe, ring)) {
                         generationDiagnostics.record(generationCandidate ? "deferredNoGenerationSlot"
                                 : dirtyRefresh ? "deferredNoDirtySlot" : cacheProbe ? "deferredNoProbeSlot"
@@ -1264,12 +1340,6 @@ public final class LodRequestManager {
                             now);
                     requestWindow.record(dirtyRefresh, generationCandidate, cacheProbe, ring);
                 }
-                // Strict mode also scans its current ring below. Once generation is
-                // full, one small deferred batch is enough; do not repeatedly remove
-                // and reinsert the entire generation backlog just because probe/sync
-                // slots remain. Ring scanning still discovers cache probes this tick.
-                if (dev.xantha.vss.compat.StrictLodVisibility.active() && !cacheOnlyReload.isActive()
-                        && !requestWindow.hasGenerationCapacity()) break;
             }
         } finally {
             for (long packed : postponed) requeueDeferredColumn(packed, dirtyColumns.contains(packed));
@@ -1456,8 +1526,7 @@ public final class LodRequestManager {
         }
         boolean generationCandidate = isGenerationCandidate(packed);
         boolean cacheProbe = !generationCandidate
-                && (isXaeroReplayCandidate(packed)
-                        || shouldUseFirstPassCacheProbe(packed, ring, requestWindow));
+                && (isXaeroReplayCandidate(packed) || shouldUseFirstPassCacheProbe(packed, ring, requestWindow));
         if (!requestWindow.canSend(false, generationCandidate, cacheProbe, ring)) {
             return count;
         }
@@ -1505,21 +1574,8 @@ public final class LodRequestManager {
         }
 
         long timestamp = columnTimestamps.get(packed);
-        if (isXaeroReplayCandidate(packed)) {
-            return true;
-        }
-        boolean strict = dev.xantha.vss.compat.StrictLodVisibility.active();
-        if (timestamp > 0L && !dirty && (!strict || strictSections.containsKey(strictSectionsKey(packed)))) {
-            return false;
-        }
-        // VSS prediction owns the distant band once a tile is ready. Dirty
-        // columns and the near band always remain authoritative.
-        if (!strict && !dirty && timestamp <= 0L && lastDimension != null
-                && ClientPredictionState.shouldDeferExactColumn(
-                        lastDimension,
-                        PositionUtil.unpackX(packed),
-                        PositionUtil.unpackZ(packed),
-                        now)) {
+        if (isXaeroReplayCandidate(packed)) return true;
+        if (timestamp > 0L && !dirty) {
             return false;
         }
         if (dirty) {
@@ -1533,8 +1589,8 @@ public final class LodRequestManager {
 
     private boolean isWithinCurrentLodWindow(long packed) {
         Minecraft minecraft = Minecraft.getInstance();
-        LocalPlayer player = minecraft.player;
-        ClientLevel level = minecraft.level;
+        LocalPlayer player = minecraft != null ? minecraft.player : null;
+        ClientLevel level = minecraft != null ? minecraft.level : null;
         if (player == null || level == null || player.isRemoved()) {
             return false;
         }
@@ -1574,6 +1630,7 @@ public final class LodRequestManager {
             return;
         }
         requestTracker.cancelRequest(requestId);
+        requestScanPending = true;
         markBackoff(packed, isGenerationCandidate(packed));
         deferredColumns.remove(packed);
         deferColumn(packed, dirtyColumns.contains(packed));
@@ -1607,6 +1664,7 @@ public final class LodRequestManager {
                     int[] sections = new int[manifest.length];
                     for (int i = 0; i < manifest.length; i++) sections[i] = manifest[i];
                     strictSections.put(strictSectionsKey(packed), sections);
+                    strictUnavailableColumns.remove(packed);
                     dev.xantha.vss.compat.StrictLodVisibility.workChanged();
                 }
             }
@@ -1621,16 +1679,15 @@ public final class LodRequestManager {
     }
 
     boolean reconcileMissingColumn(long packed) {
+        requestScanPending = true;
+        xaeroReplayColumns.remove(packed);
+        strictUnavailableColumns.remove(packed);
         strictSections.remove(strictSectionsKey(packed));
         if (dev.xantha.vss.compat.StrictLodVisibility.completed(lastDimension,
                 PositionUtil.unpackX(packed), PositionUtil.unpackZ(packed))) {
             dev.xantha.vss.compat.StrictLodVisibility.invalidate();
         }
         columnTimestamps.remove(packed);
-        // This column is no longer a local-only replay candidate: normal VSS
-        // reconciliation must be allowed to request it (and, when configured,
-        // generate it) again.
-        xaeroReplayColumns.remove(packed);
         if (lastDimension != null) {
             presenceReporter.removeKnownColumn(lastDimension, packed);
         }
@@ -1676,7 +1733,7 @@ public final class LodRequestManager {
             return false;
         }
         Minecraft minecraft = Minecraft.getInstance();
-        LocalPlayer player = minecraft.player;
+        LocalPlayer player = minecraft != null ? minecraft.player : null;
         if (player == null) {
             return false;
         }
@@ -1712,15 +1769,12 @@ public final class LodRequestManager {
                 dirtyColumns.contains(packed),
                 timeoutFor(packed, requestTracker.size()),
                 now);
+        suppressedResponses.remove(packed);
         requestIds[count] = requestId;
         positions[count] = packed;
-        // A Xaero replay must force the server to return the cached body even
-        // when Voxy already reports the same timestamp locally. A positive,
-        // synthetic stale timestamp also keeps this replay on the server's
-        // priority path; the server-side known timestamp is never downgraded.
+        // Replays need the server to send contents rather than only a version acknowledgment.
         timestamps[count] = isXaeroReplayCandidate(packed) && !dirtyColumns.contains(packed)
-                ? 1L
-                : requestTimestampFor(packed);
+                ? 1L : requestTimestampFor(packed);
         allowGeneration[count] = generationCandidate;
         cacheProbeFlags[count] = cacheProbeRequest;
         if (lastDimension != null) {
@@ -1737,7 +1791,6 @@ public final class LodRequestManager {
     }
 
     long requestTimestampFor(long packed) {
-        if (dev.xantha.vss.compat.StrictLodVisibility.active() && !strictSections.containsKey(strictSectionsKey(packed))) return -1L;
         long timestamp = columnTimestamps.get(packed);
         if (!dirtyColumns.contains(packed) || timestamp > 0L) {
             return timestamp;
@@ -1766,8 +1819,10 @@ public final class LodRequestManager {
         if (clientDistance > 0) {
             return Math.min(Math.min(clientDistance, serverDistance), hardClientLimit);
         }
-        int voxyDistance = ModCompat.getVoxyViewDistanceChunks().orElse(hardClientLimit);
-        return Math.min(Math.min(serverDistance, voxyDistance), hardClientLimit);
+        // Voxy's render distance controls drawing of its own persistent nodes,
+        // not how far VSS may request/cache real columns. Keep the two radii
+        // independent so Voxy retains its normal ultra-distance behavior.
+        return Math.min(serverDistance, hardClientLimit);
     }
 
     private void logRequestBatch(
@@ -1826,6 +1881,7 @@ public final class LodRequestManager {
                 + ", predictionPriority=" + predictionPriority.diagnostics()
                 + ", generationLimit=" + diagnosticGenerationLimit
                 + ", predictionLoading=" + ClientPredictionState.loadingProgress(lastDimension)
+                + ", cpuBudget={" + PredictionCpuBudget.SHARED.diagnostics() + "}"
                 + ", batchLimit=" + diagnosticBatchLimit
                 + ", " + events);
     }
@@ -1833,6 +1889,7 @@ public final class LodRequestManager {
     private void timeoutSweep() {
         long now = System.nanoTime();
         for (ClientRequestTracker.TimedOutRequest request : requestTracker.drainTimedOut(now)) {
+            requestScanPending = true;
             long packed = request.packed();
             generationDiagnostics.record("requestTimeout");
             markTimeout(packed);
@@ -1898,6 +1955,7 @@ public final class LodRequestManager {
             }
         });
         for (long packed : staleRequests) {
+            suppressedResponses.add(packed);
             requestTracker.cancel(packed);
             diskMissedColumns.remove(packed);
             clearBackoff(packed);
@@ -1964,9 +2022,17 @@ public final class LodRequestManager {
                 staleColumns.add(packed);
             }
         }
+        // Unavailable columns need pruning even when no timestamp was stored.
+        for (long packed : strictUnavailableColumns) {
+            if (PositionUtil.isOutOfRange(packed, playerCx, playerCz, pruneDistance)) {
+                staleColumns.add(packed);
+            }
+        }
         for (long packed : staleColumns) {
             strictSections.remove(strictSectionsKey(packed));
+            strictUnavailableColumns.remove(packed);
             columnTimestamps.remove(packed);
+            xaeroReplayColumns.remove(packed);
             dirtyColumns.remove(packed);
             dirtyColumnTimestamps.remove(packed);
             deferredColumns.remove(packed);
@@ -2004,7 +2070,8 @@ public final class LodRequestManager {
     }
 
     private static boolean isIntegratedServer() {
-        return Minecraft.getInstance().getSingleplayerServer() != null;
+        var minecraft = Minecraft.getInstance();
+        return minecraft != null && minecraft.getSingleplayerServer() != null;
     }
 
     private static int chebyshevDistance(long packed, int playerCx, int playerCz) {
@@ -2014,9 +2081,12 @@ public final class LodRequestManager {
 
     private void resetRequestState() {
         predictionPriority.reset();
+        PredictionCpuBudget.SHARED.observeLocalGeneration(false, 0);
         diagnosticGenerationLimit = 0;
         dev.xantha.vss.compat.StrictLodVisibility.invalidate();
-        strictSections.clear(); strictScanRing = -1; strictScanCursor = 0;
+        strictSections.clear();
+        strictUnavailableColumns.clear();
+        requestScanPending = true;
         generationDiagnostics.reset();
         diagnosticBatchLimit = 0;
         diagnosticGenerationSlots = 0;
@@ -2031,12 +2101,14 @@ public final class LodRequestManager {
         diskMissedColumns.clear();
         xaeroReplayColumns.clear();
         xaeroLocalSeedComplete = false;
+        suppressedResponses.clear();
         retryBackoff.clearAll();
         lastPlayerChunkX = Integer.MIN_VALUE;
         lastPlayerChunkZ = Integer.MIN_VALUE;
         scanOffsetIndex = 0;
         nearScanOffsetIndex = 0;
         presenceAuditOffsetIndex = 0;
+        presenceAuditTickCounter = 0;
         softFrontierRadius = 0;
         lastEffectiveLodDistance = -1;
         scanCompletedForCurrentOffsets = false;
@@ -2129,10 +2201,6 @@ public final class LodRequestManager {
         return protectedSyncDistance > 0 && chebyshevDistance(packed, playerCx, playerCz) <= protectedSyncDistance;
     }
 
-    private boolean isWithinSoftFrontier(long packed, int playerCx, int playerCz) {
-        return chebyshevDistance(packed, playerCx, playerCz) <= softFrontierRadius;
-    }
-
     private void updateSoftFrontier(int ring, int lodDistance) {
         softFrontierRadius = Math.min(maxFrontierRadius(lodDistance), Math.max(softFrontierRadius, ring));
     }
@@ -2208,15 +2276,6 @@ public final class LodRequestManager {
 
         int remainingCandidates() {
             return parent == null ? remainingCandidates : Math.min(remainingCandidates, parent.remainingCandidates());
-        }
-    }
-
-    private enum DeferredDrainMode {
-        DIRTY_ONLY,
-        ALL;
-
-        private boolean accepts(boolean dirtyRefresh) {
-            return this == ALL || dirtyRefresh;
         }
     }
 

@@ -47,14 +47,79 @@ class PredictionVegetationTest {
         tags.put(BlockTags.DIRT, holders(Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.COARSE_DIRT));
         tags.put(BlockTags.REPLACEABLE_BY_TREES, holders(Blocks.AIR, Blocks.GRASS, Blocks.OAK_LEAVES, Blocks.JUNGLE_LEAVES, Blocks.VINE));
         BuiltInRegistries.BLOCK.bindTags(tags);
+        ClientPredictionState.tagsChanged();
     }
 
     @AfterAll
-    static void restoreTags() { BuiltInRegistries.BLOCK.bindTags(previousTags); }
+    static void restoreTags() { BuiltInRegistries.BLOCK.bindTags(previousTags); ClientPredictionState.tagsChanged(); }
+
+    @AfterEach
+    void awaitCacheClose() throws Exception { PredictionCacheTestFiles.awaitBackgroundClose(); }
 
     private static List<Holder<Block>> holders(Block... blocks) {
         return java.util.Arrays.stream(blocks).map(block -> (Holder<Block>) BuiltInRegistries.BLOCK
                 .getHolder(BuiltInRegistries.BLOCK.getId(block)).orElseThrow()).toList();
+    }
+
+    @Test void nativeDownloadPreservesUnsyncedJavaWritesAndRollbackMarkers() {
+        var sampler = sampler(42, Blocks.GRASS_BLOCK, List.of());
+        var level = new PredictionDecorationLevel(sampler, sampler, RegistryAccess.EMPTY, 0, 0);
+        var javaPos = new BlockPos(1, 80, 1);
+        var nativePos = new BlockPos(2, 80, 1);
+        level.beginFeature();
+        level.setBlock(javaPos, Blocks.DIRT.defaultBlockState(), 0, 0);
+        level.endFeature(true);
+        level.beginFeature();
+        RustVegetationStage.applyNativeEdit(level, nativePos, Blocks.OAK_PLANKS.defaultBlockState());
+        RustVegetationStage.applyNativeEdit(level, javaPos, Blocks.STONE.defaultBlockState());
+        level.endFeature(true);
+        assertFalse(level.pendingUploads().containsKey(nativePos));
+        assertEquals(Blocks.STONE.defaultBlockState(), level.pendingUploads().get(javaPos),
+                "a preexisting pending position must keep its current state marked for upload");
+        level.clearPendingUploads();
+        level.beginFeature();
+        RustVegetationStage.applyNativeEdit(level, nativePos, Blocks.BIRCH_PLANKS.defaultBlockState());
+        level.endFeature(false);
+        assertEquals(Blocks.OAK_PLANKS.defaultBlockState(), level.getBlockState(nativePos));
+        assertEquals(Blocks.OAK_PLANKS.defaultBlockState(), level.pendingUploads().get(nativePos),
+                "rolling back a downloaded native edit must resynchronize its restored Java state");
+    }
+
+    @Test void enabledFeatureIndicesRefreshWhenTreeAndStructureSettingsChange() {
+        var config = dev.xantha.vss.config.VSSClientConfig.CONFIG;
+        boolean oldTrees = config.predictionTrees, oldStructures = config.predictionStructures;
+        var counts = new java.util.concurrent.atomic.AtomicInteger[3];
+        var features = new PlacedFeature[3];
+        for (int i = 0; i < counts.length; i++) {
+            var count = counts[i] = new java.util.concurrent.atomic.AtomicInteger();
+            var feature = new Feature<NoneFeatureConfiguration>(NoneFeatureConfiguration.CODEC) {
+                @Override public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
+                    count.incrementAndGet();
+                    return true;
+                }
+            };
+            features[i] = placed(new ConfiguredFeature<>(feature, NoneFeatureConfiguration.INSTANCE), 1);
+        }
+        var sampler = sampler(42, Blocks.GRASS_BLOCK, Map.of(
+                GenerationStep.Decoration.RAW_GENERATION, List.of(features[0]),
+                GenerationStep.Decoration.SURFACE_STRUCTURES, List.of(features[1]),
+                GenerationStep.Decoration.VEGETAL_DECORATION, List.of(features[2])));
+        try {
+            config.predictionTrees = false; config.predictionStructures = false;
+            var vegetation = new PredictionVegetation(sampler, null, false);
+            assertTrue(vegetation.available());
+            vegetation.chunk(0, 0);
+            assertEquals(1, counts[0].get()); assertEquals(0, counts[1].get()); assertEquals(0, counts[2].get());
+            config.predictionTrees = true;
+            vegetation.chunk(1, 0);
+            assertEquals(2, counts[0].get()); assertEquals(0, counts[1].get()); assertEquals(1, counts[2].get());
+            config.predictionStructures = true;
+            vegetation.chunk(2, 0);
+            assertEquals(3, counts[0].get()); assertEquals(1, counts[1].get()); assertEquals(2, counts[2].get());
+            config.predictionTrees = false;
+            vegetation.chunk(3, 0);
+            assertEquals(4, counts[0].get()); assertEquals(2, counts[1].get()); assertEquals(2, counts[2].get());
+        } finally { config.predictionTrees = oldTrees; config.predictionStructures = oldStructures; }
     }
 
     @Test void compareCanonicalSurfaceRestoreWithRepeatedRepair() {
@@ -112,6 +177,7 @@ class PredictionVegetationTest {
             saved.forEach((pos, state) -> assertEquals(state, restored.get(pos), "cached geometry must survive the upgrade"));
             assertTrue(restored.get(leaf.above()).is(Blocks.SNOW));
             assertTrue(vegetation.diagnostics().contains(",chunks=0,blocks=0,"), "upgrade must not replay trees or structures");
+            cache.flush();
             try (var lease = cache.lease(key)) {
                 assertTrue(cache.readSurfaceData(lease).weatherChecked());
                 assertEquals(restored, cache.readSurface(lease));
@@ -153,6 +219,7 @@ class PredictionVegetationTest {
             var vegetation = new PredictionVegetation(sampler, cache);
             expected = vegetation.chunk(-17, 23);
             assertTrue(expected.values().stream().anyMatch(state -> state.is(Blocks.OAK_LOG)));
+            cache.flush();
         }
         try (var cache = new PredictionDiskCache(diskDirectory, 1)) {
             var vegetation = new PredictionVegetation(sampler, cache);
@@ -182,6 +249,7 @@ class PredictionVegetationTest {
             var restored = vegetation.chunk(0, 0);
             assertEquals(1, restored.get(pos).getValue(net.minecraft.world.level.block.LeavesBlock.DISTANCE));
             assertTrue(vegetation.diagnostics().contains(",chunks=0,blocks=0,"));
+            cache.flush();
             try (var lease = cache.lease(key)) { assertEquals(restored, cache.readSurface(lease)); }
         }
     }
@@ -203,6 +271,7 @@ class PredictionVegetationTest {
             assertEquals(12, result.size());
             assertTrue(vegetation.diagnostics().contains(",chunks=0,blocks=0,"));
             assertSame(result, vegetation.chunk(0, 0));
+            cache.flush();
         }
         try (var cache = new PredictionDiskCache(diskDirectory, 29); var lease = cache.lease(key)) {
             var result = cache.readSurface(lease);
@@ -395,7 +464,7 @@ class PredictionVegetationTest {
         java.util.Arrays.fill(samples, hints);
         for (int spacing : new int[]{1, 2, 4, 8}) {
             var mesh = PredictionMeshBuilder.build(samples, null, 63, 0, spacing, 9,
-                    true, new PredictionFeatureStampCache(), null, null, 0, 0,
+                    null, null, 0, 0,
                     PredictionVegetation.Tile.EMPTY);
             assertEquals(8 * 8 * 6, mesh.vertexCount(),
                     "native tree/structure hints cannot create placeholder geometry at spacing " + spacing);
@@ -727,6 +796,7 @@ class PredictionVegetationTest {
             var visual = new PredictionVegetation(sampler, disk, true);
             visual.chunk(0,0);
             assertEquals(0, disk.hits(), "visual policy cannot silently reuse old exact entries");
+            disk.flush();
             new PredictionVegetation(sampler, disk, true).chunk(0,0);
             new PredictionVegetation(sampler, disk, false).chunk(0,0);
             assertEquals(2, disk.hits());
@@ -742,7 +812,7 @@ class PredictionVegetationTest {
         var tree = tree();
         var base = sampler(48271, Blocks.GRASS_BLOCK, List.of(tree));
         var registry = new MappedRegistry<PlacedFeature>(Registries.PLACED_FEATURE, com.mojang.serialization.Lifecycle.stable());
-        Registry.register(registry, ResourceLocation.parse("test:tree"), tree);
+        Registry.register(registry, new ResourceLocation("test:tree"), tree);
         registry.freeze();
         var access = new RegistryAccess.ImmutableRegistryAccess(List.of(registry));
         var context = new ClientTerrainSampler(48271, base.profile()) {
@@ -815,7 +885,7 @@ class PredictionVegetationTest {
                 new SimpleBlockConfiguration(BlockStateProvider.simple(Blocks.GRASS))),4);
         var base=sampler(48271,Blocks.GRASS_BLOCK,List.of(plant));
         var registry=new MappedRegistry<PlacedFeature>(Registries.PLACED_FEATURE,com.mojang.serialization.Lifecycle.stable());
-        Registry.register(registry,ResourceLocation.parse("test:native_grass"),plant);registry.freeze();
+        Registry.register(registry,new ResourceLocation("test:native_grass"),plant);registry.freeze();
         var access=new RegistryAccess.ImmutableRegistryAccess(List.of(registry));
         var context=new ClientTerrainSampler(48271,base.profile()) {
             @Override NoiseBasedChunkGenerator generatorContext(){return base.generatorContext();}
@@ -883,7 +953,7 @@ class PredictionVegetationTest {
     @Test void compareDecoratedJungleSkeletonsOnFixedChunks() {
         var configured = lookup.lookupOrThrow(Registries.CONFIGURED_FEATURE).getOrThrow(
                 net.minecraft.resources.ResourceKey.create(Registries.CONFIGURED_FEATURE,
-                        ResourceLocation.withDefaultNamespace("mega_jungle_tree")));
+                        new ResourceLocation("minecraft", "mega_jungle_tree")));
         var feature = new PlacedFeature(configured, List.of(CountPlacement.of(2),InSquarePlacement.spread(),
                 HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),BiomeFilter.biome()));
         var sampler = sampler(48271,Blocks.GRASS_BLOCK,List.of(feature));
@@ -948,7 +1018,7 @@ class PredictionVegetationTest {
         var settings = lookup.lookupOrThrow(Registries.NOISE_SETTINGS).getOrThrow(NoiseGeneratorSettings.OVERWORLD);
         var generator = new NoiseBasedChunkGenerator(source, settings);
         var random = RandomState.create(settings.value(), lookup.lookupOrThrow(Registries.NOISE), seed);
-        var profile = new DimensionProfile(ResourceLocation.withDefaultNamespace("overworld"), seed,
+        var profile = new DimensionProfile(new ResourceLocation("minecraft", "overworld"), seed,
                 -64, 384, "noise", "minecraft:overworld", 1);
         return new ClientTerrainSampler(seed, profile) {
             @Override public ClientColumnSample sample(int x, int z) { return column(ground); }
