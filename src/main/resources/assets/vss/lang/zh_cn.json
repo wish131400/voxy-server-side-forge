@@ -1,4 +1,6 @@
 {
+  "vss.voxy_options.local_chunk_ingestion": "本地区块转换",
+  "vss.voxy_options.local_chunk_ingestion.tooltip": "将本地加载区块转换为 Voxy 远景。关闭可减少本地转换工作，仍能接收服务端 LOD。不会删除已缓存远景；渲染和预测是独立选项。",
   "vss.command.render_capture.started": "VSS：关闭聊天并保持异常部位在画面内，3 秒后采集一帧；采集瞬间可能短暂停顿。",
   "vss.command.render_capture.done": "VSS 渲染诊断已保存：%s",
   "vss.command.render_capture.failed": "VSS 渲染诊断失败：%s",

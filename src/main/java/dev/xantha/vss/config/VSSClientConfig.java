@@ -17,6 +17,8 @@ public class VSSClientConfig extends JsonConfig {
 
     public String configVersion;
     public boolean receiveServerLods = true;
+    /** Convert locally loaded chunks into Voxy LOD, independently of server synchronization. */
+    public volatile boolean enableLocalChunkIngestion = true;
     public int lodDistanceChunks = 0;
     public int desiredBandwidthKbps = 0;
     @Deprecated
@@ -73,6 +75,7 @@ public class VSSClientConfig extends JsonConfig {
         Map<String, String> help = new LinkedHashMap<>();
         help.put("configVersion", "配置结构版本，升级时自动迁移；当前版本 " + CURRENT_CONFIG_VERSION + "，请勿手动修改。");
         help.put("receiveServerLods", "是否接收服务端发送的 Voxy LOD；默认 true。");
+        help.put("enableLocalChunkIngestion", "是否将本地加载区块转换为 Voxy LOD；默认 true。关闭不影响接收服务端 LOD，也不会删除已缓存的远景。");
         help.put("lodDistanceChunks", "客户端请求 LOD 的半径，单位区块；默认 0；范围 0-"
                 + MAX_LOD_DISTANCE_CHUNKS + "，0 表示使用服务端上限；Voxy 的渲染视距独立生效。");
         help.put("desiredBandwidthKbps", "客户端期望的 LOD 下载带宽上限，单位 Kbps；默认 0；范围 0-"

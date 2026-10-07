@@ -40,7 +40,6 @@ final class VoxyCompat {
     private static volatile MethodHandle getSectionRenderDist;
     private static volatile MethodHandle getEnabled;
     private static volatile MethodHandle getEnableRendering;
-    private static volatile MethodHandle getIngestEnabled;
     private static final DiagnosticCounters ingestDiagnostics = new DiagnosticCounters(
             VSSLogger::isDebugEnabled, 5_000_000_000L);
     private static volatile String lastAcceptedColumn = "none";
@@ -262,7 +261,8 @@ final class VoxyCompat {
                                             int cx, int sy, int cz, DataLayer block, DataLayer sky) throws Throwable {
         if (trackIngestCompletion) StrictLodVisibility.beginIngest(section, cx, cz);
         try {
-            boolean accepted = (boolean) rawIngest.invoke(worldId, section, cx, sy, cz, block, sky);
+            boolean accepted = VoxyIngestControl.runServerIngest(
+                    () -> (boolean) rawIngest.invoke(worldId, section, cx, sy, cz, block, sky));
             if (!accepted && trackIngestCompletion) StrictLodVisibility.cancelIngest(section);
             return accepted;
         } catch (Throwable failure) {
@@ -714,9 +714,7 @@ final class VoxyCompat {
         try {
             initConfigHandles();
             Object config = getVoxyConfig.invokeExact();
-            return config != null
-                    && readBoolean(getEnabled, config, true)
-                    && readBoolean(getIngestEnabled, config, true);
+            return config != null && readBoolean(getEnabled, config, true);
         } catch (Throwable e) {
             return true;
         }
@@ -748,9 +746,6 @@ final class VoxyCompat {
                 .asType(MethodType.methodType(Boolean.TYPE, Object.class));
         getEnableRendering = lookup
                 .findGetter(voxyConfigClass, "enableRendering", Boolean.TYPE)
-                .asType(MethodType.methodType(Boolean.TYPE, Object.class));
-        getIngestEnabled = lookup
-                .findGetter(voxyConfigClass, "ingestEnabled", Boolean.TYPE)
                 .asType(MethodType.methodType(Boolean.TYPE, Object.class));
         getVoxyConfig = lookup.unreflectGetter(configField).asType(MethodType.methodType(Object.class));
     }
