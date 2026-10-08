@@ -1,7 +1,7 @@
 
 # Voxy Server Side Forge
 
-[0.3.5 更新日志](CHANGELOG.md)
+[0.3.5 更新日志](CHANGELOG.md) · [玩家版说明](docs/release-0.3.5-player-guide.md) · [模组适配核对](docs/release-0.3.5-mod-compatibility-20261006.md)
 
 Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Voxy 远景 LOD。客户端只请求缺失或过期的列数据，再交给 Voxy 渲染，适合多人服务器、大型整合包和高速移动场景。
 
@@ -12,6 +12,7 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 | Minecraft | `1.20.1` |
 | Loader | Forge `47.x` |
 | VSS | `0.3.5-forge-1.20.1` |
+| 本轮核对的 Voxy | `0.2.7-alpha` 移植版，Forge 1.20.1 |
 
 - NeoForge 1.21.1 版本：[voxy-server-side-neoforge](https://github.com/wish131400/voxy-server-side-neoforge)
 - 下载：[CurseForge](https://www.curseforge.com/minecraft/mc-mods/voxy-server-side-forge-neoforge)
@@ -66,7 +67,7 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 
 该功能默认开启，可在 VSS 的 Embeddium/Sodium 设置页控制，需要临时关闭地图写入时执行 `/vssclient xaero disable`，恢复时执行 `/vssclient xaero enable`。执行 `/vssclient xaero reload` 会清除当前服务器所有维度的客户端列存在性记录并自动重新请求已有 LOD 缓存。
 
-Xaero `1.40.x`～`1.45.0` 已适配，并核对 `1.46.0` 对应平台的发布接口与保存流程；低于 `1.40.0` 的版本不受支持，其他版本和整合包组合仍需验证。反射接口不兼容时，Xaero 桥接会自动停用，不影响 VSS/Voxy 的 LOD 功能。
+Xaero 支持下限为 `1.40.0`。已有 `1.40.16`、`1.45.0` 及对应平台 `1.46.0` 的发布接口与保存流程核对，其他版本和整合包组合仍需验证。本轮核对的本地 Forge 实例仍安装 `1.39.12`，低于支持下限，建议升级到对应 Minecraft 1.20.1 / Forge 的已适配版本。反射接口不兼容时，Xaero 桥接会自动停用，不影响 VSS/Voxy 的 LOD 功能。具体记录见 [模组适配核对](docs/release-0.3.5-mod-compatibility-20261006.md)。
 
 ## 远处玩家与兼容模组
 
@@ -135,20 +136,21 @@ VSS 可在原版实体跟踪范围外显示简化的玩家和载具，并同步�
 
 FreeTerraForged 的侵蚀、平滑、坡度和海滩检测已由预测专用挂钩批量交给 Rust；旧版保留海滩修正，新版按预设执行高山高度压缩，并使用独立的地形高度缩放与完整种子转换。普通服务器生成器不注册该挂钩。Perlin/Perlin2、Simplex/Simplex2、白噪声、基础组合噪声、密度量化和线性样条也已有原生实现。大陆、河网、气候、部分噪声及其地表/装饰扩展仍使用 Java，完整 FreeTerraForged 生成器尚未全部迁入 Rust。已用发布 JAR 验证数值，整合包中的 Mixin 转换及最终画面仍需实机验证。瀑布流动、河岸补块等区块后处理不保证逐方块复现；已有真实列仍由 Voxy 覆盖。此适配不代表原始 RTF 的所有分支、任意地形模组叠加或 TerraBlender 扩展都已兼容。验证范围见 `docs/freeterraforged-compatibility.md`。
 
-### 地形模组版本与史诗地形
+### Forge 1.20.1 地形模组版本
 
-本仓库 JAR 的游戏版本为 **Minecraft 1.20.1 / Forge**。下表列出的是对应 NeoForge 仓库的 1.21.1 实测资料，不表示这些地形模组文件可以跨游戏版本使用：
+本仓库 JAR 的游戏版本为 **Minecraft 1.20.1 / Forge**。下表只列对应平台已有的资源或专项兼容检查，完整整合包的画面仍需实机验证：
 
-| 地形模组 | 1.21.1 验证版本 | 预测路径与边界 |
+| 地形模组 | Forge 1.20.1 核对版本 | 预测路径与边界 |
 | --- | --- | --- |
-| Tectonic | `3.0.26-neoforge-21.1`，配合 Lithostitched `1.8.0+beta6-neoforge-21.1` | 按实际运行图及自定义注册表重建；未验证所有旧版，不能声称整个 3.x 系列均支持 |
-| FreeTerraForged | `1.0.0-neoforge-1.21.1`、`0.0.6005-neoforge-1.21.1` | Java 生成上下文加 Rust 瓦片过滤；适配新版命名空间、64 位种子及高山高度压缩。其他发布版尚未逐一验证 |
-| [ETN 史诗地形](https://www.mcmod.cn/class/15808.html) / Epic Terrain | 发布名 `v0.1.4b-Beta-1.20.5~1.21.1`，文件 `epicterrain-0.1.4.jar` | Rust 重建密度缓存访问顺序、基础柱与扩展高度；已与发布数据包的 Minecraft NoiseChunk 结果对照 |
-| Epic Terrain Compatible | `1.0.3+mod`，文件 `epic-terrain_compatible-1.0.3.jar` | 三维 `cache_2d`、插值切片和单元格批量填充已在 Rust 实现，并验证基础柱液体结果。此处不包含仅标注 Forge 的 `1.0.3b-1.21.1` |
+| WWOO | `2.0.0` | 检查发行包生物群系、放置阶段和受支持地表修改；未验收所有整合包配置 |
+| Tectonic | `3.0.17` | 检查对应 1.20.1 密度图与噪声资源；未知节点保留适用的 Java 兼容路径 |
+| Lithostitched | `1.4.11` | 保留对应平台 codec 与回退适配；不能套用 NeoForge 1.21.1 的类级测试结论 |
+
+详细资料见 [Forge 地形兼容记录](docs/wwoo-tectonic-lithostitched-1.20.1-compat-20260923.md)。FreeTerraForged、ReTerraForged 和 Epic Terrain 的已验证 NeoForge 1.21.1 版本单独列在 [模组适配核对表](docs/release-0.3.5-mod-compatibility-20261006.md)，不作为本仓库的 Forge 1.20.1 发行包验证。
 
 Rust 样条现在保留数据包内重复/未排序控制点，并按 Minecraft `CubicSpline` 的二分查找求值；不会擅自排序或合并。对于随高度变化的 `cache_2d`，原生图构建返回明确的不支持原因，客户端保留已经解码的 Minecraft Java 采样器。诊断仍受 debug 模式控制。
 
-这些是各自生成配置的适配结果，不代表 Tectonic、FreeTerraForged 与史诗地形可以同时叠加生成；它们之间的数据包覆盖、TerraBlender 扩展和特定整合包的光影仍需分别验证。复现命令和采样验证见 `tools/prediction/EPIC_TERRAIN_2026-09-09.md`。
+这些是各自生成配置的适配结果，不代表多个地形生成模组可以任意叠加；数据包覆盖、TerraBlender 扩展和特定整合包的光影仍需分别验证。
 
 ## 常用命令
 
