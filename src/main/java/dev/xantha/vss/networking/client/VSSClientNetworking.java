@@ -147,10 +147,7 @@ public final class VSSClientNetworking {
                 + ",queuedColumns=" + COLUMN_PROCESSOR.getQueuedCount();
     }
 
-    public static void handleSessionConfig(SessionConfigS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
-        if (!runOnClientThread(() -> handleSessionConfig(payload, contextSupplier))) {
-            return;
-        }
+    public static void handleSessionConfig(SessionConfigS2CPayload payload) {
         if (!isClientWorldReady()) {
             discardSession();
             return;
@@ -216,6 +213,7 @@ public final class VSSClientNetworking {
         } else {
             predictionOptionKnown = false;
             lastPredictionActive = false;
+            ModCompat.onDisconnect();
             LodRequestManager manager = requestManager;
             requestManager = null;
             if (manager != null) {
@@ -226,12 +224,10 @@ public final class VSSClientNetworking {
         }
     }
 
-    public static void handleHandshakeRequest(
-            HandshakeRequestS2CPayload payload,
-            Supplier<NetworkEvent.Context> contextSupplier) {
-        if (!runOnClientThread(() -> handleHandshakeRequest(payload, contextSupplier))) {
-            return;
-        }
+    public static void handleSessionConfig(SessionConfigS2CPayload payload,
+            Supplier<NetworkEvent.Context> ignored) { handleSessionConfig(payload); }
+
+    public static void handleHandshakeRequest(HandshakeRequestS2CPayload payload) {
         if (!VSSClientConfig.CONFIG.receiveServerLods || requestManager != null || serverEnabled) {
             return;
         }
@@ -240,10 +236,10 @@ public final class VSSClientNetworking {
         handshakeRetryTicks = 0;
     }
 
-    public static void handleBatchResponse(BatchResponseS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
-        if (!runOnClientThread(() -> handleBatchResponse(payload, contextSupplier))) {
-            return;
-        }
+    public static void handleHandshakeRequest(HandshakeRequestS2CPayload payload,
+            Supplier<NetworkEvent.Context> ignored) { handleHandshakeRequest(payload); }
+
+    public static void handleBatchResponse(BatchResponseS2CPayload payload) {
         if (!serverEnabled || !isClientWorldReady()) {
             return;
         }
@@ -268,10 +264,23 @@ public final class VSSClientNetworking {
         }
     }
 
-    public static void handleDirtyColumns(DirtyColumnsS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
-        if (!runOnClientThread(() -> handleDirtyColumns(payload, contextSupplier))) {
-            return;
-        }
+    public static void handleBatchResponse(BatchResponseS2CPayload payload,
+            Supplier<NetworkEvent.Context> ignored) { handleBatchResponse(payload); }
+
+    static LodRequestManager currentPregenManager() { return requestManager; }
+
+    public static boolean isLocalPregenServer(net.minecraft.server.MinecraftServer server) {
+        return IntegratedPregenImporter.supports(server);
+    }
+
+    public static boolean tryImportLocalPregen(net.minecraft.server.MinecraftServer server,
+            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
+            dev.xantha.vss.common.processing.EncodedColumnData data,
+            java.util.function.BooleanSupplier valid, java.util.function.Consumer<Boolean> completed) {
+        return IntegratedPregenImporter.offer(server, dimension, data, requestManager, valid, completed);
+    }
+
+    public static void handleDirtyColumns(DirtyColumnsS2CPayload payload) {
         if (!serverEnabled || !isClientWorldReady()) {
             return;
         }
@@ -286,10 +295,10 @@ public final class VSSClientNetworking {
         }
     }
 
-    public static void handleVoxelColumn(VoxelColumnS2CPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
-        if (!runOnClientThread(() -> handleVoxelColumn(payload, contextSupplier))) {
-            return;
-        }
+    public static void handleDirtyColumns(DirtyColumnsS2CPayload payload,
+            Supplier<NetworkEvent.Context> ignored) { handleDirtyColumns(payload); }
+
+    public static void handleVoxelColumn(VoxelColumnS2CPayload payload) {
         if (!isClientLodSessionActive()) {
             return;
         }
@@ -323,6 +332,9 @@ public final class VSSClientNetworking {
                 receiveResult.priority(),
                 replaceMissingSections);
     }
+
+    public static void handleVoxelColumn(VoxelColumnS2CPayload payload,
+            Supplier<NetworkEvent.Context> ignored) { handleVoxelColumn(payload); }
 
     static boolean shouldReplaceMissingSections(
             LodRequestManager.ColumnReceiveResult receiveResult,
@@ -442,7 +454,8 @@ public final class VSSClientNetworking {
         }
         ClientLodPresenceCache.ScopeClearResult cleared = ClientLodPresenceCache.clearScopeWithDimensions(
                 ClientLodPresenceCache.currentScope());
-        manager.forceResyncWithoutGeneration(cleared.dimensions(), level.dimension());
+        // Xaero replay is a side-channel and must not disable VSS generation.
+        manager.forceResync();
         COLUMN_PROCESSOR.beginSession();
         ClientLodPresenceCache.flush();
         VSSLogger.info("Xaero map reload requested for current server: cleared " + cleared.columns()
@@ -489,6 +502,7 @@ public final class VSSClientNetworking {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         stopClientSessionForWorldShutdown();
+        ClientConnectionIdentity.endSession();
     }
 
     @SubscribeEvent
@@ -499,9 +513,7 @@ public final class VSSClientNetworking {
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+        if (event.phase != TickEvent.Phase.END) return;
         if (WORLDGEN_ASSEMBLY.expire()) {
             VSSLogger.warn("VSS worldgen profile transfer timed out; discarded incomplete snapshot");
         }
@@ -660,24 +672,15 @@ public final class VSSClientNetworking {
         return level != null && player != null && !player.isRemoved();
     }
 
-    private static boolean runOnClientThread(Runnable task) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.isSameThread()) {
-            return true;
-        }
-        minecraft.execute(task);
-        return false;
-    }
-
     private static void discardSession() {
         stopClientSession(false);
     }
 
     private static void stopClientSession(boolean resetStats) {
+        WORLDGEN_ASSEMBLY.clear();
         PREDICTION_CAPABILITY_SYNC.reset();
         predictionOptionKnown = false;
         lastPredictionActive = false;
-        WORLDGEN_ASSEMBLY.clear();
         dev.xantha.vss.compat.StrictLodVisibility.reset();
         ClientPredictionState.clear();
         ModCompat.onDisconnect();
@@ -695,7 +698,6 @@ public final class VSSClientNetworking {
         }
         ClientLodPresenceCache.flush();
         FarPlayerClientRenderer.clear();
-        ModCompat.onDisconnect();
         COLUMN_PROCESSOR.shutdown();
         if (resetStats) {
             COLUMN_PROCESSOR.resetStats();

@@ -89,6 +89,11 @@ public final class FarPlayerBroadcaster {
 
         double maxHorizontalDistanceSqr = square(config.lodDistanceChunks * 16.0D);
         PlayerSpatialIndex spatialIndex = PlayerSpatialIndex.build(players);
+        // Curios sync data is a snapshot of the target player. Capture it once
+        // per broadcast instead of serializing the same inventory once for
+        // every viewer that can see that player.
+        Map<UUID, CompoundTag> curiosSnapshots = new HashMap<>();
+        Set<UUID> attemptedCuriosSnapshots = new HashSet<>();
         for (ServerPlayer viewer : players) {
             if (!VSSServerNetworking.isRegistered(viewer)) {
                 NorthstarRocketCompat.clear(viewer);
@@ -151,7 +156,7 @@ public final class FarPlayerBroadcaster {
                             target.onGround(),
                             target.isOnFire(),
                             modelParts(target),
-                            CuriosCompat.capture(target),
+                            captureCuriosOnce(target, curiosSnapshots, attemptedCuriosSnapshots),
                             copyItem(target, EquipmentSlot.MAINHAND),
                             copyItem(target, EquipmentSlot.OFFHAND),
                             copyItem(target, EquipmentSlot.HEAD),
@@ -172,6 +177,21 @@ public final class FarPlayerBroadcaster {
                 NorthstarRocketCompat.finishViewer(viewer);
             }
         }
+    }
+
+    private static CompoundTag captureCuriosOnce(
+            ServerPlayer target,
+            Map<UUID, CompoundTag> snapshots,
+            Set<UUID> attemptedSnapshots) {
+        UUID targetId = target.getUUID();
+        if (!attemptedSnapshots.add(targetId)) {
+            return snapshots.get(targetId);
+        }
+        CompoundTag snapshot = CuriosCompat.capture(target);
+        if (snapshot != null) {
+            snapshots.put(targetId, snapshot);
+        }
+        return snapshot;
     }
 
     private record PlayerSpatialIndex(Map<ResourceLocation, Map<Long, List<ServerPlayer>>> buckets) {

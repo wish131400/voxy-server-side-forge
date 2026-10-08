@@ -91,6 +91,7 @@ public final class ServerNetworkingLifecycle {
             return;
         }
         persistentStore.flushDirtyIndexes(server);
+        persistentColumnWriter.scheduleMaintenance(server);
         if (playerRegistry.isEmpty() && !chunky.hasActiveJob()) {
             releaseIdleMemory();
             return;

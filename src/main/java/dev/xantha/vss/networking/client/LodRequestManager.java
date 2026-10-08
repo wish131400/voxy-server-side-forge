@@ -84,15 +84,12 @@ public final class LodRequestManager {
     private static final int BOOSTED_SCAN_CANDIDATES_PER_TICK = 32768;
     private static final int MAX_REQUESTS_PER_TICK = 256;
     private static final int INTEGRATED_MAX_REQUESTS_PER_TICK = 96;
-    /** Keep VSS/Voxy moving while Xaero drains its own map-update backlog. */
-    private static final int XAERO_BACKPRESSURE_MAX_REQUESTS_PER_TICK = 8;
     private static final long MAX_SCAN_NANOS_PER_TICK = 1_500_000L;
     private static final long INTEGRATED_MAX_SCAN_NANOS_PER_TICK = 750_000L;
     private static final int SCAN_DEADLINE_CHECK_INTERVAL = 64;
     private static final int SCAN_BOOST_TICKS = 100;
     private static final int MAX_DEFERRED_CANDIDATES_PER_TICK = 2048;
     private static final int MAX_DEFERRED_COLUMNS = 65536;
-    private static final int MAX_XAERO_LOCAL_REPLAY_COLUMNS = 65536;
     private static final int FAST_MOVE_CHUNK_THRESHOLD = 8;
     private static final int FAST_MOVE_KEEP_RADIUS_CHUNKS = 48;
     // Walk the whole active LOD window so stale cached entries cannot permanently
@@ -120,8 +117,6 @@ public final class LodRequestManager {
                     RATE_LIMIT_BACKOFF_MAX_SHIFT,
                     GENERATION_BACKOFF_MAX_SHIFT));
     private final LongOpenHashSet diskMissedColumns = new LongOpenHashSet();
-    /** Known local Voxy columns whose contents should be replayed into Xaero. */
-    private final LongOpenHashSet xaeroReplayColumns = new LongOpenHashSet();
     /** Responses from requests cancelled during a prediction toggle are stale. */
     private final LongOpenHashSet suppressedResponses = new LongOpenHashSet();
     private final ClientPresenceReporter presenceReporter;
@@ -156,8 +151,6 @@ public final class LodRequestManager {
     private final PredictionGenerationPriority predictionPriority = new PredictionGenerationPriority();
     private int diagnosticGenerationLimit;
     private boolean diagnosticXaeroBackpressure;
-    private boolean xaeroReplayArmed;
-    private boolean xaeroLocalSeedComplete;
 
     private static class RequestBuffers {
         final int[] requestIds = new int[VSSConstants.MAX_BATCH_CHUNK_REQUESTS];
@@ -369,8 +362,6 @@ public final class LodRequestManager {
             lastPlayerChunkX = playerCx;
             lastPlayerChunkZ = playerCz;
         }
-        if (ModCompat.isXaeroMapBridgeActive()) armXaeroBackfill(level, playerCx, playerCz);
-        else disarmXaeroBackfill();
         presenceReporter.updateWindow(level, level.dimension(), playerCx, playerCz, lodDistance);
         boolean allowPresenceZstd = (sessionConfig.serverCapabilities() & VSSConstants.CAPABILITY_ZSTD_COLUMNS) != 0;
         presenceReporter.drain(level, level.dimension(), allowPresenceZstd);
@@ -437,6 +428,21 @@ public final class LodRequestManager {
         return new ColumnReceiveResult(true, dirtyRefreshRequest, replacingKnownColumn, packed);
     }
 
+    /** Local explicit pregen may persist outside the display radius. It still
+     * obeys the active dimension, dirty watermark and monotonic column version. */
+    synchronized boolean processLocalPregenColumn(ResourceKey<Level> dimension, int cx, int cz,
+            long version, int[] sections, BooleanSupplier processor) {
+        if (sessionConfig == null || !sessionConfig.enabled() || !isActiveDimension(dimension)) return false;
+        long packed = PositionUtil.packPosition(cx, cz);
+        if (version <= 0 || version < dirtyColumnTimestamps.get(packed)) return false;
+        if (columnTimestamps.get(packed) >= version) return true;
+        if (!processor.getAsBoolean()) return false;
+        requestTracker.cancel(packed);
+        suppressedResponses.remove(packed);
+        acceptColumn(dimension, packed, version, sections);
+        return true;
+    }
+
     public synchronized ColumnProcessingResult processColumnIfCurrent(
             int requestId,
             ResourceKey<Level> dimension,
@@ -495,7 +501,6 @@ public final class LodRequestManager {
             int[] replacementSectionYs) {
         long requiredTimestamp = dirtyColumnTimestamps.get(packed);
         columnTimestamps.put(packed, columnTimestamp);
-        xaeroReplayColumns.remove(packed);
         strictUnavailableColumns.remove(packed);
         requestScanPending = true;
         rememberKnownColumn(dimension, packed, columnTimestamp, replacementSectionYs);
@@ -569,7 +574,6 @@ public final class LodRequestManager {
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
             requestScanPending = true;
-            boolean xaeroReplayRequest = cacheProbeRequest && xaeroReplayColumns.remove(packed);
             if (dirtyRefreshRequest && hasKnownColumn(packed)) {
                 if (hasDirtyTimestamp(packed)) {
                     markBackoff(packed, false);
@@ -598,14 +602,7 @@ public final class LodRequestManager {
                 deferredColumns.remove(packed);
                 deferColumn(packed);
             } else if (cacheProbeRequest) {
-                if (xaeroReplayRequest) {
-                    // A map-only miss cannot discard valid VSS/Voxy presence
-                    // or promote a local cache replay into world generation.
-                    generationDiagnostics.record("xaeroReplayProbeMiss");
-                    if (columnTimestamps.get(packed) <= 0L) columnTimestamps.put(packed, 0L);
-                    deferredColumns.remove(packed);
-                    clearBackoff(packed);
-                } else handleCacheProbeMiss(packed);
+                handleCacheProbeMiss(packed);
             } else if (generationAllowed()) {
                 columnTimestamps.remove(packed);
                 clearBackoff(packed);
@@ -633,7 +630,6 @@ public final class LodRequestManager {
         long packed = requestTracker.remove(requestId);
         if (packed != Long.MIN_VALUE) {
             requestScanPending = true;
-            xaeroReplayColumns.remove(packed);
             long requiredTimestamp = dirtyColumnTimestamps.get(packed);
             long localTimestamp = columnTimestamps.get(packed);
             if (localTimestamp <= 0L) {
@@ -730,65 +726,6 @@ public final class LodRequestManager {
     public synchronized void forceResync() {
         cacheOnlyReload.clear();
         resetRequestStateAfterConfigChange();
-    }
-
-    private void armXaeroBackfill(ClientLevel level, int playerCx, int playerCz) {
-        if (!xaeroReplayArmed) {
-            xaeroReplayArmed = true;
-            for (long packed : columnTimestamps.keySet()) {
-                queueXaeroReplay(packed);
-            }
-        }
-
-        if (xaeroLocalSeedComplete) {
-            return;
-        }
-        int distance = getEffectiveLodDistance();
-        if (distance <= 0) {
-            xaeroLocalSeedComplete = true;
-            return;
-        }
-        int result = ModCompat.forEachVoxyLocalColumn(
-                level,
-                playerCx,
-                playerCz,
-                distance + VSSConstants.LOD_DISTANCE_BUFFER,
-                MAX_XAERO_LOCAL_REPLAY_COLUMNS,
-                this::queueXaeroReplay);
-        if (result >= 0) {
-            xaeroLocalSeedComplete = true;
-            if (result > 0) {
-                VSSLogger.debug("Xaero local LOD backfill queued " + result + " Voxy columns");
-            }
-        }
-    }
-
-    private void disarmXaeroBackfill() {
-        if (!xaeroReplayArmed && xaeroReplayColumns.isEmpty()) {
-            return;
-        }
-        for (long packed : xaeroReplayColumns) {
-            if (requestTracker.contains(packed)) {
-                requestTracker.cancel(packed);
-            }
-            deferredColumns.remove(packed);
-        }
-        xaeroReplayColumns.clear();
-        xaeroReplayArmed = false;
-        xaeroLocalSeedComplete = false;
-    }
-
-    private void queueXaeroReplay(long packed) {
-        if (!xaeroReplayArmed || dirtyColumns.contains(packed)) {
-            return;
-        }
-        if (xaeroReplayColumns.add(packed)) {
-            deferredColumns.defer(packed);
-        }
-    }
-
-    private boolean isXaeroReplayCandidate(long packed) {
-        return xaeroReplayArmed && xaeroReplayColumns.contains(packed);
     }
 
     public synchronized void forceResyncWithoutGeneration(
@@ -995,12 +932,10 @@ public final class LodRequestManager {
         int maxCount = Math.min(
                 Math.min(VSSConstants.MAX_BATCH_CHUNK_REQUESTS, requestWindow.remaining()),
                 maxRequestsPerTick());
-        diagnosticXaeroBackpressure = ModCompat.shouldBackpressureXaeroMapInput();
-        maxCount = limitForXaeroBackpressure(maxCount, diagnosticXaeroBackpressure);
+        // Xaero is an optional, lossy side-channel. Its queue pressure must
+        // never throttle VSS/Voxy column delivery or explicit generation.
+        diagnosticXaeroBackpressure = false;
         diagnosticBatchLimit = maxCount;
-        if (diagnosticXaeroBackpressure) {
-            generationDiagnostics.record("xaeroThrottledTicks");
-        }
         int[] requestIds = requestBuffers.requestIds;
         long[] positions = requestBuffers.positions;
         long[] timestamps = requestBuffers.timestamps;
@@ -1311,7 +1246,7 @@ public final class LodRequestManager {
                     boolean generationCandidate = !dirtyRefresh && isGenerationCandidate(packed);
                     boolean cacheProbe = !dirtyRefresh
                             && !generationCandidate
-                            && (isXaeroReplayCandidate(packed) || requiresFirstPassCacheProbe(packed));
+                            && requiresFirstPassCacheProbe(packed);
                     if (!dirtyRefresh
                             && !generationCandidate
                             && !cacheProbe
@@ -1526,7 +1461,7 @@ public final class LodRequestManager {
         }
         boolean generationCandidate = isGenerationCandidate(packed);
         boolean cacheProbe = !generationCandidate
-                && (isXaeroReplayCandidate(packed) || shouldUseFirstPassCacheProbe(packed, ring, requestWindow));
+                && shouldUseFirstPassCacheProbe(packed, ring, requestWindow);
         if (!requestWindow.canSend(false, generationCandidate, cacheProbe, ring)) {
             return count;
         }
@@ -1574,7 +1509,6 @@ public final class LodRequestManager {
         }
 
         long timestamp = columnTimestamps.get(packed);
-        if (isXaeroReplayCandidate(packed)) return true;
         if (timestamp > 0L && !dirty) {
             return false;
         }
@@ -1670,8 +1604,7 @@ public final class LodRequestManager {
             }
             columnTimestamps.put(packed, Math.max(columnTimestamps.get(packed), columnTimestamp));
             diskMissedColumns.remove(packed);
-            queueXaeroReplay(packed);
-            if (!dirtyColumns.contains(packed) && !isXaeroReplayCandidate(packed)) {
+            if (!dirtyColumns.contains(packed)) {
                 deferredColumns.remove(packed);
                 clearBackoff(packed);
             }
@@ -1680,7 +1613,6 @@ public final class LodRequestManager {
 
     boolean reconcileMissingColumn(long packed) {
         requestScanPending = true;
-        xaeroReplayColumns.remove(packed);
         strictUnavailableColumns.remove(packed);
         strictSections.remove(strictSectionsKey(packed));
         if (dev.xantha.vss.compat.StrictLodVisibility.completed(lastDimension,
@@ -1772,9 +1704,7 @@ public final class LodRequestManager {
         suppressedResponses.remove(packed);
         requestIds[count] = requestId;
         positions[count] = packed;
-        // Replays need the server to send contents rather than only a version acknowledgment.
-        timestamps[count] = isXaeroReplayCandidate(packed) && !dirtyColumns.contains(packed)
-                ? 1L : requestTimestampFor(packed);
+        timestamps[count] = requestTimestampFor(packed);
         allowGeneration[count] = generationCandidate;
         cacheProbeFlags[count] = cacheProbeRequest;
         if (lastDimension != null) {
@@ -1787,7 +1717,8 @@ public final class LodRequestManager {
     }
 
     private boolean generationAllowed() {
-        return !cacheOnlyReload.isActive() && sessionConfig != null && sessionConfig.generationEnabled();
+        // Xaero map replay is independent of terrain generation.
+        return sessionConfig != null && sessionConfig.generationEnabled();
     }
 
     long requestTimestampFor(long packed) {
@@ -1804,9 +1735,8 @@ public final class LodRequestManager {
     }
 
     static int limitForXaeroBackpressure(int maxCount, boolean backpressure) {
-        if (maxCount <= 0) return 0;
-        return backpressure ? Math.min(maxCount, XAERO_BACKPRESSURE_MAX_REQUESTS_PER_TICK)
-                : maxCount;
+        // Retained as a compatibility seam; map backlog never limits VSS.
+        return Math.max(0, maxCount);
     }
 
     private int getEffectiveLodDistance() {
@@ -2032,7 +1962,6 @@ public final class LodRequestManager {
             strictSections.remove(strictSectionsKey(packed));
             strictUnavailableColumns.remove(packed);
             columnTimestamps.remove(packed);
-            xaeroReplayColumns.remove(packed);
             dirtyColumns.remove(packed);
             dirtyColumnTimestamps.remove(packed);
             deferredColumns.remove(packed);
@@ -2099,8 +2028,6 @@ public final class LodRequestManager {
         transferReset.run();
         deferredColumns.clear();
         diskMissedColumns.clear();
-        xaeroReplayColumns.clear();
-        xaeroLocalSeedComplete = false;
         suppressedResponses.clear();
         retryBackoff.clearAll();
         lastPlayerChunkX = Integer.MIN_VALUE;

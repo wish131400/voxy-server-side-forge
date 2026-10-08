@@ -24,8 +24,8 @@ class RequestWindowTest {
     }
 
     @Test
-    void xaeroBackpressureKeepsASmallVssBudgetAlive() {
-        assertEquals(8, LodRequestManager.limitForXaeroBackpressure(256, true));
+    void xaeroBackpressureDoesNotLimitVssBudget() {
+        assertEquals(256, LodRequestManager.limitForXaeroBackpressure(256, true));
         assertEquals(3, LodRequestManager.limitForXaeroBackpressure(3, true));
         assertEquals(256, LodRequestManager.limitForXaeroBackpressure(256, false));
         assertEquals(0, LodRequestManager.limitForXaeroBackpressure(0, true));
@@ -87,6 +87,23 @@ class RequestWindowTest {
     }
 
     @Test
+    void cacheProbeUsesIndependentBudget() {
+        RequestWindow window = new RequestWindow(0, 0, 0, 0, 0, 2, 0);
+
+        assertFalse(window.hasAnySyncCapacity());
+        assertFalse(window.hasGenerationCapacity());
+        assertTrue(window.hasCacheProbeCapacity());
+        assertTrue(window.canSend(false, false, true, 128));
+
+        window.record(false, false, true, 128);
+        window.record(false, false, true, 128);
+
+        assertEquals(0, window.cacheProbeRemaining());
+        assertEquals(0, window.generationSent());
+        assertFalse(window.hasAnyNormalCandidateCapacity());
+    }
+
+    @Test
     void firstPassGenerationCanUseItsOwnSlotWhenSyncBudgetIsExhausted() {
         RequestWindow window = new RequestWindow(0, 0, 0, 0, 1, 0);
 
@@ -98,20 +115,6 @@ class RequestWindowTest {
 
         assertFalse(window.hasAnyNormalCandidateCapacity());
         assertEquals(1, window.generationSent());
-    }
-
-    @Test
-    void cacheProbeUsesIndependentBudget() {
-        RequestWindow window = new RequestWindow(0, 0, 0, 0, 0, 2, 0);
-
-        assertTrue(window.hasCacheProbeCapacity());
-        assertTrue(window.canSend(false, false, true, 0));
-        window.record(false, false, true, 0);
-        window.record(false, false, true, 0);
-
-        assertFalse(window.hasCacheProbeCapacity());
-        assertEquals(0, window.generationSent());
-        assertEquals(0, window.syncSent());
     }
 
     @Test
