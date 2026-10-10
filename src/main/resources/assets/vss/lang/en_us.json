@@ -1,4 +1,6 @@
 {
+  "vss.voxy_options.local_chunk_ingestion": "Local chunk ingestion",
+  "vss.voxy_options.local_chunk_ingestion.tooltip": "Convert locally loaded chunks into Voxy LOD. Disable to reduce local conversion work while still receiving server LOD. Existing cached LOD is retained; rendering and prediction are separate settings.",
   "vss.command.render_capture.started": "VSS: close chat and keep the affected area in view. One frame will be captured after 3 seconds; this diagnostic may briefly pause rendering.",
   "vss.command.render_capture.done": "VSS render capture saved: %s",
   "vss.command.render_capture.failed": "VSS render capture failed: %s",

@@ -17,6 +17,8 @@
     "minecraft.TrackedEntitySeenByAccessor"
   ],
   "client": [
+    "voxy.VoxelIngestServiceSourceMixin",
+    "voxy.VoxyClientInstanceServerIngestMixin",
     "client.IrisPredictionCaptureMixin",
     "client.IrisPredictionShaderCaptureMixin",
     "client.SpyglassOverlayTimingMixin",
