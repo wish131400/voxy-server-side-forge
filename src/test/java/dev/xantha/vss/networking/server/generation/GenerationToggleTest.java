@@ -6,6 +6,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GenerationToggleTest {
+    @org.junit.jupiter.api.BeforeAll
+    static void initializeConfigDirectory() {
+        if (net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get() == null) {
+            net.minecraftforge.fml.loading.FMLPaths.loadAbsolutePaths(
+                    java.nio.file.Path.of("build", "tmp", "generation-tests"));
+        }
+    }
+
     @Test void explicitJobBypassesActiveAndQueuedQuotasAndUnregistersCleanly() throws Exception {
         VSSServerConfig config = new VSSServerConfig();
         config.enableChunkGeneration = true;

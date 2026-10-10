@@ -10,6 +10,7 @@ import dev.xantha.vss.common.DiagnosticCounters;
 import dev.xantha.vss.common.processing.EncodedColumnData;
 import dev.xantha.vss.common.processing.LoadedColumnData;
 import dev.xantha.vss.config.VSSServerConfig;
+import dev.xantha.vss.networking.server.generation.GenerationTickBudget.SnapshotSource;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -90,6 +91,7 @@ public final class ChunkGenerationService {
     private final DiagnosticCounters ticketDiagnostics = new DiagnosticCounters(
             VSSLogger::isDebugEnabled, 5_000_000_000L);
     private int startsThisTick;
+    private final GenerationTickBudget tickBudget = new GenerationTickBudget();
     private volatile long packingEpoch;
     private long nextPackingTaskSequence;
     private long nextQueuedSequence;
@@ -198,7 +200,7 @@ public final class ChunkGenerationService {
         ChunkPos pos = new ChunkPos(cx, cz);
         PendingGeneration generation = new PendingGeneration(pos, level, minimumTimestamp);
         generation.callbacks.add(callback);
-        if (queued.isEmpty() && canStart(generation) && tryStartThisTick()) {
+        if (queued.isEmpty() && canStart(generation) && tryStartThisTick(generation)) {
             startGeneration(key, generation);
         } else {
             if (!ensureQueueCapacityFor(playerUuid, generation)) {
@@ -243,21 +245,25 @@ public final class ChunkGenerationService {
                 packingByColumn.remove(key, existingPacking);
             }
         }
-        if (!canSubmitPackingTask(priority)) {
+        refreshTickBudget(level.getServer());
+        boolean explicitJob = backgroundOwners.contains(playerUuid);
+        SnapshotSource source = explicitJob ? SnapshotSource.CHUNKY : SnapshotSource.LIVE;
+        if (!canSnapshotThisTick(source)
+                || (!explicitJob && (!canSubmitPackingTask(priority) || shouldReserveGeneratedSnapshot()))) {
             totalPackingRejected++;
             return false;
         }
 
         SectionSerializer.ColumnSnapshot snapshot;
         try {
-            snapshot = SectionSerializer.snapshotColumn(level, chunk, cx, cz);
+            snapshot = snapshotColumn(level, chunk, cx, cz, source);
         } catch (Exception e) {
             VSSLogger.error("Failed to snapshot loaded chunk at " + cx + ", " + cz, e);
             return false;
         }
 
         try {
-            if (!canSubmitPackingTask(priority, snapshot)) {
+            if (!explicitJob && !canSubmitPackingTask(priority, snapshot)) {
                 totalPackingRejected++;
                 return false;
             }
@@ -285,7 +291,7 @@ public final class ChunkGenerationService {
     }
 
     public synchronized List<GenerationResult> tick(MinecraftServer server) {
-        startsThisTick = 0;
+        refreshTickBudget(server);
         List<GenerationResult> results = new ArrayList<>();
         drainPackingResults(results);
         drainDeferredGenerationResults(results);
@@ -329,19 +335,20 @@ public final class ChunkGenerationService {
                 continue;
             }
 
-            if (backgroundOwners.isEmpty() && processedThisTick >= config.automaticGenerationCompletionsPerTick()) {
+            boolean explicitJob = hasBackgroundCallback(generation);
+            SnapshotSource source = explicitJob ? SnapshotSource.CHUNKY : SnapshotSource.GENERATED;
+            if (!explicitJob && processedThisTick >= config.automaticGenerationCompletionsPerTick()) continue;
+            if (!explicitJob && !canSubmitPackingTask(generation.priority())) continue;
+            if (!canSnapshotThisTick(source)) {
+                tickBudget.deferGeneratedSnapshot();
                 continue;
             }
-            if (!hasBackgroundCallback(generation) && !canSubmitPackingTask(generation.priority())) {
-                continue;
-            }
-
-            processedThisTick++;
+            if (!explicitJob) processedThisTick++;
             PendingPacking handedOffPacking = null;
             try {
-                SectionSerializer.ColumnSnapshot snapshot = SectionSerializer.snapshotColumn(
-                        generation.level, chunk, generation.pos.x, generation.pos.z);
-                if (!hasBackgroundCallback(generation) && !canSubmitPackingTask(generation.priority(), snapshot)) {
+                SectionSerializer.ColumnSnapshot snapshot = snapshotColumn(
+                        generation.level, chunk, generation.pos.x, generation.pos.z, source);
+                if (!explicitJob && !canSubmitPackingTask(generation.priority(), snapshot)) {
                     totalPackingRejected++;
                     continue;
                 }
@@ -493,6 +500,8 @@ public final class ChunkGenerationService {
     }
 
     public synchronized void shutdown() {
+        tickBudget.reset();
+        startsThisTick = 0;
         releaseIdleMemory();
     }
 
@@ -542,7 +551,8 @@ public final class ChunkGenerationService {
                         totalLivePackingSubmitted,
                         totalLivePackingCompleted,
                         packingSnapshotBytes.get(),
-                        maxPackingSnapshotBytes.get());
+                        maxPackingSnapshotBytes.get())
+                + ", " + tickBudget.diagnostics();
     }
 
     public synchronized Component diagnosticsComponent(Component storageDiagnostics) {
@@ -588,26 +598,27 @@ public final class ChunkGenerationService {
                                 : totalPackingWaitNanos / 1_000_000.0D / totalPackingFinished),
                         String.format(java.util.Locale.ROOT, "%.1f", maxPackingWaitNanos / 1_000_000.0D)))
                 .append(Component.literal("; "))
-                .append(storageDiagnostics);
+                .append(storageDiagnostics)
+                .append(Component.literal("; " + tickBudget.diagnostics()));
     }
 
     private void promoteQueued() {
-        if (!config.enableChunkGeneration || queued.isEmpty() || !startsAvailableThisTick()) {
-            return;
-        }
+        if (!config.enableChunkGeneration || queued.isEmpty()) return;
+        refreshTickBudget(queued.values().iterator().next().level.getServer());
+        if (!startsAvailableThisTick(false) && backgroundOwners.isEmpty()) return;
 
         ArrayList<QueuedGenerationEntry> blocked = new ArrayList<>();
         try {
-            while (startsAvailableThisTick()) {
+            while (startsAvailableThisTick(false) || !backgroundOwners.isEmpty()) {
                 QueuedSelection selection = selectNearestStartableQueuedGeneration(blocked);
                 if (selection == null) {
                     break;
                 }
                 PendingGeneration generation = selection.generation();
 
-                if (!tryStartThisTick()) {
+                if (!tryStartThisTick(generation)) {
                     refreshQueuedPriority(selection.key(), generation);
-                    break;
+                    continue;
                 }
                 for (GenerationCallback callback : generation.callbacks) {
                     decrementQueuedCount(callback.playerUuid());
@@ -637,7 +648,7 @@ public final class ChunkGenerationService {
                 totalQueueStaleEntries++;
                 continue;
             }
-            if (!canStart(generation)) {
+            if (!canStart(generation) || !startsAvailableThisTick(hasBackgroundCallback(generation))) {
                 blocked.add(candidate);
                 continue;
             }
@@ -648,7 +659,7 @@ public final class ChunkGenerationService {
     }
 
     private boolean canStart(PendingGeneration generation) {
-        if (!hasRegularCallback(generation)) return true;
+        if (hasBackgroundCallback(generation) || !hasRegularCallback(generation)) return true;
         if (regularActiveCount() >= config.generationConcurrencyLimitGlobal)
             return false;
         return GenerationSchedulingPolicy.hasPerPlayerCapacity(perPlayerActiveCount,
@@ -813,16 +824,53 @@ public final class ChunkGenerationService {
         return PositionUtil.chebyshevDistance(generation.pos.x, generation.pos.z, view.chunkX(), view.chunkZ());
     }
 
-    private boolean startsAvailableThisTick() {
-        return !backgroundOwners.isEmpty() || startsThisTick < config.automaticGenerationStartsPerTick();
+    private boolean startsAvailableThisTick(boolean explicitJob) {
+        return tickBudget.canStart(explicitJob)
+                && (explicitJob || startsThisTick < config.automaticGenerationStartsPerTick());
     }
 
-    private boolean tryStartThisTick() {
-        if (!startsAvailableThisTick()) {
-            return false;
-        }
-        startsThisTick++;
+    private boolean tryStartThisTick(PendingGeneration generation) {
+        refreshTickBudget(generation.level.getServer());
+        boolean explicitJob = hasBackgroundCallback(generation);
+        if (!startsAvailableThisTick(explicitJob)) return false;
+        if (!explicitJob) startsThisTick++;
         return true;
+    }
+
+    private void refreshTickBudget(MinecraftServer server) {
+        if (tickBudget.beginTick(server.getTickCount(), server.getAverageTickTime(), config.generationPauseAboveMspt)) {
+            startsThisTick = 0;
+        }
+    }
+
+    private boolean canSnapshotThisTick(SnapshotSource source) {
+        return tickBudget.canSnapshot(source, config.generationSnapshotsPerTickLimit,
+                config.generationSnapshotBudgetMillis);
+    }
+
+    private boolean shouldReserveGeneratedSnapshot() {
+        if (!tickBudget.shouldReserveGeneratedSnapshot(config.generationSnapshotsPerTickLimit,
+                config.generationSnapshotBudgetMillis)) return false;
+        for (PendingGeneration generation : active.values()) {
+            // Explicit chunky work owns no automatic quota. A result that cannot
+            // enter packing must not prevent live updates from making progress.
+            if (!hasBackgroundCallback(generation)
+                    && canSubmitPackingTask(generation.priority())
+                    && generation.level.getChunkSource().getChunkNow(generation.pos.x, generation.pos.z) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private SectionSerializer.ColumnSnapshot snapshotColumn(ServerLevel level, LevelChunk chunk,
+                                                           int cx, int cz, SnapshotSource source) {
+        long started = System.nanoTime();
+        try {
+            return SectionSerializer.snapshotColumn(level, chunk, cx, cz);
+        } finally {
+            tickBudget.recordSnapshot(source, System.nanoTime() - started);
+        }
     }
 
     private void startGeneration(PendingGenerationKey key, PendingGeneration generation) {
