@@ -1,6 +1,7 @@
 package dev.xantha.vss.api;
 
 import java.util.Arrays;
+import dev.xantha.vss.common.processing.ColumnCoverage;
 import net.minecraft.world.level.chunk.DataLayer;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
@@ -9,7 +10,15 @@ public record VoxelColumnData(
         long columnTimestamp,
         boolean replaceMissingSections,
         int[] replacementSectionYs,
-        boolean completesRequest) {
+        boolean completesRequest,
+        ColumnCoverage coverage) {
+    public VoxelColumnData(SectionData[] sections, long columnTimestamp, boolean replaceMissingSections,
+            int[] replacementSectionYs, boolean completesRequest) {
+        this(sections, columnTimestamp, replaceMissingSections, replacementSectionYs, completesRequest, ColumnCoverage.FULL);
+    }
+
+    /** Unfiltered real source data; completeness and GPU readiness are separate facts. */
+    public boolean authoritative() { return !coverage.isFiltered(); }
     public VoxelColumnData(SectionData[] sections, long columnTimestamp) {
         this(sections, columnTimestamp, false);
     }
@@ -27,6 +36,9 @@ public record VoxelColumnData(
     }
 
     public VoxelColumnData {
+        if (coverage == null) coverage = ColumnCoverage.FULL;
+        if (coverage.isFiltered() && replaceMissingSections)
+            throw new IllegalArgumentException("A filtered update cannot clear missing sections");
         if (sections == null) {
             sections = new SectionData[0];
         }

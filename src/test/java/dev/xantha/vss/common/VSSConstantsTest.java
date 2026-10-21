@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Test;
 class VSSConstantsTest {
 
     @Test
-    void protocolVersionIncludesLostCitiesHints() {
-        assertEquals(49, VSSConstants.PROTOCOL_VERSION);
+    void protocolVersionIncludesScopedColumnMetadata() {
+        // Current worldgen/template wire format; incompatible peers must not handshake.
+        assertEquals(53, VSSConstants.PROTOCOL_VERSION);
     }
 
     @Test

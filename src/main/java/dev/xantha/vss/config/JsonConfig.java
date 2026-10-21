@@ -1,89 +1,33 @@
 package dev.xantha.vss.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import dev.xantha.vss.common.VSSLogger;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import net.minecraftforge.fml.loading.FMLPaths;
 
+/**
+ * 配置模型与加载器目录适配；校验和字段说明由具体配置提供，JSON 文件工作交给存储器。
+ * <p>保存是同步操作，仅由加载或显式设置流程触发，不能在逐帧渲染中调用。
+ */
 public abstract class JsonConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
     protected abstract String getFileName();
-
-    protected void validate() {
-    }
-
-    protected Map<String, String> getConfigHelp() {
-        return Map.of();
-    }
+    protected void validate() { }
+    protected Map<String, String> getConfigHelp() { return Map.of(); }
 
     public void save() {
-        try {
-            Path path = resolvePath();
-            Files.createDirectories(path.getParent());
-            Files.writeString(path, GSON.toJson(configWithHelp()));
-        } catch (Exception e) {
-            VSSLogger.error("Failed to save config " + getFileName(), e);
-        }
-    }
-
-    private JsonObject configWithHelp() {
-        JsonObject result = new JsonObject();
-        Map<String, String> helpEntries = getConfigHelp();
-        if (!helpEntries.isEmpty()) {
-            JsonObject help = new JsonObject();
-            helpEntries.forEach(help::addProperty);
-            result.add("_help", help);
-        }
-        GSON.toJsonTree(this).getAsJsonObject().entrySet()
-                .forEach(entry -> result.add(entry.getKey(), entry.getValue()));
-        return result;
+        new JsonConfigStore(configDirectory()).save(this);
     }
 
     private static Path configDirectory() {
         try {
-            return FMLPaths.CONFIGDIR.get();
+            Path directory = FMLPaths.CONFIGDIR.get();
+            if (directory != null) return directory;
         } catch (Throwable unavailable) {
-            // Unit tests and CLI tooling run without FML; keep their configs
-            // out of the repository working tree.
-            return Path.of(System.getProperty("java.io.tmpdir"), "vss-config");
+            // 无加载器的测试和工具使用同一回退路径，读写必须一致。
         }
-    }
-
-    private Path resolvePath() {
-        return configDirectory().resolve(getFileName());
+        return Path.of(System.getProperty("java.io.tmpdir"), "vss-config");
     }
 
     protected static <T extends JsonConfig> T load(Class<T> type, String fileName) {
-        Path path = FMLPaths.CONFIGDIR.get().resolve(fileName);
-        boolean exists = Files.isRegularFile(path);
-        if (exists) {
-            try {
-                T config = GSON.fromJson(Files.readString(path), type);
-                if (config != null) {
-                    config.validate();
-                    config.save();
-                    return config;
-                }
-                VSSLogger.warn("Config " + fileName + " was empty or invalid, using defaults");
-            } catch (Exception e) {
-                VSSLogger.error("Failed to read config " + fileName + ", using defaults", e);
-            }
-        }
-
-        try {
-            T config = type.getDeclaredConstructor().newInstance();
-            config.validate();
-            if (!exists) {
-                config.save();
-            }
-            return config;
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Cannot instantiate config " + type.getName(), e);
-        }
+        return new JsonConfigStore(configDirectory()).load(type, fileName);
     }
 }

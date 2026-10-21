@@ -6,7 +6,9 @@ public enum PredictionVegetationDensity {
     MEDIUM(50, 2),
     HIGH(100, 0);
 
-    public static final int SETTINGS_MASK = 3 << 10;
+    /** Display selection revision; canonical placement cache identity stays unchanged. */
+    private static final int SELECTION_VERSION = 1 << 9;
+    public static final int SETTINGS_MASK = SELECTION_VERSION | 3 << 10;
     private final int percentage, cacheIndex;
 
     PredictionVegetationDensity(int percentage, int cacheIndex) {
@@ -16,7 +18,7 @@ public enum PredictionVegetationDensity {
 
     public int percentage() { return percentage; }
     public String configName() { return name().toLowerCase(java.util.Locale.ROOT); }
-    public int settingsBits() { return cacheIndex << 10; }
+    public int settingsBits() { return cacheIndex == 0 ? 0 : SELECTION_VERSION | cacheIndex << 10; }
 
     public static PredictionVegetationDensity current() {
         return fromName(VSSClientConfig.CONFIG.predictionVegetationDensity);

@@ -110,6 +110,8 @@ public class VSSServerConfig extends JsonConfig {
     public int generationSnapshotsPerTickLimit = 0;
     public int generationSnapshotBudgetMillis = 0;
     public int generationPauseAboveMspt = 0;
+    /** Outstanding chunky columns across the whole pipeline; zero means unlimited. */
+    public volatile int chunkyQueueLimit = 0;
     public int packingQueueMaxBytes = 64 * BYTES_PER_MIB;
     @Deprecated
     public transient int dirtyBroadcastIntervalSeconds = 2;
@@ -175,6 +177,7 @@ public class VSSServerConfig extends JsonConfig {
         help.put("generationSnapshotsPerTickLimit", "每 tick 自动快照数量上限；默认 0 不额外限制。已加载区块与自动新生成区块共享预算并公平交接；/vss chunky 豁免。");
         help.put("generationSnapshotBudgetMillis", "每 tick 自动快照软时间预算，单位毫秒；默认 0 关闭，不能中断单个快照。为可交接生成结果保留部分余量；/vss chunky 豁免。");
         help.put("generationPauseAboveMspt", "平均 tick 耗时达到此毫秒数时暂停自动新增生成任务；默认 0 关闭。已生成结果继续交接；/vss chunky 豁免。");
+        help.put("chunkyQueueLimit", "/vss chunky 尚未完成的区块列队列上限；默认 0 不限制，正数限制扫描、生成、打包、保存或导入中的列数。队列满后暂缓领取新位置，完成或最终失败后自动补位；不是线程数或每秒速度，不影响普通自动生成。可用 /vss chunky limit <数量> 或 /vss 预生成 限速 <数量> 在线修改并保存，0 或不限恢复无限队列，无需重启。");
         help.put("packingQueueMaxBytes", "等待和正在打包的区块快照内存预算；默认 64 MiB；范围 8-512 MiB。");
         help.put("dirtyBroadcastIntervalTicks", "脏列版本广播间隔，单位 tick；默认 10；范围 "
                 + MIN_DIRTY_BROADCAST_INTERVAL_TICKS + "-" + MAX_DIRTY_BROADCAST_INTERVAL_TICKS + "。");
@@ -254,6 +257,7 @@ public class VSSServerConfig extends JsonConfig {
         generationSnapshotsPerTickLimit = clamp(generationSnapshotsPerTickLimit, 0, 128);
         generationSnapshotBudgetMillis = clamp(generationSnapshotBudgetMillis, 0, 50);
         generationPauseAboveMspt = clamp(generationPauseAboveMspt, 0, 1000);
+        chunkyQueueLimit = Math.max(0, chunkyQueueLimit);
         packingQueueMaxBytes = clamp(packingQueueMaxBytes, 8 * BYTES_PER_MIB, 512 * BYTES_PER_MIB);
         dirtyBroadcastIntervalTicks = clamp(dirtyBroadcastIntervalTicks, MIN_DIRTY_BROADCAST_INTERVAL_TICKS, MAX_DIRTY_BROADCAST_INTERVAL_TICKS);
         dirtyVersionCacheMaxEntries = clamp(dirtyVersionCacheMaxEntries, 1, 5000000);

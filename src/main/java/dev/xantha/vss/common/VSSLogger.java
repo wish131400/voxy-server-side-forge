@@ -1,12 +1,17 @@
 package dev.xantha.vss.common;
 
-import dev.xantha.vss.config.VSSClientConfig;
-import dev.xantha.vss.config.VSSServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class VSSLogger {
     private static final Logger LOG = LoggerFactory.getLogger("VSS");
+
+    private static volatile java.util.function.BooleanSupplier debugEnabled = () -> false;
+
+    /** 启动入口提供动态配置查询，日志底层不反向加载配置或持有配置快照。 */
+    public static void configureDebug(java.util.function.BooleanSupplier source) {
+        debugEnabled = java.util.Objects.requireNonNull(source, "source");
+    }
 
     private VSSLogger() {
     }
@@ -24,7 +29,7 @@ public final class VSSLogger {
 
     public static boolean isDebugEnabled() {
         try {
-            return VSSClientConfig.CONFIG.debugLogging || VSSServerConfig.CONFIG.debugLogging || LOG.isDebugEnabled();
+            return debugEnabled.getAsBoolean() || LOG.isDebugEnabled();
         } catch (Throwable ignored) {
             return LOG.isDebugEnabled();
         }
