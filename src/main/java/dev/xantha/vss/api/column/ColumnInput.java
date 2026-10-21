@@ -30,7 +30,24 @@ public record ColumnInput(ResourceKey<Level> dimension, int chunkX, int chunkZ,
         return sections.get(sectionY - minSectionY);
     }
 
-    public record Section(int sectionY, boolean onlyAir, byte[] blockLight, byte[] skyLight) {
+    /**
+     * Detached section metadata; light arrays are copied on input and output.
+     *
+     * @param sectionY section coordinate, in units of 16 blocks
+     * @param onlyAir whether the source section contains only air
+     * @param maxBlockY absolute block Y of the highest non-air block, including
+     *        foliage and fluids, not a ground height; {@link Integer#MIN_VALUE}
+     *        means empty or unknown (use {@code onlyAir} to distinguish them).
+     *        VSS computes this for every non-empty section supplied to a filter.
+     * @param blockLight block light, 2048 bytes or null
+     * @param skyLight sky light, 2048 bytes or null
+     */
+    public record Section(int sectionY, boolean onlyAir, int maxBlockY, byte[] blockLight, byte[] skyLight) {
+        /** Retains the original constructor descriptor; non-air height is unknown. */
+        public Section(int sectionY, boolean onlyAir, byte[] blockLight, byte[] skyLight) {
+            this(sectionY, onlyAir, Integer.MIN_VALUE, blockLight, skyLight);
+        }
+
         public Section {
             blockLight = copyLight(blockLight);
             skyLight = copyLight(skyLight);

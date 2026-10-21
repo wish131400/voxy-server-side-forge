@@ -11,6 +11,7 @@ import dev.xantha.vss.testutil.ColumnFilterFixtures;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
@@ -19,10 +20,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 class ColumnFilterCacheTest {
+    private static final AtomicInteger calls = new AtomicInteger();
     @TempDir Path world;
     @BeforeAll static void register() {
         ColumnFilterFixtures.biomes();
-        ColumnFilters.register("test:cache", 1, c -> ColumnDecision.updateAll());
+        ColumnFilters.register("test:cache", 1, c -> {
+            calls.incrementAndGet();
+            assertEquals(-16, c.section(-1).maxBlockY());
+            return ColumnDecision.updateAll();
+        });
     }
 
     private MinecraftServer server() {
@@ -37,6 +43,7 @@ class ColumnFilterCacheTest {
 
     @Test void scopedMemoryAndDiskCachesPreserveProvenanceAndCompleteness() throws Exception {
         var config = new VSSServerConfig(); var column = column(1000L);
+        int afterFiltering = calls.get();
         var memory = new ColumnLodCache(config); memory.put(Level.OVERWORLD, column);
         var cached = memory.get(Level.OVERWORLD, 0, 7).columnData();
         assertEquals(column.coverage(), cached.coverage()); assertFalse(cached.completeColumn());
@@ -48,6 +55,7 @@ class ColumnFilterCacheTest {
         assertEquals(column.coverage(), reloaded.coverage()); assertArrayEquals(column.encodedBytes(), reloaded.encodedBytes());
         assertTrue(Files.isDirectory(world.resolve("data/vss-column-cache-filtered").resolve(column.coverage().filterKey())));
         assertFalse(Files.exists(world.resolve("data/vss-column-cache")));
+        assertEquals(afterFiltering, calls.get(), "Cache hits must reuse the filtered bytes without rerunning the height scan/provider");
     }
 
     @Test void fullAndWrongPolicyDataCannotPolluteScopedCaches() throws Exception {

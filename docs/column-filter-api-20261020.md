@@ -36,6 +36,7 @@ ColumnFilters.register("pyf:vss_column_band", 1, column -> {
 `ColumnInput` 提供维度、区块 X/Z、`[minSectionY, maxSectionY)` 和该范围内连续的 section 快照。区块 X/Z 与 section Y 都以 16 方块为单位，负坐标使用向下取整。`section(sy)` 可以读取：
 
 - `onlyAir()`：真实源 section 是否为空气。完整源中被普通序列化器省略的已确认空气也出现在输入中。
+- `maxBlockY()`：该 section 内最高非空气方块的**绝对方块 Y 坐标**，不是 section Y，也不是地表高度；树叶、植物、流体均计入非空气。空 section 返回 `Integer.MIN_VALUE`。VSS 对非空源 section 填入实际值；通过旧四参数构造器手动创建的非空输入，其高度未知，也返回该哨兵值，须结合 `onlyAir()` 区分。
 - `hasBlockLight()`、`hasSkyLight()`：是否携带对应光照数组。
 - `blockLight()`、`skyLight()`：2048 字节数组或 `null`，返回防御性副本。
 
@@ -48,6 +49,41 @@ ColumnFilters.register("pyf:vss_column_band", 1, column -> {
 | `UNTOUCHED` | 不发送该 section | 本次 VSS 更新不写该 section，也不因其缺席而清除它 |
 
 粒度为整段 16×16×16。v1 不提供 section 内逐方块掩码。全 `UNTOUCHED` 是带策略身份、section 数为 0 的成功空操作，仍完成本次请求。
+
+## 最高非空气高度扩展（2026-10-21）
+
+`ColumnInput.Section` 的五参数构造器为 `(int sectionY, boolean onlyAir, int maxBlockY, byte[] blockLight, byte[] skyLight)`。保留旧四参数构造器 `(int, boolean, byte[], byte[])` 和所有旧访问方法；旧构造器的高度默认为 `Integer.MIN_VALUE`，光照仍防御性复制。旧调用方的构造和访问可继续链接，但 record 分量数、反射结构及自动生成的比较／字符串输出发生变化，不保证依赖这些细节的代码无须调整。调用 `maxBlockY()` 的新扩展须使用包含该字段的 VSS 构建。
+
+高度在 `ColumnFilterPipeline` 已反序列化的脱离世界的 section 内计算，从 local Y=15 向下寻找非空气方块；不访问活世界或 NBT Heightmaps。实时快照与磁盘 NBT 使用同一入口；未注册过滤器时直接绕过，缓存命中复用已过滤字节，不重复解析或扫描。非空 section 最坏需要 4096 次方块查询，启用过滤器后的实际额外耗时尚须按场景测量。
+
+以下仅示范“整列最高非空气点以下 32 方块”的近似高度带，**不是保证保留地表的地下剥离算法**。高建筑、树冠和起伏地形可能使较低地面落在带外；需要精确保留地表时，接入方须另行设计规则。
+
+```java
+// 外部模组自行注册；VSS 不会默认启用此策略。
+ColumnFilters.register("example:highest_band", 2, column -> {
+    final int depth = 32;
+    int top = Integer.MIN_VALUE;
+    for (var section : column.sections()) {
+        if (!section.onlyAir() && section.maxBlockY() == Integer.MIN_VALUE) {
+            return ColumnDecision.updateAll(); // 非空但高度未知，保守保留。
+        }
+        top = Math.max(top, section.maxBlockY());
+    }
+    if (top == Integer.MIN_VALUE) {
+        return ColumnDecision.updateAll(); // 已确认全空气，显式更新旧内容。
+    }
+    long cutoff = (long) top - depth; // 不对 MIN_VALUE 做 int 减法。
+    var selected = new HashMap<Integer, SectionDecision>();
+    for (var section : column.sections()) {
+        if (section.onlyAir() || section.maxBlockY() >= cutoff) {
+            selected.put(section.sectionY(), SectionDecision.UPDATE);
+        }
+    }
+    return new ColumnDecision(SectionDecision.UNTOUCHED, selected);
+});
+```
+
+示例保留截线相等的 section，并显式更新已确认空气；低于截线的非空段为 `UNTOUCHED`，因此不会删除 Voxy 已存在的地下数据。仍受单列 64 个被更新 section 的传输上限约束。只添加高度元数据不改变协议 53、缓存文件格式或过滤缓存身份算法；外部模组改用新字段后，须升级自己的注册版本，避免复用旧规则结果。过滤输出继续保持 `completeColumn=false` 和原 `coverage.filterKey()` 语义。
 
 ## 光照选项
 

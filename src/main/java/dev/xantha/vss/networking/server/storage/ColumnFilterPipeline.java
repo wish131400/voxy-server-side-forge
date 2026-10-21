@@ -46,6 +46,7 @@ public final class ColumnFilterPipeline {
         for (int y = context.minSectionY(); y < context.maxSectionY(); y++) {
             ParsedSection section = parsed.get(y);
             sections.add(new ColumnInput.Section(y, section == null || section.onlyAir(),
+                    section == null ? Integer.MIN_VALUE : section.maxBlockY(),
                     section == null ? null : section.blockLight(), section == null ? null : section.skyLight()));
         }
         ColumnDecision decision = filters.decide(new ColumnInput(context.dimension(), source.chunkX(), source.chunkZ(),
@@ -108,13 +109,28 @@ public final class ColumnFilterPipeline {
                 LevelChunkSection section = new LevelChunkSection(context.biomes());
                 section.read(input);
                 int length = input.readerIndex() - start;
-                sections.put(y, new ParsedSection(start, length, section.hasOnlyAir(), readLight(input), readLight(input)));
+                sections.put(y, new ParsedSection(start, length, section.hasOnlyAir(), highestNonAirBlockY(section, y),
+                        readLight(input), readLight(input)));
             }
             if (input.isReadable()) throw new IllegalArgumentException("Trailing source column bytes");
             return sections;
         } finally {
             input.release();
         }
+    }
+
+    private static int highestNonAirBlockY(LevelChunkSection section, int sectionY) {
+        if (section.hasOnlyAir()) return Integer.MIN_VALUE;
+        // Read only the detached section already decoded for the filter. Heightmaps
+        // may be stale and do not describe each section's highest non-air block.
+        for (int y = 15; y >= 0; y--) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    if (!section.getBlockState(x, y, z).isAir()) return (sectionY << 4) + y;
+                }
+            }
+        }
+        return Integer.MIN_VALUE;
     }
 
     private static byte[] readLight(FriendlyByteBuf input) {
@@ -129,6 +145,6 @@ public final class ColumnFilterPipeline {
         if (light != null) output.writeBytes(light);
     }
 
-    private record ParsedSection(int blockStart, int blockLength, boolean onlyAir,
+    private record ParsedSection(int blockStart, int blockLength, boolean onlyAir, int maxBlockY,
             byte[] blockLight, byte[] skyLight) { }
 }
