@@ -1,0 +1,12 @@
+// Apply after feature-handoff-tests.gradle and forest-optimization-tests.gradle.
+// Isolate the memory fix's validation outputs and distributable jars.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-memory-ownership-20261010')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/memory-ownership-20261010')
+            }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+// Apply after feature-handoff-tests.gradle and forest-optimization-tests.gradle.
+// Keep this regression and its release artifacts separate from earlier fixes.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-water-flicker-20261010')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/water-flicker-20261010')
+            }
+        }
+    }
+}

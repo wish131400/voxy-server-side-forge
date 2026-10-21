@@ -1,0 +1,34 @@
+// Isolated command and generation regression/build for the chunky queue-limit commands.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-chunky-limit-20261014')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/chunky-limit-commands-20261014')
+            }
+            sourceSets.create('chunkyLimit') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/networking/command/**'
+                java.include 'dev/xantha/vss/networking/server/command/**'
+                java.include 'dev/xantha/vss/networking/server/generation/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'dev/xantha/vss/client/prediction/ForgeTestBootstrap.java'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.register('chunkyLimitRegressionTest', Test) {
+                dependsOn tasks.named('chunkyLimitClasses')
+                testClassesDirs = sourceSets.chunkyLimit.output.classesDirs
+                classpath = sourceSets.chunkyLimit.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '2G'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/chunky-limit')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/chunky-limit')
+                testLogging { events 'passed', 'skipped', 'failed' }
+            }
+        }
+    }
+}

@@ -1,0 +1,36 @@
+// Isolated LIVE-source GPU comparison. No candidate is added to a release source set.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-raster-boxes-20261016')
+        afterEvaluate {
+            sourceSets.create('rasterBoxes') {
+                java.srcDirs = ['src/test/java', 'tools/prediction/raster-boxes-20261016/java']
+                java.include '**/RasterBoxes*Test.java', '**/AlgorithmBootstrap.java', '**/AlgorithmSupport.java',
+                    '**/ClientTerrainSamplerTest.java', '**/ForgeTestBootstrap.java', 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                    sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.register('rasterBoxesGpuTest', Test) {
+                dependsOn tasks.named('rasterBoxesClasses')
+                testClassesDirs = sourceSets.rasterBoxes.output.classesDirs
+                classpath = sourceSets.rasterBoxes.runtimeClasspath
+                useJUnitPlatform()
+                include '**/RasterBoxes*Test.class'
+                maxHeapSize = '4G'; maxParallelForks = 1; forkEvery = 1
+                outputs.upToDateWhen { false }
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/raster-boxes')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/raster-boxes')
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                systemProperty 'vss.algorithmInputs', layout.projectDirectory.dir('tools/prediction/meridian-algorithms-20261016/inputs').asFile.absolutePath
+                def compact = providers.gradleProperty('vssRasterCompact').isPresent()
+                systemProperty 'vss.rasterCompact', compact ? 'true' : 'false'
+                systemProperty 'vss.algorithmResults', layout.buildDirectory.dir(compact ? 'results-compact' : 'results').get().asFile.absolutePath
+                if (providers.gradleProperty('vssRasterQuick').isPresent()) systemProperty 'vss.rasterQuick', 'true'
+                testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+        }
+    }
+}

@@ -1,0 +1,63 @@
+// Validate the current production architecture without mixing in standalone experiments.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-one-fps-followup-20261015')
+        afterEvaluate {
+            sourceSets.main.java.setSrcDirs(['tools/prediction/one-fps-followup-20261015/production-src'])
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/one-fps-followup-20261015')
+            }
+            sourceSets.create('architectureAudit') {
+                java.srcDirs = ['tools/prediction/one-fps-followup-20261015/regression-src'] + [
+                    'tools/prediction/gpu-selection-retained/baseline-src',
+                    'tools/prediction/far-terrain-20261014/java',
+                    'tools/prediction/progressive-detail-20261014/java']
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.exclude '**/PredictionGpuTraversalExperimentTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs + [
+                    'tools/prediction/far-terrain-20261014/resources',
+                    'tools/prediction/progressive-detail-20261014/resources']
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                    sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def regression = { Test task, String name ->
+                task.dependsOn tasks.named('architectureAuditClasses')
+                task.testClassesDirs = sourceSets.architectureAudit.output.classesDirs
+                task.classpath = sourceSets.architectureAudit.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.systemProperty 'vss.persistentSceneResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('architectureAuditTest', Test) {
+                regression(delegate, 'architecture-audit-cpu')
+                ['GroundCover', 'VegetationMaterial', 'SpatialOrder', 'MeshCodec', 'WarmSurfaceRestore', 'ResourceInvalidation', 'GpuScene', 'SubmissionChanges', 'GpuSelectionPolicy', 'GpuSelectionInput', 'FramePlan',
+                 'AuthoritativeCoverageView', 'IncrementalRender', 'PreparedPassLocal', 'ScopedResidency',
+                 'SubmissionCoverage', 'MainReduction', 'TurnMain', 'OcclusionPolicy', 'MemoryLifecycle',
+                 'TurnOptimization', 'DemandLifecycle', 'ViewRefinement', 'CoverageCache', 'Renderer',
+                 'VoxyCoverageInvalidation', 'VisibleHandoff', 'DisplayGeometry', 'DisplayLod', 'DisplayError',
+                 'LodSeams', 'RealBoundarySeams', 'FeatureHandoff', 'WorkView', 'LoadingBenefit',
+                 'FirstCoverage', 'LoadingProgressIntegration', 'RegionalOwnership', 'ParentLod', 'ParentLodIntegration',
+                 'GpuLodGraph', 'GpuRepresentations', 'RenderWorkBudget'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('architectureAuditGpuTest', Test) {
+                regression(delegate, 'architecture-audit-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                ['GroundCover', 'VegetationLod', 'GpuScene', 'ProductionBatch', 'Compact', 'DisplayLod', 'SeamResidency', 'FeatureHandoff',
+                 'AuthoritativeCoverageView', 'TurnMain', 'RefinementOcclusion', 'RenderTarget'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+        }
+    }
+}

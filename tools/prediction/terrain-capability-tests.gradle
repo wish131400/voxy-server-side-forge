@@ -1,0 +1,13 @@
+allprojects {
+    tasks.withType(Test).configureEach {
+        maxHeapSize = '1g'
+        if (providers.gradleProperty('vssTerrainBaselineClasses').isPresent()) {
+            systemProperty 'vss.terrainBaselineClasses', providers.gradleProperty('vssTerrainBaselineClasses').get()
+            systemProperty 'vss.terrainBenchOutput', providers.gradleProperty('vssTerrainBenchOutput').get()
+        }
+        if (providers.gradleProperty('vssC2meDfcJar').isPresent()) {
+            systemProperty 'vss.c2meDfcJar', providers.gradleProperty('vssC2meDfcJar').get()
+        }
+        testLogging { exceptionFormat = 'full' }
+    }
+}

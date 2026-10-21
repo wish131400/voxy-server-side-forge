@@ -1,0 +1,55 @@
+// Engine-inspired experiments are isolated from production and release JARs.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-engine-render-20261014')
+        afterEvaluate {
+            sourceSets.create('engineRender') {
+                java.srcDirs = sourceSets.test.java.srcDirs + ['tools/prediction/engine-render-20261014/java', 'tools/prediction/gpu-selection-retained/baseline-src']
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.exclude '**/PredictionGpuTraversalExperimentTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                    sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def setup = { Test task, String name ->
+                task.dependsOn tasks.named('engineRenderClasses')
+                task.testClassesDirs = sourceSets.engineRender.output.classesDirs
+                task.classpath = sourceSets.engineRender.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '4G'
+                task.outputs.upToDateWhen { false }
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.systemProperty 'vss.engineInputs', layout.projectDirectory.dir('tools/prediction/engine-render-20261014/inputs').asFile.absolutePath
+                task.testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('engineInputTest', Test) {
+                setup(delegate, 'engine-input')
+                include '**/EngineResidentInputTest.class'
+            }
+            tasks.register('engineForestGpuTest', Test) {
+                setup(delegate, 'engine-forest-gpu')
+                include '**/EngineForestGpuTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+            }
+            tasks.register('engineResidentGpuTest', Test) {
+                setup(delegate, 'engine-resident-gpu')
+                include '**/RetainedGpuSelectionGpuTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                systemProperty 'vss.retainedGpuSelectionResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+            }
+            tasks.register('engineMaintenanceGpuTest', Test) {
+                setup(delegate, 'engine-maintenance-gpu')
+                include '**/EngineMaintenanceGpuTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                systemProperty 'vss.retainedGpuSelectionResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+            }
+        }
+    }
+}

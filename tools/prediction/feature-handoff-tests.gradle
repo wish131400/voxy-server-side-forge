@@ -1,0 +1,56 @@
+allprojects {
+    afterEvaluate {
+        // Compile this client's regression fixtures separately from unrelated
+        // server tests being edited in the shared checkout.
+        sourceSets.create('featureHandoff') {
+            java.srcDirs = sourceSets.test.java.srcDirs
+            java.include 'dev/xantha/vss/client/prediction/**'
+            java.include 'me/cortex/voxy/**'
+            resources.srcDirs = sourceSets.test.resources.srcDirs
+            compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+            runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                    sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+        }
+        tasks.register('featureHandoffTest', Test) {
+            dependsOn tasks.named('featureHandoffClasses')
+            testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+            classpath = sourceSets.featureHandoff.runtimeClasspath
+            useJUnitPlatform()
+            maxHeapSize = '2G'
+            reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/feature-handoff')
+            reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/feature-handoff')
+            def classes = ['FeatureHandoff', 'SubmissionCoverage', 'UploadHandoff', 'VisibleHandoff',
+                    'MeshCodec', 'DisplayGeometry', 'VegetationRuns', 'SimpleVegetation',
+                    'VoxyStableOwnership', 'VoxyCoverageInvalidation', 'RegionalOwnership', 'CoverageOwners',
+                    'WarmSurfaceRestore', 'GpuEncoding', 'SegmentedMeshGpu', 'MeshCleanup', 'CacheStorage']
+            classes.each { include "**/Prediction${it}Test.class" }
+            filter {
+                classes.each {
+                    includeTestsMatching "*Prediction${it}Test"
+                }
+            }
+            testLogging { events 'passed', 'skipped', 'failed' }
+        }
+        tasks.register('featureHandoffGpuTest', Test) {
+            dependsOn tasks.named('featureHandoffClasses')
+            testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+            classpath = sourceSets.featureHandoff.runtimeClasspath
+            useJUnitPlatform()
+            forkEvery = 1
+            maxHeapSize = '2G'
+            systemProperty 'vss.gpuTests', 'true'
+            def reportName = providers.gradleProperty('featureHandoffShaderCheck').isPresent()
+                    ? 'feature-handoff-shader-gpu' : 'feature-handoff-gpu'
+            reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${reportName}")
+            reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${reportName}")
+            def classes = providers.gradleProperty('featureHandoffShaderCheck').isPresent()
+                    ? ['FeatureHandoff'] : ['FeatureHandoff', 'ProductionBatch', 'DisplayLod', 'Compact',
+                            'SegmentedMesh', 'VoxyDepthConvention', 'RealBoundarySeams']
+            classes.each { include "**/Prediction${it}GpuTest.class" }
+            filter {
+                classes.each { includeTestsMatching "*Prediction${it}GpuTest" }
+            }
+            testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+        }
+    }
+}

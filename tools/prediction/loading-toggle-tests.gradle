@@ -1,0 +1,37 @@
+// Local regression/build for the independent prediction loading switch.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-loading-toggle-20261014')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/loading-toggle-20261014')
+            }
+            sourceSets.create('loadingToggle') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.register('loadingToggleRegressionTest', Test) {
+                dependsOn tasks.named('loadingToggleClasses')
+                testClassesDirs = sourceSets.loadingToggle.output.classesDirs
+                classpath = sourceSets.loadingToggle.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '4G'
+                systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/loading-toggle')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/loading-toggle')
+                ['LoadingSettings', 'DemandLifecycle', 'MediumCoverage', 'RefinementConvergence',
+                 'ViewRefinement', 'WorkView', 'ScreenDetail', 'VegetationSettings',
+                 'CpuAdmissionIntegration', 'CpuLeaseLifecycle', 'IdleRefinement',
+                 'PreviewHandoff', 'VoxyStableOwnership', 'FeatureHandoff', 'WarmSurfaceRestore',
+                 'MemoryLifecycle'].each { include "**/Prediction${it}Test.class" }
+                testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+        }
+    }
+}

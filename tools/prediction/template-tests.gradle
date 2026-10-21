@@ -1,0 +1,17 @@
+allprojects {
+    plugins.withId('java') {
+        dependencies.add('testImplementation', 'org.mockito:mockito-core:5.14.2')
+    }
+    tasks.withType(Test).configureEach {
+        if (providers.gradleProperty('vssTemplateJars').isPresent()) {
+            systemProperty 'vss.templateJars', providers.gradleProperty('vssTemplateJars').get()
+            maxHeapSize = '2g'
+        }
+        if (providers.gradleProperty('vssNbtTreeJar').isPresent()) {
+            systemProperty 'vss.nbtTreeJar', providers.gradleProperty('vssNbtTreeJar').get()
+        }
+        if (providers.gradleProperty('vssTemplateCatalogDirectory').isPresent()) {
+            systemProperty 'vss.templateCatalogDirectory', providers.gradleProperty('vssTemplateCatalogDirectory').get()
+        }
+    }
+}

@@ -1,0 +1,49 @@
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-scene-handoff-20261017')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/scene-handoff-20261017')
+            }
+            sourceSets.meridianImplementation.java.include '**/PredictionCoarseHandoffGpuTest.java',
+                    '**/PredictionCoarseHandoffTest.java', '**/PredictionCoarsePlanHandoffTest.java',
+                    '**/PredictionTeleportLoadingTest.java', '**/PredictionSubmissionCoverageTest.java',
+                    '**/PredictionOwnershipMemoryTest.java',
+                    '**/PredictionVoxySurfaceGpuTest.java', '**/PredictionVegetationDepthGpuTest.java',
+                    '**/StrictVoxyShaderFixtureGpuTest.java', '**/PredictionEffectFog*Test.java',
+                    '**/VssLodFogTest.java', '**/PredictionDeferredWaterGpuTest.java',
+                    '**/PredictionVoxyDepthConventionGpuTest.java', '**/PredictionGraphicsQualityGpuTest.java',
+                    '**/PredictionRenderTargetGpuTest.java', '**/PredictionInstanceExperiment.java',
+                    '**/PredictionCaveInteriorTest.java', '**/PredictionExteriorColumnsTest.java',
+                    '**/ClientCaptureExtractorTest.java'
+            def run = { Test task, String report ->
+                task.dependsOn tasks.named('meridianImplementationClasses')
+                task.testClassesDirs = sourceSets.meridianImplementation.output.classesDirs
+                task.classpath = sourceSets.meridianImplementation.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '3G'; task.maxParallelForks = 1; task.forkEvery = 1
+                task.systemProperty 'vss.gpuTests', 'true'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${report}")
+                task.testLogging { events 'passed','failed','skipped'; showStandardStreams = true }
+            }
+            tasks.register('sceneHandoffReproGpuTest', Test) {
+                run(delegate,'scene-repro-gpu')
+                include '**/PredictionCoarseHandoffGpuTest.class'
+            }
+            tasks.register('sceneHandoffLogicTest', Test) {
+                run(delegate,'scene-logic')
+                ['PredictionCoarseHandoffTest', 'PredictionCoarsePlanHandoffTest', 'PredictionTeleportLoadingTest',
+                 'PredictionAuthoritativeCoverageViewTest',
+                 'PredictionPreviewHandoffTest', 'PredictionSubmissionCoverageTest',
+                 'PredictionOwnershipMemoryTest'].each { include "**/${it}.class" }
+            }
+            tasks.register('sceneHandoffRegressionGpuTest', Test) {
+                run(delegate,'scene-regression-gpu')
+                ['PredictionVoxySurface', 'PredictionVegetationDepth', 'PredictionEffectFog',
+                 'PredictionDeferredWater','PredictionVoxyDepthConvention', 'PredictionGraphicsQuality',
+                 'PredictionRenderTarget', 'PredictionProductionBatch', 'PredictionGroundCover',
+                 'PredictionFeatureHandoff', 'StrictVoxyShaderFixture'].each { include "**/${it}GpuTest.class" }
+            }
+        }
+    }
+}

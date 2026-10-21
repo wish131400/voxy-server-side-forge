@@ -1,0 +1,68 @@
+// Isolate production regressions from the optional traversal experiment sources.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-cache-restore-20261016')
+        afterEvaluate {
+            if (providers.gradleProperty('vssCacheRestoreSnapshot').isPresent()) {
+                def snapshot = rootProject.file(providers.gradleProperty('vssCacheRestoreSnapshot').get())
+                if (!new File(snapshot, 'main/java').isDirectory() || !new File(snapshot, 'test/java').isDirectory())
+                    throw new GradleException("Incomplete cache restore snapshot: ${snapshot}")
+                sourceSets.main.java.setSrcDirs([new File(snapshot, 'main/java')])
+                sourceSets.main.resources.setSrcDirs([new File(snapshot, 'main/resources')])
+                sourceSets.test.java.setSrcDirs([new File(snapshot, 'test/java')])
+                sourceSets.test.resources.setSrcDirs([new File(snapshot, 'test/resources')])
+                logger.lifecycle("Cache restore snapshot: ${snapshot.absolutePath}; main files=${sourceSets.main.java.files.size()}; test files=${sourceSets.test.java.files.size()}")
+            }
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/cache-restore-20261016')
+            }
+            sourceSets.create('cacheRestoreValidation') {
+                java.srcDirs = sourceSets.test.java.srcDirs + [
+                        'tools/prediction/gpu-selection-retained/baseline-src',
+                        'tools/prediction/far-terrain-20261014/java',
+                        'tools/prediction/progressive-detail-20261014/java']
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.exclude '**/PredictionGpuTraversalExperimentTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs + [
+                        'tools/prediction/far-terrain-20261014/resources',
+                        'tools/prediction/progressive-detail-20261014/resources']
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.register('cacheRestoreTest', Test) {
+                dependsOn tasks.named('cacheRestoreValidationClasses')
+                testClassesDirs = sourceSets.cacheRestoreValidation.output.classesDirs
+                classpath = sourceSets.cacheRestoreValidation.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '3G'
+                forkEvery = 1
+                ['MeshDerivedCache', 'MeshCacheBenchmark', 'MeshCodec', 'ScanMerge', 'DisplayGeometry', 'PassStorage',
+                 'CityMeshCache', 'WarmSurfaceRestore', 'ResourceInvalidation', 'GroundCover',
+                 'FeatureHandoff', 'UploadHandoff', 'MeshMemory'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/cache-restore')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/cache-restore')
+                testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('cacheRestoreGpuTest', Test) {
+                dependsOn tasks.named('cacheRestoreValidationClasses')
+                testClassesDirs = sourceSets.cacheRestoreValidation.output.classesDirs
+                classpath = sourceSets.cacheRestoreValidation.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '3G'
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                ['GroundCover', 'VegetationLod', 'DisplayLod', 'Compact', 'FeatureHandoff'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/cache-restore-gpu')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/cache-restore-gpu')
+                testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+        }
+    }
+}

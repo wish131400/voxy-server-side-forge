@@ -1,0 +1,31 @@
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-visibility-stability-20261017')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/visibility-stability-20261017')
+            }
+            sourceSets.meridianImplementation.java.include '**/LegacyResidentCoverage.java', '**/LegacyOwnershipRuns.java', '**/LegacyOwnershipData.java', '**/LegacyMetadataCache.java', '**/PredictionVisibilityStabilityTest.java',
+                    '**/PredictionVisibilityStabilityGpuTest.java', '**/PredictionMemoryResidencyGpuTest.java'
+            def run = { Test task, String report ->
+                task.dependsOn tasks.named('meridianImplementationClasses')
+                task.testClassesDirs = sourceSets.meridianImplementation.output.classesDirs
+                task.classpath = sourceSets.meridianImplementation.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '3G'; task.maxParallelForks = 1; task.forkEvery = 1
+                task.systemProperty 'vss.gpuTests', 'true'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${report}")
+                task.testLogging { events 'passed','failed','skipped'; showStandardStreams = true }
+            }
+            tasks.register('visibilityStabilityTest', Test) {
+                run(delegate, 'visibility-stability-cpu')
+                include '**/PredictionVisibilityStabilityTest.class'
+            }
+            tasks.register('visibilityStabilityGpuTest', Test) {
+                run(delegate, 'visibility-stability-gpu')
+                include '**/PredictionVisibilityStabilityGpuTest.class'
+                include '**/PredictionMemoryResidencyGpuTest.class'
+            }
+        }
+    }
+}

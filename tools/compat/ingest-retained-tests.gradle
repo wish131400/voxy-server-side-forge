@@ -1,0 +1,48 @@
+// Run focused regressions without compiling unrelated retired experiment sources.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/ingest-retained-fix-20261018')
+            }
+            sourceSets.create('ingestRetained') {
+                java.srcDirs = ['src/test/java']
+                java.include '**/PredictionRetainedGeometryTest.java', '**/PredictionMemoryBudgetTest.java',
+                    '**/ClientTerrainSamplerTest.java', '**/ForgeTestBootstrap.java', '**/PredictionLodSeamsTest.java',
+                    '**/PredictionSimpleVegetationTest.java',
+                    '**/VoxyCompatIngestHookTest.java', '**/StrictIngestCompletionTest.java',
+                    '**/VoxyIngestBytecodeTest.java', '**/VoxyIngestMixinApplicationTest.java',
+                    '**/VoxyLegacyIngestMixinApplicationTest.java', '**/VoxyFluidBakeCompatibilityTest.java',
+                    '**/IngestQueueFixture.java',
+                    '**/StrictLodVisibilityHandoffTest.java', '**/PredictionVoxyStableOwnershipTest.java',
+                    'dev/xantha/vss/testutil/**', 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                    sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.register('ingestRetainedTest', Test) {
+                dependsOn tasks.named('ingestRetainedClasses')
+                testClassesDirs = sourceSets.ingestRetained.output.classesDirs
+                classpath = sourceSets.ingestRetained.runtimeClasspath
+                useJUnitPlatform(); maxHeapSize = '3G'; maxParallelForks = 1; forkEvery = 1
+                if (providers.gradleProperty('vssLegacyVoxyJar').isPresent())
+                    systemProperty 'vss.legacyVoxyJar', providers.gradleProperty('vssLegacyVoxyJar').get()
+                ['PredictionRetainedGeometry', 'PredictionMemoryBudget', 'VoxyCompatIngestHook',
+                 'StrictIngestCompletion', 'VoxyIngestBytecode', 'VoxyIngestMixinApplication',
+                 'VoxyLegacyIngestMixinApplication', 'VoxyFluidBakeCompatibility', 'StrictLodVisibilityHandoff',
+                 'PredictionVoxyStableOwnership'].each { include "**/${it}Test.class" }
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/ingest-retained')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/ingest-retained')
+                testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat 'full' }
+            }
+            tasks.register('ingestRetainedClasspath') {
+                doLast {
+                    def target = layout.buildDirectory.file('tmp/ingest-retained-classpath.txt').get().asFile
+                    target.parentFile.mkdirs()
+                    target.text = sourceSets.ingestRetained.runtimeClasspath.asPath
+                }
+            }
+        }
+    }
+}

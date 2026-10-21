@@ -1,0 +1,37 @@
+// Isolated characterization of edited-terrain handoff. Does not build a distributable JAR.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-tnt-handoff-audit-20261015')
+        afterEvaluate {
+            sourceSets.create('tntAudit') {
+                java.srcDirs = sourceSets.test.java.srcDirs + [
+                    layout.projectDirectory.dir('tools/prediction/gpu-selection-retained/baseline-src').asFile,
+                    layout.projectDirectory.dir('tools/prediction/far-terrain-20261014/java').asFile,
+                    layout.projectDirectory.dir('tools/prediction/progressive-detail-20261014/java').asFile,
+                    layout.projectDirectory.dir('tools/prediction/tnt-handoff-audit-20261015/java').asFile]
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.exclude '**/PredictionGpuTraversalExperimentTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.register('tntHandoffAuditTest', Test) {
+                dependsOn tasks.named('tntAuditClasses')
+                testClassesDirs = sourceSets.tntAudit.output.classesDirs
+                classpath = sourceSets.tntAudit.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '4G'
+                include '**/PredictionTntHandoffAuditTest.class'
+                include '**/PredictionSubmissionCoverageTest.class'
+                include '**/ClientCaptureExtractorTest.class'
+                include '**/PredictionCaptureInvalidationBatchTest.class'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/tnt-handoff-audit')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/tnt-handoff-audit')
+                testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+        }
+    }
+}

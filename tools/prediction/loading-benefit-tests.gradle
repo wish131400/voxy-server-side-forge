@@ -1,0 +1,60 @@
+// Camera-turn, boundary transaction and client-thread regression/build.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-loading-benefit-20261014')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/loading-benefit-20261014')
+            }
+            sourceSets.create('turnMain') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def regression = { Test task, String name ->
+                task.dependsOn tasks.named('turnMainClasses')
+                task.testClassesDirs = sourceSets.turnMain.output.classesDirs
+                task.classpath = sourceSets.turnMain.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('turnMainRegressionTest', Test) {
+                regression(delegate, 'loading-benefit')
+                ['LoadingBenefit', 'MainReduction', 'TurnOptimization', 'TurnMain', 'OcclusionPolicy', 'IncrementalRender', 'PreparedPassLocal',
+                 'LodSeams', 'RealBoundarySeams', 'SeamIndex', 'SeamResidency', 'SubmissionCoverage',
+                 'VoxyCoverageInvalidation', 'VoxyStableOwnership', 'FeatureHandoff', 'UploadHandoff',
+                 'VisibleHandoff', 'ResourceInvalidation', 'RegionalOwnership', 'MemoryLifecycle',
+                 'CpuCachePolicy', 'DemandLifecycle', 'WorkView', 'ViewRefinement', 'ScreenDetail',
+                 'LoadingSettings', 'LoadingProgressIntegration', 'RefinementConvergence', 'WarmSurfaceRestore', 'ScopedResidency',
+                 'GpuResidency', 'VisibilityFeedback', 'CoverageOwners', 'MediumCoverage', 'MotionPace'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+                include '**/VssLodSampleCacheTest.class'
+            }
+            tasks.register('turnMainGpuTest', Test) {
+                regression(delegate, 'loading-benefit-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                ['LoadingBenefit', 'MainReduction', 'ProductionBatch', 'Occlusion', 'SeamResidency', 'FeatureHandoff', 'Compact',
+                 'DisplayLod', 'MemoryResidency', 'TurnMain', 'RefinementOcclusion', 'RenderTarget'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+            tasks.register('loadingBenefitBenchmark', Test) {
+                regression(delegate, 'loading-benefit-benchmark')
+                include '**/PredictionLoadingBenefitBenchmark.class'
+                systemProperty 'vss.loadingBenefitResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+            }
+        }
+    }
+}

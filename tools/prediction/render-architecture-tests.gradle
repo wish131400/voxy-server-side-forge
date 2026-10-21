@@ -1,0 +1,52 @@
+// Production-path CPU/GPU A/B and handoff regressions; no game client is launched.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-render-architecture-20261011')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/render-architecture-20261011')
+            }
+            sourceSets.create('renderArchitecture') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def configureTest = { Test task, String name ->
+                task.dependsOn tasks.named('renderArchitectureClasses')
+                task.testClassesDirs = sourceSets.renderArchitecture.output.classesDirs
+                task.classpath = sourceSets.renderArchitecture.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.architectureResults', layout.buildDirectory.dir('architecture-results').get().asFile.absolutePath
+                task.testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+            tasks.register('architectureRegressionTest', Test) {
+                configureTest(delegate, 'architecture-regression')
+                ['ResourceInvalidation', 'RegionalOwnership', 'SubmissionCoverage', 'VoxyStableOwnership',
+                 'VoxyCoverageInvalidation', 'CoverageOwners', 'UploadHandoff', 'VisibleHandoff', 'FeatureHandoff',
+                 'TurnOptimization', 'GpuResidency', 'LodSeams', 'RealBoundarySeams', 'ScopedResidency', 'IncrementalRender',
+                 'PassStorage', 'AquaticSubmission', 'DisplayGeometry', 'DisplayError'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('architectureGpuTest', Test) {
+                configureTest(delegate, 'architecture-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                if (providers.gradleProperty('vssVoxyJar').isPresent()) {
+                    systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+                }
+                ['ProductionBatch', 'DisplayLod', 'Compact', 'FeatureHandoff', 'MemoryResidency', 'Occlusion',
+                 'VoxyDepthConvention'].each { include "**/Prediction${it}GpuTest.class" }
+            }
+        }
+    }
+}

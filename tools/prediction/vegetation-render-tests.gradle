@@ -1,0 +1,43 @@
+// Apply after feature-handoff-tests.gradle. Keep outputs separate from earlier packages.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-vegetation-render-20261011')
+        afterEvaluate {
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/testutil/**'
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/vegetation-render-20261011')
+            }
+            tasks.register('vegetationRenderTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform(); maxHeapSize = '2G'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/vegetation-render')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/vegetation-render')
+                ['CrossEncoding', 'RectangleEncoding', 'GpuEncoding', 'PassStorage', 'MeshCompression',
+                 'MeshCodec', 'MeshMemory', 'OwnershipMemory', 'SubmissionCoverage', 'FeatureHandoff',
+                 'UploadHandoff', 'VisibleHandoff', 'RegionalOwnership', 'VegetationRuns', 'SpatialOrder',
+                 'DisplayGeometry', 'DisplayError', 'GpuResidency', 'ScopedResidency', 'LodSeams', 'NormalDepthBridge'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+                testLogging { events 'passed', 'skipped', 'failed' }
+            }
+            tasks.register('vegetationRenderGpuTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform(); forkEvery = 1; maxHeapSize = '2G'
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.vegetationReferenceJar', providers.gradleProperty('vssVegetationReferenceJar')
+                        .getOrElse(project.file("lib/memory-residency-20261010/vss-${project.version}.jar").absolutePath)
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/vegetation-render-gpu')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/vegetation-render-gpu')
+                ['VegetationRender', 'FeatureHandoff', 'ProductionBatch', 'Compact', 'DisplayLod',
+                 'CompressedUpload', 'SegmentedMesh', 'VoxyDepthConvention', 'VoxySurface', 'Occlusion'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+                testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+        }
+    }
+}

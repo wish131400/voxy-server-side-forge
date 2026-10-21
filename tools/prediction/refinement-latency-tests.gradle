@@ -1,0 +1,57 @@
+// Current production sources with isolated outputs. Run GPU checks one loader at a time.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        def baseline = providers.gradleProperty('vssLatencyBaseline').getOrElse('false').toBoolean()
+        layout.buildDirectory = layout.projectDirectory.dir(baseline
+                ? 'build-refinement-latency-baseline-20261021' : 'build-refinement-latency-20261021')
+        afterEvaluate {
+            if (baseline) {
+                sourceSets.main.java.setSrcDirs(['.gradle-refinement-latency-20261021/pre-change/main/java'])
+                sourceSets.main.resources.setSrcDirs(['.gradle-refinement-latency-20261021/pre-change/main/resources'])
+            }
+            tasks.named('compileTestJava', JavaCompile).configure {
+                if (baseline) exclude '**/PredictionRefinementLatencyTest.java'
+                source layout.projectDirectory.file('src/test/java/dev/xantha/vss/client/prediction/AlgorithmSupport.java')
+            }
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/refinement-latency-20261021')
+            }
+            def run = { Test task ->
+                task.dependsOn tasks.named('testClasses')
+                task.testClassesDirs = sourceSets.test.output.classesDirs
+                task.classpath = sourceSets.test.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '3G'; task.maxParallelForks = 1; task.forkEvery = 1
+                task.systemProperty 'vss.algorithmInputs', layout.projectDirectory.dir('tools/prediction/meridian-algorithms-20261016/inputs').asFile.absolutePath
+                task.systemProperty 'vss.algorithmResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat = 'full'; showStandardStreams = true }
+            }
+            tasks.register('refinementLatencyTest', Test) {
+                run(delegate)
+                include '**/PredictionRefinementLatencyTest.class'
+            }
+            tasks.register('refinementLatencyAsyncFixtureTest', Test) {
+                run(delegate)
+                include '**/PredictionProgressiveLoadingTest.class'
+            }
+            tasks.register('refinementLatencyRegressionTest', Test) {
+                run(delegate)
+                ['ViewRefinement', 'MediumCoverage', 'ProgressiveLoading', 'RefinementOptimizations',
+                 'CpuBudget', 'CpuLeaseLifecycle', 'FeatureHandoff', 'VegetationPublication', 'MeshCodec',
+                 'MeshDerivedCache', 'WarmSurfaceRestore', 'LoadingBenefit', 'LoadingProgressIntegration',
+                 'DemandLifecycle', 'ParentLodIntegration', 'SubCellCoverage', 'LodSeams',
+                 'RealBoundarySeams', 'UploadHandoff', 'IncrementalRender', 'ClientPreparation',
+                 'PlanningPipeline', 'PlanningValidity', 'VoxelHierarchy'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('refinementLatencyGpuTest', Test) {
+                run(delegate); systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                ['BoundaryCommit', 'CoarseHandoff', 'SubCellCoverage', 'FeatureHandoff',
+                 'SeamResidency', 'ProductionBatch', 'VoxelHierarchy'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+        }
+    }
+}

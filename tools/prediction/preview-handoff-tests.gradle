@@ -1,0 +1,49 @@
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-preview-handoff-20261010')
+        afterEvaluate {
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/testutil/**'
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/compat/StrictVoxyUploadOwnershipTest.java'
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/compat/StrictVoxyCoverageRegionsTest.java'
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/compat/StrictVoxyCoverageChangesTest.java'
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/compat/StrictVoxyCoverageCacheTest.java'
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/compat/StrictLodVisibilityHandoffTest.java'
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/preview-handoff-20261010')
+            }
+            tasks.register('previewHandoffTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '2G'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/preview-handoff')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/preview-handoff')
+                ['PreviewHandoff', 'FeatureHandoff', 'SubmissionCoverage', 'UploadHandoff', 'VisibleHandoff',
+                 'MeshCodec', 'DisplayGeometry', 'VegetationRuns', 'SimpleVegetation', 'GpuEncoding',
+                 'VoxyStableOwnership', 'VoxyCoverageInvalidation', 'RegionalOwnership', 'CoverageOwners',
+                 'WarmSurfaceRestore', 'MeshCleanup', 'CpuBudget', 'CpuAdmissionIntegration'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+                ['VoxyUploadOwnership', 'VoxyCoverageRegions', 'VoxyCoverageChanges',
+                 'VoxyCoverageCache', 'LodVisibilityHandoff'].each { include "**/Strict${it}Test.class" }
+                testLogging { events 'passed', 'skipped', 'failed' }
+            }
+            tasks.register('previewHandoffGpuTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform()
+                forkEvery = 1
+                maxHeapSize = '2G'
+                systemProperty 'vss.gpuTests', 'true'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/preview-handoff-gpu')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/preview-handoff-gpu')
+                ['FeatureHandoff', 'ProductionBatch', 'DisplayLod', 'Compact', 'SegmentedMesh', 'RealBoundarySeams'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+                testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+        }
+    }
+}

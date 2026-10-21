@@ -1,0 +1,62 @@
+// Local A/B benchmarks and rendering regressions. No client instance is launched.
+// gradlew --offline -I tools/prediction/resource-optimization-tests.gradle resourceCpuTest resourceRegressionTest
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-resource-optimization-20261011')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/resource-optimization-20261011')
+            }
+            sourceSets.create('resourceExperiment') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/common/ReflectionAccessTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def experiment = sourceSets.resourceExperiment
+            def configureTest = { Test task, String report ->
+                task.dependsOn tasks.named('resourceExperimentClasses')
+                task.testClassesDirs = experiment.output.classesDirs
+                task.classpath = experiment.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '3G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${report}")
+                task.testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+            tasks.register('resourceCpuTest', Test) {
+                configureTest(delegate, 'resource-cpu')
+                include '**/ReflectionAccessTest.class'
+                include '**/PredictionResourceCpuTest.class'
+                include '**/PredictionGpuResidencyTest.class'
+                systemProperty 'vss.resourceResults', layout.buildDirectory.dir('resource-results').get().asFile.absolutePath
+            }
+            tasks.register('resourceRegressionTest', Test) {
+                configureTest(delegate, 'resource-regression')
+                ['ResourceInvalidation', 'RegionalOwnership', 'SubmissionCoverage', 'VoxyStableOwnership',
+                 'VoxyCoverageInvalidation', 'CoverageOwners', 'UploadHandoff', 'VisibleHandoff', 'FeatureHandoff',
+                 'TurnOptimization', 'GpuResidency', 'LodSeams', 'RealBoundarySeams', 'ScopedResidency', 'IncrementalRender',
+                 'PassStorage', 'AquaticSubmission', 'DisplayGeometry', 'DisplayError'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('resourceRegressionGpuTest', Test) {
+                configureTest(delegate, 'resource-regression-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                if (providers.gradleProperty('vssVoxyJar').isPresent()) {
+                    systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+                }
+                ['MemoryResidency', 'FeatureHandoff', 'ProductionBatch', 'DisplayLod', 'Compact',
+                 'VoxyDepthConvention'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,35 @@
+// Local regression/build for the medium coverage demand mismatch. Never launches Minecraft.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-near-detail-20261013')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/near-detail-20261013')
+            }
+            sourceSets.create('nearDetail') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.register('nearDetailRegressionTest', Test) {
+                dependsOn tasks.named('nearDetailClasses')
+                testClassesDirs = sourceSets.nearDetail.output.classesDirs
+                classpath = sourceSets.nearDetail.runtimeClasspath
+                useJUnitPlatform(); maxHeapSize = '4G'
+                systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/near-detail')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/near-detail')
+                ['DemandLifecycle', 'MediumCoverage', 'RefinementConvergence', 'ViewRefinement',
+                 'WorkView', 'ScreenDetail', 'VegetationSettings', 'CpuAdmissionIntegration',
+                 'IdleRefinement', 'PreviewHandoff', 'VoxyStableOwnership', 'FeatureHandoff',
+                 'WarmSurfaceRestore'].each { include "**/Prediction${it}Test.class" }
+                testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+        }
+    }
+}

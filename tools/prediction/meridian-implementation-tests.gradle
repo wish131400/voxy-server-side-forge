@@ -1,0 +1,66 @@
+// Validates LIVE production sources; retired candidate implementations are removed.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-meridian-implementation-20261016')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/meridian-implementation-20261016')
+                doFirst {
+                    if (providers.gradleProperty('vssMeridianBaseline').isPresent())
+                        throw new GradleException('Frozen reference sources must not produce a release JAR')
+                }
+            }
+            if (providers.gradleProperty('vssMeridianBaseline').isPresent()) {
+                layout.buildDirectory = layout.projectDirectory.dir('build-meridian-implementation-baseline-20261016')
+                sourceSets.main.java.setSrcDirs(['tools/prediction/meridian-algorithms-20261016/production-src'])
+            }
+            def cases = ['MeridianImplementation', 'MemoryBudget', 'MemoryLifecycle', 'CpuAdmissionIntegration',
+                'CpuLeaseLifecycle', 'WarmSurfaceRestore', 'LodSeams', 'RealBoundarySeams', 'FeatureHandoff',
+                'RegionalOwnership', 'AuthoritativeCoverageView', 'IncrementalRender', 'Renderer', 'ParentLod',
+                'ParentLodIntegration', 'GpuRepresentations', 'RenderWorkBudget', 'MeshCodec', 'ResourceInvalidation',
+                'ViewRefinement', 'LoadingProgressIntegration', 'DemandLifecycle', 'FirstCoverage', 'GpuScene',
+                'SubmissionChanges', 'PreparedPassLocal', 'ProductionBatchGpu', 'CompactGpu', 'DisplayLodGpu',
+                'SeamResidencyGpu', 'FeatureHandoffGpu', 'AuthoritativeCoverageViewGpu', 'TurnMainGpu', 'GroundCoverGpu']
+            def dependencies = layout.projectDirectory.file('tools/prediction/meridian-implementation-20261016/test-sources.txt').asFile.readLines('UTF-8')
+            sourceSets.create('meridianImplementation') {
+                java.srcDirs = ['src/test/java', 'tools/prediction/meridian-implementation-20261016/java']
+                dependencies.each { java.include "**/${it}.java" }
+                if (providers.gradleProperty('vssMeridianBaseline').isPresent()) java.exclude '**/PredictionMeridianImplementationTest.java'
+                java.include '**/ClientTerrainSamplerTest.java', '**/ForgeTestBootstrap.java', '**/AlgorithmBootstrap.java',
+                    '**/AlgorithmSupport.java', '**/Implementation*.java',
+                    'dev/xantha/vss/testutil/**', 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                    sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def configureRun = { Test task, String report ->
+                task.dependsOn tasks.named('meridianImplementationClasses')
+                task.testClassesDirs = sourceSets.meridianImplementation.output.classesDirs
+                task.classpath = sourceSets.meridianImplementation.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '4G'; task.maxParallelForks = 1
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${report}")
+                task.systemProperty 'vss.algorithmInputs', layout.projectDirectory.dir('tools/prediction/meridian-algorithms-20261016/inputs').asFile.absolutePath
+                task.systemProperty 'vss.algorithmResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('meridianImplementationTest', Test) {
+                configureRun(delegate, 'implementation-cpu')
+                cases.findAll { !it.endsWith('Gpu') }.each { include "**/Prediction${it}Test.class" }
+            }
+            tasks.register('meridianImplementationGpuTest', Test) {
+                configureRun(delegate, 'implementation-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'; systemProperty 'vss.indirectArenaMiB', '128'
+                cases.findAll { it.endsWith('Gpu') }.each { include "**/Prediction${it}Test.class" }
+                include '**/ImplementationWaterGpuTest.class'
+            }
+            tasks.register('meridianSeamBenchmarkTest', Test) {
+                configureRun(delegate, 'seam-benchmark')
+                include '**/ImplementationSeamBenchmarkTest.class'
+            }
+        }
+    }
+}

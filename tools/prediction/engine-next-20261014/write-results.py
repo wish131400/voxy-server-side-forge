@@ -1,0 +1,100 @@
+"""Build the implementation report from the final retained and rejected measurements."""
+from pathlib import Path
+import json
+import xml.etree.ElementTree as ET
+
+desktop = Path(__file__).resolve().parents[3].parent
+neo = desktop / "voxyserverside-neoforge-1.21.1"
+forge = desktop / "voxyserverside"
+roots = {"neoforge": neo, "forge": forge}
+summaries = {key: json.loads((root / "build-engine-next-20261014/results/next-summary.json").read_text(encoding="utf-8"))
+             for key, root in roots.items()}
+
+def entry(platform, category, mode, **keys):
+    return next(row for row in summaries[platform][category]
+                if row["mode"] == str(mode) and all(row.get(k) == str(v) for k, v in keys.items()))
+
+def metric(row, field, quantile):
+    return row[field][quantile] / 1e6
+
+def comparison(platform, category, field="frame_ns", **keys):
+    a, b = [entry(platform, category, m, **keys) for m in [0, 1]]
+    return f'{metric(a, field, "p50"):.4f} → {metric(b, field, "p50"):.4f} | {metric(a, field, "p95"):.4f} → {metric(b, field, "p95"):.4f}'
+
+lines = [
+    "**Unity／虚幻参考方案：实施、准入与打包结果（2026-10-14）**", "",
+    "本轮保留有界资源变更日志和带收益门槛的 Iris 不透明 MDI。植被 shader 专门化仅保留研究代码及数据，没有进入生产渲染路径。两个项目均完成离线 CPU／GPU 验证和独立打包；没有采样、启动或替换用户的 Minecraft 客户端，也没有提交或推送 GitHub。", "",
+    "**保留的生产改动**", "",
+    "1. 为 mesh 和 GPU 驻留对象分配不复用的资源 ID，并发布带 stamp 的有界变更日志。常驻候选、PreparedPass 和完整提交计划按需建立成员索引。只要变更与当前成员无关，就直接推进版本并复用原计划。每个日志 8,192 项，两个日志的 ID／stamp 数组合计约 256 KiB，另有按当前成员规模分配的 long 集合；日志不保存旧 mesh 引用。",
+    "2. 真正相关的 mesh／GPU 更新继续走精确 revision 检查；日志溢出、未知游标或并发覆盖也保守返回原验证路径。没有移除 ownership／residency 门槛，覆盖撤销与 morph 结束仍立即影响绘制。这一步消除了无关全局变更引起的扫描，尚未把所有相关更新改成 O(changed records)。",
+    "3. Iris 不透明 pass 在 Voxy adapter 的已知 SSBO 布局下使用现有静态 MDI 记录，保持相邻 page 和原几何顺序，允许整计划重放。至少 256 条共享页记录、连续兼容记录平均至少 8 条时才启用。连续性统计只在 Iris 提交时按 pass 版本计算和缓存，普通渲染无需执行。小集合、严重页交错、独立缓冲过多、未知布局或 batch shader 编译失败均保留直绘路径。水面仍按原透明顺序绘制。",
+    "4. 新增的 SSBO 7 及 indirect 绑定按原 indexed range 和 generic 状态恢复；pack 的 UBO 5、SSBO 10+、sampler 9+ 互不覆盖。batch 变换发生在 adapter 追加 pack 源码之前。seam／fallback 直绘会明确设置自己的 morph 状态。", "",
+    "**测量方法与边界**", "",
+    "显卡为 RTX 4070 Ti SUPER，OpenGL 4.6，NVIDIA 572.70。NeoForge 1.21.1 使用 JDK 21，Forge 1.20.1 使用 JDK 17。两仓库 GPU 测试串行运行。对照以本轮冻结的正式代码为起点；其他并行完成的归属选择和 terrain-only display 修复已对齐到 NextBefore 对照，仅移除本轮变更日志，避免用旧错误路径充当基线。原始 SHA256 见 baseline-hashes.json，测试对齐说明见 baseline-alignment.json。", "",
+    "CPU 对照先预热 240 轮，再交替 A/B 记录 129 轮；包含 512／4,096／8,192 条记录及稳定、无关更新、单项更新、1% 更新、全量替换、移动、重排和移除。记录分阶段 CPU 时间和渲染线程分配。普通完整提交使用相同 shader、候选与选择策略，包含 input → prepare → page grouping → batch replay/add/end；没有额外给候选启用 Hi-Z 来改变比较条件。", "",
+    "GPU 计时采用预热后的交替 A/B；完整提交吞吐连续提交多帧，仅在窗口尾部等待 GPU 完成，Iris 每窗口 24 帧、普通提交每窗口 16 帧，分别记录 9 轮。植被使用 6 份历史真实森林几何、真实 atlas/mip，再组合成 64／128 瓦片的大森林，预热 60 轮、计时 81 轮；完整吞吐每窗口 24 帧、11 轮。以下均为离线被测路径的每帧毫秒，不能换算整游戏 FPS，也不代表任意实际光影包。", "",
+    "**资源变更日志：CPU 对照**", "",
+    "NeoForge，8,192 条记录，input + PreparedPass。每格为旧 → 新；p95 表示该窗口内较慢的第 95 百分位。", "",
+    "| 场景 | p50（ms） | p95（ms） |", "| --- | ---: | ---: |",
+]
+labels = {"stable": "稳定", "unrelated": "无关 mesh 更新", "unrelated-gpu": "无关 GPU 更新",
+          "one-gpu": "一个相关 GPU 更新", "1pct-gpu": "1% 相关 GPU 更新", "1pct-source": "1% 源对象替换",
+          "replace-all": "全量替换", "move": "移动", "reorder": "重排", "remove": "移除／恢复"}
+for case, label in labels.items():
+    lines.append(f'| {label} | {comparison("neoforge", "next-invalidation", "cpu_ns", tiles=8192, case=case)} |')
+lines += ["", "相关更新仍有少量验证成本，不能把无关更新的结果推广到所有场景。Forge 的相关更新对照也保留如下，便于检查新增开销。", "",
+          "| Forge，8,192 条记录 | p50（ms） | p95（ms） |", "| --- | ---: | ---: |"]
+for case in ["unrelated", "unrelated-gpu", "one-gpu", "1pct-gpu", "replace-all", "move"]:
+    lines.append(f'| {labels[case]} | {comparison("forge", "next-invalidation", "cpu_ns", tiles=8192, case=case)} |')
+lines += ["", "**普通路径：包含 GPU 完成的完整提交**", "",
+          "| 平台／场景 | p50（ms） | p95（ms） |", "| --- | ---: | ---: |"]
+for platform in roots:
+    for count, case in [(4096, "unrelated"), (8192, "unrelated"), (8192, "stable"), (8192, "one-gpu"), (8192, "1pct-gpu"), (8192, "replace-all")]:
+        lines.append(f'| {platform}／{count}／{labels[case]} | {comparison(platform, "next-submission-throughput", tiles=count, case=case)} |')
+lines += ["", "收益集中在当前可见场景没有变化、其他 mesh 仍在发布更新的窗口。稳定、相关更新和全量替换不会获得同等级提升；完整逐场景数据同时保留移动、转向、分配和 GPU 查询结果。", "",
+          "**Iris：直接提交与带门槛 MDI**", "",
+          "| 平台／记录数／场景 | p50（ms） | p95（ms） |", "| --- | ---: | ---: |"]
+for platform in roots:
+    for count, case in [(128, "stable"), (256, "stable"), (256, "sparse"), (512, "stable"), (512, "turn"), (512, "sparse"), (2048, "stable")]:
+        label = {"stable": "稳定", "turn": "转向", "sparse": "每帧替换一条记录"}[case]
+        lines.append(f'| {platform}／{count}／{label} | {comparison(platform, "next-iris-throughput", tiles=count, case=case)} |')
+lines += ["", "2,048 条记录时，对照驱动逐 draw 的 uniform／绑定成本很高，差值因而明显放大。这是合成 Voxy adapter 契约测试，不能据此宣称实际光影帧率提高几十倍。小集合的候选 shader 走直绘，仍可能存在计时抖动或微小 shader 成本差异。", "",
+          "**为何收紧连续批次门槛**", "",
+          "初版只检查总条数。额外创建真实独立显存页，并测试每 1／2／4／8／64 条切页，以及独立缓冲混用。未加连续性门槛时，512 条每 1 条切页的稳定窗口从约 0.436 ms 退步至 1.260 ms，每 2 条切页从约 0.408 ms 退步至 0.662 ms；每 4 条切页在每帧稀疏更新时也退步。该初版数据保存在 rejected-ungated-layout。最终门槛只保留连续性足够的合批，以下是最终结果。", "",
+          "| NeoForge／512 条／布局 | p50（ms） | p95（ms） |", "| --- | ---: | ---: |"]
+for case in ["page-run-1-stable", "page-run-2-sparse", "page-run-4-sparse", "page-run-8-stable", "page-run-8-sparse", "page-run-64-sparse", "standalone-2-stable", "standalone-8-sparse"]:
+    lines.append(f'| {case} | {comparison("neoforge", "next-iris-layout-throughput", tiles=512, case=case)} |')
+lines += ["", "这些门槛来自本机测试，不是跨驱动的普遍保证。回退集合不再进行 MDI 命令组装；实际收益仍取决于 page 连续性、更新比例、shader pack 和驱动。", "",
+          "**未进入生产：植被 shader 专门化**", "",
+          "仅把可分类植被的 water／feature／boundary／wall／display 标志设为编译常量，保持 footprint 门槛、alpha、UV 导数、atlas、光照、雾、真实深度和归属逻辑。mode 0 为原完整 MDI；mode 1 是同通用 shader 的 terrain/feature 分批；mode 2 是分批后 feature 专用 shader；mode 3 按原几何顺序逐 run 切程序，避免整体重排。", "",
+          "| NeoForge，128 瓦片森林，距离 1,024 | 原路径 p50（ms） | 分批专用 p50（ms） | 保序专用 p50（ms） |", "| --- | ---: | ---: | ---: |"]
+for case in ["stable", "turn"]:
+    values = [metric(entry("neoforge", "next-variant-throughput", mode, mesh=-128, distance=1024, case=case), "frame_ns", "p50") for mode in [0, 2, 3]]
+    lines.append(f'| {case} | {values[0]:.4f} | {values[1]:.4f} | {values[2]:.4f} |')
+lines += ["", "分批专用路径在大森林窗口中节省了约 9%～11%，但改变了共面片元的绘制先后，最大颜色字节差为 153；深度相同仍不足以通过画面准入。保序版本增加大量 program／draw 切换，完整代价更高，而且大森林中仍有颜色及深度差异，最大颜色字节差为 68、最大 depth 差约 5.34e-5。两种候选均被拒绝，不为这点离线 GPU 收益引入画面变化。", "",
+          "首次严格一致性断言的失败日志与 XML 保存在 rejected-strict-run。之后的研究测试继续记录所有候选的完整性能和像素差异，输出 next-variant-admission.csv；quality_pass=false、production_enabled=false 明确区分实验完成与候选通过。生产 JAR 没有 Next* 测试类、实验 shader 创建器或开关。", "",
+          "**正确性与最终验证**", "",
+          "覆盖日志并发发布／环覆盖、溢出回退、相关 mesh／GPU 变更、卸载、移除、Voxy 归属撤销恢复、父子／接缝覆盖和旧 GPU 的完整交接。GPU 对照包含真实 cutout、morph 起点／中点／终点、混合 arena／standalone、普通／反向深度、两种 clip range、MRT、TAA 偏移、viewport 改变、shader 重载、水面、GL 状态和资源回收。Iris 稳态像素／深度严格相同；morph 混合过渡用颜色字节差 ≤1、depth 差 ≤1e-6 的已有浮点容差。没有实测任意实际 shader pack。", "",
+          "| 平台 | CPU 研究 | CPU 回归 | GPU 研究 | GPU 回归 | 失败／跳过 |", "| --- | ---: | ---: | ---: | ---: | ---: |"]
+validation = {}
+for key, root in roots.items():
+    counts = {}
+    for group in ["engine-next-cpu", "loading-benefit", "engine-next-gpu", "loading-benefit-gpu"]:
+        suites = [ET.parse(file).getroot() for file in (root / f"build-engine-next-20261014/test-results/{group}").glob("TEST-*.xml")]
+        counts[group] = {field: sum(int(s.get(field, "0")) for s in suites) for field in ["tests", "failures", "errors", "skipped"]}
+        assert suites and all(counts[group][field] == 0 for field in ["failures", "errors", "skipped"]), (key, group, counts[group])
+    validation[key] = counts
+    lines.append(f'| {key} | {counts["engine-next-cpu"]["tests"]} | {counts["loading-benefit"]["tests"]} | {counts["engine-next-gpu"]["tests"]} | {counts["loading-benefit-gpu"]["tests"]} | 0／0 |')
+lines += ["", "测试计数仅包含本轮选取的渲染、缓存、归属与交接回归，不代表仓库所有测试。另一个 progressive-detail 实验的 baseline 副本及 benefit 测试不在本轮编译和执行范围内，未计入通过或跳过数量。", "", "**产物及复现资料**", ""]
+for key, root in roots.items():
+    artifact = json.loads((root / "lib/engine-next-20261014/artifact-manifest.json").read_text())
+    lines += [f'- {key}：`lib/engine-next-20261014/{Path(artifact["jar"]).name}`，{artifact["bytes"]:,} 字节，class major {artifact["class_major"]}。', f'  SHA256：`{artifact["sha256"]}`。']
+lines += ["", "JAR 检查了模组元数据、测试类排除、5 个平台的 native payload、mixin 配置和 ZIP 完整性；Forge 另外确认 reobfJar 已运行，并检查 Minecraft 调用为 SRG 生产映射。源码哈希与产物哈希随 artifact-manifest.json 保存。", "",
+          "复现入口为 tools/prediction/engine-next-tests.gradle：依次运行 engineNextCpuTest、engineNextGpuTest、turnMainRegressionTest、turnMainGpuTest；Forge 额外传入 JDK 17 的 org.gradle.java.home。jar 使用同一 init 文件输出到独立目录。analyze.py 汇总 p50／p95；audit-artifacts.py 检查最终 JAR；所有 next-*.csv、summary、验证 XML 和日志按平台保存在 tools/prediction/engine-next-20261014/results。", "",
+          "本轮保持原森林表示和画质。整株共享、深度 impostor、覆盖率／体素树冠仍属独立研究，本轮没有把它们作为已实现或已验证收益。", ""]
+report = "\n".join(lines)
+for root in roots.values():
+    target = root / "docs/vss-engine-render-next-results-20261014.md"
+    target.write_text(report, encoding="utf-8")
+    (root / "tools/prediction/engine-next-20261014/results/validation-summary.json").write_text(json.dumps(validation, indent=2) + "\n", encoding="utf-8")
+print("Saved identical implementation report in both repositories.")

@@ -1,0 +1,18 @@
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        afterEvaluate {
+            sourceSets.test.java.srcDir('tools/prediction/refinement-blank-audit-20261020/src')
+            tasks.register('refinementBlankAudit', Test) {
+                dependsOn tasks.named('testClasses')
+                testClassesDirs = sourceSets.test.output.classesDirs
+                classpath = sourceSets.test.runtimeClasspath
+                useJUnitPlatform()
+                include '**/PredictionRefinementBlankAuditTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+                maxHeapSize = '2G'
+                maxParallelForks = 1
+                testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat 'full'; showStandardStreams = true }
+            }
+        }
+    }
+}

@@ -1,0 +1,45 @@
+// Apply after feature-handoff-tests.gradle. Keep this task's outputs independent.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-memory-residency-20261010')
+        afterEvaluate {
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/testutil/**'
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/memory-residency-20261010')
+            }
+            tasks.register('memoryResidencyTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform(); maxHeapSize = '2G'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/memory-residency')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/memory-residency')
+                ['OwnershipMemory', 'CpuCachePolicy', 'CompressionRetry', 'PreviewHandoff', 'SubmissionCoverage', 'RegionalOwnership',
+                 'FeatureHandoff', 'UploadHandoff', 'VisibleHandoff', 'GpuResidency', 'MeshCompression', 'MeshCodec',
+                 'MeshMemory', 'MemoryBudget', 'MemoryLifecycle', 'LodSeams', 'ScopedResidency', 'IncrementalRender',
+                 'GpuEncoding', 'RectangleEncoding', 'PassStorage', 'AquaticSubmission', 'DisplayGeometry',
+                 'DisplayError', 'CpuBudget', 'CpuAdmissionIntegration'].each { include "**/Prediction${it}Test.class" }
+                testLogging { events 'passed', 'skipped', 'failed' }
+            }
+            tasks.register('memoryResidencyGpuTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform(); forkEvery = 1; maxHeapSize = '2G'
+                systemProperty 'vss.gpuTests', 'true'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/memory-residency-gpu')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/memory-residency-gpu')
+                ['MemoryResidency', 'CompressedUpload', 'FeatureHandoff', 'ProductionBatch', 'DisplayLod', 'Compact', 'RealBoundarySeams',
+                 'SegmentedMesh', 'InstanceSubmission', 'VoxyDepthConvention'].each { include "**/Prediction${it}GpuTest.class" }
+                testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+            tasks.register('memoryResidencyClasspath') {
+                dependsOn tasks.named('featureHandoffClasses')
+                doLast {
+                    def output = layout.buildDirectory.file('memory-runtime-classpath.txt').get().asFile
+                    output.text = sourceSets.featureHandoff.runtimeClasspath.asPath
+                }
+            }
+        }
+    }
+}

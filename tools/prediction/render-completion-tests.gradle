@@ -1,0 +1,57 @@
+// Production-path CPU/GPU A/B and handoff regressions; no game client is launched.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-render-completion-20261012')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/render-completion-20261012')
+            }
+            sourceSets.create('renderCompletion') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def configureTest = { Test task, String name ->
+                task.dependsOn tasks.named('renderCompletionClasses')
+                task.testClassesDirs = sourceSets.renderCompletion.output.classesDirs
+                task.classpath = sourceSets.renderCompletion.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('followup-results').get().asFile.absolutePath
+                task.testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+            tasks.register('completionRegressionTest', Test) {
+                configureTest(delegate, 'completion-regression')
+                ['ResourceInvalidation', 'RegionalOwnership', 'SubmissionCoverage', 'VoxyStableOwnership',
+                 'VoxyCoverageInvalidation', 'CoverageOwners', 'UploadHandoff', 'VisibleHandoff', 'FeatureHandoff',
+                 'TurnOptimization', 'GpuResidency', 'LodSeams', 'RealBoundarySeams', 'ScopedResidency', 'IncrementalRender',
+                 'PassStorage', 'AquaticSubmission', 'DisplayGeometry', 'DisplayError', 'SeamIndex', 'SeamResidency', 'OcclusionPolicy', 'PreparedPassLocal', 'ParentSelectionExperiment', 'CommandDirection'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('completionCpuBenchmark', Test) {
+                configureTest(delegate, 'completion-cpu-benchmark')
+                include '**/PredictionPreparedPassBenchmark.class'
+                systemProperty 'vss.followupFixture', layout.projectDirectory.file('tools/prediction/render-followup-experiments/fixtures/residents.csv').asFile.absolutePath
+            }
+            tasks.register('completionGpuTest', Test) {
+                configureTest(delegate, 'completion-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                if (providers.gradleProperty('vssVoxyJar').isPresent()) {
+                    systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+                }
+                ['ProductionBatch', 'DisplayLod', 'Compact', 'FeatureHandoff', 'MemoryResidency', 'Occlusion',
+                 'VoxyDepthConvention', 'RefinementOcclusion', 'SeamResidency', 'CommandDirection', 'OcclusionWorkload'].each { include "**/Prediction${it}GpuTest.class" }
+            }
+        }
+    }
+}

@@ -1,0 +1,75 @@
+// Validate the current production architecture without mixing in standalone experiments.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-ground-cover-release-20261015')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/ground-cover-20261015')
+            }
+            sourceSets.create('groundCoverValidation') {
+                java.srcDirs = sourceSets.test.java.srcDirs + [
+                    'tools/prediction/gpu-selection-retained/baseline-src',
+                    'tools/prediction/far-terrain-20261014/java',
+                    'tools/prediction/progressive-detail-20261014/java']
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.exclude '**/PredictionGpuTraversalExperimentTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs + [
+                    'tools/prediction/far-terrain-20261014/resources',
+                    'tools/prediction/progressive-detail-20261014/resources']
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                    sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            // Keep this run independent of other builds cleaning compileJava's
+            // previous output directory while long GPU regressions are running.
+            def runtimeMain = tasks.register('groundCoverRuntimeMainJar', Jar) {
+                from sourceSets.main.output
+                destinationDirectory = layout.projectDirectory.dir('.gradle/vss-ground-cover-20261015')
+                archiveFileName = 'production-runtime.jar'
+            }
+            def runtimeTests = tasks.register('groundCoverRuntimeTestsJar', Jar) {
+                from sourceSets.groundCoverValidation.output
+                destinationDirectory = layout.projectDirectory.dir('.gradle/vss-ground-cover-20261015')
+                archiveFileName = 'test-runtime.jar'
+            }
+            def regression = { Test task, String name ->
+                task.dependsOn tasks.named('groundCoverValidationClasses'), runtimeMain, runtimeTests
+                task.testClassesDirs = sourceSets.groundCoverValidation.output.classesDirs
+                task.classpath = files(runtimeTests.flatMap { it.archiveFile }, runtimeMain.flatMap { it.archiveFile },
+                    sourceSets.test.compileClasspath, sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+                task.useJUnitPlatform()
+                task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.systemProperty 'vss.persistentSceneResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('groundCoverRegressionTest', Test) {
+                regression(delegate, 'ground-cover-cpu')
+                ['GroundCover', 'VegetationMaterial', 'SpatialOrder', 'MeshCodec', 'WarmSurfaceRestore', 'ResourceInvalidation', 'GpuScene', 'SubmissionChanges', 'GpuSelectionPolicy', 'GpuSelectionInput', 'FramePlan',
+                 'AuthoritativeCoverageView', 'IncrementalRender', 'PreparedPassLocal', 'ScopedResidency',
+                 'SubmissionCoverage', 'MainReduction', 'TurnMain', 'OcclusionPolicy', 'MemoryLifecycle',
+                 'TurnOptimization', 'DemandLifecycle', 'ViewRefinement', 'CoverageCache', 'Renderer',
+                 'VoxyCoverageInvalidation', 'VisibleHandoff', 'DisplayGeometry', 'DisplayLod', 'DisplayError',
+                 'LodSeams', 'RealBoundarySeams', 'FeatureHandoff', 'WorkView', 'LoadingBenefit',
+                 'FirstCoverage', 'LoadingProgressIntegration', 'RegionalOwnership', 'ParentLod', 'ParentLodIntegration',
+                 'GpuLodGraph', 'GpuRepresentations', 'RenderWorkBudget'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('groundCoverGpuTest', Test) {
+                regression(delegate, 'ground-cover-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                ['GroundCover', 'VegetationLod', 'GpuScene', 'ProductionBatch', 'Compact', 'DisplayLod', 'SeamResidency', 'FeatureHandoff',
+                 'AuthoritativeCoverageView', 'TurnMain', 'RefinementOcclusion', 'RenderTarget'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+        }
+    }
+}

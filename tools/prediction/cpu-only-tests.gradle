@@ -1,0 +1,35 @@
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-cpu-only-20261010')
+        afterEvaluate {
+            sourceSets.create('cpuOnly') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/networking/client/PredictionGenerationPriorityTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/cpu-only-20261010')
+            }
+            tasks.register('cpuOnlyTest', Test) {
+                dependsOn tasks.named('cpuOnlyClasses')
+                testClassesDirs = sourceSets.cpuOnly.output.classesDirs
+                classpath = sourceSets.cpuOnly.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '2G'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/cpu-only')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/cpu-only')
+                ['CpuBudget', 'CpuAdmissionIntegration', 'CpuLeaseLifecycle', 'FramePace',
+                 'IdleRefinement', 'ViewRefinement', 'BackgroundScheduling', 'RefinementBudget',
+                 'RefinementConvergence', 'LoadingProgressIntegration', 'GenerationPriority',
+                 'MemoryLifecycle', 'WarmSurfaceRestore'].each { include "**/Prediction${it}Test.class" }
+                testLogging { events 'passed', 'skipped', 'failed' }
+            }
+        }
+    }
+}

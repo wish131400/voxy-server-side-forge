@@ -1,0 +1,39 @@
+// Apply after meridian-implementation-tests.gradle: live sources plus the existing fixture dependencies.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-visual-handoff-20261017')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/visual-handoff-20261017')
+            }
+            sourceSets.meridianImplementation.java.include '**/PredictionVoxySurfaceGpuTest.java',
+                    '**/PredictionVegetationDepthGpuTest.java', '**/StrictVoxyShaderFixtureGpuTest.java',
+                    '**/PredictionEffectFog*Test.java', '**/VssLodFogTest.java',
+                    '**/PredictionDeferredWaterGpuTest.java', '**/PredictionVoxyDepthConventionGpuTest.java',
+                    '**/PredictionGraphicsQualityGpuTest.java', '**/PredictionVegetationRenderGpuTest.java',
+                    '**/PredictionRenderTargetGpuTest.java', '**/PredictionInstanceExperiment.java',
+                    '**/PredictionCaveInteriorTest.java', '**/PredictionExteriorColumnsTest.java',
+                    '**/ClientCaptureExtractorTest.java'
+            def run = { Test task, String report ->
+                task.dependsOn tasks.named('meridianImplementationClasses')
+                task.testClassesDirs = sourceSets.meridianImplementation.output.classesDirs
+                task.classpath = sourceSets.meridianImplementation.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '3G'; task.maxParallelForks = 1; task.forkEvery = 1
+                task.systemProperty 'vss.gpuTests', 'true'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${report}")
+                task.testLogging { events 'passed','failed','skipped'; showStandardStreams = true }
+            }
+            tasks.register('visualHandoffReproGpuTest', Test) {
+                run(delegate,'visual-repro-gpu')
+                include '**/PredictionVoxySurfaceGpuTest.class', '**/PredictionVegetationDepthGpuTest.class'
+            }
+            tasks.register('visualHandoffRegressionGpuTest', Test) {
+                run(delegate,'visual-regression-gpu')
+                ['PredictionEffectFog','PredictionDeferredWater','PredictionVoxyDepthConvention',
+                 'PredictionGraphicsQuality','PredictionRenderTarget','PredictionProductionBatch','PredictionGroundCover',
+                 'PredictionFeatureHandoff','StrictVoxyShaderFixture'].each { include "**/${it}GpuTest.class" }
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+// Apply after feature-handoff-tests.gradle and voxy-scan-tests.gradle.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-graphics-quality-20261011')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/graphics-quality-20261011')
+            }
+            tasks.named('voxyScanTest', Test).configure {
+                include '**/PredictionGraphicsQualityTest.class'
+                include '**/PredictionSpriteTableTest.class'
+            }
+            tasks.named('voxyScanGpuTest', Test).configure {
+                include '**/PredictionGraphicsQualityGpuTest.class'
+                if (providers.gradleProperty('vssVoxyJar').isPresent()) {
+                    systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+                }
+            }
+        }
+    }
+}

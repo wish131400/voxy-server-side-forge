@@ -1,0 +1,59 @@
+// Current production code; independent output/cache directories on both loaders.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-voxel-hierarchy-20261020')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/voxel-hierarchy-20261020')
+            }
+            // Use the canonical bootstrap and compatibility fixtures from src/test.
+            sourceSets.meridianImplementation.java.setSrcDirs(['src/test/java',
+                'tools/prediction/meridian-implementation-20261016/java'])
+            tasks.named('compileMeridianImplementationJava', JavaCompile).configure {
+                source layout.projectDirectory.file('src/test/java/dev/xantha/vss/client/prediction/AlgorithmSupport.java')
+            }
+            sourceSets.meridianImplementation.java.include '**/PredictionVoxelHierarchyTest.java',
+                '**/PredictionVoxelHierarchyGpuTest.java', '**/PredictionVoxelForestGpuTest.java', '**/PredictionVoxelForestResidentGpuTest.java', '**/Legacy*.java',
+                '**/PredictionPlanningTestSupport.java', '**/PredictionGpuLodGraphTest.java',
+                '**/PredictionMeshDerivedCacheTest.java', '**/PredictionMeshFixture.java'
+            def run = { Test task, String report ->
+                task.dependsOn tasks.named('meridianImplementationClasses')
+                task.testClassesDirs = sourceSets.meridianImplementation.output.classesDirs
+                task.classpath = sourceSets.meridianImplementation.runtimeClasspath
+                task.useJUnitPlatform();task.maxHeapSize='4G';task.maxParallelForks=1;task.forkEvery=1
+                task.reports.junitXml.outputLocation=layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation=layout.buildDirectory.dir("reports/tests/${report}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.systemProperty 'vss.algorithmInputs', layout.projectDirectory.dir('tools/prediction/meridian-algorithms-20261016/inputs').asFile.absolutePath
+                task.systemProperty 'vss.algorithmResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'passed','failed','skipped';exceptionFormat='full';showStandardStreams=true }
+            }
+            tasks.register('voxelHierarchyTest', Test) {
+                run(delegate,'voxel-cpu');include '**/PredictionVoxelHierarchyTest.class'
+            }
+            tasks.register('voxelHierarchyRegressionTest', Test) {
+                run(delegate,'voxel-regression')
+                ['MeshCodec','WarmSurfaceRestore','FeatureHandoff','RegionalOwnership','ParentLod','ParentLodIntegration',
+                 'GpuRepresentations','GpuLodGraph','GpuScene','MemoryLifecycle','DemandLifecycle','ResourceInvalidation',
+                 'MeshDerivedCache','CrossEncoding','DisplayGeometry'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('voxelHierarchyGpuTest', Test) {
+                run(delegate,'voxel-gpu');systemProperty 'vss.gpuTests','true'
+                include '**/PredictionVoxelHierarchyGpuTest.class'
+                systemProperty 'vss.indirectArenaMiB','128'
+            }
+            tasks.register('voxelForestGpuTest', Test) {
+                run(delegate,'voxel-forest-gpu');systemProperty 'vss.gpuTests','true'
+                include '**/PredictionVoxelForestGpuTest.class'
+                systemProperty 'vss.indirectArenaMiB','128'
+            }
+            tasks.register('voxelForestResidentGpuTest', Test) {
+                run(delegate,'voxel-forest-resident-gpu');systemProperty 'vss.gpuTests','true'
+                include '**/PredictionVoxelForestResidentGpuTest.class'
+                systemProperty 'vss.indirectArenaMiB','128'
+            }
+        }
+    }
+}

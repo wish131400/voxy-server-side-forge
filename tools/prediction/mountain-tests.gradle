@@ -15,7 +15,7 @@ allprojects {
                         ? project.property('mountainClasses').split(',')
                         : ['PredictionProductionBatchGpuTest', 'PredictionCompactGpuTest',
                            'PredictionOcclusionGpuTest', 'PredictionRawStateHandoffGpuTest',
-                           'PredictionSegmentedMeshGpuTest', 'PredictionVoxyBoundaryGpuTest']
+                           'PredictionSegmentedMeshGpuTest', 'PredictionVoxySurfaceGpuTest']
                 classes.each { include "**/${it}.class" }
             }
             if (project.hasProperty('vssSpatialReplay')) systemProperty 'vss.spatialReplay', project.property('vssSpatialReplay')

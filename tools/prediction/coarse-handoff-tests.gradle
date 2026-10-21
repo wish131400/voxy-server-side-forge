@@ -1,0 +1,45 @@
+// Run with -I on either platform. GPU fixtures create a hidden GL context;
+// run them separately from another GPU test process on the same machine.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir(
+                providers.gradleProperty('coarseHandoffBuildDir').getOrElse('build-coarse-handoff'))
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir(
+                        providers.gradleProperty('coarseHandoffJarDir').getOrElse('lib/coarse-handoff-fix'))
+            }
+            tasks.register('coarseHandoffTest', Test) {
+                dependsOn tasks.named('testClasses')
+                testClassesDirs = sourceSets.test.output.classesDirs
+                classpath = sourceSets.test.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '3G'
+                maxParallelForks = 1
+                forkEvery = 1
+                ['ParentLod', 'ParentLodIntegration', 'RectangleEncoding', 'WallEvidence',
+                 'ExteriorColumns', 'SampleStore', 'SubCellCoverage', 'LodSeams', 'FeatureHandoff',
+                 'LoadingBenefit', 'CoverageOwners', 'GpuResidency', 'UploadHandoff',
+                 'CoverageCache', 'IncrementalRender'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+                testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat 'full' }
+            }
+            tasks.register('coarseHandoffGpuTest', Test) {
+                dependsOn tasks.named('testClasses')
+                testClassesDirs = sourceSets.test.output.classesDirs
+                classpath = sourceSets.test.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '3G'
+                maxParallelForks = 1
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                ['BoundaryCommit', 'SubCellCoverage', 'CoarseHandoff', 'Compact', 'ProductionBatch', 'VoxySurface',
+                 'FeatureHandoff', 'SeamResidency', 'VegetationDepth', 'VoxelHierarchy'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+                testLogging { events 'passed', 'failed', 'skipped'; exceptionFormat 'full'; showStandardStreams = true }
+            }
+        }
+    }
+}

@@ -1,0 +1,42 @@
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-forest-optimization-20261010')
+        afterEvaluate {
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/testutil/**'
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/forest-optimization-20261010')
+            }
+            tasks.register('forestOptimizationTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '2G'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/forest-optimization')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/forest-optimization')
+                ['RectangleEncoding', 'DisplayError', 'GpuEncoding', 'PassStorage', 'DisplayGeometry', 'LodSeams',
+                 'MeshCodec', 'MeshCompression', 'GpuResidency', 'OwnershipRuns', 'SubmissionCoverage',
+                 'RegionalOwnership', 'AquaticSubmission', 'SpatialOrder', 'FeatureHandoff',
+                 'VisibleHandoff', 'ScopedResidency', 'ScreenDetail', 'IncrementalRender'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+                testLogging { events 'passed', 'skipped', 'failed' }
+            }
+            tasks.register('forestOptimizationGpuTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform()
+                forkEvery = 1
+                maxHeapSize = '2G'
+                systemProperty 'vss.gpuTests', 'true'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/forest-optimization-gpu')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/forest-optimization-gpu')
+                ['ProductionBatch', 'DisplayLod', 'Compact', 'CompressedUpload', 'UploadStaging', 'SegmentedMesh',
+                 'FeatureHandoff', 'RenderTarget', 'RealBoundarySeams', 'VoxySurface', 'VoxyDepthConvention',
+                 'InstanceSubmission', 'RawStateHandoff', 'Occlusion'].each { include "**/Prediction${it}GpuTest.class" }
+                testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+        }
+    }
+}

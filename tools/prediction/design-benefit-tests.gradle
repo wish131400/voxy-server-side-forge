@@ -1,0 +1,62 @@
+// Explicit experiments only; no Minecraft client or installed mod is modified.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-design-benefit-20261012')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/design-benefit-20261012')
+            }
+            sourceSets.create('designBenefit') {
+                java.srcDirs = sourceSets.test.java.srcDirs + ['tools/prediction/design-benefit-experiments/java']
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def configureTest = { Test task, String name ->
+                task.dependsOn tasks.named('designBenefitClasses')
+                task.testClassesDirs = sourceSets.designBenefit.output.classesDirs
+                task.classpath = sourceSets.designBenefit.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+            tasks.register('designBenefitCpuTest', Test) {
+                configureTest(delegate, 'design-benefit-cpu')
+                include '**/Benefit*Test.class'
+                exclude '**/*GpuTest.class'
+            }
+            tasks.register('designBenefitGpuTest', Test) {
+                configureTest(delegate, 'design-benefit-gpu'); forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'; systemProperty 'vss.indirectArenaMiB', '128'
+                include '**/Benefit*GpuTest.class'
+            }
+            tasks.register('designBenefitRegressionTest', Test) {
+                configureTest(delegate, 'design-benefit-regression')
+                ['ResourceInvalidation', 'RegionalOwnership', 'SubmissionCoverage', 'VoxyStableOwnership',
+                 'VoxyCoverageInvalidation', 'CoverageOwners', 'UploadHandoff', 'VisibleHandoff', 'FeatureHandoff',
+                 'TurnOptimization', 'GpuResidency', 'LodSeams', 'RealBoundarySeams', 'ScopedResidency', 'IncrementalRender',
+                 'PassStorage', 'AquaticSubmission', 'DisplayGeometry', 'DisplayError', 'SeamIndex', 'SeamResidency',
+                 'OcclusionPolicy', 'PreparedPassLocal', 'ParentSelectionExperiment', 'CommandDirection',
+                 'SpatialOrder', 'ScanMerge', 'GraphicsQuality', 'VegetationMaterial', 'SpriteTable', 'MeshCodec',
+                 'CrossEncoding', 'RectangleEncoding', 'WarmSurfaceRestore', 'CommandDirections'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('designBenefitProductionGpuTest', Test) {
+                configureTest(delegate, 'design-benefit-production-gpu'); forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'; systemProperty 'vss.indirectArenaMiB', '128'
+                if (providers.gradleProperty('vssVoxyJar').isPresent()) systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+                ['ProductionBatch', 'DisplayLod', 'Compact', 'FeatureHandoff', 'VegetationLod',
+                 'VoxyDepthConvention', 'Occlusion', 'CommandDirection', 'OcclusionWorkload'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+        }
+    }
+}

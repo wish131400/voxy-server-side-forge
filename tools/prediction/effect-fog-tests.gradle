@@ -1,0 +1,41 @@
+// Live-source regressions for status/environment fog and the Voxy final composite.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-effect-fog-20261016')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/effect-fog-20261016')
+            }
+            sourceSets.create('effectFog') {
+                java.srcDirs = ['src/test/java']
+                java.include '**/PredictionEffectFog*Test.java', '**/VssLodFogTest.java',
+                        '**/PredictionDeferredWaterGpuTest.java', '**/PredictionVoxyDepthConventionGpuTest.java',
+                        '**/AlgorithmBootstrap.java', '**/ClientTerrainSamplerTest.java', '**/ForgeTestBootstrap.java', 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def configureRun = { Test task, String report ->
+                task.dependsOn tasks.named('effectFogClasses')
+                task.testClassesDirs = sourceSets.effectFog.output.classesDirs
+                task.classpath = sourceSets.effectFog.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '2G'; task.maxParallelForks = 1; task.forkEvery = 1
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${report}")
+                task.testLogging { events 'passed', 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('effectFogTest', Test) {
+                configureRun(delegate, 'effect-fog-cpu')
+                include '**/PredictionEffectFogTest.class', '**/VssLodFogTest.class'
+            }
+            tasks.register('effectFogGpuTest', Test) {
+                configureRun(delegate, 'effect-fog-gpu')
+                include '**/PredictionEffectFogGpuTest.class', '**/PredictionDeferredWaterGpuTest.class',
+                        '**/PredictionVoxyDepthConventionGpuTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+            }
+        }
+    }
+}

@@ -1,0 +1,53 @@
+// Standalone, hidden OpenGL verification and CPU regressions for the display LOD path.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-vegetation-lod-20261012')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/vegetation-lod-20261012')
+            }
+            sourceSets.create('vegetationLod') {
+                java.srcDirs = sourceSets.test.java.srcDirs
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def configureTest = { Test task, String name ->
+                task.dependsOn tasks.named('vegetationLodClasses')
+                task.testClassesDirs = sourceSets.vegetationLod.output.classesDirs
+                task.classpath = sourceSets.vegetationLod.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+            tasks.register('vegetationLodRegressionTest', Test) {
+                configureTest(delegate, 'vegetation-lod-regression')
+                ['ResourceInvalidation', 'RegionalOwnership', 'SubmissionCoverage', 'VoxyStableOwnership',
+                 'VoxyCoverageInvalidation', 'CoverageOwners', 'UploadHandoff', 'VisibleHandoff', 'FeatureHandoff',
+                 'TurnOptimization', 'GpuResidency', 'LodSeams', 'RealBoundarySeams', 'ScopedResidency', 'IncrementalRender',
+                 'PassStorage', 'AquaticSubmission', 'DisplayGeometry', 'DisplayError', 'SeamIndex', 'SeamResidency',
+                 'OcclusionPolicy', 'PreparedPassLocal', 'ParentSelectionExperiment', 'CommandDirection',
+                 'SpatialOrder', 'ScanMerge', 'GraphicsQuality', 'VegetationMaterial', 'SpriteTable', 'MeshCodec',
+                 'CrossEncoding', 'RectangleEncoding', 'WarmSurfaceRestore'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('vegetationLodGpuTest', Test) {
+                configureTest(delegate, 'vegetation-lod-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                if (providers.gradleProperty('vssVoxyJar').isPresent()) systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+                ['VegetationLod', 'ProductionBatch', 'DisplayLod', 'Compact', 'FeatureHandoff', 'VoxyDepthConvention', 'Occlusion'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+        }
+    }
+}

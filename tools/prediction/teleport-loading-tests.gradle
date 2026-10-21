@@ -1,0 +1,39 @@
+// Apply after meridian-implementation-tests.gradle; all tests compile current production sources.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-teleport-loading-20261017')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/teleport-loading-20261017')
+            }
+            sourceSets.meridianImplementation.java.include '**/PredictionTeleportLoadingTest.java', '**/PredictionMainReductionTest.java'
+            sourceSets.meridianImplementation.java.srcDir 'tools/prediction/teleport-loading-20261017'
+            sourceSets.meridianImplementation.java.include '**/PredictionTeleportScheduleBenchmark.java'
+            def run = { Test task, String report ->
+                task.dependsOn tasks.named('meridianImplementationClasses')
+                task.testClassesDirs = sourceSets.meridianImplementation.output.classesDirs
+                task.classpath = sourceSets.meridianImplementation.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '3G'; task.maxParallelForks = 1
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${report}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${report}")
+                task.testLogging { events 'passed','failed','skipped'; showStandardStreams = false }
+            }
+            tasks.register('teleportLoadingReproTest', Test) {
+                run(delegate,'teleport-repro')
+                include '**/PredictionTeleportLoadingTest.class'
+            }
+            tasks.register('teleportLoadingRegressionTest', Test) {
+                run(delegate,'teleport-regression')
+                ['MainReduction','MemoryBudget','MemoryLifecycle','CpuAdmissionIntegration','CpuLeaseLifecycle',
+                 'WarmSurfaceRestore','LoadingProgressIntegration','DemandLifecycle','FirstCoverage','ViewRefinement',
+                 'ParentLod','ParentLodIntegration','AuthoritativeCoverageView','ResourceInvalidation',
+                 'LodSeams','RealBoundarySeams','RenderWorkBudget'].each { include "**/Prediction${it}Test.class" }
+            }
+            tasks.register('teleportScheduleBenchmark', Test) {
+                run(delegate,'teleport-benchmark')
+                include '**/PredictionTeleportScheduleBenchmark.class'
+                systemProperty 'vss.teleportBenchmark', layout.buildDirectory.file('results/teleport-schedule.json').get().asFile.absolutePath
+            }
+        }
+    }
+}

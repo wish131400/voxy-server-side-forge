@@ -1,0 +1,81 @@
+// Camera-turn, boundary transaction and client-thread regression/build.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-far-terrain-20261014')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/far-terrain-20261014')
+            }
+            sourceSets.create('turnMain') {
+                java.srcDirs = sourceSets.test.java.srcDirs + [layout.projectDirectory.dir('tools/prediction/gpu-selection-retained/baseline-src').asFile, layout.projectDirectory.dir('tools/prediction/far-terrain-20261014/java').asFile]
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.exclude '**/PredictionGpuTraversalExperimentTest.java'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs + ['tools/prediction/far-terrain-20261014/resources']
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def regression = { Test task, String name ->
+                task.dependsOn tasks.named('turnMainClasses')
+                task.testClassesDirs = sourceSets.turnMain.output.classesDirs
+                task.classpath = sourceSets.turnMain.runtimeClasspath
+                task.useJUnitPlatform()
+                task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'failed', 'skipped'; showStandardStreams = true }
+            }
+            tasks.register('turnMainRegressionTest', Test) {
+                regression(delegate, 'loading-benefit')
+                ['HeightProtection', 'DisplayGeometry', 'DisplayError', 'ScanMerge', 'SpatialOrder', 'VegetationMaterial', 'MeshCodec', 'CrossEncoding', 'RectangleEncoding', 'GpuSelectionPolicy', 'GpuSelectionInput', 'LoadingBenefit', 'MainReduction', 'TurnOptimization', 'TurnMain', 'OcclusionPolicy', 'IncrementalRender', 'PreparedPassLocal',
+                 'LodSeams', 'RealBoundarySeams', 'SeamIndex', 'SeamResidency', 'SubmissionCoverage',
+                 'VoxyCoverageInvalidation', 'VoxyStableOwnership', 'FeatureHandoff', 'UploadHandoff',
+                 'VisibleHandoff', 'ResourceInvalidation', 'RegionalOwnership', 'MemoryLifecycle',
+                 'CpuCachePolicy', 'DemandLifecycle', 'WorkView', 'ViewRefinement', 'ScreenDetail',
+                 'LoadingSettings', 'LoadingProgressIntegration', 'RefinementConvergence', 'WarmSurfaceRestore', 'ScopedResidency',
+                 'GpuResidency', 'VisibilityFeedback', 'CoverageOwners', 'MediumCoverage', 'MotionPace'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+                include '**/VssLodSampleCacheTest.class'
+            }
+            tasks.register('turnMainGpuTest', Test) {
+                regression(delegate, 'loading-benefit-gpu')
+                forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                ['GpuSelectionPolicy', 'GpuSelectionInput', 'LoadingBenefit', 'MainReduction', 'ProductionBatch', 'Occlusion', 'SeamResidency', 'FeatureHandoff', 'Compact',
+                 'DisplayLod', 'MemoryResidency', 'TurnMain', 'RefinementOcclusion', 'RenderTarget'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+            tasks.register('farTerrainCpuTest', Test) {
+                regression(delegate, 'far-terrain-cpu')
+                include '**/FarTerrain*Test.class'
+                exclude '**/*GpuTest.class'
+            }
+            tasks.register('farTerrainGpuTest', Test) {
+                regression(delegate, 'far-terrain-gpu')
+                include '**/FarTerrainSubmissionGpuTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+            }
+            tasks.register('gpuSelectionBenefitTest', Test) {
+                regression(delegate, 'gpu-selection-benefit')
+                include '**/RetainedGpuSelectionGpuTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+                systemProperty 'vss.retainedGpuSelectionResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                systemProperty 'vss.loadingBenefitResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+            }
+            tasks.register('gpuSelectionFallbackTest', Test) {
+                regression(delegate, 'gpu-selection-fallback')
+                include '**/RetainedSelectionFallbackGpuTest.class'
+                systemProperty 'vss.gpuTests', 'true'
+                systemProperty 'vss.indirectArenaMiB', '128'
+            }
+        }
+    }
+}

@@ -1,0 +1,43 @@
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-frame-fixes-20261010')
+        afterEvaluate {
+            sourceSets.featureHandoff.java.include 'dev/xantha/vss/testutil/**'
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/frame-fixes-20261010')
+            }
+            tasks.register('frameFixesTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform()
+                maxHeapSize = '2G'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/frame-fixes')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/frame-fixes')
+                def names = ['AquaticSubmission', 'CpuBudget', 'TurnOptimization', 'SubmissionCoverage', 'FramePlan', 'SpatialReplay', 'SpatialOrder', 'IncrementalRender',
+                    'ViewSelection', 'VisibleHandoff', 'FeatureHandoff', 'VisibilityFeedback', 'WorkView', 'ViewRefinement',
+                    'LodPlanner', 'TileManager', 'TileTableHash', 'TileResidencyPolicy', 'RenderWork', 'ScopedResidency',
+                    'ScopeFamilies', 'ScopeBudget', 'ScreenDetail', 'TransitionPlan', 'OwnershipRuns', 'CoverageOwners',
+                    'CoverageWork', 'MediumCoverage', 'VoxyStableOwnership', 'VoxyCoverageInvalidation', 'RegionalOwnership',
+                    'CpuAdmissionIntegration', 'CpuLeaseLifecycle', 'BackgroundScheduling', 'WarmSurfaceRestore',
+                    'LoadingProgressIntegration', 'RefinementBudget', 'RefinementConvergence', 'MemoryLifecycle']
+                names.each { include "**/Prediction${it}Test.class" }
+                testLogging { events 'passed', 'skipped', 'failed' }
+            }
+            tasks.register('frameFixesGpuTest', Test) {
+                dependsOn tasks.named('featureHandoffClasses')
+                testClassesDirs = sourceSets.featureHandoff.output.classesDirs
+                classpath = sourceSets.featureHandoff.runtimeClasspath
+                useJUnitPlatform()
+                forkEvery = 1
+                maxHeapSize = '2G'
+                systemProperty 'vss.gpuTests', 'true'
+                reports.junitXml.outputLocation = layout.buildDirectory.dir('test-results/frame-fixes-gpu')
+                reports.html.outputLocation = layout.buildDirectory.dir('reports/tests/frame-fixes-gpu')
+                ['RenderTarget', 'ProductionBatch', 'FeatureHandoff', 'RefinementOcclusion', 'Occlusion', 'DisplayLod',
+                    'VoxySurface', 'VoxyDepthConvention'].each { include "**/Prediction${it}GpuTest.class" }
+                testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+        }
+    }
+}

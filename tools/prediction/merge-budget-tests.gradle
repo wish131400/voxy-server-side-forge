@@ -1,0 +1,63 @@
+// Explicit experiments only; no Minecraft client or installed mod is modified.
+gradle.projectsLoaded {
+    rootProject.allprojects {
+        layout.buildDirectory = layout.projectDirectory.dir('build-merge-budget-20261012')
+        afterEvaluate {
+            tasks.named('jar', Jar).configure {
+                destinationDirectory = layout.projectDirectory.dir('lib/merge-budget-20261012')
+            }
+            sourceSets.create('mergeBudget') {
+                java.srcDirs = sourceSets.test.java.srcDirs + ['tools/prediction/merge-budget-experiments/java']
+                java.include 'dev/xantha/vss/client/prediction/**'
+                java.include 'dev/xantha/vss/testutil/**'
+                java.include 'me/cortex/voxy/**'
+                resources.srcDirs = sourceSets.test.resources.srcDirs + ['tools/prediction/merge-budget-experiments/resources']
+                compileClasspath += sourceSets.main.output + sourceSets.test.compileClasspath
+                runtimeClasspath = output + files(sourceSets.main.output, sourceSets.test.compileClasspath,
+                        sourceSets.main.runtimeClasspath, configurations.testRuntimeClasspath)
+            }
+            def configureTest = { Test task, String name ->
+                task.dependsOn tasks.named('mergeBudgetClasses')
+                task.testClassesDirs = sourceSets.mergeBudget.output.classesDirs
+                task.classpath = sourceSets.mergeBudget.runtimeClasspath
+                task.useJUnitPlatform(); task.maxHeapSize = '4G'
+                task.reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/${name}")
+                task.reports.html.outputLocation = layout.buildDirectory.dir("reports/tests/${name}")
+                task.systemProperty 'vss.followupResults', layout.buildDirectory.dir('results').get().asFile.absolutePath
+                task.testLogging { events 'passed', 'skipped', 'failed'; showStandardStreams = true }
+            }
+            tasks.register('mergeBudgetCpuTest', Test) {
+                configureTest(delegate, 'merge-budget-cpu')
+                include '**/MergeBudget*Test.class'
+                exclude '**/*GpuTest.class'
+            }
+            tasks.register('mergeBudgetGpuTest', Test) {
+                configureTest(delegate, 'merge-budget-gpu'); forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'; systemProperty 'vss.indirectArenaMiB', '128'
+                include '**/MergeBudget*GpuTest.class'
+            }
+            tasks.register('mergeBudgetRegressionTest', Test) {
+                configureTest(delegate, 'merge-budget-regression')
+                ['ResourceInvalidation', 'RegionalOwnership', 'SubmissionCoverage', 'VoxyStableOwnership',
+                 'VoxyCoverageInvalidation', 'CoverageOwners', 'UploadHandoff', 'VisibleHandoff', 'FeatureHandoff',
+                 'TurnOptimization', 'GpuResidency', 'LodSeams', 'RealBoundarySeams', 'ScopedResidency', 'IncrementalRender',
+                 'PassStorage', 'AquaticSubmission', 'DisplayGeometry', 'DisplayError', 'SeamIndex', 'SeamResidency',
+                 'OcclusionPolicy', 'PreparedPassLocal', 'ParentSelectionExperiment', 'CommandDirection',
+                 'SpatialOrder', 'ScanMerge', 'GraphicsQuality', 'VegetationMaterial', 'SpriteTable', 'MeshCodec',
+                 'CrossEncoding', 'RectangleEncoding', 'WarmSurfaceRestore', 'CommandDirections', 'ZoomLod',
+                 'ZoomReturn', 'ScreenDetail', 'WorkView', 'ViewRefinement', 'ScopedResidency'].each {
+                    include "**/Prediction${it}Test.class"
+                }
+            }
+            tasks.register('mergeBudgetProductionGpuTest', Test) {
+                configureTest(delegate, 'merge-budget-production-gpu'); forkEvery = 1
+                systemProperty 'vss.gpuTests', 'true'; systemProperty 'vss.indirectArenaMiB', '128'
+                if (providers.gradleProperty('vssVoxyJar').isPresent()) systemProperty 'vss.voxyJar', providers.gradleProperty('vssVoxyJar').get()
+                ['ProductionBatch', 'DisplayLod', 'Compact', 'FeatureHandoff', 'VegetationLod',
+                 'VoxyDepthConvention', 'Occlusion', 'CommandDirection', 'OcclusionWorkload', 'RefinementOcclusion'].each {
+                    include "**/Prediction${it}GpuTest.class"
+                }
+            }
+        }
+    }
+}
