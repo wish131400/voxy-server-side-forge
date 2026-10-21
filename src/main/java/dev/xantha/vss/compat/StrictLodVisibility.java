@@ -1,8 +1,8 @@
 package dev.xantha.vss.compat;
 
+import dev.xantha.vss.api.VSSApi;
 import dev.xantha.vss.common.VSSLogger;
-import dev.xantha.vss.networking.client.StrictLodFrontier;
-import dev.xantha.vss.networking.client.VSSClientNetworking;
+import dev.xantha.vss.common.StrictLodFrontier;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.lang.reflect.Field;
 import net.minecraft.client.Minecraft;
@@ -26,11 +26,7 @@ public final class StrictLodVisibility {
     private static long revision;
     private static volatile String waiting = "initializing";
     private static final java.util.concurrent.atomic.AtomicBoolean invalidated = new java.util.concurrent.atomic.AtomicBoolean();
-    private static final java.util.Map<Object, Integer> pendingIngest = new java.util.IdentityHashMap<>();
-    private static volatile boolean ingestFailed;
     private static final java.util.concurrent.atomic.AtomicLong changes = new java.util.concurrent.atomic.AtomicLong();
-    private static final java.util.Map<Object, Long> ingestColumns = new java.util.IdentityHashMap<>();
-    private static final java.util.concurrent.ConcurrentHashMap<Long, Integer> pendingColumns = new java.util.concurrent.ConcurrentHashMap<>();
     private static volatile StrictVoxyPipeline meshPipeline;
     private static long checkedChange = -1, checkedFrontier = -1;
     private static long frameChecks, unchangedFrames, coverageRetractions;
@@ -41,48 +37,13 @@ public final class StrictLodVisibility {
         catch (ReflectiveOperationException e) { throw new IllegalStateException("Unsupported Voxy mesh task", e); }
     }
 
-    public static void beginIngest(Object section, int cx, int cz) {
-        synchronized (pendingIngest) {
-            long column = dev.xantha.vss.common.PositionUtil.packPosition(cx, cz);
-            ingestColumns.put(section, column);
-            pendingColumns.merge(column, 1, Integer::sum);
-            beginIngest(section);
-        }
-    }
-
-    public static void beginIngest(Object section) {
-        synchronized (pendingIngest) { pendingIngest.merge(section, 1, Integer::sum); }
-        workChanged();
-    }
-    public static void cancelIngest(Object section) {
-        synchronized (pendingIngest) {
-            Integer count = pendingIngest.get(section);
-            if (count == null) return;
-            Long column = ingestColumns.get(section);
-            if (column != null) {
-                pendingColumns.computeIfPresent(column, (key, value) -> value == 1 ? null : value - 1);
-                if (count == 1) ingestColumns.remove(section);
-            }
-            if (count == 1) pendingIngest.remove(section); else pendingIngest.put(section, count - 1);
-        }
-        workChanged();
-    }
-    public static void ingestCompleted(Object task) {
-        if (task == null) return;
-        try { cancelIngest(field(task, "section")); }
-        catch (ReflectiveOperationException | RuntimeException e) {
-            ingestFailed = true;
-            workChanged();
-        }
-    }
-
     private StrictLodVisibility() { }
     public static boolean active() {
         // The complete-ring frontier exists only for the prediction handoff.
         // When prediction is disabled, the regular near-first VSS scheduler
         // must be allowed to refill Voxy from the player's current position.
-        return VSSClientNetworking.isPredictionActive()
-                && VSSClientNetworking.shouldApplyStrictLodOrder()
+        return VSSApi.clientSession().isPredictionActive()
+                && VSSApi.clientSession().shouldApplyStrictLodOrder()
                 && (renderHookSeen || ModCompat.isVoxyLoaded());
     }
     public static Snapshot snapshot() { return snapshot; }
@@ -184,8 +145,7 @@ public final class StrictLodVisibility {
 
     public static void reset() {
         resetGeometry();
-        synchronized (pendingIngest) { pendingIngest.clear(); ingestColumns.clear(); pendingColumns.clear(); }
-        ingestFailed = false;
+        VoxyIngestTracker.reset();
     }
     private static void resetGeometry() {
         FRONTIER.reset(); NODES.clear(); nodeOwner = null; levelIdentity = null;
@@ -207,11 +167,11 @@ public final class StrictLodVisibility {
             Minecraft mc = Minecraft.getInstance();
             if (mc == null || mc.level == null || mc.player == null) { resetGeometry(); return; }
             FRONTIER.center(mc.player.getBlockX() >> 4, mc.player.getBlockZ() >> 4,
-                    VSSClientNetworking.getEffectiveLodDistanceChunks());
+                    VSSApi.clientSession().getEffectiveLodDistanceChunks());
             if (invalidated.getAndSet(false)) {
                 FRONTIER.reset();
                 FRONTIER.center(mc.player.getBlockX() >> 4, mc.player.getBlockZ() >> 4,
-                        VSSClientNetworking.getEffectiveLodDistanceChunks());
+                        VSSApi.clientSession().getEffectiveLodDistanceChunks());
             }
             Object owner = field(renderSystem, "nodeManager");
             // A Voxy cache can publish its first GPU batch before the first
@@ -230,7 +190,7 @@ public final class StrictLodVisibility {
                 meshPipeline = null; failed = false;
                 workChanged();
                 FRONTIER.center(mc.player.getBlockX() >> 4, mc.player.getBlockZ() >> 4,
-                        VSSClientNetworking.getEffectiveLodDistanceChunks());
+                        VSSApi.clientSession().getEffectiveLodDistanceChunks());
             }
             updateRenderWindow(dimension, ((Number) field(viewport, "cameraX")).doubleValue(),
                     ((Number) field(viewport, "cameraZ")).doubleValue(),
@@ -250,17 +210,17 @@ public final class StrictLodVisibility {
                 return;
             }
             checkedChange = change; checkedFrontier = FRONTIER.revision(); frameChecks++;
-            waiting = failed || ingestFailed ? "unsupported" : "gpu-snapshot";
-            if (!failed && !ingestFailed && uploadedNodes) {
+            waiting = failed ? "unsupported" : "gpu-snapshot";
+            if (!failed && uploadedNodes) {
                 // One complete ring per frame; no timeout or 'mostly complete' shortcut.
                 waiting = "distance-limit";
                 boolean advanced = FRONTIER.advance((x, z) -> {
-                    boolean ready = VSSClientNetworking.strictColumnReady(x, z);
+                    boolean ready = VSSApi.clientSession().strictColumnReady(x, z);
                     if (!ready) waiting = "data@" + x + "," + z;
                     return ready;
                 }, (x, z) -> {
-                    boolean ready = !pendingColumns.containsKey(dev.xantha.vss.common.PositionUtil.packPosition(x, z))
-                            && VSSClientNetworking.strictColumnRenderReady(x, z,
+                    boolean ready = !VoxyIngestTracker.pendingColumn(x, z)
+                            && VSSApi.clientSession().strictColumnRenderReady(x, z,
                             y -> meshPipeline.idle(x, y, z) && NODES.coversFinest(x, y, z));
                     if (!ready) waiting = "gpu@" + x + "," + z;
                     return ready;
@@ -297,7 +257,7 @@ public final class StrictLodVisibility {
             // be considered after every delta, not while walking an unordered scatter map.
             int before = FRONTIER.visibleRing();
             if (active()) NODES.retractUncovered(FRONTIER, removedPositions, (x, z) ->
-                    VSSClientNetworking.strictColumnRenderReady(x, z, y -> NODES.coversFinest(x, y, z)));
+                    VSSApi.clientSession().strictColumnRenderReady(x, z, y -> NODES.coversFinest(x, y, z)));
             if (FRONTIER.visibleRing() < before) coverageRetractions++;
             boolean wasUploaded = uploadedNodes;
             uploadedNodes = true;

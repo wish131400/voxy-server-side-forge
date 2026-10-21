@@ -5,7 +5,6 @@ import dev.xantha.vss.api.VoxelColumnData;
 import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.common.DiagnosticCounters;
-import dev.xantha.vss.networking.client.VSSClientNetworking;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -82,7 +81,7 @@ final class VoxyCompat {
 
             VSSApi.registerColumnProcessingConsumer((level, dimension, chunkX, chunkZ, columnData) -> {
                 ingestDiagnostics.record("columnsOffered");
-                if (!VSSClientNetworking.isClientLodSessionActive()) {
+                if (!VSSApi.clientSession().isClientLodSessionActive()) {
                     ingestDiagnostics.record("columnsRejected");
                     return false;
                 }
@@ -104,7 +103,7 @@ final class VoxyCompat {
                                 return false;
                             }
                         }
-                        markLocalColumnPresent(level, chunkX, chunkZ);
+                        if (columnData.authoritative()) markLocalColumnPresent(level, chunkX, chunkZ);
                         ingestDiagnostics.record("columnsAccepted");
                         ingestDiagnostics.record("emptyColumnsAccepted");
                         if (VSSLogger.isDebugEnabled()) {
@@ -128,7 +127,7 @@ final class VoxyCompat {
                             return false;
                         }
                     }
-                    markLocalColumnPresent(level, chunkX, chunkZ);
+                    if (columnData.authoritative()) markLocalColumnPresent(level, chunkX, chunkZ);
                     ingestDiagnostics.record("columnsAccepted");
                     if (VSSLogger.isDebugEnabled()) {
                         lastAcceptedColumn = dimension.location() + "@" + chunkX + "," + chunkZ;
@@ -215,7 +214,7 @@ final class VoxyCompat {
     }
 
     static void clientTick() {
-        if (!VSSClientNetworking.isClientLodSessionActive()) {
+        if (!VSSApi.clientSession().isClientLodSessionActive()) {
             ingestDiagnostics.reset();
             lastAcceptedColumn = "none";
         } else {
@@ -241,7 +240,7 @@ final class VoxyCompat {
         }
 
         if ((!lastRenderAvailable && renderAvailable) || (!lastIngestAvailable && ingestAvailable)) {
-            VSSClientNetworking.forceLodResync("Voxy became available again");
+            VSSApi.clientSession().forceLodResync("Voxy became available again");
         }
         lastRenderAvailable = renderAvailable;
         lastIngestAvailable = ingestAvailable;
@@ -259,22 +258,19 @@ final class VoxyCompat {
 
     private static boolean trackedRawIngest(Object worldId, LevelChunkSection section,
                                             int cx, int sy, int cz, DataLayer block, DataLayer sky) throws Throwable {
-        if (trackIngestCompletion) StrictLodVisibility.beginIngest(section, cx, cz);
-        try {
-            boolean accepted = VoxyIngestControl.runServerIngest(
-                    () -> (boolean) rawIngest.invoke(worldId, section, cx, sy, cz, block, sky));
-            if (!accepted && trackIngestCompletion) StrictLodVisibility.cancelIngest(section);
-            return accepted;
-        } catch (Throwable failure) {
-            if (trackIngestCompletion) StrictLodVisibility.cancelIngest(section);
-            throw failure;
-        }
+        return VoxyIngestControl.runServerIngest(() -> trackIngestCompletion
+                ? VoxyIngestTracker.runRawIngest(section, cx, cz,
+                    () -> (boolean) rawIngest.invoke(worldId, section, cx, sy, cz, block, sky))
+                : (boolean) rawIngest.invoke(worldId, section, cx, sy, cz, block, sky));
     }
 
     static boolean hasProcessJobCompletionHook(Class<?> ingestClass) {
         try {
-            return ingestClass.getDeclaredMethod("processJob").getReturnType() == Void.TYPE;
-        } catch (NoSuchMethodException failure) {
+            var marker = ingestClass.getDeclaredMethod("vss$ingestTrackingReady");
+            return marker.getReturnType() == Boolean.TYPE
+                    && java.lang.reflect.Modifier.isStatic(marker.getModifiers())
+                    && Boolean.TRUE.equals(marker.invoke(null));
+        } catch (ReflectiveOperationException failure) {
             return false;
         }
     }

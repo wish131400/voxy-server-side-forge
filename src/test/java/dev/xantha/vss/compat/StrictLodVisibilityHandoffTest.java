@@ -2,14 +2,15 @@ package dev.xantha.vss.compat;
 
 import static org.junit.jupiter.api.Assertions.*;
 import dev.xantha.vss.config.VSSClientConfig;
-import dev.xantha.vss.networking.client.VSSClientNetworking;
+import dev.xantha.vss.api.ClientLodSession;
+import dev.xantha.vss.api.VSSApi;
 import java.lang.reflect.Field;
 import net.minecraft.world.level.Level;
 import org.junit.jupiter.api.*;
 
 class StrictLodVisibilityHandoffTest {
-    private boolean oldPrediction, oldServer, oldVoxy, oldRenderHook;
-    private int oldCapabilities;
+    private boolean oldPrediction, oldVoxy, oldRenderHook;
+    private ClientLodSession oldSession;
     private StrictVoxyNodeIndex nodes;
     private StrictVoxyPipeline pipeline;
 
@@ -22,15 +23,16 @@ class StrictLodVisibilityHandoffTest {
 
     @BeforeEach void setup() throws Exception {
         oldPrediction = VSSClientConfig.CONFIG.enablePrediction;
-        oldServer = field(VSSClientNetworking.class, "serverEnabled").getBoolean(null);
-        oldCapabilities = field(VSSClientNetworking.class, "serverCapabilities").getInt(null);
+        oldSession = VSSApi.clientSession();
         oldVoxy = field(ModCompat.class, "voxyLoaded").getBoolean(null);
         oldRenderHook = field(StrictLodVisibility.class, "renderHookSeen").getBoolean(null);
         StrictLodVisibility.reset();
         VSSClientConfig.CONFIG.enablePrediction = true;
-        field(VSSClientNetworking.class, "serverEnabled").setBoolean(null, true);
-        field(VSSClientNetworking.class, "serverCapabilities").setInt(null,
-                dev.xantha.vss.common.VSSConstants.CAPABILITY_PREDICTIVE_WORLDGEN);
+        VSSApi.bindClientSession(new ClientLodSession() {
+            @Override public boolean isServerEnabled() { return true; }
+            @Override public boolean shouldApplyStrictLodOrder() { return true; }
+            @Override public boolean isPredictionActive() { return VSSClientConfig.CONFIG.enablePrediction; }
+        });
         field(ModCompat.class, "voxyLoaded").setBoolean(null, true);
         field(StrictLodVisibility.class, "renderHookSeen").setBoolean(null, true);
         field(StrictLodVisibility.class, "dimension").set(null, Level.OVERWORLD);
@@ -43,8 +45,7 @@ class StrictLodVisibilityHandoffTest {
     }
 
     @AfterEach void cleanup() throws Exception {
-        field(VSSClientNetworking.class, "serverEnabled").setBoolean(null, oldServer);
-        field(VSSClientNetworking.class, "serverCapabilities").setInt(null, oldCapabilities);
+        VSSApi.bindClientSession(oldSession);
         field(ModCompat.class, "voxyLoaded").setBoolean(null, oldVoxy);
         field(StrictLodVisibility.class, "renderHookSeen").setBoolean(null, oldRenderHook);
         VSSClientConfig.CONFIG.enablePrediction = oldPrediction;
@@ -77,9 +78,9 @@ class StrictLodVisibilityHandoffTest {
     @Test void missingVerticalSectionKeepsPredictionWhilePendingWorkRetainsUploadedCoverage() {
         assertFalse(StrictLodVisibility.predictionCoverage(Level.OVERWORLD, 20, 64, 96, 0));
         Object section = new Object();
-        StrictLodVisibility.beginIngest(section, 20, 0);
+        var ingestTicket0 = dev.xantha.vss.compat.VoxyIngestTracker.begin(section, 20, 0);
         assertTrue(StrictLodVisibility.predictionCoverage(Level.OVERWORLD, 20, 64, 95, 0));
-        StrictLodVisibility.cancelIngest(section);
+        dev.xantha.vss.compat.VoxyIngestTracker.complete(ingestTicket0);
         assertTrue(StrictLodVisibility.predictionCoverage(Level.OVERWORLD, 20, 64, 95, 0));
         long key = StrictVoxyNodeIndex.key(0, 10, 2, 0);
         pipeline.queued(key);
@@ -194,12 +195,12 @@ class StrictLodVisibilityHandoffTest {
         pipeline.started(key).uploaded();
         assertTrue(StrictLodVisibility.predictionCoverage(Level.OVERWORLD, 20, 64, 95, 0));
         Object section = new Object();
-        StrictLodVisibility.beginIngest(section, 20, 0);
-        StrictLodVisibility.beginIngest(section, 20, 0);
+        var ingestTicket1 = dev.xantha.vss.compat.VoxyIngestTracker.begin(section, 20, 0);
+        var ingestTicket2 = dev.xantha.vss.compat.VoxyIngestTracker.begin(section, 20, 0);
         assertTrue(StrictLodVisibility.predictionCoverage(Level.OVERWORLD, 20, 64, 95, 0));
-        StrictLodVisibility.cancelIngest(section);
+        dev.xantha.vss.compat.VoxyIngestTracker.complete(ingestTicket1);
         assertTrue(StrictLodVisibility.predictionCoverage(Level.OVERWORLD, 20, 64, 95, 0));
-        StrictLodVisibility.cancelIngest(section);
+        dev.xantha.vss.compat.VoxyIngestTracker.complete(ingestTicket2);
         assertTrue(StrictLodVisibility.predictionCoverage(Level.OVERWORLD, 20, 64, 95, 0));
     }
 
@@ -217,11 +218,11 @@ class StrictLodVisibilityHandoffTest {
         assertTrue(StrictLodVisibility.predictionCoverageBox(Level.OVERWORLD, 16, 0, 0, 23, 95, 7));
         pipeline.started(key).uploaded();
         assertTrue(StrictLodVisibility.predictionCoverageBox(Level.OVERWORLD, 16, 0, 0, 23, 95, 7));
-        var section = new Object(); StrictLodVisibility.beginIngest(section, 17, 3); StrictLodVisibility.beginIngest(section, 17, 3);
+        var section = new Object(); var ingestTicket3 = dev.xantha.vss.compat.VoxyIngestTracker.begin(section, 17, 3); var ingestTicket4 = dev.xantha.vss.compat.VoxyIngestTracker.begin(section, 17, 3);
         assertTrue(StrictLodVisibility.predictionCoverageBox(Level.OVERWORLD, 16, 0, 0, 23, 95, 7));
-        StrictLodVisibility.cancelIngest(section);
+        dev.xantha.vss.compat.VoxyIngestTracker.complete(ingestTicket3);
         assertTrue(StrictLodVisibility.predictionCoverageBox(Level.OVERWORLD, 16, 0, 0, 23, 95, 7));
-        StrictLodVisibility.cancelIngest(section);
+        dev.xantha.vss.compat.VoxyIngestTracker.complete(ingestTicket4);
         assertTrue(StrictLodVisibility.predictionCoverageBox(Level.OVERWORLD, 16, 0, 0, 23, 95, 7));
         nodes.update(2, -1, -1);
         assertFalse(StrictLodVisibility.predictionCoverageBox(Level.OVERWORLD, 16, 0, 0, 23, 95, 7));

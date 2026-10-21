@@ -124,7 +124,7 @@ public final class StrictVoxyNodeIndex {
     public static int level(long key) { return (int) (key >>> 60); }
     public static int x(long key) { return (int) (key << 36 >> 40); }
     public static int z(long key) { return (int) (key << 12 >> 40); }
-    public void retractUncovered(dev.xantha.vss.networking.client.StrictLodFrontier frontier,
+    public void retractUncovered(dev.xantha.vss.common.StrictLodFrontier frontier,
                                  it.unimi.dsi.fastutil.longs.LongSet removed,
                                  java.util.function.BiPredicate<Integer, Integer> columnReady) {
         var checked = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();

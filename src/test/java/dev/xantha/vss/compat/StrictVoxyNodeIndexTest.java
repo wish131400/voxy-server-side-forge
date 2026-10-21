@@ -84,7 +84,7 @@ class StrictVoxyNodeIndexTest {
 
     @Test void atomicNodeIdReplacementDoesNotRetractButActualHoleStillDoes() {
         StrictVoxyNodeIndex index = new StrictVoxyNodeIndex();
-        var frontier = new dev.xantha.vss.networking.client.StrictLodFrontier();
+        var frontier = new dev.xantha.vss.common.StrictLodFrontier();
         frontier.center(0, 0, 128);
         for (int i=0; i<8; i++) frontier.advance((x,z)->true, (x,z)->true);
         long key = StrictVoxyNodeIndex.key(0, 1, 0, 0);

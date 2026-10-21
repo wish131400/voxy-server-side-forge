@@ -7,11 +7,21 @@ import org.junit.jupiter.api.Test;
 
 class VoxyCompatIngestHookTest {
     @Test
-    void onlyVoidNoArgWorkerCanReportIngestCompletion() {
-        assertTrue(VoxyCompat.hasProcessJobCompletionHook(VoidWorker.class));
+    void onlyVerifiedAppliedHooksCanReportIngestCompletion() {
+        assertFalse(VoxyCompat.hasProcessJobCompletionHook(VoidWorker.class));
+        assertTrue(VoxyCompat.hasProcessJobCompletionHook(VerifiedWorker.class));
+        assertFalse(VoxyCompat.hasProcessJobCompletionHook(UnreadyWorker.class));
         assertFalse(VoxyCompat.hasProcessJobCompletionHook(RenamedWorker.class));
         assertFalse(VoxyCompat.hasProcessJobCompletionHook(ReturningWorker.class));
         assertFalse(VoxyCompat.hasProcessJobCompletionHook(ArgWorker.class));
+    }
+
+    public static final class VerifiedWorker {
+        public static boolean vss$ingestTrackingReady() { return true; }
+    }
+
+    public static final class UnreadyWorker {
+        public static boolean vss$ingestTrackingReady() { return false; }
     }
 
     private static final class VoidWorker {

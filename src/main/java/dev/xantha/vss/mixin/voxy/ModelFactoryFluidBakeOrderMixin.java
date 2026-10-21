@@ -22,6 +22,14 @@ public abstract class ModelFactoryFluidBakeOrderMixin {
     @Unique
     private static final int vss$AIR_BLOCK_STATE_ID = 0;
 
+    /** Voxy 0.4.x renamed the block model queue from bakeQueue to blockBakeQueue. */
+    @Unique
+    private static final String vss$BLOCK_BAKE_QUEUE_FIELD = "blockBakeQueue";
+
+    /** Kept for older Voxy builds that still expose the pre-0.4 field name. */
+    @Unique
+    private static final String vss$LEGACY_BAKE_QUEUE_FIELD = "bakeQueue";
+
     @Unique
     private static final Set<Integer> vss$loggedFluidDefers = ConcurrentHashMap.newKeySet();
 
@@ -152,7 +160,11 @@ public abstract class ModelFactoryFluidBakeOrderMixin {
     private ConcurrentLinkedDeque vss$getBakeQueue() {
         try {
             if (this.vss$bakeQueueField == null) {
-                this.vss$bakeQueueField = vss$field("bakeQueue");
+                try {
+                    this.vss$bakeQueueField = vss$field(vss$BLOCK_BAKE_QUEUE_FIELD);
+                } catch (NoSuchFieldException missingCurrentField) {
+                    this.vss$bakeQueueField = vss$field(vss$LEGACY_BAKE_QUEUE_FIELD);
+                }
             }
             return (ConcurrentLinkedDeque) this.vss$bakeQueueField.get(this);
         } catch (ReflectiveOperationException e) {
