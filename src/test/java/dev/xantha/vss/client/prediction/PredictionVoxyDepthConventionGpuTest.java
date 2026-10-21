@@ -159,7 +159,7 @@ class PredictionVoxyDepthConventionGpuTest {
     private static void matrix(int location, Matrix4f matrix) {
         glUniformMatrix4fv(location, false, matrix.get(new float[16]));
     }
-    private static String load(ZipFile jar, String id) throws Exception {
+    static String load(ZipFile jar, String id) throws Exception {
         if (id.equals("sodium:include/fog.glsl")) return "float getFragDistance(int shape, vec3 p) { return length(p); }\n";
         String[] parts = id.split(":", 2);
         String source = new String(jar.getInputStream(jar.getEntry("assets/" + parts[0] + "/shaders/" + parts[1])).readAllBytes(), StandardCharsets.UTF_8);

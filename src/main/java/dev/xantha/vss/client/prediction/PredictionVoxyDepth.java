@@ -18,6 +18,46 @@ public final class PredictionVoxyDepth {
 
     private PredictionVoxyDepth() { }
 
+    /** Shared by depth import and both fragment paths, in the normal pipeline only. */
+    static final String RESOLVE_GLSL = """
+            bool vssResolveVoxyDepth(float referenceDepth, vec2 mainPlanes, bool surfaceTie,
+                                     out float distance, out float mainDepth) {
+                distance = 0.0;
+                mainDepth = 1.0;
+                // Voxy can retain offscreen depth for transparent/uncomposited pixels.
+                // A clear main pixel must keep its prediction fallback.
+                if (!VoxyDepthAvailable || referenceDepth >= 1.0) return false;
+                float raw = texelFetch(VoxyDepth, ivec2(gl_FragCoord.xy), 0).r;
+                if (!(raw > 0.0 && raw < 1.0)) return false;
+                vec2 uv = gl_FragCoord.xy / vec2(textureSize(VoxyDepth, 0));
+                vec4 clip = vec4(uv * 2.0 - 1.0,
+                        raw * VoxyDepthTransform.x + VoxyDepthTransform.y, 1.0);
+                float denominator = dot(VoxyDistanceDenominator, clip);
+                if (abs(denominator) <= 1e-10) return false;
+                distance = dot(VoxyDistanceNumerator, clip) / denominator;
+                if (!(distance > 0.0 && distance < 1e30)) return false;
+                mainDepth = clamp((-mainPlanes.x + mainPlanes.y / distance) * 0.5 + 0.5,
+                        0.0, 1.0 - 1.0 / 16777215.0);
+                // Refine Voxy's own final blit, preserving an independently closer
+                // vanilla surface. Two D24 bins allow storage/shader rounding.
+                float bins = 2.0 / 16777215.0;
+                if (referenceDepth < 1.0 - bins && abs(mainDepth - referenceDepth) > bins) return false;
+                if (surfaceTie) {
+                    // Prefer real water/vegetation over a coplanar prediction.
+                    // A fixed world-space bias is smaller than distant depth bins.
+                    vec4 nearClip = clip;
+                    nearClip.z = clamp(clip.z + VoxyDepthTransform.z * VoxyDepthTransform.x * bins,
+                            VoxyDepthTransform.y, 1.0);
+                    float nearDenominator = dot(VoxyDistanceDenominator, nearClip);
+                    if (abs(nearDenominator) > 1e-10) {
+                        float nearDistance = dot(VoxyDistanceNumerator, nearClip) / nearDenominator;
+                        if (nearDistance > 0.0) distance = min(distance, nearDistance);
+                    }
+                }
+                return true;
+            }
+            """;
+
     public static void capture(Object pipeline, Object viewport, int targetFramebuffer) {
         capture(pipeline, viewport, targetFramebuffer, null);
     }

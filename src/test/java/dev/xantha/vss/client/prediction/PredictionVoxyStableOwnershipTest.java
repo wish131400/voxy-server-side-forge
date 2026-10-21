@@ -66,11 +66,11 @@ class PredictionVoxyStableOwnershipTest {
         long position = StrictVoxyNodeIndex.key(0, 0, 2, 0);
         for (int frame = 0; frame < 120; frame++) {
             Object section = new Object();
-            StrictLodVisibility.beginIngest(section, 0, 0);
+            var ingestTicket0 = dev.xantha.vss.compat.VoxyIngestTracker.begin(section, 0, 0);
             pipeline.queued(position);
             var work = pipeline.started(position);
             assertEquals(4096, resolve().rendered(), "resident ownership must not oscillate while ingest or meshing is in flight");
-            StrictLodVisibility.cancelIngest(section);
+            dev.xantha.vss.compat.VoxyIngestTracker.complete(ingestTicket0);
             work.uploaded();
             assertEquals(revision, StrictLodVisibility.coverageRevision(), "CPU work state does not change uploaded geometry");
         }

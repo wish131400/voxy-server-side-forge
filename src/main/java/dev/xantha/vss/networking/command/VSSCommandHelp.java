@@ -111,6 +111,9 @@ public final class VSSCommandHelp {
                     alias(node, "开始", "start"); alias(node, "矩形", "rect"); alias(node, "当前位置", "here");
                     alias(node, "查看", "status"); alias(node, "状态", "status"); alias(node, "暂停", "pause");
                     alias(node, "继续", "resume"); alias(node, "取消", "cancel");
+                    CommandNode<CommandSourceStack> limit = node.getChild("limit");
+                    alias(limit, "查看", "get"); alias(limit, "设置", "set"); alias(limit, "不限", "unlimited");
+                    alias(node, "限速", "limit"); alias(node, "队列上限", "limit");
                 }
                 default -> { }
             }

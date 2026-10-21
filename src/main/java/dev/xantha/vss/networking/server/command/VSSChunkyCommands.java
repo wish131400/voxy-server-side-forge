@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import dev.xantha.vss.config.VSSServerConfig;
 import dev.xantha.vss.networking.command.VSSCommandHelp;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.networking.server.generation.ChunkyArea;
@@ -27,10 +28,38 @@ final class VSSChunkyCommands {
                         .then(coordinate("x1").then(coordinate("z1").then(coordinate("x2").then(coordinate("z2")
                                 .executes(context -> start(context.getSource(), () -> ChunkyArea.rectangle(
                                         integer(context, "x1"), integer(context, "z1"), integer(context, "x2"), integer(context, "z2")))))))))
+                .then(queueLimitCommand())
                 .then(Commands.literal("status").executes(context -> VSSServerNetworking.chunky().status(context.getSource())))
                 .then(Commands.literal("pause").executes(context -> VSSServerNetworking.chunky().pause(context.getSource())))
                 .then(Commands.literal("resume").executes(context -> VSSServerNetworking.chunky().resume(context.getSource())))
                 .then(Commands.literal("cancel").executes(context -> VSSServerNetworking.chunky().cancel(context.getSource())));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> queueLimitCommand() {
+        return Commands.literal("limit")
+                .executes(context -> showQueueLimit(context.getSource()))
+                .then(Commands.literal("get").executes(context -> showQueueLimit(context.getSource())))
+                .then(queueLimitArgument())
+                .then(Commands.literal("set").then(queueLimitArgument()))
+                .then(Commands.literal("unlimited").executes(context -> setQueueLimit(context.getSource(), 0)));
+    }
+
+    private static ArgumentBuilder<CommandSourceStack, ?> queueLimitArgument() {
+        return Commands.argument("columns", IntegerArgumentType.integer(0))
+                .executes(context -> setQueueLimit(context.getSource(), integer(context, "columns")));
+    }
+
+    private static int showQueueLimit(CommandSourceStack source) {
+        int limit = Math.max(0, VSSServerConfig.CONFIG.chunkyQueueLimit);
+        source.sendSuccess(() -> Component.translatable("vss.command.chunky.limit.show", limit), false);
+        return 1;
+    }
+
+    private static int setQueueLimit(CommandSourceStack source, int columns) {
+        VSSServerConfig.CONFIG.chunkyQueueLimit = columns;
+        VSSServerConfig.CONFIG.normalizeAndSave();
+        source.sendSuccess(() -> Component.translatable("vss.command.chunky.limit.saved", columns), true);
+        return 1;
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> squareArguments() {

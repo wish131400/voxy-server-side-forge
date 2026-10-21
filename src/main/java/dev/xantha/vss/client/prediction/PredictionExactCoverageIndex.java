@@ -124,5 +124,51 @@ final class PredictionExactCoverageIndex {
                 || PositionUtil.unpackZ(k.packed()) < minZ || PositionUtil.unpackZ(k.packed()) > maxZ);
     }
     int pageCount() { return pages.size(); }
+
+    /** Sparse immutable positives for planning. Built on the control worker,
+     * never copies explored-world pages on the client thread. */
+    static final class View {
+        private final java.util.Map<Long, long[]> positives;
+        View(java.util.Map<Long, long[]> positives) { this.positives = java.util.Map.copyOf(positives); }
+        boolean owns(int x, int z) {
+            var bits = positives.get(PositionUtil.packPosition(x >> SHIFT, z >> SHIFT));
+            int i = cell(x, z);
+            return bits != null && (bits[i >>> 6] & (1L << i)) != 0;
+        }
+        boolean ownsBox(int minX, int minZ, int maxX, int maxZ) {
+            if (minX > maxX || minZ > maxZ) return false;
+            for (int pz = minZ >> SHIFT; pz <= maxZ >> SHIFT; pz++)
+                for (int px = minX >> SHIFT; px <= maxX >> SHIFT; px++) {
+                    var bits = positives.get(PositionUtil.packPosition(px, pz));
+                    if (bits == null) return false;
+                    int left = Math.max(minX, px << SHIFT), right = Math.min(maxX, (px << SHIFT) + AXIS - 1);
+                    for (int z = Math.max(minZ, pz << SHIFT); z <= Math.min(maxZ, (pz << SHIFT) + AXIS - 1); z++) {
+                        int first = cell(left, z);
+                        long row = ((1L << (right - left + 1)) - 1) << (first & 63);
+                        if ((bits[first >>> 6] & row) != row) return false;
+                    }
+                }
+            return true;
+        }
+    }
+    View planningView(ResourceKey<Level> dimension, long now) {
+        var result = new java.util.HashMap<Long, long[]>();
+        pages.forEach((key, page) -> {
+            if (!dimension.equals(key.dimension())) return;
+            long[] settled = new long[page.present.length];
+            synchronized (page) {
+                for (int word = 0; word < settled.length; word++) {
+                    long bits = page.present[word];
+                    while (bits != 0) {
+                        int i = word * 64 + Long.numberOfTrailingZeros(bits);
+                        if (now - page.starts[i] >= ExactCoverageGate.SETTLE_NANOS) settled[word] |= 1L << i;
+                        bits &= bits - 1;
+                    }
+                }
+            }
+            for (long bits : settled) if (bits != 0) { result.put(key.packed(), settled); break; }
+        });
+        return new View(result);
+    }
     void clear() { pages.clear(); }
 }

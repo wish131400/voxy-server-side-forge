@@ -2,6 +2,7 @@ package dev.xantha.vss.client.prediction;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -26,6 +27,7 @@ final class PredictionVisiblePlan<K,T> {
         T value;
         double distance;
         boolean visible;
+        boolean eligible = true;
         Entry(long id,Object key,T value) { this.id=id;this.key=key;this.value=value; }
     }
     private final Map<K,Entry<T>> entries=new HashMap<>();
@@ -34,30 +36,90 @@ final class PredictionVisiblePlan<K,T> {
     private final TreeSet<Entry<T>> visible=new TreeSet<>(Comparator
             .<Entry<T>>comparingDouble(entry->entry.distance).thenComparingLong(entry->entry.id));
     private final Function<T,AABB> bounds;
+    private final Predicate<T> eligibility;
     private final Matrix4f modelView=new Matrix4f(),projection=new Matrix4f();
     private Vec3 camera;
     private long nextId, visited, orderEdits, publications;
     private boolean changed;
     private List<T> result=List.of();
+    private List<T> residentResult=List.of();
+    private boolean residentsChanged;
+    private int eligibleCount;
+    private long eligibilityRevision = Long.MIN_VALUE, eligibilityContentRevision = Long.MIN_VALUE;
+    int residentCount() { return eligibleCount; }
+    int retainedCount() { return entries.size(); }
+
+    /** Immutable opaque candidates; camera turns do not republish this input. */
+    List<T> residents() {
+        if (residentsChanged) {
+            var next = new ArrayList<T>(entries.size());
+            for (var entry : entries.values()) if (entry.eligible) next.add(entry.value);
+            residentResult = List.copyOf(next);
+            residentsChanged = false;
+        }
+        return residentResult;
+    }
     private long stableBucketX, stableBucketZ;
     private boolean stableInitialized;
 
-    PredictionVisiblePlan(Function<T,AABB> bounds) { this.bounds=bounds; }
+    PredictionVisiblePlan(Function<T,AABB> bounds) { this(bounds, value -> true); }
+
+    PredictionVisiblePlan(Function<T,AABB> bounds, Predicate<T> eligibility) {
+        this.bounds=bounds; this.eligibility=eligibility;
+    }
+
+    /**
+     * Coverage changes candidate eligibility without releasing the retained draw.
+     * Both CPU visibility and the resident GPU input use this same decision.
+     * A camera turn with unchanged coverage/content does no ownership work.
+     */
+    void refreshEligibility(long revision, long contentRevision) {
+        refreshEligibility(revision, contentRevision, value -> true);
+    }
+
+    /**
+     * Refresh only entries whose ownership inputs intersect a coverage delta.
+     * A content revision still checks every entry because it can replace the
+     * packed mesh behind any retained draw; coverage-only revisions can use a
+     * spatial predicate and avoid an O(residents) scan.
+     */
+    void refreshEligibility(long revision, long contentRevision, Predicate<T> affected) {
+        if (eligibilityRevision == revision && eligibilityContentRevision == contentRevision) return;
+        boolean contentChanged = eligibilityContentRevision != Long.MIN_VALUE
+                && eligibilityContentRevision != contentRevision;
+        for (var entry : entries.values()) {
+            if (contentChanged || affected.test(entry.value)) setEligible(entry, eligibility.test(entry.value));
+        }
+        eligibilityRevision=revision; eligibilityContentRevision=contentRevision;
+    }
+
+    private void setEligible(Entry<T> entry, boolean next) {
+        if (entry.eligible == next) return;
+        entry.eligible=next; eligibleCount+=next ? 1 : -1;
+        residentsChanged=true; residentResult=List.of(); dirty.add(entry);
+        if (!next && entry.visible) { visible.remove(entry); entry.visible=false; changed=true; }
+    }
 
     void put(K key,T value) {
         var entry=entries.get(key);
         if(entry!=null && entry.value==value) return;
-        if(entry==null) { entry=new Entry<>(nextId++,key,value);entries.put(key,entry); }
+        residentsChanged=true;
+        residentResult=List.of();
+        if(entry==null) { entry=new Entry<>(nextId++,key,value);entries.put(key,entry);eligibleCount++; }
         else {
             if(entry.visible) { visible.remove(entry);changed=true;entry.visible=false; }
             entry.value=value;
         }
+        setEligible(entry, eligibility.test(value));
         dirty.add(entry);
     }
 
     void remove(K key) {
         var entry=entries.remove(key);
         if(entry==null) return;
+        if(entry.eligible) eligibleCount--;
+        residentsChanged=true;
+        residentResult=List.of();
         dirty.remove(entry);
         if(entry.visible) { visible.remove(entry);changed=true; }
     }
@@ -80,24 +142,14 @@ final class PredictionVisiblePlan<K,T> {
                 // A conservative broad phase is supplied by the spatial
                 // index. Remove stale visible entries, then visit candidates
                 // directly instead of scanning every resident tile on turns.
-                if (!visible.isEmpty()) {
-                    var stale = new java.util.ArrayList<Entry<T>>();
-                    for (var entry : visible) if (!candidates.contains(entry.key)) stale.add(entry);
-                    for (var entry : stale) {
-                        visible.remove(entry); entry.visible=false; changed=true;
-                    }
-                }
+                removeStale(candidates);
                 for (K key : candidates) {
                     var entry = entries.get(key);
                     if (entry != null) update(entry,nextCamera,frustum,moved || dirty.contains(entry));
                 }
             }
         } else {
-            if (candidates != null) for (var mapEntry : entries.entrySet()) {
-                if (candidates.contains(mapEntry.getKey())) continue;
-                var entry = mapEntry.getValue();
-                if (entry.visible) { visible.remove(entry);entry.visible=false;changed=true; }
-            }
+            if (candidates != null) removeStale(candidates);
             for(var entry:dirty) {
                 if(candidates == null || candidates.contains(entry.key)) update(entry,nextCamera,frustum,true);
                 else if(entry.visible) { visible.remove(entry);entry.visible=false;changed=true; }
@@ -143,14 +195,7 @@ final class PredictionVisiblePlan<K,T> {
             } else {
                 // A broad phase may stop returning an entry after a move or a
                 // turn. Remove those stale entries before visiting candidates.
-                if(!visible.isEmpty()) {
-                    stableStale.clear();
-                    for(var entry:visible) if(!candidates.contains(entry.key)) stableStale.add(entry);
-                    for(var entry:stableStale) {
-                        visible.remove(entry);entry.visible=false;changed=true;
-                    }
-                    stableStale.clear();
-                }
+                removeStale(candidates);
                 for(K key:candidates) {
                     var entry=entries.get(key);
                     if(entry!=null) updateStable(entry,nextCamera,frustum,
@@ -162,13 +207,7 @@ final class PredictionVisiblePlan<K,T> {
             // not change. Keep the broad-phase contract of select(): entries
             // outside that set are no longer eligible for this frame.
             if(candidates!=null) {
-                for(var mapEntry:entries.entrySet()) {
-                    if(candidates.contains(mapEntry.getKey())) continue;
-                    var entry=mapEntry.getValue();
-                    if(entry.visible) {
-                        visible.remove(entry);entry.visible=false;changed=true;
-                    }
-                }
+                removeStale(candidates);
                 // Candidate sets may widen without a camera or matrix change
                 // (for example after a spatial index update). Visit them so a
                 // previously narrowed entry can re-enter immediately.
@@ -200,8 +239,18 @@ final class PredictionVisiblePlan<K,T> {
         return (long)Math.floor(coordinate/STABLE_ORDER_BUCKET_BLOCKS);
     }
 
+    private void removeStale(Set<K> candidates) {
+        stableStale.clear();
+        // Only visible members can become stale. A retained offscreen world
+        // does not need a full map scan, even when candidates change in place.
+        for (var entry : visible) if (!candidates.contains(entry.key)) stableStale.add(entry);
+        for (var entry : stableStale) { visible.remove(entry); entry.visible = false; changed = true; }
+        stableStale.clear();
+    }
+
     private void updateStable(Entry<T> entry,Vec3 nextCamera,Frustum frustum,
                               boolean distanceChanged) {
+        if (!entry.eligible) return;
         visited++;
         var box=bounds.apply(entry.value);
         boolean inView=frustum==null || frustum.isVisible(box);
@@ -224,6 +273,7 @@ final class PredictionVisiblePlan<K,T> {
     }
 
     private void update(Entry<T> entry,Vec3 camera,Frustum frustum,boolean distanceChanged) {
+        if (!entry.eligible) return;
         visited++;
         var box=bounds.apply(entry.value);
         boolean inView=frustum==null || frustum.isVisible(box);
@@ -241,6 +291,8 @@ final class PredictionVisiblePlan<K,T> {
     long publications() { return publications; }
     void clear() {
         entries.clear();dirty.clear();visible.clear();stableStale.clear();result=List.of();camera=null;changed=false;
+        residentResult=List.of();residentsChanged=false;
+        eligibleCount=0;eligibilityRevision=eligibilityContentRevision=Long.MIN_VALUE;
         stableInitialized=false;stableBucketX=stableBucketZ=0L;
     }
 }

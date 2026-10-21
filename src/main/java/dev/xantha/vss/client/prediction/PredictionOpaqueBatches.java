@@ -4,11 +4,14 @@ import dev.xantha.vss.client.prediction.PredictionRenderer.Draw;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Comparator;
+import java.util.HashMap;
+import net.minecraft.world.phys.Vec3;
 
 /** Render-thread page grouping within bounded near-to-far distance buckets. */
 final class PredictionOpaqueBatches {
-    private static final int BUCKET_TARGET = 384;
     private static final int BUCKET_LIMIT = 8;
+    private static final int REGION_BYTES = 16 * 1024 * 1024;
     private final ArrayList<Bucket> buckets = new ArrayList<>();
     /**
      * The visible plan is immutable between scene changes, but the renderer
@@ -23,6 +26,7 @@ final class PredictionOpaqueBatches {
     private int preparedBucketCount;
     private long cacheHits;
     private long cacheMisses;
+    private long cameraCellX, cameraCellZ;
 
     int prepare(List<Draw> draws) {
         return prepare(draws, Long.MIN_VALUE);
@@ -40,19 +44,25 @@ final class PredictionOpaqueBatches {
      */
     int prepare(List<Draw> draws, long residencyRevision,
                 IdentityHashMap<Draw, PredictionDrawRanges> drawableRanges) {
+        return prepare(draws, residencyRevision, drawableRanges, Vec3.ZERO);
+    }
+
+    int prepare(List<Draw> draws, long residencyRevision,
+                IdentityHashMap<Draw, PredictionDrawRanges> drawableRanges, Vec3 camera) {
+        long cellX = (long) Math.floor(camera.x / 128), cellZ = (long) Math.floor(camera.z / 128);
         // The legacy overload has no residency token. Keep its historical
         // rebuild semantics; only the production caller may reuse a grouping.
         if (residencyRevision != Long.MIN_VALUE
                 && draws == preparedInput && residencyRevision == preparedResidencyRevision
-                && drawableRanges == preparedRanges) {
+                && drawableRanges == preparedRanges && cellX == cameraCellX && cellZ == cameraCellZ) {
             cacheHits++;
             return preparedBucketCount;
         }
         cacheMisses++;
-        int bucketCount = draws.isEmpty() ? 0
-                : Math.min(BUCKET_LIMIT, Math.max(1, (draws.size() + BUCKET_TARGET - 1) / BUCKET_TARGET));
-        while (buckets.size() < bucketCount) buckets.add(new Bucket());
+        while (buckets.size() < BUCKET_LIMIT) buckets.add(new Bucket());
         clear();
+        int bucketCount = 0;
+        double cx = cellX * 128 + 64, cz = cellZ * 128 + 64;
         for (int index = 0; index < draws.size(); index++) {
             Draw draw = draws.get(index);
             PredictionPackedMesh packed = draw.gpu().packed();
@@ -62,16 +72,31 @@ final class PredictionOpaqueBatches {
             } else if (packed.drawRanges(false, draw.faces()).quads == 0) {
                 continue;
             }
-            int bucketIndex = Math.min(bucketCount - 1, (int) ((long) index * bucketCount / draws.size()));
+            int bucketIndex = distanceBucket(draw, cx, cz);
+            bucketCount = Math.max(bucketCount, bucketIndex + 1);
             PredictionTerrainArena.Slice slice = draw.gpu().arenaSlice();
             if (slice == null) buckets.get(bucketIndex).fallback.add(draw);
-            else buckets.get(bucketIndex).add(slice.page, draw);
+            else buckets.get(bucketIndex).add(slice.page, slice.offset / REGION_BYTES, draw);
         }
+        for (Bucket bucket : buckets) for (PageGroup group : bucket.pages)
+            group.draws.sort(Comparator.comparingInt(draw -> draw.gpu().arenaSlice().offset));
         preparedInput = draws;
         preparedRanges = drawableRanges;
         preparedResidencyRevision = residencyRevision;
         preparedBucketCount = bucketCount;
+        cameraCellX = cellX; cameraCellZ = cellZ;
         return bucketCount;
+    }
+
+    static int distanceBucket(Draw draw, double x, double z) {
+        var bounds = draw.bounds();
+        double dx = Math.max(0, Math.max(bounds.minX - x, x - bounds.maxX));
+        double dz = Math.max(0, Math.max(bounds.minZ - z, z - bounds.maxZ));
+        double distance = dx * dx + dz * dz;
+        int bucket = 0;
+        double edge = 256.0 * 256;
+        while (bucket < BUCKET_LIMIT - 1 && distance >= edge) { bucket++; edge *= 4; }
+        return bucket;
     }
 
     Bucket bucket(int index) { return buckets.get(index); }
@@ -91,7 +116,7 @@ final class PredictionOpaqueBatches {
     static final class Bucket {
         final ArrayList<PageGroup> pages = new ArrayList<>();
         final ArrayList<Draw> fallback = new ArrayList<>();
-        private final IdentityHashMap<PredictionTerrainArena.Page, PageGroup> byPage = new IdentityHashMap<>();
+        private final HashMap<GroupKey, PageGroup> byPage = new HashMap<>();
         private final ArrayList<PageGroup> reusable = new ArrayList<>();
 
         private void clear() {
@@ -101,13 +126,15 @@ final class PredictionOpaqueBatches {
             fallback.clear();
         }
 
-        private void add(PredictionTerrainArena.Page page, Draw draw) {
-            PageGroup group = byPage.get(page);
+        private void add(PredictionTerrainArena.Page page, int region, Draw draw) {
+            var key = new GroupKey(page, region);
+            PageGroup group = byPage.get(key);
             if (group == null) {
                 int index = pages.size();
                 if (index == reusable.size()) reusable.add(new PageGroup());
                 group = reusable.get(index);
-                byPage.put(page, group);
+                group.region = region;
+                byPage.put(key, group);
                 pages.add(group);
             }
             group.draws.add(draw);
@@ -116,5 +143,7 @@ final class PredictionOpaqueBatches {
 
     static final class PageGroup {
         final ArrayList<Draw> draws = new ArrayList<>();
+        int region;
     }
+    private record GroupKey(PredictionTerrainArena.Page page, int region) { }
 }

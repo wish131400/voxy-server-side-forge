@@ -58,6 +58,9 @@ final class PredictionRawDensity {
 
     private Info inspect(Object value, int depth) throws ReflectiveOperationException {
         if (value == null || value instanceof Number || value instanceof String) return HORIZONTAL;
+        var declared = dev.xantha.vss.api.worldgen.DensityFunctionTraits.find(value);
+        if (declared != null) return declared.ownsRuntimeContext() ? new Info(false, false, true)
+                : new Info(declared.coordinatePure(), declared.horizontal(), !declared.coordinatePure());
         if (value instanceof DensityMemo.NonMemoizable) return new Info(false, false, true);
         if (value instanceof DensityMemo.Memoized memo) return memo.info;
         if (value instanceof DensityCompilation.Root compiled) return inspect(compiled.original(), depth + 1);

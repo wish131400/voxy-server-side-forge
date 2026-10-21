@@ -1,6 +1,8 @@
 package dev.xantha.vss.networking.server.storage;
 
 import dev.xantha.vss.config.VSSServerConfig;
+import dev.xantha.vss.api.column.ColumnFilters;
+import dev.xantha.vss.common.processing.ColumnCoverage;
 import dev.xantha.vss.common.processing.EncodedColumnData;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -57,7 +59,8 @@ public final class ColumnLodCache {
     }
 
     private void put(ResourceKey<Level> dimension, EncodedColumnData columnData, boolean preloaded) {
-        if (!config.enableColumnCache || columnData == null || columnData.encodedBytes() == null || !columnData.completeColumn()) {
+        if (!config.enableColumnCache || columnData == null || columnData.encodedBytes() == null || !columnData.isDeliverable()
+                || !columnData.coverage().filterKey().equals(ColumnFilters.snapshot().cacheKey())) {
             return;
         }
 
@@ -91,7 +94,7 @@ public final class ColumnLodCache {
                 columnData.completeColumn(),
                 columnData.sectionYs(),
                 columnData.encodedCrc32c(),
-                effectivePreloaded));
+                effectivePreloaded, columnData.coverage()));
         this.cachedBytes += sizeBytes;
         if (effectivePreloaded) {
             preloadEntries++;
@@ -206,7 +209,9 @@ public final class ColumnLodCache {
             boolean completeColumn,
             int[] sectionYs,
             int encodedCrc32c,
-            boolean preloaded) {
+            boolean preloaded, ColumnCoverage coverage) {
+        public boolean isDeliverable() { return completeColumn || coverage.isFiltered(); }
+
         public EncodedColumnData columnData() {
             return new EncodedColumnData(
                     chunkX,
@@ -218,12 +223,12 @@ public final class ColumnLodCache {
                     schemaVersion,
                     completeColumn,
                     sectionYs,
-                    encodedCrc32c);
+                    encodedCrc32c, coverage);
         }
 
         Entry promoted() {
             return new Entry(chunkX, chunkZ, timestamp, compression, rawSize, encodedBytes, sizeBytes,
-                    schemaVersion, completeColumn, sectionYs, encodedCrc32c, false);
+                    schemaVersion, completeColumn, sectionYs, encodedCrc32c, false, coverage);
         }
     }
 }

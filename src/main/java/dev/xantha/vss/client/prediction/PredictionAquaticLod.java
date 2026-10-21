@@ -18,8 +18,14 @@ final class PredictionAquaticLod {
     }
 
     static double distance(double cameraX, double cameraZ, int baseX, int baseZ, int span) {
+        return Math.sqrt(distanceSquared(cameraX, cameraZ, baseX, baseZ, span));
+    }
+
+    static double distanceSquared(double cameraX, double cameraZ, int baseX, int baseZ, int span) {
         double dx = Math.max(0, Math.max(baseX - cameraX, cameraX - ((double) baseX + span)));
         double dz = Math.max(0, Math.max(baseZ - cameraZ, cameraZ - ((double) baseZ + span)));
-        return Math.hypot(dx, dz);
+        // Minecraft world coordinates are bounded; the robust hypot scaling
+        // for arbitrary floating-point exponents is unnecessary here.
+        return dx * dx + dz * dz;
     }
 }

@@ -9,12 +9,14 @@ import org.lwjgl.opengl.GL33;
 final class PredictionRenderTimings {
     enum Stage {
         PREPARE, COVERAGE, SEAMS, UPLOAD, OPAQUE, WATER, DEPTH_COPY, STATE, ANTIALIAS,
-        HZB_REDUCE, GPU_FILTER, INDIRECT_BUILD, INDIRECT_UPLOAD, INDIRECT_SUBMIT
+        HZB_REDUCE, GPU_FILTER, INDIRECT_BUILD, INDIRECT_UPLOAD, INDIRECT_SUBMIT,
+        SNAPSHOT, COVERAGE_STATE, GPU_RESIDENCY, VANILLA_MASK, PREPARE_TOTAL, CLIENT_SCHEDULE, CPU_CACHE, GPU_LOD_SELECT, SEAM_DRAW, VEGETATION_DRAW
     }
 
     private static final Stage[] STAGES = Stage.values();
     private static final long[] cpu = new long[STAGES.length], cpuCount = new long[STAGES.length];
     private static final long[] gpu = new long[STAGES.length], gpuCount = new long[STAGES.length];
+    private static final long[][] cpuRecent = new long[STAGES.length][128], gpuRecent = new long[STAGES.length][128];
 
     /*
      * Timestamp queries are asynchronous. A query that has not become
@@ -37,6 +39,7 @@ final class PredictionRenderTimings {
     private static final int FILTER_POOL = 4;
     private static final int INDIRECT_POOL = 5;
     private static final int AUX_POOL = 6;
+    private static final int LOD_POOL = 7, SEAM_POOL = 8, VEGETATION_POOL = 9;
     private static final Pool[] POOLS = {
             new Pool(), // OPAQUE
             new Pool(), // WATER
@@ -44,10 +47,14 @@ final class PredictionRenderTimings {
             new Pool(), // HZB_REDUCE
             new Pool(), // GPU_FILTER
             new Pool(), // INDIRECT_SUBMIT
-            new Pool()  // other/future GPU stages
+            new Pool(), // other/future GPU stages
+            new Pool(), // GPU_LOD_SELECT
+            new Pool(), // SEAM_DRAW
+            new Pool()  // VEGETATION_DRAW
     };
 
     private static boolean sampling;
+    private static boolean budgetSampling;
     private static volatile boolean reset;
     private static long dropped;
 
@@ -80,7 +87,9 @@ final class PredictionRenderTimings {
 
     static void frame(long frame) {
         sampling = (Boolean.getBoolean("vss.renderTimings")
+                || PredictionDemandProfile.enabled()
                 || dev.xantha.vss.config.VSSClientConfig.CONFIG.debugLogging) && frame % 30 == 0;
+        budgetSampling = frame % 30 == 0;
 
         // Called on the render thread. No query allocation when diagnostics are off.
         // Availability is deliberately polled without GL_QUERY_RESULT, so a
@@ -97,10 +106,14 @@ final class PredictionRenderTimings {
                     Stage stage = slot.stage;
                     if (stage != null) {
                         int stageIndex = stage.ordinal();
-                        gpu[stageIndex] += Math.max(0,
+                        long elapsed = Math.max(0,
                                 GL33.glGetQueryObjectui64(slot.end, GL15.GL_QUERY_RESULT)
                                         - GL33.glGetQueryObjectui64(slot.start, GL15.GL_QUERY_RESULT));
+                        gpu[stageIndex] += elapsed;
+                        gpuRecent[stageIndex][(int) (gpuCount[stageIndex] % 128)] = elapsed;
                         gpuCount[stageIndex]++;
+                        var lane = lane(stage);
+                        if (lane != null) PredictionRenderWorkBudget.SHARED.sample(lane, elapsed, System.nanoTime());
                     }
                     slot.pending = false;
                     slot.stage = null;
@@ -112,6 +125,8 @@ final class PredictionRenderTimings {
             java.util.Arrays.fill(cpuCount, 0);
             java.util.Arrays.fill(gpu, 0);
             java.util.Arrays.fill(gpuCount, 0);
+            for (long[] values : cpuRecent) java.util.Arrays.fill(values, 0);
+            for (long[] values : gpuRecent) java.util.Arrays.fill(values, 0);
             dropped = 0;
             reset = false;
         }
@@ -121,6 +136,7 @@ final class PredictionRenderTimings {
         // Query objects are owned by the render context. Deletion therefore
         // remains deferred to frame(), which is called on the render thread.
         reset = true;
+        PredictionRenderWorkBudget.SHARED.clear();
     }
 
     static long start() {
@@ -129,8 +145,9 @@ final class PredictionRenderTimings {
 
     static void end(Stage stage, long start) {
         if (start == 0) return;
-        cpu[stage.ordinal()] += System.nanoTime() - start;
-        cpuCount[stage.ordinal()]++;
+        int i = stage.ordinal(); long elapsed = System.nanoTime() - start;
+        cpu[i] += elapsed; cpuRecent[i][(int) (cpuCount[i] % 128)] = elapsed;
+        cpuCount[i]++;
     }
 
     private static int poolFor(Stage stage) {
@@ -141,6 +158,9 @@ final class PredictionRenderTimings {
             case HZB_REDUCE -> HZB_POOL;
             case GPU_FILTER -> FILTER_POOL;
             case INDIRECT_SUBMIT -> INDIRECT_POOL;
+            case GPU_LOD_SELECT -> LOD_POOL;
+            case SEAM_DRAW -> SEAM_POOL;
+            case VEGETATION_DRAW -> VEGETATION_POOL;
             default -> AUX_POOL;
         };
     }
@@ -150,7 +170,7 @@ final class PredictionRenderTimings {
     }
 
     static int gpuStart(Stage stage) {
-        if (stage == null || reset || !sampling
+        if (stage == null || reset || !(sampling || budgetSampling && lane(stage) != null)
                 || !(GL.getCapabilities().OpenGL33 || GL.getCapabilities().GL_ARB_timer_query)) {
             return -1;
         }
@@ -173,6 +193,15 @@ final class PredictionRenderTimings {
         return -1;
     }
 
+    private static PredictionRenderWorkBudget.Lane lane(Stage stage) {
+        return switch (stage) {
+            case WATER -> PredictionRenderWorkBudget.Lane.WATER;
+            case VEGETATION_DRAW -> PredictionRenderWorkBudget.Lane.VEGETATION;
+            case SEAM_DRAW -> PredictionRenderWorkBudget.Lane.SEAM;
+            default -> null;
+        };
+    }
+
     static void gpuEnd(int queryToken) {
         if (queryToken < 0) return;
         int poolIndex = queryToken >>> TOKEN_SLOT_BITS;
@@ -191,12 +220,33 @@ final class PredictionRenderTimings {
         for (Stage stage : STAGES) {
             int i = stage.ordinal();
             if (cpuCount[i] != 0) result.append(',').append(stage).append("CpuMs=")
-                    .append(String.format(Locale.ROOT, "%.3f", cpu[i] / (cpuCount[i] * 1e6)));
+                    .append(String.format(Locale.ROOT, "%.3f", cpu[i] / (cpuCount[i] * 1e6)))
+                    .append("(p95/p99=").append(percentiles(cpuRecent[i], cpuCount[i])).append(')');
             if (gpuCount[i] != 0) result.append(',').append(stage).append("GpuMs=")
                     .append(String.format(Locale.ROOT, "%.3f", gpu[i] / (gpuCount[i] * 1e6)))
-                    .append("(n=").append(gpuCount[i]).append(')');
+                    .append("(n=").append(gpuCount[i]).append(",p95/p99=")
+                    .append(percentiles(gpuRecent[i], gpuCount[i])).append(')');
         }
         return result.append(",dropped=").append(dropped).toString();
+    }
+
+    private static String percentiles(long[] values, long count) {
+        int n = (int) Math.min(count, values.length);
+        long[] sorted = java.util.Arrays.copyOf(values, n); java.util.Arrays.sort(sorted);
+        return String.format(Locale.ROOT, "%.3f/%.3f", sorted[Math.max(0, (int) Math.ceil(n * .95) - 1)] / 1e6,
+                sorted[Math.max(0, (int) Math.ceil(n * .99) - 1)] / 1e6);
+    }
+
+    /** Cumulative sampled counters. Consumers take differences only within a session. */
+    static java.util.Map<String, Object> snapshot() {
+        var result = new java.util.LinkedHashMap<String, Object>();
+        for (Stage stage : STAGES) {
+            int i = stage.ordinal();
+            result.put(stage.name(), java.util.Map.of("cpuNanos",cpu[i],"cpuSamples",cpuCount[i],
+                    "gpuNanos",gpu[i],"gpuSamples",gpuCount[i]));
+        }
+        result.put("dropped",dropped);
+        return result;
     }
 
     private PredictionRenderTimings() { }

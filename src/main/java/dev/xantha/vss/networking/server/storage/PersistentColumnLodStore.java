@@ -1,6 +1,8 @@
 package dev.xantha.vss.networking.server.storage;
 
 import dev.xantha.vss.common.VSSLogger;
+import dev.xantha.vss.api.column.ColumnFilters;
+import dev.xantha.vss.common.processing.ColumnCoverage;
 import dev.xantha.vss.common.processing.EncodedColumnData;
 import dev.xantha.vss.common.processing.LodByteCompression;
 import dev.xantha.vss.config.VSSServerConfig;
@@ -180,9 +182,9 @@ public final class PersistentColumnLodStore {
                     encodedBytes,
                     header.timestamp(),
                     header.schemaVersion(),
-                    true,
+                    ColumnFilters.snapshot().isEmpty(),
                     header.sectionYs(),
-                    header.encodedCrc32c()));
+                    header.encodedCrc32c(), new ColumnCoverage(ColumnFilters.snapshot().cacheKey())));
         } catch (Exception e) {
             misses++;
             deleteQuietly(path);
@@ -230,13 +232,15 @@ public final class PersistentColumnLodStore {
         if (!config.enablePersistentColumnCache
                 || columnData == null
                 || columnData.encodedBytes() == null
-                || !columnData.completeColumn()
+                || !columnData.isDeliverable()
+                || !columnData.coverage().filterKey().equals(ColumnFilters.snapshot().cacheKey())
                 || !isPersistentCompression(columnData.compression())
                 || columnData.rawSize() <= 0
                 || columnData.rawSize() > MAX_COLUMN_BYTES
                 || columnData.encodedBytes().length <= 0
                 || columnData.encodedBytes().length > MAX_ENCODED_COLUMN_BYTES
-                || columnData.schemaVersion() != EncodedColumnData.SCHEMA_VERSION) {
+                || columnData.schemaVersion() != EncodedColumnData.SCHEMA_VERSION
+                || !columnData.hasValidEncodedCrc32c()) {
             return false;
         }
 
@@ -293,6 +297,7 @@ public final class PersistentColumnLodStore {
         }
 
         synchronized (columnLock(dimension, cx, cz)) {
+            invalidateInactiveNamespaces(server, dimension, cx, cz, 0L);
             deleteColumn(server, dimension, cx, cz);
         }
     }
@@ -302,6 +307,9 @@ public final class PersistentColumnLodStore {
             return;
         }
         synchronized (columnLock(dimension, cx, cz)) {
+            // A real world edit invalidates every policy's view of this column.
+            // Otherwise restarting without a filter could resurrect stale full data.
+            invalidateInactiveNamespaces(server, dimension, cx, cz, minimumInvalidTimestamp);
             if (minimumInvalidTimestamp <= 0L) {
                 deleteColumn(server, dimension, cx, cz);
                 return;
@@ -321,6 +329,46 @@ public final class PersistentColumnLodStore {
             }
             deleteColumn(server, dimension, cx, cz);
             return;
+        }
+    }
+
+    private void invalidateInactiveNamespaces(MinecraftServer server, ResourceKey<Level> dimension,
+            int cx, int cz, long minimumInvalidTimestamp) {
+        Path active = root(server);
+        Path data = server.getWorldPath(LevelResource.ROOT).resolve("data");
+        Path relativeColumn = active.relativize(columnPath(server, dimension, cx, cz));
+        ArrayList<Path> namespaces = new ArrayList<>();
+        namespaces.add(data.resolve(CACHE_DIR));
+        Path filtered = data.resolve(CACHE_DIR + "-filtered");
+        if (Files.isDirectory(filtered, java.nio.file.LinkOption.NOFOLLOW_LINKS)) {
+            try (Stream<Path> children = Files.list(filtered)) {
+                children.filter(path -> path.getFileName().toString().matches("[0-9a-f]{64}"))
+                        .filter(path -> Files.isDirectory(path, java.nio.file.LinkOption.NOFOLLOW_LINKS))
+                        .forEach(namespaces::add);
+            } catch (IOException failure) {
+                VSSLogger.warn("Failed to invalidate inactive column cache namespaces", failure);
+            }
+        }
+        for (Path namespace : namespaces) {
+            if (namespace.equals(active)) continue;
+            Path path = namespace.resolve(relativeColumn);
+            if (!Files.isRegularFile(path, java.nio.file.LinkOption.NOFOLLOW_LINKS)) continue;
+            if (minimumInvalidTimestamp > 0L) {
+                // The fixed prefix is shared by full and filtered cache files. Do
+                // not validate an inactive header against the active policy's mode.
+                try (DataInputStream in = new DataInputStream(Files.newInputStream(path))) {
+                    if (in.readInt() == FILE_MAGIC && in.readInt() == FILE_VERSION_CURRENT
+                            && in.readInt() == cx && in.readInt() == cz
+                            && in.readLong() >= minimumInvalidTimestamp) continue;
+                } catch (IOException ignored) {
+                    // A broken old entry must not survive invalidation either.
+                }
+            }
+            if (deleteQuietly(path)) {
+                // Inactive indexes have no in-memory owner; rebuild the region on
+                // next activation rather than editing an index under another mode.
+                deleteQuietly(path.getParent().resolve(INDEX_FILE_NAME));
+            }
         }
     }
 
@@ -857,7 +905,7 @@ public final class PersistentColumnLodStore {
         }
         int encodedCrc32c = in.readInt();
         int length = in.readInt();
-        if (storedCx != cx || storedCz != cz || !completeColumn) {
+        if (storedCx != cx || storedCz != cz || completeColumn != ColumnFilters.snapshot().isEmpty()) {
             return null;
         }
         IndexSlot slot = new IndexSlot(timestamp, method, rawSize, schemaVersion, encodedCrc32c, length, sectionYs);
@@ -898,7 +946,10 @@ public final class PersistentColumnLodStore {
     }
 
     private Path root(MinecraftServer server) {
-        return server.getWorldPath(LevelResource.ROOT).resolve("data").resolve(CACHE_DIR);
+        Path data = server.getWorldPath(LevelResource.ROOT).resolve("data");
+        String key = ColumnFilters.snapshot().cacheKey();
+        return key.isEmpty() ? data.resolve(CACHE_DIR)
+                : data.resolve(CACHE_DIR + "-filtered").resolve(key);
     }
 
     private static String safeDimension(ResourceLocation location) {

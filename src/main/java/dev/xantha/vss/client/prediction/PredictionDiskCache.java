@@ -52,7 +52,7 @@ final class PredictionDiskCache implements AutoCloseable {
     }
     // Schema 3 includes surface features from their actual decoration stages.
     // Old empty/vegetation-only surface entries must regenerate; terrain stays reusable.
-    private static int schema(Key key) { return key.kind == 0 ? SCHEMA : 5; }
+    private int schema(Key key) { return (key.kind == 0 || key.kind == 3) ? SCHEMA : templateIdentity == null ? 5 : 7; }
     final class Lease implements AutoCloseable {
         final Key key;
         final Entry entry;
@@ -71,6 +71,7 @@ final class PredictionDiskCache implements AutoCloseable {
     private final Path root;
     private final long fingerprint;
     private final PredictionCacheMappings mappings;
+    private final byte[] templateIdentity;
     private final Shared shared;
     private volatile boolean closed;
     private volatile long lastDemandNanos = System.nanoTime();
@@ -129,13 +130,17 @@ final class PredictionDiskCache implements AutoCloseable {
             }, new ThreadPoolExecutor.AbortPolicy());
 
     PredictionMesh readMesh(Lease terrain, byte[] identity, int axis) {
+        return readMesh(terrain, identity, axis, 0);
+    }
+
+    PredictionMesh readMesh(Lease terrain, byte[] identity, int axis, int spacing) {
         if (identity == null || !terrain.valid() || !terrain.readable) return null;
         try (var lease = lease(Key.mesh(terrain.key))) {
             var mesh = read(lease, (input, version) -> {
                 int length = bounded(input.readInt(), PredictionMeshCodec.MAX_BYTES);
                 byte[] bytes = input.readNBytes(length);
                 if (bytes.length != length) throw new EOFException("mesh payload");
-                return PredictionMeshCodec.decode(bytes, identity, axis);
+                return PredictionMeshCodec.decode(bytes, identity, axis, spacing);
             });
             if (!terrain.valid()) return null;
             if (mesh == null) meshMisses.increment(); else meshHits.increment();
@@ -159,14 +164,19 @@ final class PredictionDiskCache implements AutoCloseable {
 
     PredictionMeshCodec.MeshRecord readMeshBaseRecord(Lease terrain, byte[] baseIdentity, int axis,
             byte[] rawIdentity, java.util.function.Predicate<dev.xantha.vss.common.worldgen.LostCityPreview.Tile> validate) {
+        return readMeshBaseRecord(terrain, baseIdentity, axis, 0, rawIdentity, validate);
+    }
+
+    PredictionMeshCodec.MeshRecord readMeshBaseRecord(Lease terrain, byte[] baseIdentity, int axis, int spacing,
+            byte[] rawIdentity, java.util.function.Predicate<dev.xantha.vss.common.worldgen.LostCityPreview.Tile> validate) {
         if (baseIdentity == null || !terrain.valid() || !terrain.readable) return null;
         try (var lease = lease(Key.mesh(terrain.key))) {
             var record = read(lease, (input, version) -> {
                 int length = bounded(input.readInt(), PredictionMeshCodec.MAX_BYTES);
                 byte[] bytes = input.readNBytes(length);
                 if (bytes.length != length) throw new EOFException("mesh payload");
-                return rawIdentity == null ? PredictionMeshCodec.decodeBaseRecord(bytes, baseIdentity, axis)
-                        : PredictionMeshCodec.decodeCityBaseRecord(bytes, rawIdentity, baseIdentity, axis, validate);
+                return rawIdentity == null ? PredictionMeshCodec.decodeBaseRecord(bytes, baseIdentity, axis, spacing)
+                        : PredictionMeshCodec.decodeCityBaseRecord(bytes, rawIdentity, baseIdentity, axis, spacing, validate);
             });
             if (!terrain.valid()) return null;
             if (record == null) meshMisses.increment(); else {
@@ -349,9 +359,16 @@ final class PredictionDiskCache implements AutoCloseable {
     }
 
     PredictionDiskCache(Path root, long fingerprint, PredictionCacheMappings mappings) {
+        this(root, fingerprint, mappings, null);
+    }
+
+    PredictionDiskCache(Path root, long fingerprint, PredictionCacheMappings mappings, String catalog) {
         this.root = root.toAbsolutePath().normalize();
         this.fingerprint = fingerprint;
         this.mappings = mappings;
+        this.templateIdentity = catalog == null ? null : java.util.HexFormat.of().parseHex(catalog);
+        if (templateIdentity != null && templateIdentity.length != 32)
+            throw new IllegalArgumentException("Invalid surface template identity");
         shared = ROOTS.computeIfAbsent(this.root, ignored -> new Shared());
         synchronized (shared) {
             if (shared.regions == null) shared.regions = new PredictionRegionStorage(this.root);
@@ -377,6 +394,21 @@ final class PredictionDiskCache implements AutoCloseable {
             entry.users++;
             return new Lease(key, entry, !shared.invalidations.containsKey(key));
         }
+    }
+
+    boolean hasCapturedTerrain() { return Files.isDirectory(root.resolve("3-0")); }
+    boolean hasCapturedRegion(Key key) { return Files.isRegularFile(shared.regions.path(key)); }
+
+    PredictionCapturedTerrain.Node readCapturedNode(Lease lease) {
+        return read(lease, (input, version) -> {
+            var node = PredictionCapturedTerrain.Node.read(input, mappings);
+            if ((lease.key.detail() == 0) != (node.columns != null)) throw new IOException("capture node level");
+            return node;
+        });
+    }
+
+    boolean writeCapturedNode(Lease lease, PredictionCapturedTerrain.Node node) {
+        return write(lease, 6, output -> node.write(output, mappings));
     }
 
     record TerrainData(ClientColumnSample[] samples, long colorFingerprint,
@@ -562,7 +594,7 @@ final class PredictionDiskCache implements AutoCloseable {
                 BlockPos pos = new BlockPos(input.readInt(), input.readInt(), input.readInt());
                 blocks.put(pos, palette[index(input.readInt(), palette.length)]);
             }
-            return new SurfaceData(Map.copyOf(blocks), version >= 4, version >= 5);
+            return new SurfaceData(Map.copyOf(blocks), version >= 4 && version != 8, version >= 5 && version != 8);
         });
     }
 
@@ -717,7 +749,8 @@ final class PredictionDiskCache implements AutoCloseable {
         synchronized (decodedStates) {
             BlockState state = decodedStates.get(json);
             if (state != null) return state;
-            state = BlockState.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(json)).getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
+            state = BlockState.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(json))
+                    .getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
             stateDecodes.increment();
             if (decodedStates.size() >= 4096) decodedStates.remove(decodedStates.keySet().iterator().next());
             if (!closed) decodedStates.put(json, state);
@@ -729,7 +762,8 @@ final class PredictionDiskCache implements AutoCloseable {
         synchronized (encodedStates) {
             String json = encodedStates.get(state);
             if (json != null) return json;
-            json = BlockState.CODEC.encodeStart(JsonOps.INSTANCE, state).getOrThrow(false, message -> { throw new IllegalArgumentException(message); }).toString();
+            json = BlockState.CODEC.encodeStart(JsonOps.INSTANCE, state)
+                    .getOrThrow(false, message -> { throw new IllegalArgumentException(message); }).toString();
             if (encodedStates.size() >= 4096) encodedStates.remove(encodedStates.keySet().iterator().next());
             if (!closed) encodedStates.put(state, json);
             return json;
@@ -749,9 +783,17 @@ final class PredictionDiskCache implements AutoCloseable {
                     new InflaterInputStream(new ByteArrayInputStream(record.bytes())), 32 * 1024))) {
             if (input.readInt() != MAGIC) { missCorrupt.increment(); throw new IOException("cache magic mismatch"); }
             int version=input.readInt();
-            if ((version != schema(lease.key) && version != 5 && version != 4 && version != 3 && !(lease.key.kind == 0 && (version == 1 || version == 2))) || input.readLong() != fingerprint
+            boolean templateRecord = (lease.key.kind == 1 || lease.key.kind == 2) && templateIdentity != null;
+            boolean validVersion = templateRecord ? version == 7 || version == 8
+                    : version == schema(lease.key) || lease.key.kind == 3 && version == 6 || version == 5 || version == 4 || version == 3
+                    || lease.key.kind == 0 && (version == 1 || version == 2);
+            if (!validVersion || input.readLong() != fingerprint
                     || input.readInt() != lease.key.kind || input.readInt() != lease.key.x || input.readInt() != lease.key.z
                     || input.readInt() != lease.key.detail) { missIdentity.increment(); throw new IOException("cache identity mismatch"); }
+            if (templateRecord && !Arrays.equals(templateIdentity, input.readNBytes(32))) {
+                missIdentity.increment();
+                throw new IOException("cache template catalog mismatch");
+            }
             T result = decoder.read(input, version);
             if (input.read() != -1) { missCorrupt.increment(); throw new IOException("trailing cache data"); } // also validates zlib checksum
             if (!lease.valid()) { missRaced.increment(); misses.increment(); return null; }
@@ -801,6 +843,8 @@ final class PredictionDiskCache implements AutoCloseable {
     }
 
     private Path encodeTemporary(Lease lease, int version, Encoder encoder) throws IOException {
+        boolean templateRecord = (lease.key.kind == 1 || lease.key.kind == 2) && templateIdentity != null;
+        if (templateRecord) version = version >= 5 ? 7 : 8;
         Path temporary = null;
         try {
             Path target = file(lease.key);
@@ -813,6 +857,7 @@ final class PredictionDiskCache implements AutoCloseable {
                     new DeflaterOutputStream(new BufferedOutputStream(Files.newOutputStream(temporary)), compressor), 32 * 1024))) {
                 output.writeInt(MAGIC); output.writeInt(version); output.writeLong(fingerprint);
                 output.writeInt(lease.key.kind); output.writeInt(lease.key.x); output.writeInt(lease.key.z); output.writeInt(lease.key.detail);
+                if (templateRecord) output.write(templateIdentity);
                 encoder.write(output);
             } finally { compressor.end(); }
             Path completed = temporary;
@@ -966,6 +1011,12 @@ final class PredictionDiskCache implements AutoCloseable {
                 // Corrected predicate semantics have a separate surface identity.
                 keys.add(Key.surface(x, z, settings | PredictionVegetation.PREDICATE_SETTINGS_VERSION));
                 keys.add(Key.surface(x, z, settings | 96 | PredictionVegetation.PREDICATE_SETTINGS_VERSION));
+                // New pool/dimension semantics must still respond to world edits.
+                int runtime = settings | PredictionVegetation.STRUCTURE_RUNTIME_SETTINGS_VERSION;
+                keys.add(Key.surface(x, z, runtime));
+                keys.add(Key.surface(x, z, runtime | 96));
+                keys.add(Key.surface(x, z, runtime | PredictionVegetation.PREDICATE_SETTINGS_VERSION));
+                keys.add(Key.surface(x, z, runtime | 96 | PredictionVegetation.PREDICATE_SETTINGS_VERSION));
             }
         }
         return keys;
@@ -981,12 +1032,9 @@ final class PredictionDiskCache implements AutoCloseable {
 
     void invalidateCaptures(it.unimi.dsi.fastutil.longs.LongSet columns) {
         Set<Key> keys = new HashSet<>();
-        // Authoritative arrivals only replace sampled columns. Match the live
-        // manager's sparse-grid dependency check for unloaded tiles too; otherwise
-        // a chunk between far grid points deletes useful persisted ancestors.
-        // Explicit world edits still use the conservative invalidateChunk path.
+        // Area mips include captures between grid points. Persisted ancestors follow the same dependency.
         for (long column : columns)
-            addAffectedTerrain(keys, (int) (column >> 32), (int) column, true);
+            addAffectedTerrain(keys, (int) (column >> 32), (int) column, false);
         invalidate(keys);
     }
 

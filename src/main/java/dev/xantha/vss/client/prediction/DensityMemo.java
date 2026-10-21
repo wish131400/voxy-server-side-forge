@@ -76,7 +76,8 @@ final class DensityMemo {
         DensityFunction[] result = new DensityFunction[roots.length];
         for (int i = 0; i < roots.length; i++) {
             DensityFunction root = roots[i];
-            result[i] = root == null ? null : root.mapAll(function -> memo.wrap(function, wrapped, analysis));
+            result[i] = root == null || analysis.inspect(root).stateful() ? root
+                    : root.mapAll(function -> memo.wrap(function, wrapped, analysis));
         }
         return result;
     }

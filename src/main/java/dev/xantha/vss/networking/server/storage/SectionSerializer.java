@@ -33,11 +33,13 @@ public final class SectionSerializer {
     }
 
     public static LoadedColumnData serializeColumn(ServerLevel level, LevelChunk chunk, int cx, int cz) {
-        return serializeColumn(level, (ChunkAccess) chunk, cx, cz, true);
+        return ColumnFilterPipeline.apply(ColumnFilterPipeline.Context.capture(level),
+                serializeColumn(level, (ChunkAccess) chunk, cx, cz, true));
     }
 
     public static LoadedColumnData serializeChunkAccess(ServerLevel level, ChunkAccess chunk, int cx, int cz) {
-        return serializeColumn(level, chunk, cx, cz, false);
+        return ColumnFilterPipeline.apply(ColumnFilterPipeline.Context.capture(level),
+                serializeColumn(level, chunk, cx, cz, false));
     }
 
     public static ColumnSnapshot snapshotColumn(ServerLevel level, LevelChunk chunk, int cx, int cz) {
@@ -87,10 +89,15 @@ public final class SectionSerializer {
 
         boolean completeColumn = hasCompleteRequiredLighting(requiresSkyLight, missingSkyLight)
                 && isCompleteColumn(sections, minSectionY, highestIncludedSectionY);
-        return new ColumnSnapshot(cx, cz, includedSections.toArray(SectionSnapshot[]::new), completeColumn);
+        return new ColumnSnapshot(cx, cz, includedSections.toArray(SectionSnapshot[]::new), completeColumn,
+                ColumnFilterPipeline.Context.capture(level));
     }
 
     public static LoadedColumnData serializeSnapshot(ColumnSnapshot snapshot) {
+        return ColumnFilterPipeline.apply(snapshot.filterContext(), serializeSnapshotRaw(snapshot));
+    }
+
+    private static LoadedColumnData serializeSnapshotRaw(ColumnSnapshot snapshot) {
         SectionSnapshot[] sections = snapshot.sections();
         if (sections.length == 0) {
             return emptyColumn(snapshot.chunkX(), snapshot.chunkZ(), snapshot.completeColumn());
@@ -275,7 +282,11 @@ public final class SectionSerializer {
         }
     }
 
-    public record ColumnSnapshot(int chunkX, int chunkZ, SectionSnapshot[] sections, boolean completeColumn) {
+    public record ColumnSnapshot(int chunkX, int chunkZ, SectionSnapshot[] sections, boolean completeColumn,
+            ColumnFilterPipeline.Context filterContext) {
+        public ColumnSnapshot(int chunkX, int chunkZ, SectionSnapshot[] sections, boolean completeColumn) {
+            this(chunkX, chunkZ, sections, completeColumn, null);
+        }
     }
 
     public record SectionSnapshot(

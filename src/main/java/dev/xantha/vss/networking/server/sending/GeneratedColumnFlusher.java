@@ -1,5 +1,6 @@
 package dev.xantha.vss.networking.server.sending;
 
+import dev.xantha.vss.networking.server.runtime.ServerLifecycleGuard;
 
 import dev.xantha.vss.networking.server.generation.ChunkGenerationService;
 import dev.xantha.vss.networking.server.generation.ChunkyGenerationService;
@@ -8,7 +9,6 @@ import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
 import dev.xantha.vss.networking.server.storage.ColumnLodCache;
 import dev.xantha.vss.networking.server.storage.PersistentColumnWriter;
-import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.common.VSSConstants;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.common.processing.EncodedColumnData;
@@ -18,7 +18,14 @@ import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * 在服务端线程消费生成结果，先交给显式 chunky 作业，再处理普通玩家请求。
+ * <p>复核原请求状态身份、取消和维度后，分别委派缓存、持久化与列交付。
+ * 不建立第二套生成或发送队列，停止期间不交付结果。
+ */
 public final class GeneratedColumnFlusher {
+    private final ServerLifecycleGuard lifecycle;
+    private final ColumnDeliveryService delivery;
     private final PlayerRequestRegistry playerRegistry;
     private final ChunkGenerationService generationService;
     private final ColumnLodCache columnCache;
@@ -30,7 +37,11 @@ public final class GeneratedColumnFlusher {
             ChunkGenerationService generationService,
             ColumnLodCache columnCache,
             PersistentColumnWriter persistentColumnWriter,
-            ChunkyGenerationService chunky) {
+            ChunkyGenerationService chunky,
+            ServerLifecycleGuard lifecycle,
+            ColumnDeliveryService delivery) {
+        this.lifecycle = java.util.Objects.requireNonNull(lifecycle, "lifecycle");
+        this.delivery = java.util.Objects.requireNonNull(delivery, "delivery");
         this.playerRegistry = playerRegistry;
         this.generationService = generationService;
         this.columnCache = columnCache;
@@ -39,7 +50,7 @@ public final class GeneratedColumnFlusher {
     }
 
     public void flush(MinecraftServer server) {
-        if (VSSServerNetworking.isServerStopping()) {
+        if (lifecycle.isStopping()) {
             return;
         }
         for (ChunkGenerationService.GenerationResult result : generationService.tick(server)) {
@@ -62,12 +73,12 @@ public final class GeneratedColumnFlusher {
                 continue;
             }
 
-            if (!VSSServerNetworking.isColumnStillRelevant(player, result.dimension(), columnData.chunkX(), columnData.chunkZ())) {
+            if (!delivery.isColumnStillRelevant(player, result.dimension(), columnData.chunkX(), columnData.chunkZ())) {
                 state.clearRequest(result.requestId());
                 continue;
             }
 
-            if (!columnData.hasBody() || !columnData.completeColumn()) {
+            if (!columnData.hasBody() || !columnData.isDeliverable()) {
                 if (VSSLogger.isDebugEnabled()) {
                     VSSLogger.debug("LOD column unavailable: reason=" + (!columnData.hasBody() ? "empty-body" : "incomplete")
                             + ", dimension=" + result.dimension().location() + ", chunk=" + columnData.chunkX()
@@ -86,12 +97,12 @@ public final class GeneratedColumnFlusher {
                 continue;
             }
 
-            boolean queued = VSSServerNetworking.queueColumn(player, state, new VoxelColumnS2CPayload(
+            boolean queued = delivery.queueColumn(player, state, new VoxelColumnS2CPayload(
                     result.requestId(),
                     result.dimension(),
                     columnData), result.priority());
             columnCache.put(result.dimension(), columnData);
-            if (!queued && VSSServerNetworking.isColumnStillRelevant(player, result.dimension(), columnData.chunkX(), columnData.chunkZ())) {
+            if (!queued && delivery.isColumnStillRelevant(player, result.dimension(), columnData.chunkX(), columnData.chunkZ())) {
                 state.addPreloadColumn(new PlayerRequestState.PreloadColumn(
                         columnData.chunkX(),
                         columnData.chunkZ(),

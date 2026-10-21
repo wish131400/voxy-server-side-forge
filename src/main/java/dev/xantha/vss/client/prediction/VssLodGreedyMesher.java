@@ -28,6 +28,15 @@ public final class VssLodGreedyMesher {
         if (maxWidth <= 0 || maxHeight <= 0) {
             throw new IllegalArgumentException("merge bounds must be positive");
         }
+        if (!Boolean.getBoolean("vss.disableVoxyScanMerge")) {
+            List<Rectangle> result = new ArrayList<>();
+            // Every signed int is a valid key, including zero and the empty
+            // marker handled by the caller. Reserve long zero for the scanner.
+            PredictionScanMesher2D.scan(size, size, maxWidth, maxHeight,
+                    (x, y) -> Integer.toUnsignedLong(cells[y * size + x]) + 1,
+                    (x, y, width, height, key) -> result.add(new Rectangle(x, y, width, height, (int)(key - 1))));
+            return List.copyOf(result);
+        }
         boolean[] used = new boolean[cells.length];
         List<Rectangle> result = new ArrayList<>();
         for (int z = 0; z < size; z++) {

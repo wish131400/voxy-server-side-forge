@@ -6,6 +6,139 @@ package dev.xantha.vss.client.prediction;
 final class PredictionGpuEncoding {
     private PredictionGpuEncoding() { }
     record Encoded(int[] words, int paletteBaseTexel) { }
+    private static final int CROSS_PLANE = 1 << 30;
+
+    /** GPU-only 20-byte records: opposite corners with winding stored in the
+     * unused normal coordinate, attributes, and a separate cell/palette word.
+     * Vertical plant crosses use both endpoints and a tag in the normal word.
+     * A negative palette base selects this layout. Exceptional faces reference
+     * exact six-word coordinates after the palette. CPU/disk layout stays exact. */
+    static Encoded rectangles(Encoded source, int quads) {
+        if (source.paletteBaseTexel <= 0 || quads < 64 || Boolean.getBoolean("vss.disableRectangleGpu")) return source;
+        int[] words = source.words;
+        int exceptional = 0;
+        for (int q = 0; q < quads; q++)
+            if (rectangleWinding(words, q * 8) < 0 && !crossPlane(words, q * 8)) exceptional++;
+        int recordWords = Math.addExact(Math.multiplyExact(quads, 5), 3) & ~3;
+        int paletteWords = source.paletteBaseTexel * 4;
+        int colors = words.length - paletteWords;
+        int palette = recordWords;
+        int length = Math.addExact(Math.addExact(palette, colors), Math.multiplyExact(exceptional, 8));
+        if (length > words.length - Math.max(16, words.length / 16)) return source;
+        int[] result = new int[length];
+        int fallback = palette + colors;
+        for (int q = 0; q < quads; q++) {
+            int p = q * 8, at = q * 4;
+            int winding = rectangleWinding(words, p);
+            if (winding >= 0) {
+                int normal = normal(words[p + 6]), u = (normal + 1) % 3, v = (normal + 2) % 3;
+                result[at] = coordinate(words, p, 0, 0) | coordinate(words, p, 2, 0) << 16;
+                result[at + 1] = coordinate(words, p, 0, 2) | coordinate(words, p, 2, 2) << 16;
+                result[at + 2] = coordinate(words, p, 0, 1) | coordinate(words, p, 2, 1) << 16;
+                int word = normal == 0 ? 0 : normal == 1 ? 2 : 1;
+                result[at + word] = (result[at + word] & 65535) | (1 << (winding == 1 ? u : v)) << 16;
+            } else if (crossPlane(words, p)) {
+                result[at] = coordinate(words, p, 0, 0) | coordinate(words, p, 2, 0) << 16;
+                result[at + 1] = coordinate(words, p, 0, 2) | coordinate(words, p, 2, 2) << 16;
+                result[at + 2] = coordinate(words, p, 0, 1) | coordinate(words, p, 2, 1) << 16;
+                result[at + (normal(words[p + 6]) == 0 ? 0 : 1)] |= CROSS_PLANE;
+            } else {
+                result[at] = fallback / 4;
+                int normal = normal(words[p + 6]);
+                result[at + (normal == 0 ? 0 : normal == 2 ? 1 : 2)] |= Integer.MIN_VALUE;
+                System.arraycopy(words, p, result, fallback, 6);
+                fallback += 8;
+            }
+            result[at + 3] = words[p + 6];
+            result[quads * 4 + q] = words[p + 7];
+        }
+        System.arraycopy(words, paletteWords, result, palette, colors);
+        return new Encoded(result, -palette / 4);
+    }
+
+    private static int normal(int flags) {
+        return switch (flags >>> PredictionPackedMesh.FLAGS_AXIS_SHIFT & 3) {
+            case 0 -> 1; case 1 -> 0; case 2 -> 2; default -> -1;
+        };
+    }
+    private static int coordinate(int[] words, int p, int corner, int axis) {
+        return words[p + (axis == 0 ? 0 : axis == 2 ? 2 : 4) + corner / 2] >>> ((corner & 1) * 16) & 65535;
+    }
+    static int rectangleWinding(int[] words, int p) {
+        int n = normal(words[p + 6]);
+        if (n < 0) return -1;
+        int u = (n + 1) % 3, v = (n + 2) % 3;
+        int plane = coordinate(words, p, 0, n);
+        for (int c = 1; c < 4; c++) if (coordinate(words, p, c, n) != plane) return -1;
+        int u0 = coordinate(words, p, 0, u), u2 = coordinate(words, p, 2, u);
+        int v0 = coordinate(words, p, 0, v), v2 = coordinate(words, p, 2, v);
+        if (u0 == u2 || v0 == v2) return -1;
+        if (coordinate(words, p, 1, u) == u2 && coordinate(words, p, 1, v) == v0
+                && coordinate(words, p, 3, u) == u0 && coordinate(words, p, 3, v) == v2) return 1;
+        if (coordinate(words, p, 1, u) == u0 && coordinate(words, p, 1, v) == v2
+                && coordinate(words, p, 3, u) == u2 && coordinate(words, p, 3, v) == v0) return 0;
+        return -1;
+    }
+
+    /** Only exact vertical crosses participate. Reserve two high endpoint bits
+     * for the cross/exception tags; wider or irregular models keep their coordinates. */
+    private static boolean crossPlane(int[] words, int p) {
+        int flags = words[p + 6], n = normal(flags);
+        if ((n != 0 && n != 2) || (flags & PredictionPackedMesh.FLAG_UNSHADED) == 0
+                || (flags & PredictionPackedMesh.FLAG_MODEL_UV) != 0
+                || (flags >>> PredictionPackedMesh.FLAGS_FLUID_SHIFT & 3) != 0
+                || coordinate(words, p, 2, n) >= 16384) return false;
+        for (int a = 0; a <= 2; a += 2) {
+            if (coordinate(words, p, 0, a) == coordinate(words, p, 2, a)
+                    || coordinate(words, p, 0, a) != coordinate(words, p, 3, a)
+                    || coordinate(words, p, 1, a) != coordinate(words, p, 2, a)) return false;
+        }
+        return coordinate(words, p, 0, 1) != coordinate(words, p, 2, 1)
+                && coordinate(words, p, 0, 1) == coordinate(words, p, 1, 1)
+                && coordinate(words, p, 2, 1) == coordinate(words, p, 3, 1);
+    }
+
+    /** CPU reference decoder for GPU regression/offline validation only. */
+    static int[] decodeGpu(Encoded stored, int quads) {
+        if (stored.paletteBaseTexel >= 0) return decode(stored.words, stored.paletteBaseTexel, quads);
+        int[] input = stored.words;
+        int palette = -stored.paletteBaseTexel * 4, paletteEnd = input.length;
+        for (int q = 0; q < quads; q++) if (exceptional(input, q * 4)) paletteEnd = Math.min(paletteEnd, (input[q * 4] & Integer.MAX_VALUE) * 4);
+        int[] legacy = new int[quads * 8 + paletteEnd - palette];
+        int[] corner = new int[12];
+        for (int q = 0; q < quads; q++) {
+            int p = q * 4, out = q * 8;
+            if (exceptional(input, p)) System.arraycopy(input, (input[p] & Integer.MAX_VALUE) * 4, legacy, out, 6);
+            else {
+                int n = normal(input[p + 3]);
+                int normalWord = n == 0 ? 0 : n == 2 ? 1 : 2;
+                boolean cross = (input[p + normalWord] & CROSS_PLANE) != 0;
+                corner[0] = input[p] & 65535; corner[1] = input[p + 2] & 65535; corner[2] = input[p + 1] & 65535;
+                for (int c = 1; c < 4; c++) System.arraycopy(corner, 0, corner, c * 3, 3);
+                corner[6] = input[p] >>> 16; corner[7] = input[p + 2] >>> 16; corner[8] = input[p + 1] >>> 16;
+                if (cross) {
+                    corner[6 + n] &= 16383;
+                    corner[3] = corner[6]; corner[5] = corner[8]; corner[10] = corner[7];
+                } else {
+                    corner[6 + n] = corner[n];
+                    int mask = input[p + normalWord] >>> 16;
+                    for (int a = 0; a < 3; a++) {
+                        corner[3 + a] = (mask & 1 << a) != 0 ? corner[6 + a] : corner[a];
+                        corner[9 + a] = (mask & 1 << a) == 0 ? corner[6 + a] : corner[a];
+                    }
+                }
+                for (int a = 0; a < 3; a++) for (int pair = 0; pair < 2; pair++)
+                    legacy[out + (a == 0 ? 0 : a == 2 ? 2 : 4) + pair] = corner[pair * 6 + a] | corner[pair * 6 + 3 + a] << 16;
+            }
+            legacy[out + 6] = input[p + 3]; legacy[out + 7] = input[quads * 4 + q];
+        }
+        System.arraycopy(input, -stored.paletteBaseTexel * 4, legacy, quads * 8, legacy.length - quads * 8);
+        return decode(legacy, quads * 2, quads);
+    }
+    private static boolean exceptional(int[] words, int p) {
+        int n = normal(words[p + 3]);
+        return words[p + (n == 0 ? 0 : n == 2 ? 1 : 2)] < 0;
+    }
 
     /** Select one pass without decoding an already compact CPU payload. The two opaque
      * spans straddle canonical water; appended display geometry belongs to opaque. */
@@ -96,6 +229,7 @@ final class PredictionGpuEncoding {
 
     /** Canonical words for disk caches and CPU consumers; never used by the render loop. */
     static int[] decode(int[] stored, int paletteBaseTexel, int quads) {
+        if (paletteBaseTexel < 0) return decodeGpu(new Encoded(stored, paletteBaseTexel), quads);
         if (paletteBaseTexel == 0) return stored;
         if (quads < 0 || (long)quads * 2 != paletteBaseTexel
                 || (long)paletteBaseTexel * 4 >= stored.length || (stored.length & 3) != 0)

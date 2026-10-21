@@ -33,8 +33,11 @@ final class DensityCompilation implements AutoCloseable {
     DensityCompilation(DensityFunction... source) {
         this.source = source.clone();
         this.roots = new DensityFunction[source.length];
-        for (int i = 0; i < source.length; i++) roots[i] = enabled ? new Root(this, i) : source[i];
-        state = enabled ? "deferred" : "disabled";
+        var analysis = new PredictionRawDensity();
+        boolean allExternal = source.length > 0;
+        for (int i = 0; i < source.length; i++) allExternal &= analysis.inspect(source[i]).stateful();
+        for (int i = 0; i < source.length; i++) roots[i] = enabled && !allExternal ? new Root(this, i) : source[i];
+        state = !enabled ? "disabled" : allExternal ? "external" : "deferred";
     }
 
     DensityFunction[] roots() { return roots.clone(); }

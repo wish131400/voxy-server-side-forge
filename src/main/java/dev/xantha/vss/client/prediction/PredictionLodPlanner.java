@@ -3,6 +3,9 @@ package dev.xantha.vss.client.prediction;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
+import dev.xantha.vss.client.prediction.PredictionTileManager.PredictionTileKey;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
@@ -13,6 +16,26 @@ import net.minecraft.world.level.Level;
  * terrain converges to LOD 0.
  */
 final class PredictionLodPlanner {
+    /** Pure ancestor expansion, coarse parents precede every descendant. */
+    static List<PredictionTileKey> withCoarseCoverage(List<PredictionTileKey> leaves, VssLodLayout layout) {
+        Set<PredictionTileKey> plan = new LinkedHashSet<>();
+        int top = layout.levelCount() - 1;
+        for (PredictionTileKey key : leaves) {
+            int shift = top - key.lod();
+            plan.add(new PredictionTileKey(key.dimension(), key.tileX() >> shift, key.tileZ() >> shift, top));
+        }
+        // Include every intermediate ancestor before its descendants. A root no
+        // longer stays visible until a distant final-resolution tile finishes.
+        for (int level = top - 1; level >= 0; level--) {
+            for (PredictionTileKey key : leaves) {
+                if (key.lod() > level) continue;
+                int shift = level - key.lod();
+                plan.add(new PredictionTileKey(key.dimension(), key.tileX() >> shift, key.tileZ() >> shift, level));
+            }
+        }
+        return List.copyOf(plan);
+    }
+
     private static final int ROOT_RADIUS = 3;
     private static final int MAX_DESIRED = 512;
     private static final int MAX_EXPANDED = MAX_DESIRED * 4;
@@ -107,6 +130,28 @@ final class PredictionLodPlanner {
             double minBuildY, double maxBuildY, int surfaceRadius,
             java.util.function.Predicate<PredictionTileManager.PredictionTileKey> needsSurface,
             java.util.function.Predicate<PredictionTileManager.PredictionTileKey> highRelief) {
+        return plan(dimension, cameraX, cameraY, cameraZ, layout, focus, pixelsPerBlock,
+                minBuildY, maxBuildY, surfaceRadius, needsSurface, highRelief, null);
+    }
+
+    static List<PredictionTileManager.PredictionTileKey> plan(
+            ResourceKey<Level> dimension, double cameraX, double cameraY, double cameraZ,
+            VssLodLayout layout, VssLodFocus focus, double pixelsPerBlock,
+            double minBuildY, double maxBuildY, int surfaceRadius,
+            java.util.function.Predicate<PredictionTileManager.PredictionTileKey> needsSurface,
+            java.util.function.Predicate<PredictionTileManager.PredictionTileKey> highRelief,
+            PredictionWorkView view) {
+        return plan(dimension, cameraX, cameraY, cameraZ, layout, focus, pixelsPerBlock,
+                minBuildY, maxBuildY, surfaceRadius, needsSurface, highRelief, view, key -> false);
+    }
+
+    static List<PredictionTileManager.PredictionTileKey> plan(
+            ResourceKey<Level> dimension, double cameraX, double cameraY, double cameraZ,
+            VssLodLayout layout, VssLodFocus focus, double pixelsPerBlock,
+            double minBuildY, double maxBuildY, int surfaceRadius,
+            java.util.function.Predicate<PredictionTileManager.PredictionTileKey> needsSurface,
+            java.util.function.Predicate<PredictionTileManager.PredictionTileKey> highRelief,
+            PredictionWorkView view, java.util.function.Predicate<PredictionTileManager.PredictionTileKey> occluded) {
         if (layout == null) {
             throw new IllegalArgumentException("layout is required");
         }
@@ -117,10 +162,16 @@ final class PredictionLodPlanner {
         int reach = layout.maxDistanceBlocks() / topBlocks + 2;
         java.util.Map<PredictionTileManager.PredictionTileKey, RuntimeNode> leaves = new java.util.HashMap<>();
         double localFineRadius = PredictionDetailBands.fineRadius(layout.maxDistanceBlocks(), dimension);
+        // Heap comparisons revisit each node many times. Classify each key once
+        // within this plan, while still using a fresh view and feedback next plan.
+        var viewPriorities = new java.util.HashMap<PredictionTileManager.PredictionTileKey, Integer>();
+        java.util.function.ToIntFunction<RuntimeNode> priority = node -> view != null
+                ? node.scopedDetail() ? -1 : viewPriorities.computeIfAbsent(node.key(), key ->
+                        view.band(key, layout, focus, minBuildY, maxBuildY) + (occluded.test(key) ? 2 : 0))
+                : node.distanceSquared() <= 256D * 256 ? 0 : node.scopedDetail() ? 1
+                : node.distanceSquared() < localFineRadius * localFineRadius ? 2 : 3;
         var candidates = new java.util.PriorityQueue<RuntimeNode>(
-                Comparator.comparingInt((RuntimeNode node) -> node.distanceSquared() <= 256D * 256 ? 0
-                        : node.scopedDetail() ? 1
-                        : node.distanceSquared() < localFineRadius * localFineRadius ? 2 : 3)
+                Comparator.comparingInt(priority)
                         .thenComparingDouble(node -> node.scopedDetail() ? node.focusDistanceSquared() : 0)
                         .thenComparing(Comparator.comparingDouble(RuntimeNode::projected).reversed())
                         .thenComparingDouble(RuntimeNode::distanceSquared)
@@ -129,7 +180,7 @@ final class PredictionLodPlanner {
         for (int tz = centerTileZ - reach; tz <= centerTileZ + reach; tz++) {
             for (int tx = centerTileX - reach; tx <= centerTileX + reach; tx++) {
                 RuntimeNode root = runtimeNode(dimension, tx, tz, top, cameraX, cameraY, cameraZ,
-                        layout, focus, pixelsPerBlock, minBuildY, maxBuildY, surfaceRadius, needsSurface, highRelief);
+                        layout, focus, pixelsPerBlock, minBuildY, maxBuildY, surfaceRadius, needsSurface, highRelief, view);
                 if (root != null) {
                     leaves.put(root.key(), root);
                     candidates.add(root);
@@ -158,7 +209,7 @@ final class PredictionLodPlanner {
             for (var childKey : PredictionTransitionPlan.children(parent.key())) {
                 var child = runtimeNode(dimension, childKey.tileX(), childKey.tileZ(), childKey.lod(),
                         cameraX, cameraY, cameraZ, layout, focus, pixelsPerBlock, minBuildY, maxBuildY,
-                        surfaceRadius, needsSurface, highRelief);
+                        surfaceRadius, needsSurface, highRelief, view);
                 if (child != null) children.add(child);
             }
             if (leaves.size() - 1 + children.size() > MAX_BAND_LEAVES) break;
@@ -179,13 +230,15 @@ final class PredictionLodPlanner {
         int leafBudget = (focus == null ? MAX_RUNTIME_LEAVES : MAX_SCOPED_LEAVES) + leaves.size() - rootCount;
         while (!candidates.isEmpty() && expanded < MAX_RUNTIME_EXPANDED) {
             RuntimeNode parent = candidates.remove();
+            if (view != null && view.band(parent.key(), layout, focus, minBuildY, maxBuildY) > PredictionWorkView.BUFFER)
+                continue;
             if (parent.projected() <= layout.pixelThreshold()) continue;
             if (parent.key().lod() == 0) continue;
             List<RuntimeNode> children = new ArrayList<>(4);
             for (int dz = 0; dz < 2; dz++) for (int dx = 0; dx < 2; dx++) {
                 RuntimeNode child = runtimeNode(dimension, parent.key().tileX() * 2 + dx,
                         parent.key().tileZ() * 2 + dz, parent.key().lod() - 1,
-                        cameraX, cameraY, cameraZ, layout, focus, pixelsPerBlock, minBuildY, maxBuildY, surfaceRadius, needsSurface, highRelief);
+                        cameraX, cameraY, cameraZ, layout, focus, pixelsPerBlock, minBuildY, maxBuildY, surfaceRadius, needsSurface, highRelief, view);
                 if (child != null) children.add(child);
             }
             if (leaves.size() - 1 + children.size() > leafBudget) break;
@@ -220,7 +273,8 @@ final class PredictionLodPlanner {
                                        VssLodLayout layout, VssLodFocus focus,
                                        double pixelsPerBlock, double minBuildY, double maxBuildY, int surfaceRadius,
                                        java.util.function.Predicate<PredictionTileManager.PredictionTileKey> needsSurface,
-                                       java.util.function.Predicate<PredictionTileManager.PredictionTileKey> highRelief) {
+                                       java.util.function.Predicate<PredictionTileManager.PredictionTileKey> highRelief,
+                                       PredictionWorkView view) {
         int tileBlocks = layout.tileBlocks(level);
         double minX = tileX * (double) tileBlocks;
         double minZ = tileZ * (double) tileBlocks;
@@ -235,9 +289,11 @@ final class PredictionLodPlanner {
         double distance = Math.sqrt(dx * dx + dz * dz + vertical * vertical);
         boolean focused = focus != null && focus.intersects(minX, minZ, maxX, maxZ);
         double scale = focused ? focus.selectionScale(pixelsPerBlock) : pixelsPerBlock;
-        double projected = VssLodProjection.projectedSize(tileBlocks, Math.max(1.0D, distance), scale);
-        // Normal surface detail is a radius, never the crosshair ray. The scoped
-        // target alone forces distant terrain down to the same plant-capable grid.
+        var key = new PredictionTileManager.PredictionTileKey(dimension, tileX, tileZ, level);
+        double projected = PredictionScreenDetail.projected(view, key, layout, cameraX, cameraY, cameraZ,
+                scale, minBuildY, maxBuildY);
+        // Ordinary surface follows screen size with a view, or the startup radius without one.
+        // The telescope can still request detail beyond the ordinary screen threshold.
         VssLodFocus surfaceFocus = PredictionWorkOrder.surfaceFocus(focus);
         boolean surfaceFocused = surfaceFocus != null && surfaceFocus.intersects(minX, minZ, maxX, maxZ);
         // Give steep/structural terrain one earlier subdivision using cached
@@ -253,8 +309,10 @@ final class PredictionLodPlanner {
         // Every target inside the horizon can reach block detail. Reserve the
         // bounded telescope patch before spending the remaining planning slots.
         if (level > 0 && surfaceFocused) projected = Math.max(projected, layout.pixelThreshold() * (32.0D + level));
-        if (level > 1 && (surfaceRadius > 0 && distance <= surfaceRadius || surfaceFocused)
-                && needsSurface.test(new PredictionTileManager.PredictionTileKey(dimension, tileX, tileZ, level))) {
+        boolean normalSurface = surfaceRadius > 0 && (view == null ? distance <= surfaceRadius
+                : PredictionScreenDetail.surfaceVisible(view, key, layout, cameraX, cameraY, cameraZ,
+                        pixelsPerBlock, minBuildY, maxBuildY));
+        if (level > 1 && (normalSurface || surfaceFocused) && needsSurface.test(key)) {
             projected = Math.max(projected, layout.pixelThreshold() * (2.0D + level));
         }
         return new RuntimeNode(new PredictionTileManager.PredictionTileKey(dimension, tileX, tileZ, level),

@@ -8,13 +8,15 @@ import net.minecraft.world.level.block.Block;
 
 /** Lossless finished geometry, independent of view-dependent masks and parent morphs. */
 final class PredictionMeshCodec {
-    // Rebuild walls where a surface replacement consumed the complete suspended roof.
-    // Terrain and decoration sample caches remain valid.
-    /** Rebuild old solid-box growing plants; raw terrain and feature caches remain valid. */
-    static final int VERSION = 11, RECORD_VERSION = 9, MAX_BYTES = 16 * 1024 * 1024;
+    // Worker-built feature voxel hierarchy and derived range format changed.
+    // Rebuild finished meshes; terrain and placement sample caches remain valid.
+    static final int VERSION = 15, RECORD_VERSION = 9, DERIVED_RECORD_VERSION = 11,
+            MAX_BYTES = 16 * 1024 * 1024;
     record MeshRecord(PredictionMesh mesh, boolean surfaceCompleted,
-                      dev.xantha.vss.common.worldgen.LostCityPreview.Tile cities, byte[] baseIdentity, byte[] fullIdentity) { }
-    private static final int CITY_RECORD_VERSION = 10;
+                      dev.xantha.vss.common.worldgen.LostCityPreview.Tile cities, byte[] baseIdentity,
+                      byte[] fullIdentity, boolean prepared) { }
+    private static final int CITY_RECORD_VERSION = 10, DERIVED_CITY_RECORD_VERSION = 12;
+    static final int PREPARED_RECORD_VERSION = 13, PREPARED_CITY_RECORD_VERSION = 14;
 
     static byte[] withCityBuildings(byte[] signature, dev.xantha.vss.common.worldgen.LostCityPreview.Tile buildings) {
         if (signature == null || buildings == null) return signature;
@@ -170,6 +172,13 @@ final class PredictionMeshCodec {
     static byte[] encode(PredictionMesh mesh, byte[] signature, byte[] baseSignature,
                          boolean baseSafe, boolean surfaceCompleted, byte[] rawIdentity,
                          dev.xantha.vss.common.worldgen.LostCityPreview.Tile cities) throws IOException {
+        return encode(mesh, signature, baseSignature, baseSafe, surfaceCompleted, rawIdentity, cities, true);
+    }
+
+    private static byte[] encode(PredictionMesh mesh, byte[] signature, byte[] baseSignature,
+                                boolean baseSafe, boolean surfaceCompleted, byte[] rawIdentity,
+                                dev.xantha.vss.common.worldgen.LostCityPreview.Tile cities,
+                                boolean includePrepared) throws IOException {
         byte[] cityBytes = cities == null ? null : PredictionCityMeshCache.encode(cities);
         if (cities != null && (rawIdentity == null || rawIdentity.length != 32
                 || !Arrays.equals(baseSignature, withCityBuildings(rawIdentity, PredictionCityMeshCache.buildings(cities)))))
@@ -181,33 +190,47 @@ final class PredictionMeshCodec {
                 || mesh.retainedHeapBytes()>MAX_BYTES)throw new IOException("invalid mesh record");
         var bytes=new ByteArrayOutputStream();
         try(var out=new DataOutputStream(bytes)) {
-            out.writeInt(cities == null ? RECORD_VERSION : CITY_RECORD_VERSION);out.write(signature);out.write(baseSignature);out.writeBoolean(baseSafe);out.writeInt(mesh.cellAxis());
+            var plan = includePrepared ? payload.cachePlan() : null;
+            boolean merged = payload.cacheWordsMerged();
+            int recordVersion = plan != null ? (cities == null ? PREPARED_RECORD_VERSION : PREPARED_CITY_RECORD_VERSION) : cities == null
+                    ? (merged ? DERIVED_RECORD_VERSION : RECORD_VERSION)
+                    : (merged ? DERIVED_CITY_RECORD_VERSION : CITY_RECORD_VERSION);
+            out.writeInt(recordVersion);out.write(signature);out.write(baseSignature);out.writeBoolean(baseSafe);out.writeInt(mesh.cellAxis());
             out.writeInt(mesh.vertexCount());out.writeInt(mesh.waterVertexCount());
             out.writeInt(payload.terrainQuadCount());out.writeInt(payload.spriteQuadCount());out.writeBoolean(payload.downFaces());
             out.writeInt(payload.morphMinY());out.writeInt(payload.morphMaxY());
-            int[] words = payload.cacheWords();
+            int[] words = plan == null ? payload.cacheWords() : payload.quads();
             var used=new BitSet(256);
             for(int i=6;i<words.length;i+=12){int row=words[i]&0xffff;if(row>0 && row!=255)used.set(row);}
             mesh.seamMesh().materialRows(used);
             out.writeInt(used.cardinality());
             for(int row=used.nextSetBit(0);row>=0;row=used.nextSetBit(row+1)) {out.writeInt(row);VssLodSpriteTable.writeMaterial(out,row);}
             ints(out,words);
+            if (plan != null) out.writeInt(plan.sourceWords());
             for(int i=0;i<VssLodFaceGroup.COUNT;i++) {
                 out.writeInt(payload.terrainRangeFirst(i));out.writeInt(payload.terrainRangeCount(i));
                 out.writeInt(payload.waterRangeFirst(i));out.writeInt(payload.waterRangeCount(i));
             }
             mesh.seamMesh().writeCache(out);
             out.writeBoolean(surfaceCompleted);
+            if (plan != null) PredictionMeshDerivedCache.write(out, plan, words);
             if (cityBytes != null) {
                 out.write(rawIdentity); out.write(cityBytes); out.writeInt(32 + cityBytes.length);
             }
         }
+        // Preserve a usable canonical cache when derived metadata exceeds the record cap.
+        if (bytes.size() > MAX_BYTES && includePrepared)
+            return encode(mesh, signature, baseSignature, baseSafe, surfaceCompleted, rawIdentity, cities, false);
         if(bytes.size()>MAX_BYTES)throw new IOException("mesh record too large");
         return bytes.toByteArray();
     }
 
     static PredictionMesh decode(byte[] bytes, byte[] signature, int expectedAxis) throws IOException {
-        MeshRecord result = decodeRecord(bytes, signature, null, expectedAxis);
+        return decode(bytes, signature, expectedAxis, 0);
+    }
+
+    static PredictionMesh decode(byte[] bytes, byte[] signature, int expectedAxis, int spacing) throws IOException {
+        MeshRecord result = decodeRecord(bytes, signature, null, expectedAxis, null, null, spacing);
         return result == null ? null : result.mesh();
     }
 
@@ -220,6 +243,10 @@ final class PredictionMeshCodec {
         return decodeRecord(bytes, null, baseSignature, expectedAxis);
     }
 
+    static MeshRecord decodeBaseRecord(byte[] bytes, byte[] baseSignature, int expectedAxis, int spacing) throws IOException {
+        return decodeRecord(bytes, null, baseSignature, expectedAxis, null, null, spacing);
+    }
+
     private static MeshRecord decodeRecord(byte[] bytes, byte[] signature, byte[] baseSignature,
                                             int expectedAxis) throws IOException {
         return decodeRecord(bytes, signature, baseSignature, expectedAxis, null, null);
@@ -230,14 +257,27 @@ final class PredictionMeshCodec {
         return decodeRecord(bytes, null, liveBase, axis, rawIdentity, validate);
     }
 
+    static MeshRecord decodeCityBaseRecord(byte[] bytes, byte[] rawIdentity, byte[] liveBase, int axis, int spacing,
+            java.util.function.Predicate<dev.xantha.vss.common.worldgen.LostCityPreview.Tile> validate) throws IOException {
+        return decodeRecord(bytes, null, liveBase, axis, rawIdentity, validate, spacing);
+    }
+
     private static MeshRecord decodeRecord(byte[] bytes, byte[] signature, byte[] baseSignature,
             int expectedAxis, byte[] rawIdentity,
             java.util.function.Predicate<dev.xantha.vss.common.worldgen.LostCityPreview.Tile> validate) throws IOException {
+        return decodeRecord(bytes, signature, baseSignature, expectedAxis, rawIdentity, validate, 0);
+    }
+
+    private static MeshRecord decodeRecord(byte[] bytes, byte[] signature, byte[] baseSignature,
+            int expectedAxis, byte[] rawIdentity,
+            java.util.function.Predicate<dev.xantha.vss.common.worldgen.LostCityPreview.Tile> validate, int spacing) throws IOException {
         if(bytes.length>MAX_BYTES)throw new IOException("mesh record too large");
         try {
             dev.xantha.vss.common.worldgen.LostCityPreview.Tile cities = null;
             int geometryEnd = bytes.length;
-            if (bytes.length >= 4 && ByteBuffer.wrap(bytes).getInt() == CITY_RECORD_VERSION) {
+            int firstVersion = bytes.length >= 4 ? ByteBuffer.wrap(bytes).getInt() : -1;
+            if (firstVersion == CITY_RECORD_VERSION || firstVersion == DERIVED_CITY_RECORD_VERSION
+                    || firstVersion == PREPARED_CITY_RECORD_VERSION) {
                 int length = ByteBuffer.wrap(bytes).getInt(bytes.length - 4);
                 if (length < 32 || length > bytes.length - 4 - 69) throw new IOException("city mesh footer");
                 geometryEnd = bytes.length - 4 - length;
@@ -250,7 +290,9 @@ final class PredictionMeshCodec {
             }
             var stream=new ByteArrayInputStream(bytes);var header=new DataInputStream(stream);
             int recordVersion = header.readInt();
-            if(recordVersion != 8 && recordVersion != RECORD_VERSION && recordVersion != CITY_RECORD_VERSION)return null;
+            boolean preparedRecord = recordVersion == PREPARED_RECORD_VERSION || recordVersion == PREPARED_CITY_RECORD_VERSION;
+            if(recordVersion != 8 && recordVersion != RECORD_VERSION && recordVersion != DERIVED_RECORD_VERSION
+                    && recordVersion != CITY_RECORD_VERSION && recordVersion != DERIVED_CITY_RECORD_VERSION && !preparedRecord)return null;
             byte[] fullIdentity=header.readNBytes(32), storedBase=header.readNBytes(32);
             boolean storedBaseSafe=header.readBoolean();
             if(fullIdentity.length != 32 || storedBase.length != 32
@@ -269,7 +311,12 @@ final class PredictionMeshCodec {
             }
             var in=ByteBuffer.wrap(bytes);in.limit(geometryEnd);in.position(bytes.length-stream.available());
             int[] words=ints(in);if(words.length%12!=0 || terrain>words.length/12 || sprites>words.length/12)throw new IOException("mesh quads");
+            int sourceWords = preparedRecord ? in.getInt() : words.length;
+            if (sourceWords < 0 || sourceWords > words.length || sourceWords % 12 != 0
+                    || terrain > sourceWords / 12 || sprites > sourceWords / 12) throw new IOException("mesh source length");
+            var referenced = new BitSet(256);
             for(int i=6;i<words.length;i+=12){int old=words[i]&0xffff;if(old>=256||rows[old]<0)throw new IOException("mesh unresolved material");
+                referenced.set(old);
                 // CPU seam colours use alpha=255 for flat; packed GPU quads
                 // use row zero. Never sample the unallocated atlas row 255.
                 int row=rows[old]==VssLodSpriteTable.FLAT?0:rows[old];
@@ -280,10 +327,10 @@ final class PredictionMeshCodec {
             int tend=0,wend=terrain;
             for(int i=0;i<count;i++) {
                 tf[i]=in.getInt();tc[i]=in.getInt();wf[i]=in.getInt();wc[i]=in.getInt();
-                if(tf[i]!=(tc[i]==0?0:tend)||wf[i]!=(wc[i]==0?0:wend)||tc[i]<0||wc[i]<0||tc[i]>terrain-tend||wc[i]>words.length/12-wend)throw new IOException("mesh ranges");
+                if(tf[i]!=(tc[i]==0?0:tend)||wf[i]!=(wc[i]==0?0:wend)||tc[i]<0||wc[i]<0||tc[i]>terrain-tend||wc[i]>sourceWords/12-wend)throw new IOException("mesh ranges");
                 tend+=tc[i];wend+=wc[i];
             }
-            if(tend!=terrain||wend!=words.length/12)throw new IOException("mesh range totals");
+            if(tend!=terrain||wend!=sourceWords/12)throw new IOException("mesh range totals");
             var seams=new PredictionSeamMesh(in,axis);
             seams.remapMaterials(rows);
             boolean surfaceCompleted = false;
@@ -292,10 +339,20 @@ final class PredictionMeshCodec {
                 if (complete > 1 || complete == 1 && !storedBaseSafe)throw new IOException("mesh surface completion");
                 surfaceCompleted = complete == 1;
             }
+            var plan = preparedRecord ? PredictionMeshDerivedCache.read(in, sourceWords, words.length / 12, tf, tc) : null;
             if(in.hasRemaining())throw new IOException("trailing mesh bytes");
-            var packed=new PredictionPackedMesh(words,axis,terrain,tf,tc,wf,wc,down,sprites);
+            PredictionPackedMesh packed;
+            boolean prepared = plan != null && plan.compatible(rows, referenced);
+            if (prepared) {
+                packed = PredictionPackedMesh.restorePrepared(words, axis, terrain, tf, tc, wf, wc, down, sprites, plan);
+            } else {
+                if (sourceWords != words.length) words = Arrays.copyOf(words, sourceWords);
+                packed = preparedRecord || recordVersion == DERIVED_RECORD_VERSION || recordVersion == DERIVED_CITY_RECORD_VERSION
+                        ? PredictionPackedMesh.restoreMerged(words, axis, terrain, tf, tc, wf, wc, down, sprites, spacing)
+                        : PredictionPackedMesh.scanMerged(words,axis,terrain,tf,tc,wf,wc,down,sprites,spacing);
+            }
             packed.morph(null,min,max); // Parent and upload age belong to this session.
-            return new MeshRecord(PredictionMesh.restored(vertices,waterVertices,packed,seams), surfaceCompleted, cities, storedBase, fullIdentity);
+            return new MeshRecord(PredictionMesh.restored(vertices,waterVertices,packed,seams), surfaceCompleted, cities, storedBase, fullIdentity, prepared);
         } catch (BufferUnderflowException | IndexOutOfBoundsException malformed) { throw new IOException("truncated mesh",malformed); }
     }
 

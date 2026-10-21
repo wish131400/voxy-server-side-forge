@@ -32,9 +32,9 @@ public final class WorldgenProfileBuilder {
         for (ServerLevel level : server.getAllLevels()) {
             if (dimension != null && !dimension.equals(level.dimension())) continue;
             if (generators.size() >= WorldgenProfileS2CPayload.MAX_DIMENSIONS) break;
-            generators.put(level, WorldgenCodecSnapshot.encodeGenerator(
+            generators.put(level, WorldgenCodecSnapshot.withDimensionType(WorldgenCodecSnapshot.encodeGenerator(
                     level.getChunkSource().getGenerator(), server.registryAccess(), references, dependencies,
-                    TerraBlenderRegionSnapshot.regionTypeFor(level)));
+                    TerraBlenderRegionSnapshot.regionTypeFor(level)), level.dimensionType()));
         }
         Encoded registries = WorldgenCodecSnapshot.encodeRegistries(server.registryAccess(), server.getResourceManager(), references, dependencies);
         long registryFingerprint = fingerprintBytes(registries.bytes());

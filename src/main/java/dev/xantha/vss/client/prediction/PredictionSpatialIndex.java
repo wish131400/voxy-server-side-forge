@@ -132,7 +132,8 @@ final class PredictionSpatialIndex<T> {
         // The exact tile culling box is inflated by two blocks for seam and
         // rasterization tolerance. Keep the broad phase at least as wide so
         // a tile visible only on a frustum edge cannot be dropped here.
-        if (frustum != null && !frustum.isVisible(new AABB(bx,nodeMinY,bz,bx+span,nodeMaxY,bz+span).inflate(2.0D))) return;
+        if (frustum != null && !frustum.isVisible(new AABB(bx - 2.0D, nodeMinY - 2.0D, bz - 2.0D,
+                bx + span + 2.0D, nodeMaxY + 2.0D, bz + span + 2.0D))) return;
         T value=values[lod].get(key);
         if (value!=null) visit.accept(value);
         if (lod==0) return;

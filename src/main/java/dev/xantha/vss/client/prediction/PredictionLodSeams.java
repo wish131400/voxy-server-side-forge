@@ -8,10 +8,33 @@ import java.util.*;
 
 /** Connects the selected surface heights at ownership boundaries. No world-bottom skirts. */
 final class PredictionLodSeams {
-    record Surface(PredictionTile tile, boolean[] allowed) { }
+    record Surface(PredictionTile tile, boolean[] allowed, PredictionCoverageGrid grid) {
+        Surface(PredictionTile tile, boolean[] allowed) { this(tile,allowed,null); }
+        int nodes() { return grid == null ? allowed.length : grid.size(); }
+        boolean owns(int node) { return grid == null ? allowed[node] : grid.leaf(node) && grid.ground(node); }
+        int cell(int node) { return grid == null ? node : grid.source(node); }
+        int step(int node) { return grid == null ? tile.spacingBlocks() : grid.step(node); }
+        int x(int node) { return grid == null ? node % tile.cellAxis() * tile.spacingBlocks() : grid.x(node); }
+        int z(int node) { return grid == null ? node / tile.cellAxis() * tile.spacingBlocks() : grid.z(node); }
+        int nodeAt(int x, int z) { return grid == null ? cellAt(tile,x,z) : grid.nodeAt(x-tile.baseBlockX(),z-tile.baseBlockZ()); }
+        boolean ownsAt(int x, int z) {
+            if(x<tile.baseBlockX() || z<tile.baseBlockZ() || x>=tile.baseBlockX()+tile.spanBlocks() || z>=tile.baseBlockZ()+tile.spanBlocks()) return false;
+            int node=nodeAt(x,z); return node>=0 && node<nodes() && owns(node);
+        }
+    }
     record Patch(Surface surface, PredictionPackedMesh mesh, net.minecraft.world.phys.AABB bounds) {
         Patch(Surface surface, PredictionPackedMesh mesh) {
             this(surface, mesh, bounds(surface.tile(), mesh));
+        }
+
+        Patch rebind(Surface next) {
+            var tile = next.tile();
+            // The words did not change. Retain their already computed extent,
+            // but include a replacement terrain's possibly wider depth bound.
+            var extent = new net.minecraft.world.phys.AABB(bounds.minX,
+                    Math.min(bounds.minY, tile.depthBound().minY() - 2), bounds.minZ,
+                    bounds.maxX, Math.max(bounds.maxY, tile.depthBound().maxY() + 2), bounds.maxZ);
+            return new Patch(next, mesh, extent);
         }
 
         private static net.minecraft.world.phys.AABB bounds(PredictionTile tile, PredictionPackedMesh mesh) {
@@ -37,13 +60,13 @@ final class PredictionLodSeams {
     private final Map<PredictionTileKey, byte[]> boundaryMasks = new HashMap<>();
     private final Index index = new Index(List.of());
     private final Map<PredictionTileKey, Cached> cache = new HashMap<>();
-    private long localReuses, updatedSurfaces;
+    private long localReuses, updatedSurfaces, inputReuses;
     long localReuses() { return localReuses; }
     long updatedSurfaces() { return updatedSurfaces; }
     byte[] boundaryMask(PredictionTileKey key) { return boundaryMasks.get(key); }
     Index index() { return index; }
     Surface surface(PredictionTileKey key) { return previous.get(key); }
-    private record Cached(Surface source, int[] edges, Surface[] neighbors, PredictionPackedMesh mesh, Patch patch) { }
+    private record Cached(Surface source, int[] edges, PredictionPackedMesh mesh, Patch patch) { }
     record Changes(Map<PredictionTileKey, Patch> patches, Set<PredictionTileKey> removed,
                    Set<PredictionTileKey> boundaries, Set<PredictionTileKey> surfaces) {
         static final Changes EMPTY = new Changes(Map.of(),Set.of(),Set.of(),Set.of());
@@ -57,7 +80,8 @@ final class PredictionLodSeams {
         for (var surface:surfaces) {
             removed.remove(surface.tile().key());
             var old=previous.get(surface.tile().key());
-            if(old==null || old.tile()!=surface.tile() || !Arrays.equals(old.allowed(),surface.allowed())) changed.add(surface);
+            if(old==null || old.tile()!=surface.tile() || !Arrays.equals(old.allowed(),surface.allowed())
+                    || !PredictionCoverageGrid.same(old.grid(),surface.grid())) changed.add(surface);
         }
         if(changed.isEmpty() && removed.isEmpty()) return patches;
         apply(changed,removed);
@@ -74,6 +98,7 @@ final class PredictionLodSeams {
         var changes=new LinkedHashMap<PredictionTileKey,Surface>();
         var removed=new HashSet<PredictionTileKey>();
         var footprints=new ArrayList<PredictionTile>();
+        var rebound=new LinkedHashMap<PredictionTileKey,Surface>();
         for(var key:removals) {
             var old=previous.get(key);
             if(old!=null) { removed.add(key);footprints.add(old.tile()); }
@@ -82,12 +107,19 @@ final class PredictionLodSeams {
             var key=surface.tile().key();
             var old=previous.get(key);
             removed.remove(key);
-            if(old!=null && old.tile()==surface.tile() && Arrays.equals(old.allowed(),surface.allowed())) continue;
+            if(old!=null && old.tile()==surface.tile() && Arrays.equals(old.allowed(),surface.allowed())
+                    && PredictionCoverageGrid.same(old.grid(),surface.grid())) continue;
+            if (old != null && sameInputs(old, surface)) {
+                // Geometry/coverage dependencies, rather than tile identity or
+                // build revision, determine whether neighbouring seams change.
+                rebound.put(key, new Surface(surface.tile(), old.allowed(), old.grid()));
+                continue;
+            }
             changes.put(key,surface);
             if(old!=null) footprints.add(old.tile());
             footprints.add(surface.tile());
         }
-        if(changes.isEmpty() && removed.isEmpty()) return Changes.EMPTY;
+        if(changes.isEmpty() && removed.isEmpty() && rebound.isEmpty()) return Changes.EMPTY;
         var affected=new HashSet<PredictionTileKey>();
         for(var tile:footprints) affected(tile,affected);
         for(var key:removed) {
@@ -95,6 +127,17 @@ final class PredictionLodSeams {
             boundaryMasks.remove(key);patchByKey.remove(key);
         }
         for(var entry:changes.entrySet()) { previous.put(entry.getKey(),entry.getValue());index.put(entry.getValue()); }
+        var upserts=new LinkedHashMap<PredictionTileKey,Patch>();
+        for (var entry : rebound.entrySet()) {
+            var key = entry.getKey(); var surface = entry.getValue();
+            previous.put(key, surface); index.put(surface); inputReuses++;
+            var old = cache.get(key);
+            if (old != null) {
+                var patch = old.patch() == null ? null : old.patch().rebind(surface);
+                cache.put(key, new Cached(surface, old.edges(), old.mesh(), patch));
+                if (patch != null) { patchByKey.put(key, patch); upserts.put(key, patch); }
+            }
+        }
         for(var tile:footprints) affected(tile,affected);
         localReuses+=Math.max(0,cache.size()-affected.stream().filter(cache::containsKey).count());
         // Publish all changed masks before rebuilding any seam that consults a neighbor.
@@ -105,7 +148,6 @@ final class PredictionLodSeams {
             var surface=previous.get(key);
             if(surface!=null) boundaryMasks.put(key,PredictionBoundaryWalls.build(surface,index));
         }
-        var upserts=new LinkedHashMap<PredictionTileKey,Patch>();
         var retired=new HashSet<>(removed);
         for(var key:affected) {
             var surface=previous.get(key);
@@ -118,7 +160,18 @@ final class PredictionLodSeams {
             else { patchByKey.put(key,item.patch());upserts.put(key,item.patch()); }
         }
         var changedKeys=new HashSet<>(removed);changedKeys.addAll(changes.keySet());
+        changedKeys.addAll(rebound.keySet());
         return new Changes(upserts,retired,affected,changedKeys);
+    }
+
+    private static boolean sameInputs(Surface old, Surface next) {
+        var a = old.tile(); var b = next.tile();
+        return a.cellAxis() == b.cellAxis() && a.spacingBlocks() == b.spacingBlocks()
+                && a.baseBlockX() == b.baseBlockX() && a.baseBlockZ() == b.baseBlockZ()
+                && Arrays.equals(old.allowed(), next.allowed())
+                && PredictionCoverageGrid.same(old.grid(),next.grid())
+                && Arrays.equals(a.samples(), b.samples())
+                && a.mesh().seamMesh().sameContent(b.mesh().seamMesh());
     }
 
     private void affected(PredictionTile tile,Set<PredictionTileKey> keys) {
@@ -128,47 +181,46 @@ final class PredictionLodSeams {
     }
 
     String diagnostics() { return "mode=incremental,builds=" + PredictionSeamMesh.builds()
-            + ",localReuses=" + localReuses + ",updated=" + updatedSurfaces; }
+            + ",localReuses=" + localReuses + ",inputReuses=" + inputReuses + ",updated=" + updatedSurfaces; }
     long wallIndexBuilds() { return PredictionSeamMesh.builds(); }
+    List<Patch> patchesSnapshot() { return List.copyOf(patchByKey.values()); }
     void clear() { previous.clear();patches=List.of();patchByKey.clear();cache.clear();boundaryMasks.clear();index.clear(); }
 
     private static Cached stitch(Surface surface, Index index, Cached old) {
-        boolean sameSource = old != null && old.source() == surface;
-        int[] edges = sameSource ? old.edges() : boundaryEdges(surface);
-        Surface[] neighbors = sameSource ? old.neighbors() : new Surface[edges.length];
-        boolean sameNeighbors = sameSource;
-        int axis = surface.tile().cellAxis(), step = surface.tile().spacingBlocks();
-        for (int i = 0; i < edges.length; i++) {
-            int edge = edges[i], cell = edge >>> 2, direction = edge & 3;
-            int nx = direction == 0 ? -1 : direction == 1 ? 1 : 0;
-            int nz = direction == 2 ? -1 : direction == 3 ? 1 : 0;
-            int wx = surface.tile().baseBlockX() + (cell % axis) * step;
-            int wz = surface.tile().baseBlockZ() + (cell / axis) * step;
-            Surface neighbor = index.at(wx + (nx < 0 ? -1 : nx > 0 ? step : step / 2),
-                    wz + (nz < 0 ? -1 : nz > 0 ? step : step / 2));
-            if (sameSource && neighbor != old.neighbors()[i]) {
-                if (sameNeighbors) neighbors = neighbors.clone();
-                sameNeighbors = false;
-            }
-            if (!sameNeighbors) neighbors[i] = neighbor;
-        }
-        // An edge midpoint can remain unchanged while another segment changes.
-        // Regional reuse above is the safe cache check for mixed-resolution edges.
+        boolean sameCoverage = old != null && old.source().tile().cellAxis() == surface.tile().cellAxis()
+                && Arrays.equals(old.source().allowed(), surface.allowed()) && PredictionCoverageGrid.same(old.source().grid(),surface.grid());
+        int[] edges = sameCoverage ? old.edges() : boundaryEdges(surface);
+        int axis = surface.tile().cellAxis();
         var words = new IntArrayList();
         for (int i = 0; i < edges.length; i++) {
-            int cell = edges[i] >>> 2, direction = edges[i] & 3;
-            edge(surface, neighbors[i], index, words, cell, cell % axis, cell / axis,
-                    direction == 0 ? -1 : direction == 1 ? 1 : 0,
-                    direction == 2 ? -1 : direction == 3 ? 1 : 0);
+            int edge = edges[i], node = edge >>> 2, cell = surface.cell(node), direction = edge & 3;
+            int step=surface.step(node);
+            int nx = direction == 0 ? -1 : direction == 1 ? 1 : 0;
+            int nz = direction == 2 ? -1 : direction == 3 ? 1 : 0;
+            int wx = surface.tile().baseBlockX() + surface.x(node);
+            int wz = surface.tile().baseBlockZ() + surface.z(node);
+            Surface neighbor = index.at(wx + (nx < 0 ? -1 : nx > 0 ? step : step / 2),
+                    wz + (nz < 0 ? -1 : nz > 0 ? step : step / 2));
+            edge(surface, neighbor, index, words, cell, surface.x(node), surface.z(node), step, nx, nz);
         }
-        var mesh = PredictionPackedMesh.terrainRecords(words.toIntArray(), axis);
-        return new Cached(surface, edges, neighbors, mesh, mesh.quadCount() == 0 ? null : new Patch(surface, mesh));
+        var mesh = PredictionPackedMesh.seamRecords(words.toIntArray(), axis);
+        return new Cached(surface, edges, mesh, mesh.quadCount() == 0 ? null : new Patch(surface, mesh));
     }
 
     private static int[] boundaryEdges(Surface surface) {
         PredictionTile tile = surface.tile();
         int axis = tile.cellAxis();
         var edges = new IntArrayList();
+        if(surface.grid()!=null) {
+            for(int node=0;node<surface.nodes();node++) if(surface.owns(node)) {
+                int x=surface.tile().baseBlockX()+surface.x(node),z=surface.tile().baseBlockZ()+surface.z(node),step=surface.step(node);
+                for(int dir=0;dir<4;dir++) {
+                    int nx=dir==0?-1:dir==1?1:0,nz=dir==2?-1:dir==3?1:0;
+                    if(!surface.ownsAt(x+(nx<0?-1:nx>0?step:step/2),z+(nz<0?-1:nz>0?step:step/2))) edges.add(node*4+dir);
+                }
+            }
+            return edges.toIntArray();
+        }
         for (int z = 0; z < axis; z++) for (int x = 0; x < axis; x++) {
             int cell = z * axis + x;
             if (!surface.allowed()[cell]) continue;
@@ -181,24 +233,24 @@ final class PredictionLodSeams {
     }
 
     private static void edge(Surface source, Surface adjacent, Index index, IntArrayList words,
-                             int cell, int x, int z, int nx, int nz) {
+                             int cell, int x, int z, int step, int nx, int nz) {
         PredictionTile tile = source.tile();
         PredictionTile neighbor = adjacent == null ? null : adjacent.tile();
-        int step = tile.spacingBlocks();
-        int wx = tile.baseBlockX() + x * step, wz = tile.baseBlockZ() + z * step;
+        int wx = tile.baseBlockX() + x, wz = tile.baseBlockZ() + z;
         int adjacentX = wx + (nx < 0 ? -1 : nx > 0 ? step : step / 2);
         int adjacentZ = wz + (nz < 0 ? -1 : nz > 0 ? step : step / 2);
         if (neighbor == null || neighbor == tile) return;
         // The finer side enumerates the seam, splitting every coarse edge at
         // its actual fine-cell endpoints. Equal levels emit each seam once.
-        if (step > neighbor.spacingBlocks() || step == neighbor.spacingBlocks() && nx + nz < 0) return;
+        int neighborStep=adjacent.step(adjacent.nodeAt(adjacentX,adjacentZ));
+        if (step > neighborStep || step == neighborStep && nx + nz < 0) return;
         int neighborCell = cellAt(neighbor, adjacentX, adjacentZ);
         var ownSample = tile.samples()[PredictionGpuTile.sampleIndexForCell(cell, tile.cellAxis())];
         var otherSample = neighbor.samples()[PredictionGpuTile.sampleIndexForCell(neighborCell, neighbor.cellAxis())];
         if (PredictionExteriorColumns.interiorVolume(ownSample) || PredictionExteriorColumns.interiorVolume(otherSample)) {
             if (PredictionExteriorColumns.interiorVolume(ownSample) && PredictionExteriorColumns.interiorVolume(otherSample)) {
-                volumeEdge(source, adjacent, index, words, cell, x, z, nx, nz, ownSample, otherSample, true);
-                volumeEdge(source, adjacent, index, words, cell, x, z, nx, nz, otherSample, ownSample, false);
+                volumeEdge(source, adjacent, index, words, cell, x, z, step, nx, nz, ownSample, otherSample, true);
+                volumeEdge(source, adjacent, index, words, cell, x, z, step, nx, nz, otherSample, ownSample, false);
             }
             return;
         }
@@ -209,21 +261,20 @@ final class PredictionLodSeams {
         if (!ownQuads.hasTop(cell) || !neighborQuads.hasTop(neighborCell)) return;
         int ownY = Math.round(ownQuads.topY(cell)), otherY = Math.round(neighborQuads.topY(neighborCell));
         if (PredictionExteriorColumns.profiled(ownSample) || PredictionExteriorColumns.profiled(otherSample)) {
-            exteriorEdge(source, adjacent, index, words, cell, x, z, nx, nz, ownY, otherY, true);
-            exteriorEdge(source, adjacent, index, words, cell, x, z, nx, nz, otherY, ownY, false);
+            exteriorEdge(source, adjacent, index, words, cell, x, z, step, nx, nz, ownY, otherY, true);
+            exteriorEdge(source, adjacent, index, words, cell, x, z, step, nx, nz, otherY, ownY, false);
         } else if (ownY != otherY) {
-            exteriorEdge(source, adjacent, index, words, cell, x, z, nx, nz,
+            exteriorEdge(source, adjacent, index, words, cell, x, z, step, nx, nz,
                     Math.max(ownY, otherY), Math.min(ownY, otherY), ownY > otherY);
         }
     }
 
     private static void exteriorEdge(Surface source, Surface adjacent, Index index, IntArrayList words,
-            int cell, int x, int z, int nx, int nz, int top, int neighborY, boolean own) {
+            int cell, int x, int z, int step, int nx, int nz, int top, int neighborY, boolean own) {
         var tile = source.tile();
-        int step = tile.spacingBlocks();
         var higher = own ? tile : adjacent.tile();
         var other = own ? adjacent.tile() : tile;
-        int wx = tile.baseBlockX() + x * step, wz = tile.baseBlockZ() + z * step;
+        int wx = tile.baseBlockX() + x, wz = tile.baseBlockZ() + z;
         int neighborCell = cellAt(adjacent.tile(), wx + (nx < 0 ? -1 : nx > 0 ? step : step / 2),
                 wz + (nz < 0 ? -1 : nz > 0 ? step : step / 2));
         int higherCell = own ? cell : neighborCell, otherCell = own ? neighborCell : cell;
@@ -232,7 +283,7 @@ final class PredictionLodSeams {
         int tint = higher.mesh().seamMesh().topColor(higherCell);
         int normalX = own ? nx : -nx, normalZ = own ? nz : -nz;
         int face = normalX > 0 ? 4 : normalX < 0 ? 3 : normalZ > 0 ? 2 : 1;
-        int ax = (x + (nx > 0 ? 1 : 0)) * step, az = (z + (nz > 0 ? 1 : 0)) * step;
+        int ax = x + (nx > 0 ? step : 0), az = z + (nz > 0 ? step : 0);
         int bx = ax + (nz != 0 ? step : 0), bz = az + (nx != 0 ? step : 0);
         var gaps = new ArrayList<>(PredictionWallEvidence.exposed(sample, otherSample, top, neighborY,
                 higher.spacingBlocks(), other.spacingBlocks()));
@@ -283,10 +334,10 @@ final class PredictionLodSeams {
     record HeightSpan(int bottom, int top) { }
 
     private static void volumeEdge(Surface source, Surface adjacent, Index index, IntArrayList words,
-            int cell, int x, int z, int nx, int nz, ClientColumnSample solid, ClientColumnSample other, boolean own) {
+            int cell, int x, int z, int step, int nx, int nz, ClientColumnSample solid, ClientColumnSample other, boolean own) {
         var tile = source.tile();
-        int step = tile.spacingBlocks(), dx = own ? nx : -nx, dz = own ? nz : -nz;
-        int ax = (x + (nx > 0 ? 1 : 0)) * step, az = (z + (nz > 0 ? 1 : 0)) * step;
+        int dx = own ? nx : -nx, dz = own ? nz : -nz;
+        int ax = x + (nx > 0 ? step : 0), az = z + (nz > 0 ? step : 0);
         int bx = ax + (nz != 0 ? step : 0), bz = az + (nx != 0 ? step : 0);
         var volume = solid.volume();
         for (int i = 0; i < volume.size(); i++) {
@@ -362,7 +413,7 @@ final class PredictionLodSeams {
             for (int i = 0; i < spans.length; i++) {
                 int span = spans[i];
                 Surface surface = levelTables[i].get(key(Math.floorDiv(x, span), Math.floorDiv(z, span)));
-                if (surface != null && surface.allowed()[cellAt(surface.tile(), x, z)]) return surface;
+                if (surface != null && surface.ownsAt(x,z)) return surface;
             }
             return null;
         }

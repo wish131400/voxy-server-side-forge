@@ -27,11 +27,11 @@ class PredictionRendererTest {
     }
 
     @Test
-    void periodicExpiryRetainsOwnershipButChangedOwnersInvalidateTheMask() {
+    void ownershipVersionsRetainStableMasksAndRejectChangedOwners() {
         var view = new PredictionRenderer.CoverageView(0, 0, 700.0, null);
         var coverage = new PredictionRenderer.TileCoverage(new boolean[]{true}, 1, 1, 0, 0);
-        var cached = new PredictionRenderer.CachedCoverage(1L, 5L, 0L, view, coverage);
-        // Already expired, yet safe to keep while the optional probe waits.
+        var cached = new PredictionRenderer.CachedCoverage(1L, 5L, view, coverage);
+        // Ownership is versioned; no timer can silently retire this proof.
         assertTrue(cached.matchesOwnership(1L, 5L, view));
         assertFalse(cached.matchesOwnership(1L, 6L, view));
         assertFalse(cached.matchesOwnership(2L, 5L, view));
@@ -40,7 +40,7 @@ class PredictionRendererTest {
     @Test
     void movementAndTelescopeChangesInvalidateTheWholeCoverageView() {
         var view = new PredictionRenderer.CoverageView(0, 0, 700.0, null);
-        var cached = new PredictionRenderer.CachedCoverage(1L, 5L, Long.MAX_VALUE, view, null);
+        var cached = new PredictionRenderer.CachedCoverage(1L, 5L, view, null);
         assertFalse(cached.matchesOwnership(1L, 5L,
                 new PredictionRenderer.CoverageView(1, 0, 700.0, null)));
         assertFalse(cached.matchesOwnership(1L, 5L,

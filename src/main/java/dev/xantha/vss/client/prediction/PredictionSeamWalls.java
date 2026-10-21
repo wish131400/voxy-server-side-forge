@@ -67,6 +67,19 @@ final class PredictionSeamWalls {
     int bottom(int record) { int at = record * stride; return stride == 5 ? words[at + 2] : heightBase + (words[at + stride - 2] & 65535); }
     int top(int record) { int at = record * stride; return stride == 5 ? words[at + 3] : heightBase + (words[at + stride - 2] >>> 16); }
 
+    boolean sameContent(PredictionSeamWalls other) {
+        if (this == other) return true;
+        if (count() != other.count()) return false;
+        if (stride == other.stride && heightBase == other.heightBase
+                && java.util.Arrays.equals(endpoints, other.endpoints))
+            return java.util.Arrays.equals(words, other.words);
+        // Raw cache records and compact records have the same meaning.
+        for (int i = 0; i < count(); i++)
+            if (firstBits(i) != other.firstBits(i) || lastBits(i) != other.lastBits(i)
+                    || bottom(i) != other.bottom(i) || top(i) != other.top(i) || flags(i) != other.flags(i)) return false;
+        return true;
+    }
+
     /** Preserve the existing disk format without allocating an expanded array. */
     void writeCache(DataOutputStream out) throws IOException {
         out.writeInt(count() * 5);

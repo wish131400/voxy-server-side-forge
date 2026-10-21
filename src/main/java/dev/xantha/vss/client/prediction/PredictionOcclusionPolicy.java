@@ -14,6 +14,38 @@ final class PredictionOcclusionPolicy {
     private long revision, ownership, epoch;
     private double x, y, z;
     private double directMs, culledMs;
+    private long restarts, completedComparisons;
+    private final Matrix4f previousView = new Matrix4f();
+    private boolean settling;
+    private int quietFrames;
+    private long quads = -1;
+    private double previousX, previousY, previousZ;
+
+    /** Keep the last measured decision during motion; visibility itself is always current-frame. */
+    boolean chooseStable(Matrix4f transform, double cx, double cy, double cz,
+                         int w, int h, long candidateQuads, long materials) {
+        if (!initialized || width != w || height != h || ownership != materials) {
+            initialized = true; width = w; height = h; ownership = materials;
+            x = cx; y = cy; z = cz; view.set(transform); previousView.set(transform);
+            previousX = cx; previousY = cy; previousZ = cz; quads = candidateQuads;
+            settling = false; quietFrames = 0; restart();
+        } else {
+            boolean moving = !previousView.equals(transform, .012f)
+                    || Math.abs(cx - previousX) > 1 || Math.abs(cy - previousY) > 1 || Math.abs(cz - previousZ) > 1;
+            boolean workloadChanged = Math.abs(candidateQuads - quads) > Math.max(256, quads / 4);
+            previousView.set(transform); previousX = cx; previousY = cy; previousZ = cz;
+            if (moving || workloadChanged) {
+                if (!settling) { epoch++; comparing = false; culling = winner; settling = true; }
+                quietFrames = 0; quads = candidateQuads;
+            } else if (settling && ++quietFrames >= 12) {
+                settling = false; x = cx; y = cy; z = cz; view.set(transform); quads = candidateQuads;
+                restart();
+            }
+        }
+        if (!settling && !comparing && ++stableAge >= RECHECK) restart();
+        age++;
+        return culling;
+    }
 
     boolean choose(Matrix4f transform, double cx, double cy, double cz,
                    int w, int h, long residency, long coverage) {
@@ -30,7 +62,7 @@ final class PredictionOcclusionPolicy {
     }
 
     private void restart() {
-        epoch++; Arrays.fill(counts, 0); comparing = true; culling = winner; age = stableAge = 0;
+        epoch++; restarts++; Arrays.fill(counts, 0); comparing = true; culling = winner; age = stableAge = 0;
     }
 
     long epoch() { return epoch; }
@@ -48,6 +80,7 @@ final class PredictionOcclusionPolicy {
         if (culledMs > directMs + margin) winner = false;
         else if (culledMs < directMs - margin) winner = true;
         culling = winner; comparing = false; age = stableAge = 0;
+        completedComparisons++;
     }
 
     private static double trimmed(double[] values) {
@@ -58,7 +91,8 @@ final class PredictionOcclusionPolicy {
     }
 
     String diagnostics() {
-        return ",occlusionPolicy=" + (comparing ? "measuring-" : "selected-") + (culling ? "hiz" : "direct")
-                + ",directGpuMs=" + directMs + ",culledGpuMs=" + culledMs;
+        return ",occlusionPolicy=" + (settling ? "moving-" : comparing ? "measuring-" : "selected-") + (culling ? "hiz" : "direct")
+                + ",directGpuMs=" + directMs + ",culledGpuMs=" + culledMs
+                + ",occlusionRestarts=" + restarts + ",occlusionComparisons=" + completedComparisons;
     }
 }

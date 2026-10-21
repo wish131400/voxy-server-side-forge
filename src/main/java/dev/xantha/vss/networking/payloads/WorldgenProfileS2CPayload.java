@@ -19,7 +19,7 @@ public record WorldgenProfileS2CPayload(
         int registriesRawSize,
         byte[] registries,
         List<DimensionProfile> dimensions) {
-    public static final int FORMAT_VERSION = 3;
+    public static final int FORMAT_VERSION = 5;
     public static final int MAX_DIMENSIONS = 64;
     public static final int MAX_STRING_LENGTH = 8192;
     public static final int MAX_REGISTRIES_BYTES = 8 * 1024 * 1024;

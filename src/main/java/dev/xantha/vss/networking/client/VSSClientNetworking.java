@@ -38,6 +38,12 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent;
 
+/**
+ * 客户端连接状态与网络事件入口，是握手、协商距离和当前请求管理器的唯一状态来源。
+ * <p>启动时安装 ClientLodSessionAdapter，让 API/预测/兼容层查询同一会话。
+ * 网络消息按平台约定交回客户端线程；异步列处理必须复核连接和维度身份。
+ * 断线清理请求、分片与导入状态，不能依靠渲染器另存一份在线标记。
+ */
 public final class VSSClientNetworking {
     private static volatile boolean serverEnabled;
     private static volatile int serverLodDistance;
@@ -66,6 +72,9 @@ public final class VSSClientNetworking {
     }
 
     public static boolean shouldApplyStrictLodOrder() {
+        // A section-scoped policy cannot complete an authoritative full-column
+        // frontier. Keep ordinary near-first scheduling without that barrier.
+        if (!ClientConnectionIdentity.columnFilterKey().isEmpty()) return false;
         if (serverEnabled) return true;
         if (!waitingForHandshake || !VSSClientConfig.CONFIG.receiveServerLods) return false;
         var connection = Minecraft.getInstance().getConnection();
@@ -174,6 +183,7 @@ public final class VSSClientNetworking {
         sessionConfigRevision = payload.configRevision();
         if (!payload.enabled()
                 || (payload.serverCapabilities() & VSSConstants.CAPABILITY_PREDICTIVE_WORLDGEN) == 0) {
+            dev.xantha.vss.client.prediction.PredictionTemplateRepository.reset();
             ClientPredictionState.clear();
         }
         if (payload.enabled()) {
@@ -184,7 +194,8 @@ public final class VSSClientNetworking {
                 manager = new LodRequestManager(
                         ClientLodPresenceCache.currentScope(),
                         new ClientRequestTracker(),
-                        COLUMN_PROCESSOR::clearPendingTransfers);
+                        COLUMN_PROCESSOR::clearPendingTransfers,
+                        !ClientConnectionIdentity.columnFilterKey().isEmpty());
             }
             boolean requestStateReset = manager.onSessionConfig(payload);
             if (requestStateReset && !newSession) {
@@ -299,6 +310,10 @@ public final class VSSClientNetworking {
             Supplier<NetworkEvent.Context> ignored) { handleDirtyColumns(payload); }
 
     public static void handleVoxelColumn(VoxelColumnS2CPayload payload) {
+        if (!payload.coverage().filterKey().equals(ClientConnectionIdentity.columnFilterKey())) {
+            onColumnTransferFailed(payload.requestId(), payload.transferId(), payload.dimension(), payload.chunkX(), payload.chunkZ());
+            return;
+        }
         if (!isClientLodSessionActive()) {
             return;
         }
@@ -368,7 +383,9 @@ public final class VSSClientNetworking {
                             columnData);
                     if (accepted) {
                         manager.recordStrictSections(column.chunkX(), column.chunkZ(), columnData);
-                        ClientPredictionState.onExactColumn(column.dimension(), column.chunkX(), column.chunkZ(), columnData);
+                        if (columnData.authoritative()) {
+                            ClientPredictionState.onExactColumn(column.dimension(), column.chunkX(), column.chunkZ(), columnData);
+                        }
                     }
                     return accepted;
                 });
@@ -477,6 +494,7 @@ public final class VSSClientNetworking {
 
     @SubscribeEvent
     public static void onClientLogin(ClientPlayerNetworkEvent.LoggingIn event) {
+        dev.xantha.vss.client.prediction.PredictionTemplateRepository.reset();
         WORLDGEN_ASSEMBLY.clear();
         dev.xantha.vss.compat.StrictLodVisibility.reset();
         ClientPredictionState.clear();
@@ -677,6 +695,7 @@ public final class VSSClientNetworking {
     }
 
     private static void stopClientSession(boolean resetStats) {
+        dev.xantha.vss.client.prediction.PredictionTemplateRepository.reset();
         WORLDGEN_ASSEMBLY.clear();
         PREDICTION_CAPABILITY_SYNC.reset();
         predictionOptionKnown = false;

@@ -38,6 +38,9 @@ class PackagedDensityCompilerTest {
         try (var loader = new URLClassLoader(urls, getClass().getClassLoader()) {
             @Override protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
                 boolean isolated = name.startsWith("dev.xantha.vss.client.prediction.Density")
+                        || name.startsWith("dev.xantha.vss.api.worldgen.DensityFunctionTraits")
+                        || name.startsWith("dev.xantha.vss.client.prediction.FreeTerraForged")
+                        || name.startsWith("dev.xantha.vss.common.worldgen.FreeTerraForgedVariant")
                         || name.equals("dev.xantha.vss.client.prediction.PredictionRawDensity")
                         || name.startsWith("dev.xantha.vss.client.prediction.PredictionRawDensity$")
                         || name.equals("dev.xantha.vss.client.prediction.PredictionClimateSampler")
@@ -87,6 +90,29 @@ class PackagedDensityCompilerTest {
             Array.set(roots, 0, range); Array.set(roots, 1, gradient);
             var memoType = loader.loadClass("dev.xantha.vss.client.prediction.DensityMemo");
             var wrap = memoType.getDeclaredMethod("wrapRoots", roots.getClass()); wrap.setAccessible(true);
+            var traits = loader.loadClass("dev.xantha.vss.api.worldgen.DensityFunctionTraits$Traits");
+            var aware = loader.loadClass("dev.xantha.vss.api.worldgen.DensityFunctionTraits$Aware");
+            Object runtimeTraits = traits.getMethod("runtimeOwned").invoke(null);
+            var runtimeCalls = new java.util.concurrent.atomic.AtomicInteger();
+            Object runtimeNode = Proxy.newProxyInstance(loader, new Class<?>[]{function, aware}, (proxy, call, args) -> {
+                String name = call.getName();
+                if (name.equals("vssDensityTraits")) return runtimeTraits;
+                if (name.equals(mapped(names, function, "compute", "(L" + context.getName().replace('.', '/') + ";)D")))
+                    return (double) runtimeCalls.incrementAndGet();
+                if (name.equals(mapped(names, function, "minValue", "()D"))) return -100.0;
+                if (name.equals(mapped(names, function, "maxValue", "()D"))) return 100.0;
+                if (name.equals("hashCode")) return System.identityHashCode(proxy);
+                if (name.equals("equals")) return proxy == args[0];
+                if (name.equals("toString")) return "owned packaged density";
+                throw new AssertionError("runtime-owned node must not be transformed: " + name);
+            });
+            Object runtimeRoots = Array.newInstance(function, 1); Array.set(runtimeRoots, 0, runtimeNode);
+            assertSame(runtimeNode, Array.get(wrap.invoke(null, runtimeRoots), 0));
+            var runtimeCompute = method(function, names, "compute", context);
+            Object samePoint = factory.newInstance(5, 60, -7);
+            assertEquals(1.0, runtimeCompute.invoke(runtimeNode, samePoint));
+            assertEquals(2.0, runtimeCompute.invoke(runtimeNode, samePoint));
+            System.out.println("PACKAGED_TRAITS_OK runtimeOwned=true repeatedStatePreserved=true");
             Object memoRoots = wrap.invoke(null, roots);
             var compiler = loader.loadClass("dev.xantha.vss.client.prediction.DensityGraphCompiler");
             var compile = compiler.getDeclaredMethod("compile", roots.getClass());

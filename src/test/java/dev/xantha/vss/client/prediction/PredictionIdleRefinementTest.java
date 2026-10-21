@@ -9,6 +9,20 @@ import org.junit.jupiter.api.Test;
 import dev.xantha.vss.client.prediction.PredictionTileManager.PredictionTileKey;
 
 class PredictionIdleRefinementTest {
+    @Test void offscreenPromotionCannotBlockNewViewOrConsumeItsTargetBudget() {
+        var policy = new PredictionIdleRefinement();
+        var front = new PredictionTileKey(Level.OVERWORLD, 4, 0, 4);
+        var rear = new PredictionTileKey(Level.OVERWORLD, -4, 0, 4);
+        var base = Map.of(front, 32, rear, 32);
+        var resident = new HashMap<>(base);
+        assertEquals(Map.of(rear, 64), policy.update(base.keySet(), base, resident, layout,
+                key -> key.equals(rear), key -> 10, true, 0));
+        assertEquals(Map.of(front, 64), policy.update(base.keySet(), base, resident, layout,
+                key -> key.equals(front), key -> 10, true, 2_000_000_000L),
+                "an unfinished offscreen optional request must not hold the new view");
+        assertEquals(32, resident.get(rear), "request pruning never deletes or downgrades resident geometry");
+    }
+
     private final VssLodLayout layout = VssLodLayout.of(8192, 2, true, true);
     private final PredictionTileKey root = new PredictionTileKey(Level.OVERWORLD, -2, -3, 4);
 

@@ -111,11 +111,10 @@ class PredictionWarmSurfaceRestoreTest {
                 try (var in = new InflaterInputStream(new ByteArrayInputStream(PredictionCacheTestFiles.read(cache, meshKey)))) {
                     raw = in.readAllBytes();
                 }
-                int footer = ByteBuffer.wrap(raw).getInt(raw.length - 4);
-                int length = raw.length - footer - 4;
-                ByteBuffer.wrap(raw).putInt(36, 9).putInt(32, length - 36);
+                byte[] legacy = PredictionMeshCacheTestRecords.recode(Arrays.copyOfRange(raw, 36, raw.length), 9);
+                ByteBuffer.wrap(raw).putInt(32, legacy.length);
                 var bytes = new ByteArrayOutputStream();
-                try (var out = new DeflaterOutputStream(bytes)) { out.write(raw, 0, length); }
+                try (var out = new DeflaterOutputStream(bytes)) { out.write(raw, 0, 36); out.write(legacy); }
                 PredictionCacheTestFiles.write(cache, meshKey, bytes.toByteArray()); cache.flush();
             }
             PredictionCacheTestFiles.awaitBackgroundClose();
@@ -372,6 +371,23 @@ class PredictionWarmSurfaceRestoreTest {
         assertTrue(upgraded.surfaceReady);
     }
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(ints = {9, 11})
+    void completedCanonicalMeshUpgradesStaticPlanWithoutGatheringSources(int version) throws Exception {
+        var cold = run(directory, 0, false, false);
+        makeLegacy(directory, key(0, false), version);
+        var warm = run(directory, 0, false, false);
+        assertSameOutput(cold, warm);
+        assertEquals(0, warm.sourceReads); assertEquals(0, warm.placements); assertEquals(0, warm.heightCalls);
+        try (var cache = new PredictionDiskCache(directory, 1);
+             var in = new InflaterInputStream(new ByteArrayInputStream(PredictionCacheTestFiles.read(cache, PredictionDiskCache.Key.mesh(key(0, false)))))) {
+            byte[] raw = in.readAllBytes();
+            assertEquals(PredictionMeshCodec.PREPARED_RECORD_VERSION, ByteBuffer.wrap(raw).getInt(36));
+        }
+        PredictionCacheTestFiles.awaitBackgroundClose();
+        assertSameOutput(cold, run(directory, 0, false, false));
+    }
+
     @Test void changedResourcesAndSettingsCannotReuseSurfaceCompletion() throws Exception {
         run(directory, 0, false, false);
         byte[] changed = RESOURCES.clone(); changed[0] = 1;
@@ -526,14 +542,19 @@ class PredictionWarmSurfaceRestoreTest {
     }
 
     static void makeLegacy(Path root, PredictionDiskCache.Key key) throws Exception {
+        makeLegacy(root, key, 8);
+    }
+
+    static void makeLegacy(Path root, PredictionDiskCache.Key key, int version) throws Exception {
         try (var cache = new PredictionDiskCache(root, 1)) {
             byte[] raw;
             try (var in = new InflaterInputStream(new ByteArrayInputStream(PredictionCacheTestFiles.read(cache, PredictionDiskCache.Key.mesh(key))))) {
                 raw = in.readAllBytes();
             }
-            ByteBuffer.wrap(raw).putInt(36, 8).putInt(32, raw.length - 37);
+            byte[] legacy = PredictionMeshCacheTestRecords.recode(Arrays.copyOfRange(raw, 36, raw.length), version);
+            ByteBuffer.wrap(raw).putInt(32, legacy.length);
             var encoded = new ByteArrayOutputStream();
-            try (var out = new DeflaterOutputStream(encoded)) { out.write(raw, 0, raw.length - 1); }
+            try (var out = new DeflaterOutputStream(encoded)) { out.write(raw, 0, 36); out.write(legacy); }
             PredictionCacheTestFiles.write(cache, PredictionDiskCache.Key.mesh(key), encoded.toByteArray()); cache.flush();
         }
         PredictionCacheTestFiles.awaitBackgroundClose();
@@ -547,7 +568,7 @@ class PredictionWarmSurfaceRestoreTest {
         return PredictionMeshCodec.baseSignature(PredictionMeshResources.ready(), data.samples(), data.surfaceTints(), data.foliageTints(),
                 data.waterTints(), 63, 0xff3f76e4, (64 << lod) / data.cellAxis(), true,
                 (VSSClientConfig.CONFIG.predictionTrees ? 1 : 0) | (VSSClientConfig.CONFIG.predictionStructures ? 2 : 0)
-                        | PredictionVegetation.predicateSettings()
+                        | PredictionVegetation.runtimeSettings()
                         | dev.xantha.vss.config.PredictionVegetationDensity.current().settingsBits());
     }
     private static PredictionTileManager manager(ClientTerrainSampler source, PredictionDiskCache cache) {

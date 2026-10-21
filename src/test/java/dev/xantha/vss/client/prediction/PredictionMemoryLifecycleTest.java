@@ -28,19 +28,19 @@ class PredictionMemoryLifecycleTest {
         VSSClientConfig.CONFIG.rememberTerrain = false;
         VSSClientConfig.CONFIG.predictionDistanceBlocks = 1024;
         VSSClientConfig.CONFIG.predictionTrees = false;
-        // Flat samples now share storage; leave only 4 MiB above the workspace
-        // so this regression still exercises actual memory pressure.
-        PredictionMemoryBudget budget = new PredictionMemoryBudget(132L * PredictionMemoryBudget.MIB,
+        // Keep only 4 MiB above the current build allowance: enough to start one
+        // worker, while retained results still exercise actual memory pressure.
+        PredictionMemoryBudget budget = new PredictionMemoryBudget(PredictionMemoryBudget.BUILD_BYTES + 4L * PredictionMemoryBudget.MIB,
                 0, () -> Long.MAX_VALUE, System::nanoTime);
         try (PredictionTileManager manager = new PredictionTileManager(PROFILE.levelKey(), plain(), budget)) {
             var leaves = PredictionLodPlanner.plan(PROFILE.levelKey(), 2261, 123, 3901,
                     manager.layout(), null, 1500);
-            var plan = PredictionTileManager.withCoarseCoverage(leaves, manager.layout());
+            var plan = PredictionLodPlanner.withCoarseCoverage(leaves, manager.layout());
             var roots = plan.stream().filter(key -> key.lod() == manager.layout().levelCount() - 1).toList();
             var previouslyCovered = new HashSet<PredictionTileManager.PredictionTileKey>();
             for (int cycle = 0; cycle < 150; cycle++) {
                 replan(manager);
-                await(() -> manager.pendingCount() == 0);
+                await(() -> manager.pendingCount() == 0 && budget.activeBuildCount() == 0);
                 assertTrue(budget.usedBytes() <= budget.limitBytes());
                 var current = manager.readyTiles().stream().map(PredictionTileManager.PredictionTile::key)
                         .collect(java.util.stream.Collectors.toSet());
@@ -70,11 +70,14 @@ class PredictionMemoryLifecycleTest {
             for (int i = 0; i < 60 && stable < 5; i++) {
                 long builds = manager.builtTileCount();
                 replan(manager);
-                await(() -> manager.pendingCount() == 0);
+                // Publication clears pending before the worker releases its build lease.
+                // Compare completed rounds, not a race with the previous reservation.
+                await(() -> manager.pendingCount() == 0 && budget.activeBuildCount() == 0);
                 stable = manager.builtTileCount() == builds ? stable + 1 : 0;
                 assertTrue(budget.usedBytes() <= budget.limitBytes());
             }
-            assertEquals(5,stable,"a full static view must converge without rebuilding in a loop");
+            assertEquals(5,stable,"a full static view must converge without rebuilding in a loop: "
+                    + manager.surfaceDiagnostics());
             assertTrue(manager.readyCount() < 100, "byte cap must act before the old 2048-tile ceiling");
             System.out.println("bounded manager: tiles=" + manager.readyCount() + ", roots=" + roots.size()
                     + ", residentBytes=" + budget.usedBytes() + ", limit=" + budget.limitBytes());
@@ -100,7 +103,7 @@ class PredictionMemoryLifecycleTest {
             int top = manager.layout().levelCount() - 1;
             var leaves = PredictionLodPlanner.plan(PROFILE.levelKey(), 2261, 123, 3901,
                     manager.layout(), null, 1500);
-            var roots = PredictionTileManager.withCoarseCoverage(leaves, manager.layout())
+            var roots = PredictionLodPlanner.withCoarseCoverage(leaves, manager.layout())
                     .stream().filter(key -> key.lod() == top
                             && PredictionWorkOrder.distanceSquared(key, manager.layout(), 2261, 3901) == 0).toList();
             // Ingest/reload concerns the loaded nearby region. Faraway roots
@@ -123,7 +126,7 @@ class PredictionMemoryLifecycleTest {
                 for (int z = 0; z < span; z++) for (int x = 0; x < span; x++) {
                     manager.invalidate(key.tileX() * span + x, key.tileZ() * span + z);
                 }
-                assertTrue(manager.fullyAuthoritative(key));
+                assertTrue(PredictionDemandTestSupport.fullyAuthoritative(manager, key));
             }
             replan(manager);
             await(() -> manager.pendingCount() == 0);
@@ -190,7 +193,7 @@ class PredictionMemoryLifecycleTest {
     }
 
     private static void replan(PredictionTileManager manager) {
-        for (int tick = 0; tick < 5; tick++) manager.tick(2261, 123, 3901, 1500, null);
+        PredictionClientTestTicks.plan(manager, 2261, 123, 3901, 1500);
     }
 
     @Test
@@ -199,7 +202,7 @@ class PredictionMemoryLifecycleTest {
         VSSClientConfig.CONFIG.rememberTerrain = false;
         CountDownLatch entered = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
-        PredictionMemoryBudget budget = new PredictionMemoryBudget(144L * PredictionMemoryBudget.MIB,
+        PredictionMemoryBudget budget = new PredictionMemoryBudget(PredictionMemoryBudget.BUILD_BYTES + 16L * PredictionMemoryBudget.MIB,
                 0, () -> Long.MAX_VALUE, System::nanoTime);
         ClientTerrainSampler sampler = new ClientTerrainSampler(42, PROFILE) {
             @Override public ClientColumnSample sample(int x, int z) {
@@ -311,11 +314,19 @@ class PredictionMemoryLifecycleTest {
                 coarsePlan(manager);
                 await(() -> manager.pendingCount() == 0);
             } while (manager.readyTiles().stream().filter(tile -> tile.key().equals(old.key()))
-                    .findFirst().orElseThrow().revision() == old.revision() && System.nanoTime() < deadline);
+                    .anyMatch(tile -> tile.revision() == old.revision() || !tile.samples()[0].captured())
+                    && System.nanoTime() < deadline);
             var replacement = manager.readyTiles().stream().filter(tile -> tile.key().equals(old.key()))
                     .findFirst().orElseThrow();
             assertNotEquals(old.revision(), replacement.revision(), "GPU upload key must change");
-            assertTrue(replacement.samples()[0].captured());
+            var cacheField = PredictionTileManager.class.getDeclaredField("sampleCache");
+            cacheField.setAccessible(true);
+            var cache = (VssLodSampleCache) cacheField.get(manager);
+            var cachedBase = cache.get((long) (chunkX * 16) << 32 | (chunkZ * 16) & 0xffffffffL);
+            assertTrue(replacement.samples()[0].captured(), () -> "key=" + old.key()
+                    + ",axis=" + old.cellAxis() + "->" + replacement.cellAxis()
+                    + ",cachedBase=" + cachedBase + ",cacheSize=" + cache.size()
+                    + ",built=" + manager.builtTileCount() + ",pending=" + manager.pendingCount());
             assertFalse(replacement.samples()[0].hasSurface(), "captured air must replace old ground");
             long built = manager.builtTileCount();
             for (int i = 0; i < 5; i++) coarsePlan(manager);
@@ -384,7 +395,7 @@ class PredictionMemoryLifecycleTest {
     }
 
     private static void coarsePlan(PredictionTileManager manager) {
-        for (int i = 0; i < 5; i++) manager.tick(64, 100, 64, .01, null);
+        PredictionClientTestTicks.plan(manager, 64, 100, 64, .01);
     }
 
     private static ClientColumnSample plainColumn() {

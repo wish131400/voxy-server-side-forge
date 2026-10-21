@@ -27,12 +27,12 @@ class PredictionSpatialReplayTest {
             int terrain=Arrays.stream(count).sum();
             int[] original=words.clone();
             var oldBounds=new PredictionMeshletBounds(words);
-            oldRuns+=new PredictionOwnershipRuns(words).ends.length;
+            oldRuns+=new LegacyOwnershipRuns(words).size();
             long start=System.nanoTime();
             int[][] retained=PredictionSpatialOrder.arrange(words,first,count,aquatic);
             elapsed+=System.nanoTime()-start;
             var newBounds=new PredictionMeshletBounds(words);
-            newRuns+=new PredictionOwnershipRuns(words).ends.length;
+            newRuns+=new LegacyOwnershipRuns(words).size();
             int boxes=oldBounds.values.length/6;groups+=boxes;
             oldSpan+=PredictionSpatialOrderTest.meanSpan(oldBounds.values)*boxes;
             newSpan+=PredictionSpatialOrderTest.meanSpan(newBounds.values)*boxes;

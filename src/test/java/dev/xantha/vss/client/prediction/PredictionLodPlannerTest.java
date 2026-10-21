@@ -6,21 +6,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.util.Set;
 import java.util.List;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.junit.jupiter.api.Test;
 
 class PredictionLodPlannerTest {
+    private static ResourceKey<Level> dimension;
+
     @org.junit.jupiter.api.BeforeAll
-    static void bootstrap() { ClientTerrainSamplerTest.bootstrapMinecraft(); }
-    private static final ResourceKey<Level> DIMENSION = ResourceKey.create(
-            net.minecraft.core.registries.Registries.DIMENSION,
-            ResourceLocation.withDefaultNamespace("overworld"));
+    static void bootstrap() {
+        // Registry keys must not initialize before Minecraft's bootstrap in an isolated JVM.
+        ClientTerrainSamplerTest.bootstrapMinecraft();
+        dimension = Level.OVERWORLD;
+    }
 
     @Test
     void plannerProducesFineTilesNearFocusAndCoarseTilesFarAway() {
         List<PredictionTileManager.PredictionTileKey> keys =
-                PredictionLodPlanner.plan(DIMENSION, 0, 0);
+                PredictionLodPlanner.plan(dimension, 0, 0);
         assertTrue(keys.size() <= 512);
         long fine = keys.stream().filter(key -> key.lod() == 0).count();
         long coarse = keys.stream().filter(key -> key.lod() >= 4).count();
@@ -31,7 +33,7 @@ class PredictionLodPlannerTest {
     @Test
     void plannerLeavesDoNotOverlapWhenTheFocusMoves() {
         List<PredictionTileManager.PredictionTileKey> keys =
-                PredictionLodPlanner.plan(DIMENSION, 1_003, -997);
+                PredictionLodPlanner.plan(dimension, 1_003, -997);
         for (int i = 0; i < keys.size(); i++) {
             PredictionTileManager.PredictionTileKey left = keys.get(i);
             int leftSpan = PredictionTileManager.TILE_CHUNKS << left.lod();
@@ -55,28 +57,28 @@ class PredictionLodPlannerTest {
     void coveringSelectionKeepsFinerLoadedTileWhenDistanceRequestsCoarser() {
         VssLodLayout layout = VssLodLayout.of(8_192, 6.0D, true, false);
         PredictionTileManager.PredictionTileKey fine =
-                new PredictionTileManager.PredictionTileKey(DIMENSION, 17, -2, 0);
+                new PredictionTileManager.PredictionTileKey(dimension, 17, -2, 0);
         PredictionTileManager.PredictionTileKey exact =
-                new PredictionTileManager.PredictionTileKey(DIMENSION, 8, -1, 1);
+                new PredictionTileManager.PredictionTileKey(dimension, 8, -1, 1);
         PredictionTileManager.PredictionTileKey parent =
-                new PredictionTileManager.PredictionTileKey(DIMENSION, 2, -1, 3);
+                new PredictionTileManager.PredictionTileKey(dimension, 2, -1, 3);
 
         assertEquals(fine, PredictionTileManager.findCoveringKey(
-                Set.of(fine, exact, parent), DIMENSION, layout, 68, -7, 1));
+                Set.of(fine, exact, parent), dimension, layout, 68, -7, 1));
         assertEquals(fine, PredictionTileManager.findCoveringKey(
-                Set.of(fine), DIMENSION, layout, 68, -7, 1));
+                Set.of(fine), dimension, layout, 68, -7, 1));
         assertEquals(parent, PredictionTileManager.findCoveringKey(
-                Set.of(parent), DIMENSION, layout, 68, -7, 1));
+                Set.of(parent), dimension, layout, 68, -7, 1));
     }
 
     @Test
     void coveringSelectionDoesNotTreatAnotherTileAsCoverage() {
         VssLodLayout layout = VssLodLayout.of(8_192, 6.0D, true, false);
         PredictionTileManager.PredictionTileKey elsewhere =
-                new PredictionTileManager.PredictionTileKey(DIMENSION, 99, 99, 0);
+                new PredictionTileManager.PredictionTileKey(dimension, 99, 99, 0);
 
         assertEquals(null, PredictionTileManager.findCoveringKey(
-                Set.of(elsewhere), DIMENSION, layout, 68, -7, 1));
+                Set.of(elsewhere), dimension, layout, 68, -7, 1));
     }
 
     @Test
@@ -84,7 +86,7 @@ class PredictionLodPlannerTest {
         VssLodLayout layout = VssLodLayout.of(8_192, 6.0D, true, false);
         VssLodFocus focus = new VssLodFocus(0.0D, 0.0D, 256.0D);
         List<PredictionTileManager.PredictionTileKey> keys = PredictionLodPlanner.plan(
-                DIMENSION, 0.0D, 64.0D, 0.0D, layout, focus, 32.0D);
+                dimension, 0.0D, 64.0D, 0.0D, layout, focus, 32.0D);
         assertFalse(keys.isEmpty());
         // The leading nearby work must be dominated by fine tiles:
         // near-field-first means the ground under the camera builds before
@@ -105,7 +107,7 @@ class PredictionLodPlannerTest {
         VssLodLayout layout = VssLodLayout.of(8_192, 6.0D, true, false);
         VssLodFocus focus = new VssLodFocus(0.0D, 0.0D, 512.0D);
         List<PredictionTileManager.PredictionTileKey> keys = PredictionLodPlanner.plan(
-                DIMENSION, 0.0D, 64.0D, 0.0D, layout, focus, 32.0D);
+                dimension, 0.0D, 64.0D, 0.0D, layout, focus, 32.0D);
         int firstCoarseIndex = -1;
         int lastFineIndex = -1;
         for (int index = 0; index < keys.size(); index++) {
@@ -127,7 +129,7 @@ class PredictionLodPlannerTest {
     void saturatedRuntimePlanRefinesAllDirectionsAndKeepsCompleteCoverage() {
         VssLodLayout layout = VssLodLayout.of(8192, 1.0D, true, false);
         for (VssLodFocus focus : new VssLodFocus[]{null, new VssLodFocus(0, 0, 1024, 6144)}) {
-            var keys = PredictionLodPlanner.plan(DIMENSION, 0, 182, 0, layout, focus, 1536);
+            var keys = PredictionLodPlanner.plan(dimension, 0, 182, 0, layout, focus, 1536);
             assertTrue(keys.size() <= (focus == null ? 1024 : 2048) + PredictionLodPlanner.MAX_BAND_LEAVES + PredictionTransitionPlan.MAX_EXTRA_LEAVES);
             assertEquals(keys.size(), new java.util.HashSet<>(keys).size());
             for (int distance : new int[]{32, 128, 512, 1024, 2048, 4096}) {

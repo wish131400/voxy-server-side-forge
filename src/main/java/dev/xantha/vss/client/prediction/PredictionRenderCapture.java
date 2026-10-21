@@ -58,6 +58,7 @@ public final class PredictionRenderCapture {
         active.report.put("gpu", GL11.glGetString(GL11.GL_RENDERER));
         active.report.put("openGL", GL11.glGetString(GL11.GL_VERSION));
         active.report.put("predictionEnabled", dev.xantha.vss.config.VSSClientConfig.CONFIG.enablePrediction);
+        active.report.put("predictionLoadingEnabled", dev.xantha.vss.config.VSSClientConfig.CONFIG.isPredictionLoadingEnabled());
         active.report.put("shadersActive", PredictionIrisBridge.shadersActive());
         active.report.put("gameVersion", net.minecraft.SharedConstants.getCurrentVersion().getName());
         active.report.put("mods", net.minecraftforge.fml.ModList.get().getMods().stream().map(mod ->

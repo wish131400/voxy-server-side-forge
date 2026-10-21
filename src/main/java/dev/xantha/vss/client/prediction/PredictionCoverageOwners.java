@@ -27,6 +27,16 @@ final class PredictionCoverageOwners {
 
     PredictionTileManager.PredictionTile coveringTileAtDetail(PredictionTileManager.RenderSnapshot snapshot,
                                                              int x, int z, int desiredLod) {
+        return coveringTileAtDetail(snapshot, x, z, desiredLod, false);
+    }
+
+    PredictionTileManager.PredictionTile coveringFeatureTileAtDetail(PredictionTileManager.RenderSnapshot snapshot,
+                                                                    int x, int z, int desiredLod) {
+        return coveringTileAtDetail(snapshot, x, z, desiredLod, true);
+    }
+
+    private PredictionTileManager.PredictionTile coveringTileAtDetail(PredictionTileManager.RenderSnapshot snapshot,
+                                                                     int x, int z, int desiredLod, boolean features) {
         if (desiredLod < 0) return null;
         if (source != snapshot) advance(snapshot);
         // Every level is aligned to this minimum footprint. The sixteen
@@ -36,6 +46,7 @@ final class PredictionCoverageOwners {
         z = Math.floorDiv(z, span) * span;
         // Ordinary ownership does not depend on desired detail; share its answer across levels.
         int detail = snapshot.hasScopedTiles() ? Math.min(20, desiredLod) : 0;
+        if (features) detail |= 32;
         long key = pack(x, z), hash = HashCommon.mix(key ^ detail * 0x9E3779B97F4A7C15L);
         int bucket = (int) Long.remainderUnsigned(hash, buckets), start = bucket * ways, end = Math.min(start + ways, capacity);
         int slot = -1, free = -1;
@@ -47,7 +58,8 @@ final class PredictionCoverageOwners {
         if (slot >= 0 && versions[slot] == version) {
             checkedAt[slot] = serial; flags[slot] |= RECENT; hits++; return owners[slot];
         }
-        var owner = snapshot.coveringTileAtDetail(x, z, desiredLod);
+        var owner = features ? snapshot.coveringFeatureTileAtDetail(x, z, desiredLod)
+                : snapshot.coveringTileAtDetail(x, z, desiredLod);
         if (slot < 0) {
             slot = free >= 0 ? free : victim(bucket, start, end);
             if ((flags[slot] & OCCUPIED) == 0) entries++; else evictions++;

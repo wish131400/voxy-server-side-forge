@@ -24,6 +24,12 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
+/**
+ * 一个客户端 LOD 会话的请求规划、在途窗口、重试与列接收状态。
+ * <p>由客户端网络入口拥有并在客户端线程驱动；内部并发容器不代表整个规划器可并行 tick。
+ * 请求接收完成与 Voxy 上传可绘制是不同事实，不得用前者提前撤销预测覆盖。
+ * 断线/换维度沿 reset 清理状态；异步结果必须由上层验证连接身份后交接。
+ */
 public final class LodRequestManager {
     private final java.util.concurrent.ConcurrentHashMap<Long, int[]> strictSections =
             new java.util.concurrent.ConcurrentHashMap<>();
@@ -42,11 +48,13 @@ public final class LodRequestManager {
     private final java.util.Set<Long> strictUnavailableColumns =
             java.util.concurrent.ConcurrentHashMap.newKeySet();
     public boolean strictColumnReady(int cx, int cz) {
+        if (filteredSession) return false;
         long packed = PositionUtil.packPosition(cx, cz);
         return strictSections.containsKey(strictSectionsKey(packed)) || strictUnavailableColumns.contains(packed);
     }
 
     public boolean strictColumnRenderReady(int cx, int cz, java.util.function.IntPredicate ready) {
+        if (filteredSession) return false;
         long packed = PositionUtil.packPosition(cx, cz);
         int[] sections = strictSections.get(strictSectionsKey(packed));
         if (sections == null) return strictUnavailableColumns.contains(packed);
@@ -56,6 +64,12 @@ public final class LodRequestManager {
 
     synchronized void recordStrictSections(int cx, int cz, dev.xantha.vss.api.VoxelColumnData data) {
         long packed = PositionUtil.packPosition(cx, cz);
+        if (!data.authoritative()) {
+            strictSections.remove(strictSectionsKey(packed));
+            strictUnavailableColumns.remove(packed);
+            dev.xantha.vss.compat.StrictLodVisibility.workChanged();
+            return;
+        }
         strictSections.put(strictSectionsKey(packed), java.util.Arrays.stream(data.sections())
                 .filter(section -> !section.section().hasOnlyAir()).mapToInt(section -> section.sectionY()).toArray());
         strictUnavailableColumns.remove(packed);
@@ -120,6 +134,9 @@ public final class LodRequestManager {
     /** Responses from requests cancelled during a prediction toggle are stale. */
     private final LongOpenHashSet suppressedResponses = new LongOpenHashSet();
     private final ClientPresenceReporter presenceReporter;
+    // Positive timestamps acknowledge delivery under this policy; they do not
+    // certify full Voxy coverage and must never escape as complete-column presence.
+    private final boolean filteredSession;
     private final Runnable transferReset;
     private final CacheOnlyReloadTracker cacheOnlyReload = new CacheOnlyReloadTracker();
 
@@ -178,6 +195,12 @@ public final class LodRequestManager {
     }
 
     LodRequestManager(String presenceScope, ClientRequestTracker requestTracker, Runnable transferReset) {
+        this(presenceScope, requestTracker, transferReset, false);
+    }
+
+    LodRequestManager(String presenceScope, ClientRequestTracker requestTracker, Runnable transferReset,
+            boolean filteredSession) {
+        this.filteredSession = filteredSession;
         this.requestTracker = requestTracker;
         this.presenceReporter = new ClientPresenceReporter(presenceScope, new ClientPresenceReporter.ReconciliationListener() {
             @Override
@@ -362,12 +385,14 @@ public final class LodRequestManager {
             lastPlayerChunkX = playerCx;
             lastPlayerChunkZ = playerCz;
         }
-        presenceReporter.updateWindow(level, level.dimension(), playerCx, playerCz, lodDistance);
-        boolean allowPresenceZstd = (sessionConfig.serverCapabilities() & VSSConstants.CAPABILITY_ZSTD_COLUMNS) != 0;
-        presenceReporter.drain(level, level.dimension(), allowPresenceZstd);
-        if (++presenceAuditTickCounter >= PRESENCE_AUDIT_INTERVAL_TICKS) {
-            presenceAuditTickCounter = 0;
-            auditKnownPresence(level, playerCx, playerCz, lodDistance);
+        if (!filteredSession) {
+            presenceReporter.updateWindow(level, level.dimension(), playerCx, playerCz, lodDistance);
+            boolean allowPresenceZstd = (sessionConfig.serverCapabilities() & VSSConstants.CAPABILITY_ZSTD_COLUMNS) != 0;
+            presenceReporter.drain(level, level.dimension(), allowPresenceZstd);
+            if (++presenceAuditTickCounter >= PRESENCE_AUDIT_INTERVAL_TICKS) {
+                presenceAuditTickCounter = 0;
+                auditKnownPresence(level, playerCx, playerCz, lodDistance);
+            }
         }
         timeoutSweep();
         PredictionCpuBudget.SHARED.observeLocalGeneration(isIntegratedServer(), requestTracker.generationSize());
@@ -436,6 +461,7 @@ public final class LodRequestManager {
         long packed = PositionUtil.packPosition(cx, cz);
         if (version <= 0 || version < dirtyColumnTimestamps.get(packed)) return false;
         if (columnTimestamps.get(packed) >= version) return true;
+        if (filteredSession) presenceReporter.removeKnownColumn(dimension, packed);
         if (!processor.getAsBoolean()) return false;
         requestTracker.cancel(packed);
         suppressedResponses.remove(packed);
@@ -472,6 +498,9 @@ public final class LodRequestManager {
 
         boolean processed;
         try {
+            // A scoped CLEAR/UPDATE can invalidate a previous full-column claim
+            // in the same Voxy database, even if only part of ingestion succeeds.
+            if (filteredSession) presenceReporter.removeKnownColumn(dimension, packed);
             processed = processor.getAsBoolean();
         } catch (RuntimeException e) {
             failTrackedRequest(requestId, packed);
@@ -1583,6 +1612,7 @@ public final class LodRequestManager {
             long packed,
             long columnTimestamp,
             int[] replacementSectionYs) {
+        if (filteredSession) return;
         presenceReporter.recordKnownColumn(
                 dimension,
                 packed,
@@ -1591,6 +1621,7 @@ public final class LodRequestManager {
     }
 
     void restoreKnownColumn(long packed, long columnTimestamp) {
+        if (filteredSession) return;
         if (columnTimestamp > 0L) {
             if (!strictSections.containsKey(strictSectionsKey(packed))) {
                 byte[] manifest = presenceReporter.sectionManifest(lastDimension, packed);
@@ -1722,6 +1753,7 @@ public final class LodRequestManager {
     }
 
     long requestTimestampFor(long packed) {
+        if (filteredSession) return 0L;
         long timestamp = columnTimestamps.get(packed);
         if (!dirtyColumns.contains(packed) || timestamp > 0L) {
             return timestamp;

@@ -1,0 +1,101 @@
+// Module contracts run against production bytecode; no game or graphics context is created.
+// Retired algorithm comparisons require their own fixtures, listed explicitly below.
+def algorithmExperiments = ['PredictionGpuTraversalExperimentTest', 'PredictionProgressiveBenefitTest', 'PredictionProgressiveDetailTest', 'PredictionProgressiveDetailGpuTest', 'PredictionProgressiveReplayTest', 'PredictionOwnershipMemoryReplay']
+sourceSets.test.java {
+    algorithmExperiments.each { exclude "**/${it}.java" }
+}
+
+tasks.register('architectureTest', Test) {
+    group = 'verification'
+    description = 'Checks production dependency boundaries and package contracts.'
+    dependsOn tasks.named('testClasses')
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    include '**/architecture/*Test.class'
+    maxHeapSize = '2G'
+    systemProperty 'vss.mainClasses', sourceSets.main.output.classesDirs.asPath
+    systemProperty 'vss.mainSources', file('src/main/java').absolutePath
+    testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+}
+
+tasks.register('moduleRegressionTest', Test) {
+    group = 'verification'
+    description = 'Runs CPU regressions for module boundaries, state and lifecycle handoffs.'
+    dependsOn tasks.named('testClasses')
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    include '**/api/*Test.class', '**/common/**/*Test.class', '**/config/*Test.class'
+    include '**/networking/server/state/*Test.class', '**/networking/server/runtime/*Test.class'
+    include '**/networking/server/sending/*Test.class'
+    include '**/ColumnStorageReadPipelineTest.class', '**/ExistingColumnPreloaderTest.class'
+    include '**/PlayerSession*Test.class', '**/ChunkyQueueLimitIntegrationTest.class'
+    include '**/CancelableTaskCallbacksTest.class', '**/StrictLodVisibilityHandoffTest.class'
+    include '**/PredictionVoxyStableOwnershipTest.class', '**/VSSClientNetworkingTest.class'
+    include '**/ClientLodSessionAdapterTest.class', '**/ClientConnectionIdentityTest.class'
+    include '**/StrictVoxyNodeIndexTest.class'
+    include '**/PredictionPlanningPipelineTest.class', '**/PredictionPlanningValidityTest.class'
+    include '**/PredictionMainReductionTest.class', '**/PredictionTurnMainTest.class'
+    include '**/PredictionCoarsePlanHandoffTest.class', '**/PredictionTeleportLoadingTest.class'
+    include '**/PredictionDemandLifecycleTest.class', '**/PredictionViewRefinementTest.class'
+    include '**/PredictionSubCellCoverageTest.class'
+    // These fixtures configure static loader / Minecraft registries. Isolate test classes,
+    // rather than making the result depend on the order in which classes run.
+    maxHeapSize = '3G'
+    maxParallelForks = 1
+    forkEvery = 1
+    testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+}
+
+// Follow-up CPU regressions for callers of the extracted planning boundary.
+// Keep this opt-in suite separate from the fixed module gate; no GPU or game is launched.
+tasks.register('planningConsumerTest', Test) {
+    group = 'verification'
+    description = 'Runs CPU regressions for planning consumers, residency and memory lifecycle.'
+    dependsOn tasks.named('testClasses')
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    ['PredictionLoadingBenefitTest', 'PredictionDemandProfileTest', 'PredictionMediumCoverageTest',
+     'PredictionMemoryLifecycleTest', 'PredictionSurfacePipelineTest', 'PredictionTileManagerTest',
+     'PredictionLodPlannerTest'].each { include "**/${it}.class" }
+    maxHeapSize = '3G'
+    maxParallelForks = 1
+    forkEvery = 1
+    doFirst {
+        // The opt-in writer reads its directory during class initialization. A new
+        // directory prevents a previous run's JSONL from satisfying the assertion.
+        temporaryDir.mkdirs()
+        systemProperty 'vss.detailProfileDirectory', java.nio.file.Files.createTempDirectory(
+                temporaryDir.toPath(), 'profile-').toFile().absolutePath
+    }
+    testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+}
+
+// Protocol/cache regressions for the optional source-side whole-column filter API.
+tasks.register('columnFilterTest', Test) {
+    group = 'verification'
+    description = 'Verifies column policy decisions, cache isolation and scoped network delivery.'
+    dependsOn tasks.named('testClasses')
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    include '**/ColumnFiltersTest.class', '**/ColumnFilter*Test.class'
+    include '**/VoxelColumnS2CPayloadTest.class', '**/ServerIdentityS2CPayloadTest.class'
+    include '**/ClientColumnTransferAssemblerTest.class', '**/ColumnPayloadSplitterTest.class'
+    include '**/NbtSectionSerializerTest.class', '**/SectionSerializerLightCompletenessTest.class'
+    include '**/PersistentColumnLodStoreTest.class', '**/PersistentColumnWriteAcknowledgementTest.class'
+    maxHeapSize = '3G'
+    maxParallelForks = 1
+    forkEvery = 1
+    testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+}
+
+tasks.register('verifyModules') {
+    group = 'verification'
+    description = 'Required module dependency checks and CPU handoff regressions.'
+    dependsOn tasks.named('architectureTest'), tasks.named('moduleRegressionTest'), tasks.named('columnFilterTest')
+}
+tasks.named('test', Test).configure { exclude '**/architecture/*Test.class' }
+tasks.named('check').configure { dependsOn tasks.named('verifyModules') }

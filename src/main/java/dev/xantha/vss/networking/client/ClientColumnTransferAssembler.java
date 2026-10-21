@@ -185,7 +185,7 @@ final class ClientColumnTransferAssembler {
     private static boolean isValidPart(VoxelColumnS2CPayload payload) {
         if (payload == null
                 || !payload.hasTransferMetadata()
-                || !payload.completeColumn()
+                || !payload.isDeliverable()
                 || payload.partCount() < 1
                 || payload.partCount() > VoxelColumnS2CPayload.MAX_TRANSFER_PARTS
                 || payload.partIndex() < 0
@@ -272,6 +272,7 @@ final class ClientColumnTransferAssembler {
         private final ResourceKey<Level> dimension;
         private final long columnTimestamp;
         private final boolean completeColumn;
+        private final dev.xantha.vss.common.processing.ColumnCoverage partsCoverage;
         private final boolean priority;
         private final boolean replaceMissingSections;
         private final VoxelColumnS2CPayload[] parts;
@@ -292,8 +293,9 @@ final class ClientColumnTransferAssembler {
             dimension = firstPart.dimension();
             columnTimestamp = firstPart.columnTimestamp();
             completeColumn = firstPart.completeColumn();
+            partsCoverage = firstPart.coverage();
             this.priority = priority;
-            this.replaceMissingSections = replaceMissingSections;
+            this.replaceMissingSections = replaceMissingSections && !firstPart.coverage().isFiltered();
             parts = new VoxelColumnS2CPayload[firstPart.partCount()];
             requestKey = RequestKey.from(firstPart);
             lastPartNanos = nowNanos;
@@ -310,9 +312,10 @@ final class ClientColumnTransferAssembler {
                     && Objects.equals(dimension, part.dimension())
                     && columnTimestamp == part.columnTimestamp()
                     && completeColumn == part.completeColumn()
+                    && partsCoverage.equals(part.coverage())
                     && parts.length == part.partCount()
                     && priority == incomingPriority
-                    && replaceMissingSections == incomingReplaceMissingSections;
+                    && replaceMissingSections == (incomingReplaceMissingSections && !part.coverage().isFiltered());
         }
 
         private AssembledColumn assemble() {

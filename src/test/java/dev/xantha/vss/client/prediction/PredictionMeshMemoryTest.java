@@ -151,6 +151,9 @@ class PredictionMeshMemoryTest {
 
     @Test
     void packingAllocatesFinalPayloadWithoutPerQuadObjectArrays() {
+        String displaySetting = System.getProperty("vss.disablePredictionDisplayLod");
+        System.setProperty("vss.disablePredictionDisplayLod", "true");
+        try {
         var bean = (com.sun.management.ThreadMXBean) java.lang.management.ManagementFactory.getThreadMXBean();
         org.junit.jupiter.api.Assumptions.assumeTrue(bean.isThreadAllocatedMemorySupported());
         bean.setThreadAllocatedMemoryEnabled(true);
@@ -167,12 +170,17 @@ class PredictionMeshMemoryTest {
         long perBuild = (bean.getThreadAllocatedBytes(thread) - before) / 8;
         long payload = packed.quads().length * 4L;
         assertTrue(packed.quadCount() > 8_000);
-        long indexes = packed.ownershipRuns.ends.length * 28L + packed.occlusionBounds.values.length * 4L;
-        assertTrue(perBuild < payload + indexes + 65_536,
-                "packing should allocate final payload/index arrays plus fixed scratch, not per-quad objects or growth copies: " + perBuild);
+        long indexes = LegacyOwnershipRuns.of(packed).size() * 28L + packed.occlusionBounds.values.length * 4L;
+        assertTrue(perBuild < payload + indexes + LegacyOwnershipRuns.of(packed).retainedHeapBytes() + 65_536,
+                "packing should allocate bounded raw construction and compact final index arrays plus fixed scratch, not per-quad objects or growth copies: " + perBuild
+                        + ", payload=" + payload + ", constructionIndexes=" + indexes + ", compactIndexes=" + LegacyOwnershipRuns.of(packed).retainedHeapBytes());
         System.out.println("packing allocation: quads=" + packed.quadCount() + ", payloadBytes=" + payload
-                + ", ownershipRuns=" + packed.ownershipRuns.ends.length + ", indexBytes=" + indexes
+                + ", ownershipRuns=" + LegacyOwnershipRuns.of(packed).size() + ", indexBytes=" + indexes
                 + ", allocatedBytesPerBuild=" + perBuild);
+        } finally {
+            if (displaySetting == null) System.clearProperty("vss.disablePredictionDisplayLod");
+            else System.setProperty("vss.disablePredictionDisplayLod", displaySetting);
+        }
     }
 
     @Test

@@ -29,10 +29,26 @@ public final class PredictionMesh {
     boolean affineTintSafe;
     /** Worker-only end of ground geometry, before vegetation and structure faces. */
     int[] terrainEnds;
+    /** Worker-only start of biome representative vegetation, after complete features. */
+    int[] previewStarts;
+    /** Set by the publishing worker, including completed empty decoration. */
+    boolean surfaceReadyForRendering;
+    /** Transient old decoration carried through a same-footprint terrain upgrade. Never persisted. */
+    boolean featureFallback;
+
+    void retainFeatures(PredictionTileManager.PredictionTile resident, int spacing) {
+        var previous = resident.mesh().gpuPayload();
+        if (previous == null || !PredictionFeatureHandoff.available(resident)) return;
+        gpuPayload = gpuPayload.withFeaturesFrom(previous, spacing, resident.spacingBlocks());
+        surfaceReadyForRendering = resident.mesh().surfaceReadyForRendering;
+        featureFallback = true;
+    }
     /** Worker-side quad view, released after preparing a compact published mesh. */
     private volatile PredictionQuadMesh packed;
     private volatile PredictionPackedMesh gpuPayload;
     private volatile PredictionSeamMesh seamMesh;
+    /** In-memory source proof; restored independent meshes never claim child provenance. */
+    PredictionParentLod.Proof parentLod;
     private float[] morph;
     /** Set once by the publishing worker after lossless sample interning. */
     int retainedSampleObjects = -1;
@@ -62,10 +78,21 @@ public final class PredictionMesh {
 
     /** Worker-only packing, completed before this mesh enters render residency. */
     void prepareGpuPayload(PredictionTileManager.PredictionTile tile) {
+        prepareGpuPayload(tile, null);
+    }
+
+    /** Compose the retained exact features before generating any derived display/encoding data. */
+    void prepareGpuPayload(PredictionTileManager.PredictionTile tile, PredictionTileManager.PredictionTile resident) {
         if (gpuPayload != null) return;
         seamMesh();
-        gpuPayload = PredictionPackedMesh.pack(tile);
-        gpuPayload.morph(morph, tile.depthBound().minY(), tile.depthBound().maxY());
+        gpuPayload = PredictionPackedMesh.pack(tile, resident);
+        int min = tile.depthBound().minY(), max = tile.depthBound().maxY();
+        if (resident != null) {
+            min = Math.min(min, resident.depthBound().minY()); max = Math.max(max, resident.depthBound().maxY());
+            surfaceReadyForRendering = resident.mesh().surfaceReadyForRendering;
+            featureFallback = true;
+        }
+        gpuPayload.morph(morph, min, max);
         // All CPU consumers now use the exact seam summary. Retain complete
         // vertices only for legacy/test triangle meshes, never published tiles.
         if (positions.length == 0 && waterPositions.length == 0) packed = null;
@@ -175,6 +202,7 @@ public final class PredictionMesh {
                 new float[0], new float[0], new int[0], new boolean[0],
                 vertexCount, waterVertexCount, cellCount, null, null, null, null, cellAxis);
         compact.packed = quads;
+        compact.parentLod = parentLod;
         return compact;
     }
 
@@ -182,6 +210,7 @@ public final class PredictionMesh {
         long floats = (long) positions.length + normals.length + waterPositions.length + waterNormals.length;
         long ints = (long) colors.length + waterColors.length
                 + (terrainEnds == null ? 0 : terrainEnds.length)
+                + (previewStarts == null ? 0 : previewStarts.length)
                 + (cellOffsets == null ? 0 : cellOffsets.length)
                 + (cellCounts == null ? 0 : cellCounts.length)
                 + (waterOffsets == null ? 0 : waterOffsets.length)

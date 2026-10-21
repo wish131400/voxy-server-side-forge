@@ -54,8 +54,8 @@ class PredictionCaptureInvalidationBatchTest {
 
             ClientPredictionState.onDirtyColumns(Level.OVERWORLD, new long[]{a, b, a});
             assertEquals(1L, epochs.get(tile).longValue());
-            assertEquals(8L, versions.get(a).longValue());
-            assertEquals(10L, versions.get(b).longValue());
+            assertFalse(versions.containsKey(a), "withdrawn queued captures release their version slot");
+            assertFalse(versions.containsKey(b));
             assertTrue(latest.isEmpty());
             assertEquals(0, samples.size(), "both chunks, including opposite corners, must expire");
             assertTrue(manager.isAuthoritative(0, 0));
@@ -76,7 +76,7 @@ class PredictionCaptureInvalidationBatchTest {
         }
     }
 
-    @Test void sparseAncestorsStillIgnoreBatchesBetweenGridPoints() throws Exception {
+    @Test void sparseAncestorsIncludeAllEditedAreasBetweenGridPoints() throws Exception {
         int distance = VSSClientConfig.CONFIG.predictionDistanceBlocks;
         VSSClientConfig.CONFIG.predictionDistanceBlocks = 65536;
         try (var manager = manager(null)) {
@@ -86,9 +86,9 @@ class PredictionCaptureInvalidationBatchTest {
             pending.add(tile);
             assertFalse(PredictionTileManager.captureIntersectsGrid(tile, manager.layout(), 1, 1));
             manager.invalidate(new long[]{PositionUtil.packPosition(1, 1), PositionUtil.packPosition(2, 2)});
-            assertTrue(epochs.isEmpty());
-            manager.invalidate(new long[]{PositionUtil.packPosition(1, 1), PositionUtil.packPosition(4, 4)});
             assertEquals(1L, epochs.get(tile).longValue());
+            manager.invalidate(new long[]{PositionUtil.packPosition(1, 1), PositionUtil.packPosition(4, 4)});
+            assertEquals(2L, epochs.get(tile).longValue());
         } finally { VSSClientConfig.CONFIG.predictionDistanceBlocks = distance; }
     }
 
@@ -124,7 +124,7 @@ class PredictionCaptureInvalidationBatchTest {
         }
     }
 
-    @Test void captureDiskBatchKeepsDecorationAndSparseAncestorsUntilTheirGridChanges() {
+    @Test void captureDiskBatchUpdatesAreaAncestorsAndKeepsReusableDecoration() {
         var between = new it.unimi.dsi.fastutil.longs.LongOpenHashSet(new long[]{
                 PositionUtil.packPosition(1, 1), PositionUtil.packPosition(2, 2)});
         try (var disk = new PredictionDiskCache(directory, 77);
@@ -134,7 +134,7 @@ class PredictionCaptureInvalidationBatchTest {
              var surface = disk.lease(PredictionDiskCache.Key.surface(1, 1, 0))) {
             disk.invalidateCaptures(between);
             assertFalse(nearby.valid()); assertFalse(nearbyMesh.valid());
-            assertTrue(sparse.valid(), "captures between sample points must preserve the persisted ancestor");
+            assertFalse(sparse.valid(), "area captures between sample points must invalidate the persisted ancestor");
             assertTrue(surface.valid(), "authoritative captures do not invalidate reusable decoration");
             disk.invalidateCapture(4, 4);
             assertFalse(sparse.valid(), "the next capture on the ancestor grid must invalidate it");

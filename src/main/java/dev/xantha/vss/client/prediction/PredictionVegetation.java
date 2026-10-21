@@ -26,6 +26,8 @@ import net.minecraftforge.fml.ModList;
 /** World-coordinate vegetation shared by all prediction LOD levels. */
 final class PredictionVegetation {
     static final int PREDICATE_SETTINGS_VERSION = 1 << 8;
+    // Invalidate incomplete structure placements/finished meshes, keeping raw terrain samples.
+    static final int STRUCTURE_RUNTIME_SETTINGS_VERSION = 1 << 12;
     private static final int PREDICATE_SETTINGS = ModList.get() != null && ModList.get().isLoaded("byepregen")
             ? PREDICATE_SETTINGS_VERSION : 0;
     private static final int MAX_CHUNKS = 512;
@@ -68,6 +70,8 @@ final class PredictionVegetation {
 
     static int predicateSettings() { return PREDICATE_SETTINGS; }
 
+    static int runtimeSettings() { return STRUCTURE_RUNTIME_SETTINGS_VERSION | PREDICATE_SETTINGS; }
+
     boolean available() {
         for (var step : enabledFeatures().indices()) if (step.length != 0) return true;
         return VSSClientConfig.CONFIG.predictionStructures && structures.available();
@@ -98,7 +102,7 @@ final class PredictionVegetation {
         this.terrainColumns = new VssLodSampleCache(terrain.interiorTerrain() ? 512 : 32_768);
         this.diskCache = diskCache;
         this.settings = (VSSClientConfig.CONFIG.predictionTrees ? 1 : 0) | (VSSClientConfig.CONFIG.predictionStructures ? 2 : 0)
-                | (reuseTrees ? 28 : 0) | (terrain.interiorTerrain() ? 96 : 0) | predicateSettings();
+                | (reuseTrees ? 28 : 0) | (terrain.interiorTerrain() ? 96 : 0) | runtimeSettings();
         this.context = terrain.decorationContext();
         this.access = context.decorationAccess();
         this.treeModels = reuseTrees ? new PredictionTreeModels(access, context.generatorContext()) : null;
@@ -571,7 +575,7 @@ final class PredictionVegetation {
             try {
                 feature.placeWithBiomeCheck(level, context.generatorContext(), random, origin);
                 success = true;
-            } catch (java.util.concurrent.CancellationException cancelled) {
+            } catch (PredictionWorkDeferred | java.util.concurrent.CancellationException cancelled) {
                 throw cancelled;
             } catch (RuntimeException failure) {
                 if (VSSClientConfig.CONFIG.debugLogging) VSSLogger.debug("VSS cached snow upgrade skipped: " + failure);
@@ -622,7 +626,7 @@ final class PredictionVegetation {
                         if (reusableTree) treeModels.place(feature, level, random, origin);
                         else PredictionSurfaceFeatureAdapters.place(feature,level,context.generatorContext(),random,origin);
                         success = true;
-                    } catch (java.util.concurrent.CancellationException cancelled) {
+                    } catch (PredictionWorkDeferred | java.util.concurrent.CancellationException cancelled) {
                         throw cancelled;
                     } catch (RuntimeException failure) {
                         if (PredictionMissingRegistry.permanent(failure, access)) missingRegistryFailures.add(feature);

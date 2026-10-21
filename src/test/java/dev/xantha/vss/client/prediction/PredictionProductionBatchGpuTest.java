@@ -25,7 +25,7 @@ class PredictionProductionBatchGpuTest {
         try {
             glfwMakeContextCurrent(window);GL.createCapabilities();RenderSystem.initRenderThread();
             PredictionMeshCodecTest.bootstrap();
-            try(var program=PredictionTerrainProgram.createBatch();var legacy=PredictionTerrainProgram.create();var batch=new PredictionIndirectBatch()) {
+            try(var program=PredictionTerrainProgram.createBatch();var legacy=referenceProgram();var batch=new PredictionIndirectBatch()) {
                 int vao=glGenVertexArrays();glBindVertexArray(vao);
                 int ebo=glGenBuffers();glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
                 var entries=new ArrayList<PredictionRenderer.Draw>();int max=0;
@@ -81,7 +81,7 @@ class PredictionProductionBatchGpuTest {
                     setup.use();int handle=glGetInteger(GL_CURRENT_PROGRAM);
                     glUniform1i(glGetUniformLocation(handle,"ExactCoverage"),8);
                     glUniform3f(glGetUniformLocation(handle,"ExactCoverageGrid"),0,0,1);
-                    setup.setVoxyOwnershipDistance(4096);
+
                 }
                 for(boolean water:new boolean[]{false,true})for(boolean split:new boolean[]{false,true}) {
                     byte[][] pixels=new byte[3][];float[][] depths=new float[3][];
@@ -136,8 +136,11 @@ class PredictionProductionBatchGpuTest {
                     if(!water&&!split){int visible=0;for(int i=0;i<pixels[0].length;i+=4)if(pixels[0][i]!=0||pixels[0][i+1]!=0||pixels[0][i+2]!=0)visible++;assertTrue(visible>100);}
                 }
                 verifyPlanTransitions(program, entries, camera, target);
+                verifyGroupedFallbackReplay(program, entries, camera, target);
                 verifyOwnershipPrimitives(program, legacy, batch, entries, camera);
                 benchmarkOcclusion(program,batch,entries.get(0),camera,projection,target);
+                CompletionProductionDirectionBenchmark.run(program,camera,
+                        new Matrix4f(projection.matrix()).mul(new Matrix4f().lookAlong(0,-1,0,0,0,-1)),target);
                 target.destroyBuffers();glBindFramebuffer(GL_FRAMEBUFFER,0);
                 var groups = new PredictionOpaqueBatches();
                 var expanded = new ArrayList<PredictionRenderer.Draw>();
@@ -158,6 +161,8 @@ class PredictionProductionBatchGpuTest {
                 assertEquals(0, groups.prepare(List.of()));
                 benchmark(program,legacy,batch,entries,camera,VssLodFaceGroup.ALL);
                 benchmark(program,legacy,batch,entries,camera,5);
+                ArchitectureBatchBenchmark.run(program, entries, camera);
+                ArchitectureOverflowBenchmark.run(program, entries, camera);
                 glEnable(GL_RASTERIZER_DISCARD);
                 try {
                     program.use();
@@ -195,6 +200,82 @@ class PredictionProductionBatchGpuTest {
         var reordered = new ArrayList<>(arena);
         Collections.swap(reordered, 2, 3);
         assertAll("production cached submission transitions",
+            () -> {
+                try (var cached = new PredictionIndirectBatch(); var cold = new PredictionIndirectBatch()) {
+                    transitionFrame(program, cached, arena, camera, target, false, true, 60, true, true);
+                    long hits = diagnosticCounter(cached, "planIdentityHits");
+                    var fast = transitionFrame(program, cached, arena, camera, target, false, true, 60, true, true);
+                    assertEquals(hits, diagnosticCounter(cached, "planIdentityHits"), "culled whole replay must bypass individual draws");
+                    assertTrue(diagnosticCounter(cached, "wholePlanHits") > 0);
+                    assertArrayEquals(transitionFrame(program, cold, arena, camera, target, false, true, 60, false, true), fast,
+                            "current-frame depth must be rebuilt at the same near-to-far bucket boundaries");
+                }
+            },
+            () -> {
+                try (var cached = new PredictionIndirectBatch(); var cold = new PredictionIndirectBatch()) {
+                    for (boolean water : new boolean[]{false, true}) {
+                        transitionFrame(program, cached, arena, camera, target, water, true, 61, true);
+                        long hits = diagnosticCounter(cached, "planIdentityHits");
+                        var fast = transitionFrame(program, cached, arena, camera, target, water, true, 61, true);
+                        assertEquals(hits, diagnosticCounter(cached, "planIdentityHits"), "whole pass must bypass individual draw checks");
+                        assertArrayEquals(transitionFrame(program, cold, arena, camera, target, water, true, 61), fast);
+                        assertEquals(0, cached.uploadedBatches());
+                        long whole = diagnosticCounter(cached, "wholePlanHits");
+                        transitionFrame(program, cached, arena, camera, target, water, true, 62, true);
+                        assertEquals(whole, diagnosticCounter(cached, "wholePlanHits"), "residency changes must require item validation");
+                        arena.get(0).gpu().packed().morph(null, 0, 0);
+                        transitionFrame(program, cached, arena, camera, target, water, true, 62, true);
+                        assertEquals(whole, diagnosticCounter(cached, "wholePlanHits"), "mutable metadata must invalidate whole replay");
+                    }
+                }
+            },
+            () -> {
+                try (var cached = new PredictionIndirectBatch(); var cold = new PredictionIndirectBatch()) {
+                    for (boolean water : new boolean[]{false, true}) {
+                        transitionFrame(program, cached, arena, camera, target, water, true, 17);
+                        long checks = diagnosticCounter(cached, "planContentChecks");
+                        long hits = diagnosticCounter(cached, "planIdentityHits");
+                        var replay = transitionFrame(program, cached, arena, camera, target, water, true, 17);
+                        assertArrayEquals(transitionFrame(program, cold, arena, camera, target, water, true, 17), replay);
+                        assertEquals(checks, diagnosticCounter(cached, "planContentChecks"),
+                                "warm replay must bypass signatures and content comparisons");
+                        assertTrue(diagnosticCounter(cached, "planIdentityHits") >= hits + arena.size());
+                        hits = diagnosticCounter(cached, "planIdentityHits");
+                        var unrelatedUpdate = transitionFrame(program, cached, arena, camera, target, water, true, 18);
+                        assertArrayEquals(replay, unrelatedUpdate);
+                        assertTrue(diagnosticCounter(cached, "planIdentityHits") >= hits + arena.size(),
+                                "unrelated residency updates must verify and reuse each existing item");
+                        assertEquals(0, cached.uploadedBatches());
+                    }
+                    var equivalents = arena.stream().map(draw -> new PredictionRenderer.Draw(draw.tile(), draw.gpu(),
+                            draw.allowed(), draw.features(), draw.seam(), draw.faces(), draw.morph(), draw.bounds())).toList();
+                    var equivalentFrame = transitionFrame(program, cached, equivalents, camera, target, false, true, 17);
+                    assertArrayEquals(transitionFrame(program, cold, equivalents, camera, target, false, true, 17), equivalentFrame);
+                    long equivalentChecks = diagnosticCounter(cached, "planContentChecks");
+                    transitionFrame(program, cached, equivalents, camera, target, false, true, 17);
+                    assertEquals(equivalentChecks, diagnosticCounter(cached, "planContentChecks"),
+                            "an equivalent replacement draw must adopt its identity after one verification");
+                    var sameMesh = equivalents.get(0).gpu().packed();
+                    sameMesh.morph(null, sameMesh.morphMinY(), sameMesh.morphMaxY());
+                    transitionFrame(program, cached, equivalents, camera, target, false, true, 17);
+                    long sameMetadataChecks = diagnosticCounter(cached, "planContentChecks");
+                    transitionFrame(program, cached, equivalents, camera, target, false, true, 17);
+                    assertEquals(sameMetadataChecks, diagnosticCounter(cached, "planContentChecks"),
+                            "an unchanged metadata update must adopt its revision after one verification");
+                    // A mutable metadata update behind the same Draw must still
+                    // invalidate the fast path and match a freshly encoded batch.
+                    var mesh = arena.get(0).gpu().packed();
+                    long checks = diagnosticCounter(cached, "planContentChecks");
+                    mesh.morph(null, -64, 384);
+                    var actual = transitionFrame(program, cached, arena, camera, target, false, true, 17);
+                    var expected = transitionFrame(program, cold, arena, camera, target, false, true, 17);
+                    assertArrayEquals(expected, actual, "morph metadata behind an unchanged draw must rebuild");
+                    assertTrue(diagnosticCounter(cached, "planContentChecks") > checks);
+                    mesh.morph(null, 0, 0);
+                    assertArrayEquals(transitionFrame(program, cold, arena, camera, target, false, true, 17),
+                            transitionFrame(program, cached, arena, camera, target, false, true, 17));
+                }
+            },
             () -> {
                 for (boolean water : new boolean[]{false, true}) {
                     for (var changed : List.of(reordered, arena.subList(0, 5), arena.subList(2, 8), arena)) {
@@ -237,23 +318,200 @@ class PredictionProductionBatchGpuTest {
                 }
             });
     }
+    /** Opaque page grouping draws standalone tiles without calling add(). The
+     * cached MDI prefix must never stand in for that complete mixed pass. */
+    private static void verifyGroupedFallbackReplay(PredictionTerrainProgram program,
+            List<PredictionRenderer.Draw> entries, Vec3 camera,
+            com.mojang.blaze3d.pipeline.TextureTarget target) throws Exception {
+        verifyRecentRegions(program, entries, camera, target);
+        assertTrue(entries.stream().anyMatch(d -> d.gpu().arenaSlice() == null));
+        assertTrue(entries.stream().anyMatch(d -> d.gpu().arenaSlice() != null));
+        for (boolean culled : new boolean[]{false, true}) {
+            try (var cached = new PredictionIndirectBatch(); var cold = new PredictionIndirectBatch()) {
+                byte[] expected = groupedFallbackFrame(program, cold, entries, camera, target, false, culled);
+                assertArrayEquals(expected, groupedFallbackFrame(program, cached, entries, camera, target, true, culled));
+                long whole = diagnosticCounter(cached, "wholePlanHits");
+                long identity = diagnosticCounter(cached, "planIdentityHits");
+                for (int frame = 0; frame < 12; frame++) {
+                    assertArrayEquals(expected, groupedFallbackFrame(program, cached, entries, camera, target, true, culled),
+                            "grouped standalone geometry must survive every cached frame; HiZ=" + culled + " frame=" + frame);
+                    assertEquals(whole, diagnosticCounter(cached, "wholePlanHits"),
+                            "an MDI-only plan is incomplete when the pass also contains direct draws");
+                    assertEquals(0, cached.uploadedBatches(), "mixed passes still reuse static page command buffers");
+                }
+                assertTrue(diagnosticCounter(cached, "planIdentityHits") > identity,
+                        "standalone draws must retain per-item replay of unchanged MDI batches");
+            }
+        }
+        System.out.println("PASS: mixed page/standalone opaque passes preserve color and depth for 12 cached frames, with and without current-frame HiZ");
+    }
+
+    private static void verifyRecentRegions(PredictionTerrainProgram program,
+            List<PredictionRenderer.Draw> entries, Vec3 camera,
+            com.mojang.blaze3d.pipeline.TextureTarget target) throws Exception {
+        var all = entries.stream().filter(d -> d.gpu().arenaSlice() != null).limit(8).toList();
+        var partial = all.subList(1, all.size());
+        try (var cached = new PredictionIndirectBatch(); var cold = new PredictionIndirectBatch()) {
+            byte[] expected = regionFrame(program, cold, all, camera, target);
+            assertArrayEquals(expected, regionFrame(program, cached, all, camera, target));
+            long encoded = diagnosticCounter(cached, "encodedItems");
+            regionFrame(program, cached, partial, camera, target);
+            assertEquals(encoded, diagnosticCounter(cached, "encodedItems"), "leaving a region must not rebuild its neighbours");
+            assertArrayEquals(expected, regionFrame(program, cached, all, camera, target));
+            assertEquals(encoded, diagnosticCounter(cached, "encodedItems"), "turning back reuses retained records");
+            assertEquals(0, cached.uploadedBatches());
+
+            var changed = new ArrayList<>(all); var old = all.get(2);
+            changed.set(2, new PredictionRenderer.Draw(old.tile(), old.gpu(), old.allowed(), old.features(), old.seam(),
+                    old.faces(), old.morph() == 0 ? 1 : 0, old.bounds()));
+            assertArrayEquals(regionFrame(program, cold, changed, camera, target),
+                    regionFrame(program, cached, changed, camera, target));
+            assertEquals(encoded + 1, diagnosticCounter(cached, "encodedItems"), "only the changed region is encoded");
+            regionFrame(program, cached, all, camera, target);
+            regionFrame(program, cached, partial, camera, target);
+            var planField = PredictionIndirectBatch.class.getDeclaredField("opaquePlan"); planField.setAccessible(true);
+            Object plan = planField.get(cached);
+            var regionsField = plan.getClass().getDeclaredField("regions"); regionsField.setAccessible(true);
+            var frameField = plan.getClass().getDeclaredField("frame"); frameField.setAccessible(true);
+            var regions = (Map<?, ?>) regionsField.get(plan); Object unused = null;
+            for (var entry : regions.values()) {
+                var usedFrame = entry.getClass().getDeclaredField("usedFrame"); usedFrame.setAccessible(true);
+                if (usedFrame.getLong(entry) != frameField.getLong(plan)) { unused = entry; break; }
+            }
+            assertNotNull(unused, "a turn retains the offscreen region within budget");
+            var usedAt = unused.getClass().getDeclaredField("usedAt"); usedAt.setAccessible(true);
+            usedAt.setLong(unused, System.nanoTime() - 3_000_000_000L);
+            regionFrame(program, cached, partial, camera, target);
+            assertFalse(regions.containsValue(unused), "expired offscreen regions release their records and mesh references");
+            encoded = diagnosticCounter(cached, "encodedItems");
+            assertArrayEquals(expected, regionFrame(program, cached, all, camera, target));
+            assertEquals(encoded + 1, diagnosticCounter(cached, "encodedItems"), "only the expired region needs re-encoding");
+        }
+        System.out.println("PASS: fixed regions retain records during turns, rebuild only changed/expired records, and preserve color+depth");
+    }
+
+    private static byte[] regionFrame(PredictionTerrainProgram program, PredictionIndirectBatch batch,
+            List<PredictionRenderer.Draw> draws, Vec3 camera,
+            com.mojang.blaze3d.pipeline.TextureTarget target) {
+        target.bindWrite(true); glViewport(0, 0, 128, 128);
+        glEnable(GL_DEPTH_TEST); glDepthFunc(GL_GREATER); glDepthMask(true); glDisable(GL_BLEND);
+        glClearDepth(0); glClearColor(0, 0, 0, 1); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        program.use(); program.batch(false); program.setOpaqueAlpha(1);
+        batch.begin(program, true, 73, 19);
+        for (var draw : draws) {
+            batch.nextRegion(draw.tile().key().tileX() * 31 + draw.tile().key().tileZ());
+            assertTrue(batch.add(draw, draw.gpu().packed().drawRanges(false, draw.faces()), camera, false, true, Long.MAX_VALUE));
+        }
+        batch.end();
+        var pixels = BufferUtils.createByteBuffer(128 * 128 * 4); var depth = BufferUtils.createFloatBuffer(128 * 128);
+        glReadPixels(0, 0, 128, 128, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        glReadPixels(0, 0, 128, 128, GL_DEPTH_COMPONENT, GL_FLOAT, depth);
+        var result = ByteBuffer.allocate(pixels.remaining() + depth.remaining() * 4);
+        result.put(pixels); while (depth.hasRemaining()) result.putFloat(depth.get());
+        assertEquals(GL_NO_ERROR, glGetError()); return result.array();
+    }
+
+    static byte[] groupedFallbackFrame(PredictionTerrainProgram program, PredictionIndirectBatch batch,
+            List<PredictionRenderer.Draw> draws, Vec3 camera,
+            com.mojang.blaze3d.pipeline.TextureTarget target, boolean whole, boolean culled) {
+        target.bindWrite(true); glViewport(0, 0, 128, 128);
+        glEnable(GL_DEPTH_TEST); glDepthFunc(GL_GREATER); glDepthMask(true); glDisable(GL_BLEND);
+        glClearDepth(0); glClearColor(0, 0, 0, 1); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        program.use(); program.batch(false); program.setOpaqueAlpha(1);
+        var projection = VssLodProjection.of(new Matrix4f().perspective((float)Math.toRadians(80), 1, .05f, 65536));
+        var view = new Matrix4f().lookAlong(0, -1, 0, 0, 0, -1);
+        program.setCamera(view, projection.matrix());
+        if (culled) batch.begin(program, target.getDepthTextureId(), 128, 128,
+                new Matrix4f(projection.matrix()).mul(view), null, 73, 19);
+        else batch.begin(program, true, 73, 19);
+        long replayed = whole ? batch.replayPass(draws, 1, true, camera, Long.MAX_VALUE) : -1;
+        if (replayed < 0) {
+            var groups = new PredictionOpaqueBatches();
+            int count = groups.prepare(draws);
+            for (int b = 0; b < count; b++) {
+                batch.nextOcclusionBucket();
+                var bucket = groups.bucket(b);
+                for (var page : bucket.pages) {
+                batch.nextRegion(page.region);
+                for (var draw : page.draws) {
+                    var ranges = draw.gpu().packed().drawRanges(false, VssLodFaceGroup.ALL);
+                    assertTrue(batch.add(draw, ranges, camera, false, true, Long.MAX_VALUE));
+                }
+                }
+                if (!bucket.fallback.isEmpty()) batch.flush();
+                for (var draw : bucket.fallback) {
+                    var packed = draw.gpu().packed();
+                    var ranges = packed.drawRanges(false, VssLodFaceGroup.ALL);
+                    // Match drawNormalPass's grouped fallback, which bypasses add().
+                    batch.fallback(draw, ranges, camera);
+                    program.batch(false); draw.gpu().bindTerrain(program); draw.gpu().bindYield(3);
+                    program.setTile((float)(draw.tile().baseBlockX() - camera.x), (float)-camera.y,
+                            (float)(draw.tile().baseBlockZ() - camera.z), draw.tile().spacingBlocks(), packed.cellAxis(), true);
+                    program.setMorph(packed, 0); program.setBoundaryReplacement(!draw.seam());
+                    PredictionRenderer.submitRanges(ranges, packed, false);
+                }
+            }
+        }
+        batch.end();
+        long expectedQuads=draws.stream().mapToLong(d -> d.gpu().packed().drawRanges(false, d.faces()).quads).sum();
+        assertEquals(expectedQuads, diagnosticCounter(batch, "mdiCandidateQuads") + diagnosticCounter(batch, "directCandidateQuads"),
+                "complete mixed submission includes direct geometry, including replayed frames");
+        var color = BufferUtils.createByteBuffer(128 * 128 * 4);
+        var depth = BufferUtils.createFloatBuffer(128 * 128);
+        glReadPixels(0, 0, 128, 128, GL_RGBA, GL_UNSIGNED_BYTE, color);
+        glReadPixels(0, 0, 128, 128, GL_DEPTH_COMPONENT, GL_FLOAT, depth);
+        ByteBuffer result = ByteBuffer.allocate(color.remaining() + depth.remaining() * 4);
+        result.put(color); while (depth.hasRemaining()) result.putFloat(depth.get());
+        assertEquals(GL_NO_ERROR, glGetError());
+        return result.array();
+    }
+
+    private static long diagnosticCounter(PredictionIndirectBatch batch, String name) {
+        var match = java.util.regex.Pattern.compile("(?:^|,)" + name + "=(\\d+)").matcher(batch.diagnostics());
+        assertTrue(match.find(), batch.diagnostics()); return Long.parseLong(match.group(1));
+    }
     private static byte[] transitionFrame(PredictionTerrainProgram program, PredictionIndirectBatch batch,
             List<PredictionRenderer.Draw> draws, Vec3 camera,
             com.mojang.blaze3d.pipeline.TextureTarget target, boolean water, boolean productionOverload, long revision) {
+        return transitionFrame(program, batch, draws, camera, target, water, productionOverload, revision, false);
+    }
+    private static byte[] transitionFrame(PredictionTerrainProgram program, PredictionIndirectBatch batch,
+            List<PredictionRenderer.Draw> draws, Vec3 camera,
+            com.mojang.blaze3d.pipeline.TextureTarget target, boolean water, boolean productionOverload, long revision, boolean whole) {
+        return transitionFrame(program, batch, draws, camera, target, water, productionOverload, revision, whole, false);
+    }
+    private static byte[] transitionFrame(PredictionTerrainProgram program, PredictionIndirectBatch batch,
+            List<PredictionRenderer.Draw> draws, Vec3 camera,
+            com.mojang.blaze3d.pipeline.TextureTarget target, boolean water, boolean productionOverload, long revision,
+            boolean whole, boolean culled) {
         target.bindWrite(true); glViewport(0, 0, 128, 128);
         glEnable(GL_DEPTH_TEST); glDepthFunc(GL_GREATER); glDepthMask(true); glDisable(GL_BLEND);
         glClearDepth(0); glClearColor(0, 0, 0, 1); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         program.use(); program.setOpaqueAlpha(water ? 0 : 1);
-        if (productionOverload) batch.begin(program, !water, revision, 19);
+        if (culled) {
+            var projection = VssLodProjection.of(new Matrix4f().perspective((float)Math.toRadians(80), 1, .05f, 65536));
+            batch.begin(program, target.getDepthTextureId(), 128, 128,
+                    new Matrix4f(projection.matrix()).mul(new Matrix4f().lookAlong(0, -1, 0, 0, 0, -1)), null, revision, 19);
+        } else if (productionOverload) batch.begin(program, !water, revision, 19);
         else batch.begin(program, !water);
-        for (var draw : draws) assertTrue(batch.add(draw, draw.gpu().packed().drawRanges(water, VssLodFaceGroup.ALL),
-                camera, water, true, Long.MAX_VALUE));
+        long replayed = whole ? batch.replayPass(draws, 1, true, camera, Long.MAX_VALUE) : -1;
+        if (replayed < 0) for (int i = 0; i < draws.size(); i++) {
+            if (culled && i % 2 == 0) batch.nextOcclusionBucket();
+            var draw = draws.get(i);
+            assertTrue(batch.add(draw, draw.gpu().packed().drawRanges(water, VssLodFaceGroup.ALL), camera, water, true, Long.MAX_VALUE));
+        }
         batch.end();
         var pixels = BufferUtils.createByteBuffer(128 * 128 * 4);
         glReadPixels(0, 0, 128, 128, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
         byte[] result = new byte[pixels.remaining()]; pixels.get(result);
         assertEquals(GL_NO_ERROR, glGetError());
         return result;
+    }
+    private static PredictionTerrainProgram referenceProgram() {
+        String old = System.getProperty("vss.disableFixedOwnershipReuse");
+        System.setProperty("vss.disableFixedOwnershipReuse", "true");
+        try { return PredictionTerrainProgram.create(); }
+        finally { if (old == null) System.clearProperty("vss.disableFixedOwnershipReuse"); else System.setProperty("vss.disableFixedOwnershipReuse", old); }
     }
     private static void assertCommandRecords(PredictionIndirectBatch batch, boolean water) throws Exception {
         var field = PredictionIndirectBatch.class.getDeclaredField(water ? "waterSlots" : "opaqueSlots"); field.setAccessible(true);
@@ -281,9 +539,7 @@ class PredictionProductionBatchGpuTest {
     }
     private static void verifyOwnershipPrimitives(PredictionTerrainProgram program, PredictionTerrainProgram legacy,
             PredictionIndirectBatch batch, List<PredictionRenderer.Draw> entries, Vec3 camera) throws Exception {
-        var coverageField = PredictionRenderer.class.getDeclaredField("submissionCoverage");
-        coverageField.setAccessible(true);
-        var state = (PredictionSubmissionCoverage) coverageField.get(null);
+        var state = new LegacyResidentCoverage(PredictionCoarseHandoffTest.ready());
         var passClass = Class.forName(PredictionRenderer.class.getName() + "$PreparedPass");
         var constructor = passClass.getDeclaredConstructor(boolean.class); constructor.setAccessible(true);
         var prepare = passClass.getDeclaredMethod("prepare", List.class, long.class, Vec3.class); prepare.setAccessible(true);
@@ -334,8 +590,8 @@ class PredictionProductionBatchGpuTest {
                     glEndQuery(GL_PRIMITIVES_GENERATED);
                     long primitives = glGetQueryObjectui64(query, GL_QUERY_RESULT);
                     assertEquals(quads * 2, primitives, "actual GPU triangle count, not pixel visibility");
-                    if (coverage == all) assertEquals(0, primitives, "Voxy interior must submit no opaque or water primitives");
-                    else if (coverage == mixed) assertTrue(primitives > 0 && primitives < baseline, "boundary fallback only");
+                    if (coverage == all) assertEquals(baseline, primitives, "resident interior keeps every fallback primitive for depth testing");
+                    else if (coverage == mixed) assertEquals(baseline, primitives, "resident boundary cannot change static submission");
                     else if (baseline < 0) { baseline = primitives; assertTrue(baseline > 0); }
                     else assertEquals(baseline, primitives, "coverage revocation restores every primitive");
                     System.out.println("OWNERSHIP_PRIMITIVES water="+water+" mdi="+mdi+" coverage="
@@ -369,6 +625,11 @@ class PredictionProductionBatchGpuTest {
             for(long[] values:times)Arrays.sort(values);
             assertTrue(batch.diagnostics().contains(",hiddenQuads="+((long)repeats*ranges.quads)),
                     "the asynchronous sample must confirm all repeated production geometry was suppressed: "+batch.diagnostics());
+            assertEquals((long)repeats*ranges.quads, diagnosticCounter(batch,"sampleCandidateQuads"));
+            assertEquals(0, diagnosticCounter(batch,"sampleAfterHizQuads"));
+            assertTrue(diagnosticCounter(batch,"hizBuilds") <= 2, "eight bands share at most two current-frame pyramids");
+            assertTrue(diagnosticCounter(batch,"filterBarriers") <= 2, "pages share the filtering barriers");
+            assertTrue(diagnosticCounter(batch,"sampleSubmissionFrame") <= diagnosticCounter(batch,"submissionFrame"));
             System.out.printf(Locale.ROOT,"PRODUCTION_OCCLUSION hiddenQuads=%d buckets=8 GPU_ms=%.4f->%.4f %s (repeated production fixture, not world FPS)%n",
                     (long)repeats*ranges.quads,times[0][15]/1e6,times[1][15]/1e6,batch.diagnostics());
         } finally {glDeleteQueries(query);}

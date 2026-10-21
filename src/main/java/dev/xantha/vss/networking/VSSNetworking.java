@@ -13,6 +13,8 @@ import dev.xantha.vss.networking.payloads.HandshakeC2SPayload;
 import dev.xantha.vss.networking.payloads.HandshakeRequestS2CPayload;
 import dev.xantha.vss.networking.payloads.LostCityHintsC2SPayload;
 import dev.xantha.vss.networking.payloads.LostCityHintsS2CPayload;
+import dev.xantha.vss.networking.payloads.StructureTemplateRequestC2SPayload;
+import dev.xantha.vss.networking.payloads.StructureTemplateFragmentS2CPayload;
 import dev.xantha.vss.networking.payloads.RegionPresenceC2SPayload;
 import dev.xantha.vss.networking.payloads.ServerIdentityS2CPayload;
 import dev.xantha.vss.networking.payloads.SessionConfigS2CPayload;
@@ -113,7 +115,7 @@ public final class VSSNetworking {
                 .loginIndex(ServerIdentityS2CPayload::getAsInt, ServerIdentityS2CPayload::setLoginIndex)
                 .buildLoginPacketList(isLocal -> java.util.List.of(Pair.of(
                         VSSConstants.MOD_ID + ":server_identity",
-                        ServerIdentityS2CPayload.fromConfig())))
+                        ServerIdentityS2CPayload.fromConfig(dev.xantha.vss.api.column.ColumnFilters.snapshot().cacheKey()))))
                 .consumerNetworkThread(VSSNetworking::handleServerIdentity)
                 .noResponse()
                 .add();
@@ -126,6 +128,17 @@ public final class VSSNetworking {
                 .encoder(LostCityHintsS2CPayload::encode)
                 .decoder(LostCityHintsS2CPayload::decode)
                 .consumerMainThread(VSSNetworking::handleLostCityHints)
+                .add();
+        CHANNEL.messageBuilder(StructureTemplateRequestC2SPayload.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(StructureTemplateRequestC2SPayload::encode)
+                .decoder(StructureTemplateRequestC2SPayload::decode)
+                .consumerMainThread(VSSServerNetworking::handleStructureTemplateRequest)
+                .add();
+        CHANNEL.messageBuilder(StructureTemplateFragmentS2CPayload.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(StructureTemplateFragmentS2CPayload::encode)
+                .decoder(StructureTemplateFragmentS2CPayload::decode)
+                .consumerMainThread((payload, context) -> DistExecutor.safeRunWhenOn(Dist.CLIENT,
+                        () -> () -> dev.xantha.vss.client.prediction.PredictionTemplateRepository.receive(payload)))
                 .add();
     }
 

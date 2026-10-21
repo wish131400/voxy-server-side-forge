@@ -108,7 +108,7 @@ class PredictionCoverageCacheTest {
             for (int lod = 1; lod < 20; lod++) assertSame(finest, snapshot.coveringTileAtDetail(x, z, lod));
         }
         var original = new PredictionRenderer.CoverageView(0, 0, 1400, null).ownership(false);
-        var coverage = new PredictionRenderer.CachedCoverage(1, 2, 0, original, null);
+        var coverage = new PredictionRenderer.CachedCoverage(1, 2, original, null);
         for (int step = 0; step < 1000; step++) {
             var moved = new PredictionRenderer.CoverageView(step, -step, 1400 + step * .01,
                     new VssLodFocus(step, step, 64));
@@ -134,7 +134,7 @@ class PredictionCoverageCacheTest {
         try {
             StrictLodVisibility.updateRenderWindow(DIMENSION, 1, 1, 64);
             var view = new PredictionRenderer.CoverageView(0, 0, 1400, null).ownership(false);
-            var cached = new PredictionRenderer.CachedCoverage(1, 2, 0, view, null);
+            var cached = new PredictionRenderer.CachedCoverage(1, 2, view, null);
             long revision = StrictLodVisibility.coverageRevision();
             StrictLodVisibility.updateRenderWindow(DIMENSION, 15, 15, 64);
             assertEquals(revision, StrictLodVisibility.coverageRevision());
@@ -146,7 +146,7 @@ class PredictionCoverageCacheTest {
             assertEquals(1, movement.windows().size());
             assertFalse(movement.windows().get(0).affects(0, 0, 4, 4));
             assertTrue(movement.windows().get(0).affects(60, 0, 64, 4));
-            var moved = new PredictionRenderer.CachedCoverage(1, 2, 0, view, null);
+            var moved = new PredictionRenderer.CachedCoverage(1, 2, view, null);
             StrictLodVisibility.updateRenderWindow(DIMENSION, 16, 15, 0);
             assertTrue(moved.matchesOwnership(1, 2, view));
         } finally {

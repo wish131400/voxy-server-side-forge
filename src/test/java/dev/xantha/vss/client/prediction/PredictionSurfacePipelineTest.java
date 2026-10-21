@@ -18,7 +18,7 @@ class PredictionSurfacePipelineTest {
     @Test void horizonAndIntermediateAncestorsPrecedeTheirChildren() {
         var layout = VssLodLayout.of(8192, 2, true, false);
         var leaf = new PredictionTileManager.PredictionTileKey(Level.OVERWORLD, -51, 72, 0);
-        var plan = PredictionTileManager.withCoarseCoverage(List.of(leaf), layout);
+        var plan = PredictionLodPlanner.withCoarseCoverage(List.of(leaf), layout);
         assertEquals(layout.levelCount(), plan.size());
         assertEquals(layout.levelCount() - 1, plan.get(0).lod());
         assertEquals(leaf, plan.get(plan.size() - 1));

@@ -1,5 +1,8 @@
 package dev.xantha.vss.networking.server;
 
+import dev.xantha.vss.networking.server.sending.ColumnDeliveryService;
+import dev.xantha.vss.networking.server.session.PlayerSessionLookup;
+
 
 import dev.xantha.vss.networking.server.diagnostics.ServerNetworkingDiagnostics;
 import dev.xantha.vss.networking.server.diagnostics.ServerRequestStats;
@@ -14,17 +17,14 @@ import dev.xantha.vss.networking.server.runtime.PersistentColumnReadCoordinator;
 import dev.xantha.vss.networking.server.runtime.ServerLifecycleGuard;
 import dev.xantha.vss.networking.server.runtime.ServerNetworkingLifecycle;
 import dev.xantha.vss.networking.server.sending.GeneratedColumnFlusher;
-import dev.xantha.vss.networking.server.sending.ColumnPayloadSplitter;
 import dev.xantha.vss.networking.server.sending.QueuedColumnSender;
 import dev.xantha.vss.networking.server.session.PlayerSessionManager;
 import dev.xantha.vss.networking.server.session.WorldgenProfileHolder;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
-import dev.xantha.vss.networking.server.state.PlayerSendQueue;
 import dev.xantha.vss.networking.server.storage.ColumnLodCache;
 import dev.xantha.vss.networking.server.storage.PersistentColumnLodStore;
 import dev.xantha.vss.networking.server.storage.PersistentColumnWriter;
-import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.common.VSSConstants;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.config.VSSServerConfig;
@@ -39,8 +39,6 @@ import dev.xantha.vss.networking.server.compat.LostCityHintService;
 import dev.xantha.vss.networking.payloads.HandshakeRequestS2CPayload;
 import dev.xantha.vss.networking.payloads.RegionPresenceC2SPayload;
 import dev.xantha.vss.networking.payloads.VoxelColumnS2CPayload;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -53,19 +51,25 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent;
 
+/**
+ * 服务端组装与平台事件入口。只在此创建共享组件，再以构造参数交给业务模块。
+ * <p>保持静态门面供命令和平台适配器使用；存储、调度、会话实现不得反向调用本类。
+ */
 public final class VSSServerNetworking {
-    private static final AtomicLong NEXT_TRANSFER_ID = new AtomicLong(1L);
     private static final PlayerRequestRegistry PLAYER_REGISTRY = new PlayerRequestRegistry();
     private static final ChunkGenerationService GENERATION_SERVICE = new ChunkGenerationService(VSSServerConfig.CONFIG);
     private static final ColumnLodCache COLUMN_CACHE = new ColumnLodCache(VSSServerConfig.CONFIG);
     private static final PersistentColumnLodStore PERSISTENT_COLUMN_STORE = new PersistentColumnLodStore(VSSServerConfig.CONFIG);
     private static final ServerRequestStats REQUEST_STATS = new ServerRequestStats();
     private static final ServerLifecycleGuard SERVER_LIFECYCLE = new ServerLifecycleGuard();
+    private static final PlayerSessionLookup SESSION_LOOKUP = new PlayerSessionLookup(PLAYER_REGISTRY, SERVER_LIFECYCLE);
+    private static final ColumnDeliveryService COLUMN_DELIVERY = new ColumnDeliveryService(
+            SERVER_LIFECYCLE, () -> VSSServerConfig.CONFIG, VSSNetworking::sendToPlayer);
     private static final DiskTaskRuntime DISK_RUNTIME = new DiskTaskRuntime(
             VSSServerConfig.MIN_DISK_READER_THREADS,
             VSSServerConfig.MAX_DISK_READER_THREADS,
             () -> VSSServerConfig.CONFIG.diskReaderThreads,
-            () -> !isServerStopping());
+            () -> !SERVER_LIFECYCLE.isStopping());
     private static final PersistentColumnReadCoordinator COLUMN_READ_COORDINATOR = new PersistentColumnReadCoordinator(
             PERSISTENT_COLUMN_STORE,
             DISK_RUNTIME);
@@ -75,13 +79,18 @@ public final class VSSServerNetworking {
             GENERATION_SERVICE,
             COLUMN_CACHE,
             DISK_RUNTIME,
-            COLUMN_READ_COORDINATOR);
+            COLUMN_READ_COORDINATOR,
+            SERVER_LIFECYCLE,
+            COLUMN_DELIVERY);
     private static final PersistentColumnWriter PERSISTENT_COLUMN_WRITER = new PersistentColumnWriter(
             PERSISTENT_COLUMN_STORE,
-            DISK_RUNTIME);
+            DISK_RUNTIME,
+            SERVER_LIFECYCLE);
     private static final ChunkyGenerationService CHUNKY_SERVICE = new ChunkyGenerationService(
             GENERATION_SERVICE, COLUMN_CACHE, PERSISTENT_COLUMN_STORE,
-            PERSISTENT_COLUMN_WRITER, DISK_RUNTIME, PLAYER_REGISTRY);
+            PERSISTENT_COLUMN_WRITER, DISK_RUNTIME, PLAYER_REGISTRY,
+            SERVER_LIFECYCLE,
+            SESSION_LOOKUP);
     private static final ColumnStorageReadPipeline STORAGE_READ_PIPELINE = new ColumnStorageReadPipeline(
             PLAYER_REGISTRY,
             GENERATION_SERVICE,
@@ -90,13 +99,17 @@ public final class VSSServerNetworking {
             PERSISTENT_COLUMN_WRITER,
             REQUEST_STATS,
             DISK_RUNTIME,
-            COLUMN_READ_COORDINATOR);
+            COLUMN_READ_COORDINATOR,
+            SERVER_LIFECYCLE,
+            COLUMN_DELIVERY);
     private static final GeneratedColumnFlusher GENERATED_COLUMN_FLUSHER = new GeneratedColumnFlusher(
             PLAYER_REGISTRY,
             GENERATION_SERVICE,
             COLUMN_CACHE,
             PERSISTENT_COLUMN_WRITER,
-            CHUNKY_SERVICE);
+            CHUNKY_SERVICE,
+            SERVER_LIFECYCLE,
+            COLUMN_DELIVERY);
     private static final long DIAGNOSTIC_INTERVAL_NANOS = 5_000_000_000L;
     private static final ColumnRequestBatchHandler BATCH_REQUEST_HANDLER = new ColumnRequestBatchHandler(
             PLAYER_REGISTRY,
@@ -104,10 +117,13 @@ public final class VSSServerNetworking {
             STORAGE_READ_PIPELINE,
             REQUEST_STATS,
             DISK_RUNTIME,
-            DIAGNOSTIC_INTERVAL_NANOS);
+            DIAGNOSTIC_INTERVAL_NANOS,
+            SERVER_LIFECYCLE,
+            COLUMN_DELIVERY);
     private static final ClientControlMessageHandler CONTROL_MESSAGE_HANDLER = new ClientControlMessageHandler(
             PLAYER_REGISTRY,
-            GENERATION_SERVICE);
+            GENERATION_SERVICE,
+            SERVER_LIFECYCLE);
     private static final ServerNetworkingDiagnostics NETWORKING_DIAGNOSTICS = new ServerNetworkingDiagnostics(
             PLAYER_REGISTRY,
             GENERATION_SERVICE,
@@ -121,7 +137,9 @@ public final class VSSServerNetworking {
     private static final QueuedColumnSender QUEUED_COLUMN_SENDER = new QueuedColumnSender(
             PLAYER_REGISTRY,
             PRIORITY_SEND_COLUMNS_PER_TICK,
-            DIAGNOSTIC_INTERVAL_NANOS);
+            DIAGNOSTIC_INTERVAL_NANOS,
+            SERVER_LIFECYCLE,
+            COLUMN_DELIVERY);
     private static final ServerNetworkingLifecycle SERVER_RUNTIME = new ServerNetworkingLifecycle(
             PLAYER_REGISTRY,
             GENERATION_SERVICE,
@@ -139,7 +157,8 @@ public final class VSSServerNetworking {
     private static final PlayerSessionManager SESSION_MANAGER = new PlayerSessionManager(
             PLAYER_REGISTRY,
             EXISTING_COLUMN_PRELOADER,
-            SERVER_RUNTIME::markSessionActive);
+            SERVER_RUNTIME::markSessionActive,
+            SERVER_LIFECYCLE);
 
     private VSSServerNetworking() {
     }
@@ -157,35 +176,20 @@ public final class VSSServerNetworking {
     }
 
     public static boolean isRegistered(ServerPlayer player) {
-        return !isServerStopping() && PLAYER_REGISTRY.contains(player.getUUID());
+        return SESSION_LOOKUP.isRegistered(player);
     }
 
     public static boolean hasRegisteredPlayers() {
-        return !isServerStopping() && !PLAYER_REGISTRY.isEmpty();
+        return SESSION_LOOKUP.hasRegisteredPlayers();
     }
 
     public static boolean hasRegisteredPlayers(ServerLevel level) {
-        if (isServerStopping()) {
-            return false;
-        }
-        for (ServerPlayer player : level.players()) {
-            if (isRegistered(player)) {
-                return true;
-            }
-        }
-        return false;
+        return SESSION_LOOKUP.hasRegisteredPlayers(level);
     }
 
-    public static long clientKnownColumnTimestamp(
-            ServerPlayer player,
-            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
-            int cx,
-            int cz) {
-        if (isServerStopping() || player == null) {
-            return 0L;
-        }
-        PlayerRequestState state = PLAYER_REGISTRY.get(player.getUUID());
-        return state != null ? state.clientKnownTimestamp(dimension, cx, cz) : 0L;
+    public static long clientKnownColumnTimestamp(ServerPlayer player,
+            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension, int cx, int cz) {
+        return SESSION_LOOKUP.clientKnownColumnTimestamp(player, dimension, cx, cz);
     }
 
     public static void refreshSessionConfigs(MinecraftServer server) {
@@ -256,101 +260,19 @@ public final class VSSServerNetworking {
         PERSISTENT_COLUMN_WRITER.invalidate(level.dimension(), cx, cz, dirtyTimestamp);
     }
 
+    /** 服务端事件与外部兼容入口；交付规则由注入的服务统一执行。 */
     public static boolean queueColumn(ServerPlayer player, PlayerRequestState state, VoxelColumnS2CPayload payload) {
-        return queueColumn(player, state, payload, false);
+        return COLUMN_DELIVERY.queueColumn(player, state, payload);
     }
 
-    public static boolean queueColumn(ServerPlayer player, PlayerRequestState state, VoxelColumnS2CPayload payload, boolean priority) {
-        if (state.consumeCancelled(payload.requestId()) || !state.isActiveRequest(payload.requestId())) {
-            return false;
-        }
-        if (isServerStopping()) {
-            state.clearRequest(payload.requestId());
-            return false;
-        }
-        if (!payload.completeColumn()) {
-            if (VSSLogger.isDebugEnabled()) {
-                VSSLogger.debug("LOD column unavailable: reason=incomplete, dimension=" + payload.dimension().location()
-                        + ", chunk=" + payload.chunkX() + "," + payload.chunkZ() + ", request=" + payload.requestId());
-            }
-            state.clearRequest(payload.requestId());
-            sendNotGenerated(player, payload.requestId());
-            return false;
-        }
-        if (!isPayloadStillRelevant(player, payload)) {
-            state.clearRequest(payload.requestId());
-            sendBackpressured(player, payload.requestId());
-            return false;
-        }
-        boolean allowZstdColumns = state.supportsZstdColumns();
-        VoxelColumnS2CPayload transferPayload = payload.withTransferMetadata(
-                nextTransferId(),
-                0,
-                1,
-                payload.replacementSectionYs());
-        transferPayload.setAllowZstdEncoding(allowZstdColumns);
-        VSSServerConfig config = VSSServerConfig.CONFIG;
-        long effectiveBandwidth = Math.min(config.totalBandwidthBytesPerSecond(), state.desiredBandwidth());
-        List<VoxelColumnS2CPayload> payloads = ColumnPayloadSplitter.splitForBandwidth(
-                player.serverLevel(),
-                transferPayload,
-                effectiveBandwidth,
-                config.enableNetworkColumnCompression);
-        for (VoxelColumnS2CPayload queuedPayload : payloads) {
-            queuedPayload.setAllowZstdEncoding(allowZstdColumns);
-        }
-        state.prepareSendOrder(player.getBlockX() >> 4, player.getBlockZ() >> 4);
-        PlayerSendQueue.EnqueueResult admission = state.enqueue(payloads, priority);
-        for (int rejectedRequestId : admission.rejectedRequestIds()) {
-            sendBackpressured(player, rejectedRequestId);
-        }
-        return admission.accepted();
+    public static boolean queueColumn(ServerPlayer player, PlayerRequestState state,
+            VoxelColumnS2CPayload payload, boolean priority) {
+        return COLUMN_DELIVERY.queueColumn(player, state, payload, priority);
     }
 
-    private static boolean isPayloadStillRelevant(ServerPlayer player, VoxelColumnS2CPayload payload) {
-        return isColumnStillRelevant(player, payload.dimension(), payload.chunkX(), payload.chunkZ());
-    }
-
-    public static boolean isColumnStillRelevant(
-            ServerPlayer player,
-            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
-            int cx,
-            int cz) {
-        if (isServerStopping() || player == null || !VSSServerConfig.CONFIG.enabled) {
-            return false;
-        }
-        if (!player.serverLevel().dimension().equals(dimension)) {
-            return false;
-        }
-
-        int playerCx = player.getBlockX() >> 4;
-        int playerCz = player.getBlockZ() >> 4;
-        int maxDistance = VSSServerConfig.CONFIG.effectiveColumnSyncDistanceChunks() + VSSConstants.LOD_DISTANCE_BUFFER;
-        return PositionUtil.chebyshevDistance(cx, cz, playerCx, playerCz) <= maxDistance;
-    }
-
-    private static void sendBackpressured(ServerPlayer player, int requestId) {
-        sendResponse(player, requestId, VSSConstants.RESPONSE_BACKPRESSURE);
-    }
-
-    private static void sendNotGenerated(ServerPlayer player, int requestId) {
-        sendResponse(player, requestId, VSSConstants.RESPONSE_NOT_GENERATED);
-    }
-
-    private static void sendResponse(ServerPlayer player, int requestId, byte responseType) {
-        if (requestId < 0) {
-            return;
-        }
-        VSSNetworking.sendToPlayer(
-                player,
-                new BatchResponseS2CPayload(
-                        new byte[] {responseType},
-                        new int[] {requestId},
-                        1));
-    }
-
-    private static long nextTransferId() {
-        return NEXT_TRANSFER_ID.getAndUpdate(current -> current == Long.MAX_VALUE ? 1L : current + 1L);
+    public static boolean isColumnStillRelevant(ServerPlayer player,
+            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension, int cx, int cz) {
+        return COLUMN_DELIVERY.isColumnStillRelevant(player, dimension, cx, cz);
     }
 
     public static void handleCancel(CancelRequestC2SPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -383,6 +305,14 @@ public final class VSSServerNetworking {
         if (player != null && !isServerStopping()) LostCityHintService.handle(player, payload);
     }
 
+    public static void handleStructureTemplateRequest(
+            dev.xantha.vss.networking.payloads.StructureTemplateRequestC2SPayload payload,
+            Supplier<NetworkEvent.Context> contextSupplier) {
+        ServerPlayer player = contextSupplier.get().getSender();
+        if (player != null && !isServerStopping() && VSSServerConfig.CONFIG.enabled)
+            dev.xantha.vss.networking.server.session.StructureTemplateService.handle(player, payload);
+    }
+
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && !isServerStopping()) {
@@ -399,6 +329,7 @@ public final class VSSServerNetworking {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             LostCityHintService.forgetPlayer(player.getUUID());
+            dev.xantha.vss.networking.server.session.StructureTemplateService.forgetPlayer(player.getUUID());
             SERVER_RUNTIME.onPlayerLogout(player);
         }
     }
@@ -406,6 +337,7 @@ public final class VSSServerNetworking {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
+            dev.xantha.vss.networking.server.session.StructureTemplateService.tick(event.getServer());
             SERVER_RUNTIME.onServerTick(event.getServer());
         }
     }

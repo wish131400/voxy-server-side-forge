@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Exercises the production queue and its final CPU lease, including the LOW frame fuse. */
+/** Exercises the production queue and its final CPU lease, including CPU saturation and capped frame rates. */
 class PredictionCpuAdmissionIntegrationTest {
     private static final long SECOND = 1_000_000_000L;
     private static final DimensionProfile PROFILE = new DimensionProfile(ResourceLocation.tryParse("minecraft:overworld"),
@@ -58,7 +58,7 @@ class PredictionCpuAdmissionIntegrationTest {
         PredictionFramePace.resetForTesting();
     }
 
-    @Test void lowPauseCompletesCurrentTerrainWithTwoSecondsBetweenStarts() throws Exception {
+    @Test void cpuSaturationCompletesCurrentTerrainWithTwoSecondsBetweenStarts() throws Exception {
         framePace(40_000_000L);
         var clock = new AtomicLong();
         var budget = budget(clock);
@@ -96,7 +96,7 @@ class PredictionCpuAdmissionIntegrationTest {
         }
     }
 
-    @Test void lowPauseCompletesImportantSurfaceEvenBehindTheWorkView() throws Exception {
+    @Test void cpuSaturationDefersUnseenSurfaceThenCompletesItAfterTurning() throws Exception {
         framePace(40_000_000L);
         var clock = new AtomicLong();
         var budget = budget(clock);
@@ -115,41 +115,67 @@ class PredictionCpuAdmissionIntegrationTest {
 
             enqueue(manager, key, true);
             awaitIdle(manager);
-            assertTrue(keys(manager, "surfaceReady").contains(key), "important surfaces must publish under LOW + PAUSE");
+            assertFalse(keys(manager, "surfaceReady").contains(key), "an invisible surface must wait even when the visible view has finished");
+            assertEquals(0, sampler.work.get());
+            manager.setWorkView(PredictionWorkView.of(0, 80, 0, 1, 0, 0, 70, 1));
+            enqueue(manager, key, true);
+            awaitIdle(manager);
+            assertTrue(keys(manager, "surfaceReady").contains(key), "important surfaces must publish under CPU saturation");
             assertTrue(sampler.work.get() > 0);
             assertEquals(1, manager.builtTileCount());
             assertTrue(budget.diagnostics().contains("active=0,detail=0"));
         }
     }
 
-    @Test void lowPressureOneCompletesCurrentTerrainWithoutReopeningTheRegularLane() throws Exception {
-        framePace(25_000_000L); // 40 FPS: LOW pauses, but shared CPU pressure is only 1.
+    @Test void cpuPressureOneReducesConcurrencyWithoutTheSaturationDelay() throws Exception {
+        framePace(33_333_333L);
         var clock = new AtomicLong();
-        var budget = budget(clock);
+        var budget = budget(clock, .90);
         var sampler = new Sampler(null);
         try (var manager = manager(sampler, budget)) {
             var key = root(manager, 0);
             plan(manager, key, 8, 16);
-            assertTrue(budget.diagnostics().contains("pressure=1"));
-            enqueue(manager, key, false);
-            assertEquals(0, manager.pendingCount(), "pressure must settle before admitting a detail job");
-            assertEquals(0, sampler.work.get());
-            clock.set(2 * SECOND);
+            assertEquals(PredictionCpuBudget.ThrottleLevel.REDUCE, budget.currentThrottle());
             enqueue(manager, key, false);
             awaitIdle(manager);
             assertEquals(16, residents(manager).get(key).cellAxis());
-            assertTrue(sampler.work.get() > 0, "the paused current target must make actual progress at 40 FPS");
-            var next = root(manager, 1);
-            plan(manager, next, 8, 16);
-            int work = sampler.work.get();
-            clock.set(4 * SECOND - 1);
-            enqueue(manager, next, false);
-            assertEquals(0, manager.pendingCount());
-            assertEquals(work, sampler.work.get(), "pressure 1 must enforce the same two-second start interval");
-            clock.incrementAndGet();
-            enqueue(manager, next, false);
+            assertTrue(sampler.work.get() > 0);
+            assertTrue(budget.diagnostics().contains("active=0,detail=0"));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"low", "medium", "high"})
+    void thirtyFpsAllowsActualTerrainAndIdleBuildsInEveryTier(String tier) throws Exception {
+        VSSClientConfig.CONFIG.performanceTier = tier;
+        framePace(33_333_333L);
+        var clock = new AtomicLong();
+        var budget = budget(clock, .5);
+        var sampler = new Sampler(null);
+        try (var manager = manager(sampler, budget)) {
+            var key = root(manager, 0);
+            plan(manager, key, 8, 16);
+            assertEquals(PredictionCpuBudget.ThrottleLevel.NONE, budget.currentThrottle());
+            assertTrue(budget.allowsIdleRefinement());
+            enqueue(manager, key, false);
             awaitIdle(manager);
-            assertEquals(16, residents(manager).get(next).cellAxis());
+            assertEquals(16, residents(manager).get(key).cellAxis());
+            assertEquals(1, manager.builtTileCount());
+
+            var idleKey = root(manager, 1);
+            plan(manager, idleKey, 8, 8);
+            field("terrainTargets").set(manager, Map.of(key, 16, idleKey, 16));
+            field("idleTargets").set(manager, Map.of(idleKey, 16));
+            field("idleAllowed").setBoolean(manager, true);
+            // Publication marks foreground planning dirty. This direct-enqueue
+            // fixture must model the next completed plan before admitting idle work.
+            field("foregroundWorkPending").setBoolean(manager, false);
+            enqueue(manager, idleKey, false);
+            awaitIdle(manager);
+            assertEquals(16, residents(manager).get(idleKey).cellAxis(), "optional idle quality must progress at capped 30 FPS");
+            assertEquals(2, manager.builtTileCount());
+            assertEquals(8, budget.localGenerationLimit(16, false));
+            assertTrue(budget.diagnostics().contains("active=0,detail=0"));
         }
     }
 
@@ -245,13 +271,15 @@ class PredictionCpuAdmissionIntegrationTest {
     private static void framePace(long gap) {
         long now = System.nanoTime();
         for (int i = 50; i >= 0; i--) PredictionFramePace.recordFrame(now - i * gap);
-        assertEquals(PredictionFramePace.ThrottleLevel.PAUSE, PredictionFramePace.currentThrottle());
+        assertEquals(1.0E9 / gap, PredictionFramePace.averageFps(), .01);
     }
 
     private static PredictionCpuBudget budget(AtomicLong clock) {
-        // Both pressures leave spare total capacity; the cross-manager test verifies detail cap 1.
-        return new PredictionCpuBudget(() -> 8, () -> .5, () -> .4, PredictionFramePace::averageFps,
-                clock::get, false);
+        return budget(clock, .98);
+    }
+
+    private static PredictionCpuBudget budget(AtomicLong clock, double cpuLoad) {
+        return new PredictionCpuBudget(() -> 8, () -> cpuLoad, () -> .4, clock::get, false);
     }
 
     private static PredictionTileManager manager(ClientTerrainSampler sampler, PredictionCpuBudget budget) {

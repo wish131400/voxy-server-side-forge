@@ -104,6 +104,103 @@ class PredictionVegetationSettingsTest {
                 PredictionVegetationSelection.select(reversed, PredictionVegetationDensity.MEDIUM));
     }
 
+    @Test void touchingCrownsSelectIndependentTreesAndRemainStableNestedSubsets() {
+        var blocks = new LinkedHashMap<BlockPos, BlockState>();
+        for (int z = -4; z < 4; z++) for (int x = -4; x < 4; x++) tree(blocks, x * 3, z * 3);
+        var canonical = Map.copyOf(blocks);
+        Map<BlockPos, BlockState> previous = Map.of();
+        for (var density : PredictionVegetationDensity.values()) {
+            var selected = PredictionVegetationSelection.select(blocks, density);
+            int roots = 0, expected = 0;
+            for (int z = -4; z < 4; z++) for (int x = -4; x < 4; x++) {
+                var oneTree = new HashMap<BlockPos, BlockState>(); tree(oneTree, x * 3, z * 3);
+                boolean keep = density.keep(x * 3, z * 3);
+                for (var pos : oneTree.keySet()) assertEquals(keep, selected.containsKey(pos),
+                        "touching crowns must not override the root choice: " + density + "/" + pos);
+                if (selected.containsKey(new BlockPos(x * 3, 64, z * 3))) roots++;
+                if (keep) expected++;
+            }
+            assertEquals(expected, roots);
+            assertTrue(selected.entrySet().containsAll(previous.entrySet()));
+            previous = selected;
+            var reversed = new LinkedHashMap<BlockPos, BlockState>();
+            var positions = new ArrayList<>(blocks.keySet()); Collections.reverse(positions);
+            for (var pos : positions) reversed.put(pos, blocks.get(pos));
+            assertEquals(selected, PredictionVegetationSelection.select(reversed, density));
+            System.out.println("TOUCHING_CROWNS density=" + density + " roots=" + roots + "/64 blocks="
+                    + selected.size() + "/" + blocks.size());
+        }
+        assertEquals(canonical, blocks);
+    }
+
+    @Test void connectedWideTrunksAndBranchesRemainOneWholeTree() {
+        int x = 0;
+        while (PredictionVegetationDensity.MEDIUM.keep(x, 0)
+                == PredictionVegetationDensity.MEDIUM.keep(x + 2, 0)) x++;
+        var blocks = new HashMap<BlockPos, BlockState>();
+        for (int dx = 0; dx < 2; dx++) for (int z = 0; z < 2; z++)
+            for (int y = 64; y <= 67; y++) blocks.put(new BlockPos(x + dx, y, z), Blocks.OAK_LOG.defaultBlockState());
+        blocks.put(new BlockPos(x + 2, 68, 0), Blocks.OAK_LOG.defaultBlockState());
+        for (int dx = -1; dx <= 3; dx++) for (int z = -1; z <= 2; z++)
+            blocks.put(new BlockPos(x + dx, 69, z), Blocks.OAK_LEAVES.defaultBlockState());
+        for (var density : PredictionVegetationDensity.values()) {
+            var selected = PredictionVegetationSelection.select(blocks, density);
+            assertEquals(density.keep(x, 0) ? blocks : Map.of(), selected,
+                    "wide trunks and connected branches use the same lowest root");
+        }
+    }
+
+    @Test void sharedOverlappingCanopyStaysConnectedToSelectedTrunks() {
+        var blocks = new LinkedHashMap<BlockPos, BlockState>();
+        for (int x = -16; x <= 16; x += 4) {
+            for (int y = 64; y <= 66; y++) blocks.put(new BlockPos(x, y, 0), Blocks.OAK_LOG.defaultBlockState());
+            for (int dx = -3; dx <= 3; dx++) for (int z = -3; z <= 3; z++)
+                blocks.put(new BlockPos(x + dx, 67, z), Blocks.OAK_LEAVES.defaultBlockState());
+        }
+        Map<BlockPos, BlockState> previous = Map.of();
+        for (var density : PredictionVegetationDensity.values()) {
+            var selected = PredictionVegetationSelection.select(blocks, density);
+            var reachable = new HashSet<BlockPos>(); var queue = new ArrayList<BlockPos>();
+            for (int x = -16; x <= 16; x += 4) {
+                for (int y = 64; y <= 66; y++) {
+                    var pos = new BlockPos(x, y, 0);
+                    assertEquals(density.keep(x, 0), selected.containsKey(pos));
+                    if (selected.containsKey(pos) && reachable.add(pos)) queue.add(pos);
+                }
+            }
+            for (int i = 0; i < queue.size(); i++) {
+                var pos = queue.get(i);
+                for (int dx = -1; dx <= 1; dx++) for (int dy = -1; dy <= 1; dy++) for (int dz = -1; dz <= 1; dz++) {
+                    var next = pos.offset(dx, dy, dz);
+                    if (selected.containsKey(next) && reachable.add(next)) queue.add(next);
+                }
+            }
+            assertEquals(selected.keySet(), reachable, "no floating crown pieces after selection");
+            assertTrue(selected.entrySet().containsAll(previous.entrySet())); previous = selected;
+            var shuffled = new ArrayList<>(blocks.keySet()); Collections.shuffle(shuffled, new Random(42));
+            var reordered = new LinkedHashMap<BlockPos, BlockState>();
+            for (var pos : shuffled) reordered.put(pos, blocks.get(pos));
+            assertEquals(selected, PredictionVegetationSelection.select(reordered, density));
+        }
+    }
+
+    @Test void touchingCrownsDoNotChangeChoicesAcrossDisplayTileBoundaries() {
+        int z = 4;
+        while (PredictionVegetationDensity.MEDIUM.keep(31, z)
+                || !PredictionVegetationDensity.MEDIUM.keep(34, z)) z++;
+        var blocks = new HashMap<BlockPos, BlockState>(); tree(blocks, 31, z); tree(blocks, 34, z);
+        var sources = List.of(new PredictionVegetationDisplayCache.Source(0, Map.copyOf(blocks)));
+        var cache = new PredictionVegetationDisplayCache();
+        for (int baseX : new int[]{0, 32}) {
+            try (var build = cache.begin(baseX, 0, 32, 1, true, PredictionVegetationDensity.MEDIUM)) {
+                var tile = cache.tile(build, sources, ignored -> false);
+                assertEquals(baseX == 32, !tile.blocks().isEmpty(),
+                        "clipping cannot turn a retained neighbouring tree into a discarded grove");
+            }
+        }
+        assertEquals(blocks, sources.get(0).blocks());
+    }
+
     @Test void selectionPreservesBuildingsTerrainCutsFluidsAndStandaloneTemplateWood() {
         int x = 0;
         while (PredictionVegetationDensity.LOW.keep(x, 0)) x++;
@@ -221,6 +318,13 @@ class PredictionVegetationSettingsTest {
                 assertEquals(density, PredictionVegetationDensity.fromSettings(density.settingsBits()));
                 var identity = PredictionMeshCodec.baseSignature(new byte[]{1, 2, 3}, new ClientColumnSample[0],
                         new int[0], new int[0], new int[0], 63, 0, 1, true, settings | density.settingsBits());
+                int legacy = settings | (density == PredictionVegetationDensity.LOW ? 1
+                        : density == PredictionVegetationDensity.MEDIUM ? 2 : 0) << 10;
+                assertSame(before, method.invoke(manager, legacy), "canonical placements remain reusable");
+                var oldIdentity = PredictionMeshCodec.baseSignature(new byte[]{1, 2, 3}, new ClientColumnSample[0],
+                        new int[0], new int[0], new int[0], 63, 0, 1, true, legacy);
+                assertEquals(density == PredictionVegetationDensity.HIGH, Arrays.equals(oldIdentity, identity),
+                        "rebuild legacy filtered meshes while preserving the unchanged high-density identity");
                 if (previous != null) assertFalse(Arrays.equals(previous, identity));
                 previous = identity;
             }

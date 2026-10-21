@@ -17,39 +17,55 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-/** Server-supplied templates only; never consult a player's save or guess missing pieces. */
+/** Locally available templates are used only after matching the server's exact resource digest. */
 final class PredictionStructureTemplates extends StructureTemplateManager {
+    static final long MAX_NBT_BYTES = 512L * 1024 * 1024;
+    private static PredictionStructureTemplates shared;
     private final JsonObject encoded;
+    private final PredictionTemplateRepository repository;
     private final Map<ResourceLocation, StructureTemplate> decoded = new LinkedHashMap<>(32, .75F, true);
     private final Map<ResourceLocation, Long> decodedWeights = new java.util.HashMap<>();
     private long decodedBytes;
 
     static synchronized PredictionStructureTemplates open(JsonObject encoded) throws IOException {
+        PredictionTemplateRepository repository = encoded.has("_vss_catalog")
+                ? PredictionTemplateRepository.forCatalog(encoded) : null;
+        if (repository != null && shared != null && shared.repository == repository) return shared;
         // Vanilla's constructor requires a generated-directory handle. This is a
         // private disposable cache directory, closed immediately after construction;
         // get/getOrCreate below use only the immutable server snapshot.
         var storage = LevelStorageSource.createDefault(FMLPaths.GAMEDIR.get().resolve("vss/prediction/template-loader"));
         try (var handle = storage.createAccess("cache")) {
-            return new PredictionStructureTemplates(encoded, handle);
+            var manager = new PredictionStructureTemplates(encoded, repository, handle);
+            if (repository != null) shared = manager;
+            return manager;
         }
     }
 
-    private PredictionStructureTemplates(JsonObject encoded, LevelStorageSource.LevelStorageAccess handle) {
+    private PredictionStructureTemplates(JsonObject encoded, PredictionTemplateRepository repository,
+                                         LevelStorageSource.LevelStorageAccess handle) {
         super(ResourceManager.Empty.INSTANCE, handle, DataFixers.getDataFixer(), BuiltInRegistries.BLOCK.asLookup());
         this.encoded = encoded;
+        this.repository = repository;
     }
 
+    static synchronized void clearShared() { shared = null; }
+
     @Override public synchronized Optional<StructureTemplate> get(ResourceLocation id) {
+        if (repository != null) repository.checkOpen();
         StructureTemplate template = decoded.get(id);
         if (template != null) return Optional.of(template);
         if (!encoded.has(id.toString())) return Optional.empty();
         try {
-            byte[] bytes = java.util.Base64.getDecoder().decode(encoded.get(id.toString()).getAsString());
-            var accounting = new NbtAccounter(32 * 1024 * 1024);
+            byte[] bytes = repository == null
+                    ? java.util.Base64.getDecoder().decode(encoded.get(id.toString()).getAsString()) : repository.bytes(id);
+            if (bytes == null) return Optional.empty();
+            var accounting = new NbtAccounter(MAX_NBT_BYTES);
             var tag = readTemplate(bytes, accounting);
             // Prediction has no entities, block entities, loot or ticking state.
             tag.remove("entities");
             stripEndCityEntityMarkers(id, tag);
+            stripOceanRuinEntityMarkers(id, tag);
             template = readStructure(tag);
             long weight = accounting.getUsage();
             while (!decoded.isEmpty() && (decoded.size() >= 256 || decodedBytes + weight > 64L * 1024 * 1024)) {
@@ -84,6 +100,18 @@ final class PredictionStructureTemplates extends StructureTemplateManager {
             var data = block.getCompound("nbt");
             String marker = data.getString("metadata");
             if (marker.startsWith("Sentry") || marker.startsWith("Elytra")) data.putString("metadata","");
+        }
+    }
+    static void stripOceanRuinEntityMarkers(ResourceLocation id, net.minecraft.nbt.CompoundTag tag) {
+        if (!id.getNamespace().equals("minecraft") || !id.getPath().startsWith("underwater_ruin/")) return;
+        // OceanRuinPieces creates the drowned through getLevel() before it
+        // checks addFreshEntity(). Prediction has no ServerLevel or entities;
+        // keep the ruin and chest markers, omitting only this entity marker.
+        for (var value : tag.getList("blocks", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+            var block = (net.minecraft.nbt.CompoundTag) value;
+            if (!block.contains("nbt", net.minecraft.nbt.Tag.TAG_COMPOUND)) continue;
+            var data = block.getCompound("nbt");
+            if (data.getString("metadata").equals("drowned")) data.putString("metadata", "");
         }
     }
 }

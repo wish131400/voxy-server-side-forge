@@ -37,11 +37,13 @@ final class ClientCaptureExtractor {
         // Prediction receives columns after transfer assembly. The replacement
         // flag controls Voxy storage cleanup, not whether fresh terrain is complete.
         boolean complete = data != null && data.completesRequest();
+        // Complete real columns need metadata, never 256 expensive density evaluations.
+        ClientColumnSample metadata = complete ? sampler.samplePreview(chunkX * 16 + 8, chunkZ * 16 + 8, 16) : null;
         ClientColumnSample[] result = new ClientColumnSample[256];
         for (int z = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++) {
                 result[z * 16 + x] = extractColumn(chunkX, chunkZ, x, z, access, sampler,
-                        minY, maxY, complete);
+                        minY, maxY, complete, metadata);
             }
         }
         return result;
@@ -50,11 +52,12 @@ final class ClientCaptureExtractor {
     private static ClientColumnSample extractColumn(int chunkX, int chunkZ, int x, int z,
                                                      SectionAccess access,
                                                      ClientTerrainSampler sampler,
-                                                     int minY, int maxY, boolean complete) {
-        ClientColumnSample predicted = sampler.sampleSurface(chunkX * 16 + x, chunkZ * 16 + z);
+                                                     int minY, int maxY, boolean complete, ClientColumnSample metadata) {
+        ClientColumnSample predicted = metadata != null ? metadata : sampler.sampleSurface(chunkX * 16 + x, chunkZ * 16 + z);
         // A delta/unfinished transfer cannot prove either the top surface or
         // empty space above it. Wait for the assembled authoritative column.
         if (!complete) return predicted.withoutVegetationHints();
+        boolean portalContext = !complete;
         int topY = Integer.MIN_VALUE;
         int fluidY = Integer.MIN_VALUE;
         int fluid = 0;
@@ -80,6 +83,11 @@ final class ClientCaptureExtractor {
                 }
                 continue;
             }
+            if (!portalContext && state.is(Blocks.OBSIDIAN)) {
+                // Only portal/obsidian ambiguity needs the original per-column seed comparison.
+                predicted = sampler.sampleSurface(chunkX * 16 + x, chunkZ * 16 + z);
+                portalContext = true;
+            }
             if (isGround(state) && !elevatedPortalBlock(access, x, y, z, state, predicted)) {
                 topY = y + 1;
                 topBlock = blockId(state);
@@ -99,9 +107,10 @@ final class ClientCaptureExtractor {
             }
         }
 
+        int biomeIndex = sampler.captureBiomeIndex(access.biome(x, topY == Integer.MIN_VALUE ? minY : topY - 1, z), predicted.biomeIndex());
         if (topY == Integer.MIN_VALUE) {
             return new ClientColumnSample(minY, fluidFound ? fluidY : minY,
-                    predicted.biomeIndex(), ClientColumnSample.NO_BLOCK, 0, 0, 0, 0, fluid,
+                    biomeIndex, ClientColumnSample.NO_BLOCK, 0, 0, 0, 0, fluid,
                     flags | ClientColumnSample.FLAG_NO_SURFACE, 0,
                     ClientColumnSample.NO_BLOCK, ClientColumnSample.NO_BLOCK,
                     ClientColumnSample.NO_SPAN, ClientColumnSample.NO_SPAN,
@@ -120,7 +129,7 @@ final class ClientCaptureExtractor {
         ClientColumnSample captured = new ClientColumnSample(
                 topY,
                 fluidY == Integer.MIN_VALUE ? predicted.fluidY() : fluidY,
-                predicted.biomeIndex(),
+                biomeIndex,
                 topBlock,
                 0,
                 0,
@@ -216,6 +225,11 @@ final class ClientCaptureExtractor {
             this.sections = Map.copyOf(indexed);
             this.minSectionY = Math.floorDiv(minY, 16);
             this.maxSectionY = Math.floorDiv(maxY, 16);
+        }
+
+        private net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome> biome(int x, int y, int z) {
+            var section = sections.get(Math.floorDiv(y, 16));
+            return section == null ? null : section.getNoiseBiome(x >> 2, Math.floorMod(y, 16) >> 2, z >> 2);
         }
 
         private BlockState state(int x, int y, int z) {

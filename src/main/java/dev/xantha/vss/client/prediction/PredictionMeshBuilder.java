@@ -331,6 +331,7 @@ public final class PredictionMeshBuilder {
         var interiorPlants = vegetation == null ? null : vegetation.withoutExteriorEnvelope();
         var interiorEdits = new PredictionInteriorEdits(samples, vegetation, baseX, baseZ, stepBlocks, gridSize);
         int[] terrainEnds = new int[cellCount];
+        int[] previewStarts = simpleCells.isEmpty() ? null : new int[cellCount];
         MeshSegments segments = segmented ? new MeshSegments(stepBlocks) : null;
         for (int z = 0; z < cellAxis; z++) {
             requireCurrent(current);
@@ -402,6 +403,7 @@ public final class PredictionMeshBuilder {
                 if (cityGeometry != null && !s00.captured())
                     addLostCityPreview(terrain, cityGeometry.overlays(cell), foliageTint, 0, 0);
                 var representative = simpleCells.get(cell);
+                if (previewStarts != null) previewStarts[cell] = terrain.vertexCount();
                 if (representative != null && !cityVegetation)
                     addSimpleVegetation(terrain, representative, foliageTint);
 
@@ -436,18 +438,19 @@ public final class PredictionMeshBuilder {
                 if (segmented && (terrain.vertexCount() >= SEGMENT_VERTEX_TARGET || water.vertexCount() >= SEGMENT_VERTEX_TARGET)) {
                     requireCurrent(current);
                     segments.add(triangleMesh(terrain, water, waterCells, cellOffsets, cellCounts,
-                            waterOffsets, waterCounts, terrainEnds, cellAxis, stepBlocks, affineTintSafe));
+                            waterOffsets, waterCounts, terrainEnds, previewStarts, cellAxis, stepBlocks, affineTintSafe));
                     terrain = new VertexAccumulator(Math.min(cellCount * 8, 16_384));
                     water = new VertexAccumulator(Math.min(cellCount * 8, 16_384));
                     waterCells = new boolean[cellCount];
                     cellOffsets = new int[cellCount]; cellCounts = new int[cellCount];
                     waterOffsets = new int[cellCount]; waterCounts = new int[cellCount];
                     terrainEnds = new int[cellCount];
+                    previewStarts = simpleCells.isEmpty() ? null : new int[cellCount];
                 }
             }
         }
         PredictionMesh result = triangleMesh(terrain, water, waterCells, cellOffsets, cellCounts,
-                waterOffsets, waterCounts, terrainEnds, cellAxis, stepBlocks, affineTintSafe);
+                waterOffsets, waterCounts, terrainEnds, previewStarts, cellAxis, stepBlocks, affineTintSafe);
         if (!segmented) return result;
         requireCurrent(current);
         if (segments.parts.isEmpty() || result.vertexCount() != 0 || result.waterVertexCount() != 0) segments.add(result);
@@ -456,12 +459,13 @@ public final class PredictionMeshBuilder {
 
     private static PredictionMesh triangleMesh(VertexAccumulator terrain, VertexAccumulator water,
             boolean[] waterCells, int[] cellOffsets, int[] cellCounts, int[] waterOffsets, int[] waterCounts,
-            int[] terrainEnds, int cellAxis, int stepBlocks, boolean affineTintSafe) {
+            int[] terrainEnds, int[] previewStarts, int cellAxis, int stepBlocks, boolean affineTintSafe) {
         PredictionMesh result = new PredictionMesh(terrain.positions(), terrain.normals(), terrain.colors(),
                 water.positions(), water.normals(), water.colors(), waterCells,
                 terrain.vertexCount(), water.vertexCount(), cellAxis * cellAxis,
                 cellOffsets, cellCounts, waterOffsets, waterCounts, cellAxis, stepBlocks);
         result.terrainEnds = terrainEnds;
+        result.previewStarts = previewStarts;
         result.affineTintSafe = affineTintSafe;
         return result;
     }
@@ -504,8 +508,10 @@ public final class PredictionMeshBuilder {
         int[] replacements = new int[samples.length];
         java.util.Arrays.fill(replacements, Integer.MIN_VALUE);
         int[] neighbors = new int[8];
-        for (int z = 1; z < gridSize - 1; z++) {
-            for (int x = 1; x < gridSize - 1; x++) {
+        // The final formal row/column also borders a neighbour's unmodified
+        // halo. Preserve both sides of that contract, including east/south.
+        for (int z = 1; z < gridSize - 2; z++) {
+            for (int x = 1; x < gridSize - 2; x++) {
                 int center = index(x, z, gridSize);
                 ClientColumnSample sample = samples[center];
                 if (sample.volume() != null || sample.captured() || sample.surfaceOnly() || !sample.hasSurface() || sample.fluid() != 0

@@ -116,7 +116,7 @@ class PredictionScopedResidencyTest {
     }
 
     @org.junit.jupiter.params.ParameterizedTest
-    @org.junit.jupiter.params.provider.ValueSource(strings={"pruneReady","makeRoomForSurface"})
+    @org.junit.jupiter.params.provider.ValueSource(strings={"pruneReady","prepared"})
     @SuppressWarnings("unchecked")
     void memoryReclamationProtectsTheCurrentFocusAndReleasesItWhenTheFocusEnds(String reclaimMethod) throws Exception {
         var profile=new dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload.DimensionProfile(
@@ -139,8 +139,11 @@ class PredictionScopedResidencyTest {
             ((java.util.Set<PredictionTileKey>)desired.get(manager)).add(target);
             var mediumPending=PredictionTileManager.class.getDeclaredField("mediumCoveragePending"); mediumPending.setAccessible(true);
             mediumPending.setBoolean(manager,true);
-            var reclaim=PredictionTileManager.class.getDeclaredMethod(reclaimMethod,int.class,int.class); reclaim.setAccessible(true);
-            reclaim.invoke(manager,0,0);
+            if (reclaimMethod.equals("prepared")) PredictionDemandTestSupport.reclaim(manager, 0, 0);
+            else {
+                var reclaim=PredictionTileManager.class.getDeclaredMethod(reclaimMethod,int.class,int.class); reclaim.setAccessible(true);
+                reclaim.invoke(manager,0,0);
+            }
             var prune=PredictionTileManager.class.getDeclaredMethod("pruneReady",int.class,int.class); prune.setAccessible(true);
             assertSame(detail,ready.get(detail.key()),"extra telescope work must not reclaim the detail it is replacing");
             assertFalse(ready.containsKey(other.key()),"unrelated covered detail stays reclaimable under pressure");

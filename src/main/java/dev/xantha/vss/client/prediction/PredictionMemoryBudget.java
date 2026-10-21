@@ -27,6 +27,14 @@ final class PredictionMemoryBudget {
     private boolean detailPressure;
     private long detailPressureSince;
     private static final long DETAIL_PRESSURE_GRACE_NANOS = 5_000_000_000L;
+    enum BuildKind { TERRAIN, SURFACE, RESTORE }
+    enum BuildOutcome { COMPLETED, CANCELLED, FAILED }
+    private final BuildCost[] costs = java.util.Arrays.stream(BuildKind.values()).map(k -> new BuildCost()).toArray(BuildCost[]::new);
+    private static final class BuildCost {
+        long completed, cancelled, failed, elapsedNanos, maxNanos, retainedHigh, uploadHigh;
+    }
+    record CostSnapshot(long completed, long cancelled, long failed, long elapsedNanos, long maxNanos,
+                        long retainedHigh, long uploadHigh, long reservationBytes) { }
 
     PredictionMemoryBudget(long limit, long minimumFree, LongSupplier freeHeap, LongSupplier clock) {
         this(limit, minimumFree, freeHeap, clock, Integer.MAX_VALUE);
@@ -70,13 +78,39 @@ final class PredictionMemoryBudget {
     }
 
     synchronized Reservation tryReserveBuild() {
+        return tryReserveBuild(BuildKind.TERRAIN);
+    }
+
+    synchronized Reservation tryReserveBuild(BuildKind kind) {
         if (activeBuilders >= maxBuilders) return null;
-        Reservation reservation = tryReserve(BUILD_BYTES);
+        Reservation reservation = tryReserve(buildBytes(kind));
         if (reservation != null) {
             reservation.building = true;
+            reservation.kind = kind;
+            reservation.started = clock.getAsLong();
             activeBuilders++;
         }
         return reservation;
+    }
+
+    /** Cache restore uses the same byte allowance without occupying a generation slot. */
+    synchronized Reservation tryReserveRestore() {
+        var reservation = tryReserve(buildBytes(BuildKind.RESTORE));
+        if (reservation != null) { reservation.kind = BuildKind.RESTORE; reservation.started = clock.getAsLong(); }
+        return reservation;
+    }
+
+    private long buildBytes(BuildKind kind) {
+        // Retained output is a measured lower bound, not an allocation/peak-heap
+        // estimate. It may raise admission, but never lower the proven floor.
+        long retained = costs[kind.ordinal()].retainedHigh;
+        return Math.max(BUILD_BYTES, retained > Long.MAX_VALUE / 2 ? Long.MAX_VALUE : retained * 2);
+    }
+
+    synchronized CostSnapshot cost(BuildKind kind) {
+        var c = costs[kind.ordinal()];
+        return new CostSnapshot(c.completed, c.cancelled, c.failed, c.elapsedNanos, c.maxNanos,
+                c.retainedHigh, c.uploadHigh, buildBytes(kind));
     }
 
     synchronized Reservation tryReserve(long bytes) {
@@ -90,6 +124,10 @@ final class PredictionMemoryBudget {
 
     synchronized boolean exhausted() {
         return paused() || BUILD_BYTES > availableBytes();
+    }
+
+    synchronized boolean exhausted(BuildKind kind) {
+        return paused() || buildBytes(kind) > availableBytes();
     }
 
     synchronized boolean allowsIdleRefinement() {
@@ -152,6 +190,20 @@ final class PredictionMemoryBudget {
                 + ",workerLimit=" + maxBuilders + ",availableBuildSlots=" + availableBuildSlots();
     }
 
+    synchronized String costDiagnostics() {
+        var out = new StringBuilder("buildCosts={");
+        for (var kind : BuildKind.values()) {
+            if (kind.ordinal() != 0) out.append(';');
+            var c = costs[kind.ordinal()];
+            out.append(kind).append(":ok=").append(c.completed).append(",cancel=").append(c.cancelled)
+                    .append(",fail=").append(c.failed).append(",meanUs=")
+                    .append(c.completed == 0 ? 0 : c.elapsedNanos / c.completed / 1000)
+                    .append(",maxUs=").append(c.maxNanos / 1000).append(",retainedHigh=").append(c.retainedHigh)
+                    .append(",uploadHigh=").append(c.uploadHigh).append(",reserve=").append(buildBytes(kind));
+        }
+        return out.append('}').toString();
+    }
+
     synchronized int activeBuildCount() {
         return activeBuilders;
     }
@@ -186,9 +238,36 @@ final class PredictionMemoryBudget {
         private boolean closed;
         private boolean building;
         private boolean working = true;
+        private BuildKind kind;
+        private long started;
+        private boolean costFinished;
 
         private Reservation(long bytes) {
             this.bytes = bytes;
+        }
+
+        /** No world/system queries, only counters; publication may then transfer this lease. */
+        void completeBuild(long retainedBytes, long uploadBytes, boolean restored) {
+            synchronized (PredictionMemoryBudget.this) {
+                if (closed || costFinished || kind == null) return;
+                if (restored) kind = BuildKind.RESTORE;
+                var c = costs[kind.ordinal()];
+                long elapsed = Math.max(0, clock.getAsLong() - started);
+                c.completed++; c.elapsedNanos += elapsed; c.maxNanos = Math.max(c.maxNanos, elapsed);
+                c.retainedHigh = Math.max(c.retainedHigh, Math.max(0, retainedBytes));
+                c.uploadHigh = Math.max(c.uploadHigh, Math.max(0, uploadBytes));
+                costFinished = true;
+            }
+        }
+
+        void finishBuild(BuildOutcome outcome) {
+            synchronized (PredictionMemoryBudget.this) {
+                if (costFinished || kind == null) return;
+                if (outcome == BuildOutcome.COMPLETED) throw new IllegalArgumentException("completed build needs byte counts");
+                var c = costs[kind.ordinal()];
+                if (outcome == BuildOutcome.FAILED) c.failed++; else c.cancelled++;
+                costFinished = true;
+            }
         }
 
         boolean retain(long residentBytes) {
@@ -209,10 +288,20 @@ final class PredictionMemoryBudget {
             }
         }
 
+        /** Published metadata can enter/leave cold storage without creating a new tile. */
+        void accountResident(long residentBytes) {
+            synchronized (PredictionMemoryBudget.this) {
+                if (closed || working || residentBytes < 0) return;
+                used += residentBytes - bytes;
+                bytes = residentBytes;
+            }
+        }
+
         @Override
         public void close() {
             synchronized (PredictionMemoryBudget.this) {
                 if (!closed) {
+                    finishBuild(BuildOutcome.CANCELLED);
                     if (working) workingBytes -= bytes;
                     else if (adaptive) {
                         refreshCollections();

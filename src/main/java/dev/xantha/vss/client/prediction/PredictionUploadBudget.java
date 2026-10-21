@@ -10,6 +10,7 @@ final class PredictionUploadBudget {
     private int tiles;
     private long bytes;
     private long nanos;
+    private long preparationNanos;
     private long requiredBytes, requiredNanos, reservedBytes, reservedNanos;
 
     // Masks and seams publish atomically with ownership. Reserve their measured
@@ -22,13 +23,20 @@ final class PredictionUploadBudget {
         reservedBytes = requiredBytes; reservedNanos = requiredNanos;
         requiredBytes = 0; requiredNanos = 0;
         tiles = 0; bytes = 0; nanos = 0;
+        preparationNanos = 0;
     }
 
     void clear() { requiredBytes = 0; requiredNanos = 0; reset(); }
 
     boolean allows(long nextBytes) {
-        return tiles == 0 || tiles < MAX_TILES && bytes + nextBytes + reservedBytes <= MAX_BYTES && nanos + reservedNanos < MAX_NANOS;
+        boolean busy = PredictionRenderWorkBudget.SHARED.busy(System.nanoTime());
+        int count = busy ? 4 : MAX_TILES;
+        long capacity = busy ? MAX_BYTES / 4 : MAX_BYTES;
+        return tiles == 0 || tiles < count && bytes + nextBytes + reservedBytes <= capacity
+                && nanos + reservedNanos < MAX_NANOS;
     }
+
+    void recordPreparation(long elapsedNanos) { preparationNanos += Math.max(0, elapsedNanos); }
 
     void record(long uploadedBytes, long elapsedNanos) {
         tiles++;
@@ -37,6 +45,7 @@ final class PredictionUploadBudget {
     }
 
     String diagnostics() { return "uploads=" + tiles + ",uploadBytes=" + bytes + ",uploadUs=" + nanos / 1000
+            + ",uploadPreparationUs=" + preparationNanos / 1000
             + ",handoffBytes=" + requiredBytes + ",handoffUs=" + requiredNanos / 1000
             + ",reservedHandoffUs=" + reservedNanos / 1000; }
 }

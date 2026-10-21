@@ -13,12 +13,12 @@ import org.lwjgl.system.MemoryUtil;
 /**
  * Render-thread GPU cache for one prediction tile, The packed-quad LOD approach style: the
  * mesh lives in a texture buffer of losslessly packed quads that the vertex
- * program expands from {@code gl_VertexID}, and the exact-coverage yield
- * is a tiny R8 cell mask.
+ * program expands from {@code gl_VertexID}. Ownership uses an R8 cell mask,
+ * or an RG32F sparse tree where a finer tile splits a source cell.
  *
  * <p>Only a mesh change re-uploads the quad payload; coverage
- * flips — the old pipeline's dominant rebuild source — update a few hundred
- * mask bytes.  Camera movement touches nothing.</p>
+ * changes update mask data and grow its arena tail only when necessary.
+ * Camera movement alone does not rewrite geometry.</p>
  */
 final class PredictionGpuTile implements AutoCloseable {
     /** Four unsigned words per texel: one packed quad spans three texels. */
@@ -27,15 +27,28 @@ final class PredictionGpuTile implements AutoCloseable {
     private final PredictionTileManager.PredictionTileKey key;
     private long meshRevision = Long.MIN_VALUE;
     private PredictionPackedMesh packed;
+    private final long submissionId = PredictionSubmissionChanges.newId();
+    long submissionId() { return submissionId; }
+    private long submissionRevision;
+    static long submissionEpoch() { return PredictionSubmissionChanges.GPU.epoch(); }
+    long submissionRevision() { return submissionRevision; }
+    private void submissionChanged() { submissionRevision++; PredictionSubmissionChanges.GPU.publish(submissionId); }
     private int uploadedPaletteBase;
     int paletteBaseTexel() { return uploadedPaletteBase; }
     private boolean[] coverage;
     private boolean[] publishedCoverage;
     private byte[] boundaryCoverage;
+    private PredictionCoverageGrid coverageGrid;
+    private boolean treeTexture;
+    private boolean arenaMaskAvailable=true, waterArenaMaskAvailable=true;
 
     int updateBoundaryCoverage(byte[] mask) {
         if (mask == null || packed == null) return 0;
         if (Arrays.equals(boundaryCoverage, mask)) { boundaryCoverage = mask; return 0; }
+        if (coverageGrid != null) {
+            int bytes=uploadCoverageTree(mask);
+            boundaryCoverage=mask;return bytes;
+        }
         var bytes = MemoryUtil.memAlloc(mask.length);
         try (var unpack = PredictionPixelUnpack.begin()) {
             bytes.put(mask).flip();
@@ -46,13 +59,16 @@ final class PredictionGpuTile implements AutoCloseable {
                 int[] values = new int[mask.length];
                 for (int i = 0; i < mask.length; i++) values[i] = mask[i] & 255;
                 PredictionTerrainArena.SHARED.mask(arenaSlice, values);
+                arenaMaskAvailable=true;
             }
             if (waterArenaSlice != null) {
                 int[] values = new int[mask.length];
                 for (int i = 0; i < mask.length; i++) values[i] = mask[i] & 255;
                 PredictionTerrainArena.WATER.mask(waterArenaSlice, values);
+                waterArenaMaskAvailable=true;
             }
             boundaryCoverage = mask;
+            submissionChanged();
         } finally {
             PredictionGlState.bindTexture(0);
             MemoryUtil.memFree(bytes);
@@ -62,28 +78,71 @@ final class PredictionGpuTile implements AutoCloseable {
 
     /** Renderer-only contract: published ownership arrays are never mutated. */
     int updatePublishedCoverage(boolean[] allowed) {
-        if (coverage != null && publishedCoverage == allowed) return 0;
+        return updatePublishedCoverage(allowed,null);
+    }
+    int updatePublishedCoverage(boolean[] allowed, PredictionCoverageGrid grid) {
+        if (coverage != null && publishedCoverage == allowed && coverageGrid == grid) return 0;
+        if (grid != null) {
+            coverageGrid=grid;
+            int bytes=uploadCoverageTree(grid.mask(null));
+            coverage=allowed.clone();publishedCoverage=allowed;boundaryCoverage=null;
+            return bytes;
+        }
+        if(coverageGrid!=null) { coverageGrid=null;coverage=null; }
         int bytes = updateCoverage(allowed);
         publishedCoverage = allowed;
         return bytes;
     }
+
+    /** Red retains the existing normalized mask contract; green is an exact child index. */
+    private int uploadCoverageTree(byte[] mask) {
+        int[] words=coverageGrid.words(mask);
+        int axis=(int)Math.ceil(Math.sqrt(words.length));
+        var values=MemoryUtil.memAllocFloat(axis*axis*2);
+        try(var unpack=PredictionPixelUnpack.begin()) {
+            for(int i=0;i<axis*axis;i++) { int word=i<words.length?words[i]:0;values.put((word&255)/255f).put(word>>>8); }
+            values.flip();
+            if(yieldTexture==-1) yieldTexture=TextureUtil.generateTextureId();
+            PredictionGlState.bindTexture(yieldTexture);
+            GlStateManager._texParameter(GL11.GL_TEXTURE_2D,GL11.GL_TEXTURE_MIN_FILTER,GL11.GL_NEAREST);
+            GlStateManager._texParameter(GL11.GL_TEXTURE_2D,GL11.GL_TEXTURE_MAG_FILTER,GL11.GL_NEAREST);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D,0,org.lwjgl.opengl.GL30.GL_RG32F,axis,axis,0,
+                    org.lwjgl.opengl.GL30.GL_RG,GL11.GL_FLOAT,values);
+            yieldAxis=axis;treeTexture=true;
+            if(arenaSlice!=null) {
+                var grown=arenaSlice.arena.resizeMask(arenaSlice,words.length);
+                arenaMaskAvailable=grown!=null;
+                if(grown!=null) { arenaSlice=grown;arenaSlice.arena.mask(arenaSlice,words); }
+            }
+            if(waterArenaSlice!=null) {
+                var grown=waterArenaSlice.arena.resizeMask(waterArenaSlice,words.length);
+                waterArenaMaskAvailable=grown!=null;
+                if(grown!=null) { waterArenaSlice=grown;waterArenaSlice.arena.mask(waterArenaSlice,words); }
+            }
+            submissionChanged();return axis*axis*8+words.length*4;
+        } finally { PredictionGlState.bindTexture(0);MemoryUtil.memFree(values); }
+    }
     private long uploadedAt;
     float morphAmount(long now) { return packed == null || packed.morph() == null ? 0 : PredictionMorph.amount(now-uploadedAt); }
     float morphStartSeconds() { return packed == null || packed.morph() == null ? 0.0F : PredictionMorph.startSeconds(uploadedAt); }
+    boolean morphActive(long now) {
+        return packed != null && packed.morph() != null && now - uploadedAt < PredictionMorph.DURATION_NANOS;
+    }
+    long morphEndsAt() { return uploadedAt + PredictionMorph.DURATION_NANOS; }
 
     private PredictionQuadBufferPool.Allocation quadAllocation;
     private PredictionQuadBufferPool.Allocation waterQuadAllocation;
     private PredictionTerrainArena.Slice arenaSlice;
     private PredictionTerrainArena.Slice waterArenaSlice;
-    PredictionTerrainArena.Slice arenaSlice() { return arenaSlice; }
+    PredictionTerrainArena.Slice arenaSlice() { return arenaMaskAvailable ? arenaSlice : null; }
     PredictionTerrainArena.Slice arenaSlice(boolean water) {
-        if (!water) return arenaSlice;
-        if (waterArenaSlice != null) return waterArenaSlice;
+        if (!water) return arenaSlice();
+        if (waterArenaSlice != null) return waterArenaMaskAvailable ? waterArenaSlice : null;
         // A standalone texture-buffer fallback cannot be submitted through
         // MDI (the batch binds an arena page), so force the caller to use the
         // stateful path instead of accidentally applying water-local ranges
         // to the opaque page.
-        return waterQuadAllocation != null ? null : arenaSlice;
+        return waterQuadAllocation != null ? null : arenaSlice();
     }
     boolean dedicatedWaterArena() { return waterArenaSlice != null; }
     int rangeBase(boolean water) {
@@ -137,6 +196,7 @@ final class PredictionGpuTile implements AutoCloseable {
         uploadedPaletteBase = next.opaquePaletteBaseTexel();
         meshRevision = tile.revision();
         uploadedAt = System.nanoTime();
+        submissionChanged();
         // The mesh changed shape; force the coverage mask to re-upload even
         // if the boolean array happens to be equal to the previous one.
         coverage = null;
@@ -159,6 +219,7 @@ final class PredictionGpuTile implements AutoCloseable {
         // Seam records are uploaded in canonical form, even when a caller supplied a compact mesh.
         uploadedPaletteBase = 0;
         packed = next;
+        if (changed) submissionChanged();
         return changed ? next.quadBytes() + (next.morph() == null ? 0 : (next.morph().length + 3) / 4 * 16L) : 0;
     }
 
@@ -166,6 +227,7 @@ final class PredictionGpuTile implements AutoCloseable {
     int updateCoverage(boolean[] allowed) {
         // This general API also accepts caller-mutated arrays (including GPU fixtures).
         publishedCoverage = null;
+        if(coverageGrid!=null) { coverageGrid=null;coverage=null; }
         if (packed == null || Arrays.equals(coverage, allowed)) {
             return 0;
         }
@@ -190,25 +252,29 @@ final class PredictionGpuTile implements AutoCloseable {
             } else {
                 PredictionGlState.bindTexture(yieldTexture);
             }
-            if (yieldAxis != axis) {
+            if (yieldAxis != axis || treeTexture) {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, org.lwjgl.opengl.GL30.GL_R8, axis, axis, 0,
                         GL11.GL_RED, GL11.GL_UNSIGNED_BYTE, pixels);
                 yieldAxis = axis;
+                treeTexture=false;
             } else {
                 GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, axis, axis,
                         GL11.GL_RED, GL11.GL_UNSIGNED_BYTE, pixels);
             }
             PredictionGlState.bindTexture(0);
             coverage = allowed.clone();
+            submissionChanged();
             if (arenaSlice != null) {
                 int[] values = new int[allowed.length];
                 for (int i = 0; i < allowed.length; i++) values[i] = allowed[i] ? 255 : 0;
                 PredictionTerrainArena.SHARED.mask(arenaSlice, values);
+                arenaMaskAvailable=true;
             }
             if (waterArenaSlice != null) {
                 int[] values = new int[allowed.length];
                 for (int i = 0; i < allowed.length; i++) values[i] = allowed[i] ? 255 : 0;
                 PredictionTerrainArena.WATER.mask(waterArenaSlice, values);
+                waterArenaMaskAvailable=true;
             }
             boundaryCoverage = null;
             return axis * axis;
@@ -249,7 +315,7 @@ final class PredictionGpuTile implements AutoCloseable {
         PredictionQuadBufferPool.Allocation next = null, nextWater = null;
         try {
             if (data.hasRemaining()) {
-                nextArena = PredictionTerrainArena.SHARED.upload(data, axis * axis);
+                nextArena = PredictionTerrainArena.uploadOpaque(data, axis * axis);
                 next = nextArena == null ? PredictionQuadBufferPool.SHARED.upload(data) : null;
             }
             if (waterData != null && waterData.hasRemaining()) {
@@ -271,6 +337,7 @@ final class PredictionGpuTile implements AutoCloseable {
         waterQuadAllocation = nextWater;
         arenaSlice = nextArena;
         waterArenaSlice = nextWaterArena;
+        arenaMaskAvailable=waterArenaMaskAvailable=true;
         coverage = null;
         publishedCoverage = null;
         boundaryCoverage = null;
@@ -295,6 +362,7 @@ final class PredictionGpuTile implements AutoCloseable {
     }
 
     void bindTerrain(PredictionTerrainProgram program, boolean water) {
+        program.setCoverageTree(coverageGrid!=null);
         boolean dedicated = water && (waterArenaSlice != null || waterQuadAllocation != null);
         PredictionTerrainArena.Slice slice = dedicated ? waterArenaSlice : arenaSlice;
         PredictionQuadBufferPool.Allocation allocation = dedicated ? waterQuadAllocation : quadAllocation;
@@ -335,7 +403,7 @@ final class PredictionGpuTile implements AutoCloseable {
     long residentBytes() {
         return (arenaSlice != null ? arenaSlice.length : quadAllocation == null ? 0 : quadAllocation.capacity)
                 + (waterArenaSlice != null ? waterArenaSlice.length : waterQuadAllocation == null ? 0 : waterQuadAllocation.capacity)
-                + (long) yieldAxis * yieldAxis;
+                + (long) yieldAxis * yieldAxis * (treeTexture?8:1);
     }
     long standaloneBytes() {
         return (quadAllocation == null ? 0L : quadAllocation.capacity)
@@ -348,6 +416,7 @@ final class PredictionGpuTile implements AutoCloseable {
 
     @Override
     public void close() {
+        if (packed != null) submissionChanged();
         closeQuads();
         if (yieldTexture != -1) {
             TextureUtil.releaseTextureId(yieldTexture);
@@ -359,6 +428,7 @@ final class PredictionGpuTile implements AutoCloseable {
         coverage = null;
         publishedCoverage = null;
         boundaryCoverage = null;
+        coverageGrid = null;
         meshRevision = Long.MIN_VALUE;
     }
 

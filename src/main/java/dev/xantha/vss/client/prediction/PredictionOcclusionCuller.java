@@ -46,6 +46,18 @@ final class PredictionOcclusionCuller implements AutoCloseable {
             uniform bool Hierarchical;
             shared bool parentHidden;
             shared uint testedCount, hiddenCount, testedQuads, rejectedQuads;
+            bool backFacing(Box box) {
+                uint directions = floatBitsToUint(box.lo.w)&127u;
+                if(directions == 0u || (directions & 64u) != 0u) return false;
+                vec3 lo = box.lo.xyz + CameraOffset, hi = box.hi.xyz + CameraOffset;
+                if(any(isnan(lo)) || any(isnan(hi)) || any(isinf(lo)) || any(isinf(hi))) return false;
+                // World-space float cancellation near Minecraft's coordinate limit
+                // must not hide a face that the relative vertex shader still sees.
+                uint visible = (hi.x > -4.0 ? 1u : 0u) | (lo.x < 4.0 ? 2u : 0u)
+                        | (hi.y > -4.0 ? 4u : 0u) | (lo.y < 4.0 ? 8u : 0u)
+                        | (hi.z > -4.0 ? 16u : 0u) | (lo.z < 4.0 ? 32u : 0u);
+                return (directions & visible) == 0u;
+            }
             bool occluded(Box box) {
                 if(any(isnan(box.lo))||any(isnan(box.hi))||any(isinf(box.lo))||any(isinf(box.hi))) return false;
                 vec3 boxLo = box.lo.xyz + CameraOffset;
@@ -88,7 +100,7 @@ final class PredictionOcclusionCuller implements AutoCloseable {
                 uint id=gl_GlobalInvocationID.x;
                 if(id<Count) {
                     uint start=id*5u;
-                    bool hide=parentHidden || occluded(boxes[id]);
+                    bool hide=parentHidden || backFacing(boxes[id]) || occluded(boxes[id]);
                     for(uint i=0u;i<5u;i++) result[start+i]=i==0u&&hide?0u:source[start+i];
                     if(Sample) {
                         atomicAdd(testedCount,1u); atomicAdd(testedQuads,source[start]/6u);
@@ -103,10 +115,16 @@ final class PredictionOcclusionCuller implements AutoCloseable {
             }
             """;
     private int reduce, filter, pyramid, width, height, levels;
+    static String visibilityShader() {
+        return FILTER.substring(FILTER.indexOf("bool backFacing("), FILTER.indexOf("void main()"));
+    }
+    int pyramidTexture() { return state != null && rebuilds > 0 ? pyramid : 0; }
+    int pyramidLevels() { return levels; }
     private int sourceLevelUniform, scaleUniform, transformUniform, cameraOffsetUniform,
             viewUniform, sampleUniform, countUniform, levelsUniform, hierarchicalUniform;
     private int depth, viewWidth, viewHeight, rebuilds, lastRebuilds;
     private long frame, sampleFrame;
+    private long submissionFrame, sampleSubmissionFrame, sampleMdiQuads, sampleDirectQuads;
     private final int[] lastStats = new int[4];
     private final Sample[] samples = {new Sample(), new Sample(), new Sample()};
     private Sample activeSample;
@@ -118,6 +136,8 @@ final class PredictionOcclusionCuller implements AutoCloseable {
 
     boolean begin(int depth, int width, int height, Matrix4f transform) {
         lastRebuilds=0;
+        frame++;
+        poll();
         if (failed || Boolean.getBoolean("vss.disablePredictionOcclusion") || depth <= 0 || width <= 0 || height <= 0
                 || !org.lwjgl.opengl.GL.getCapabilities().OpenGL45) return false;
         if(glGetInteger(GL_CLIP_DEPTH_MODE)!=GL_NEGATIVE_ONE_TO_ONE || glGetInteger(GL_CLIP_ORIGIN)!=GL_LOWER_LEFT) return false;
@@ -135,15 +155,15 @@ final class PredictionOcclusionCuller implements AutoCloseable {
                 levelsUniform=glGetUniformLocation(filter,"Levels");
                 hierarchicalUniform=glGetUniformLocation(filter,"Hierarchical");
             }
-            this.depth=depth; viewWidth=width; viewHeight=height; rebuilds=0; frame++;
-            poll();
+            this.depth=depth; viewWidth=width; viewHeight=height; rebuilds=0;
             activeSample=null;
             if (frame % 30 == 1) for (Sample sample : samples) if (sample.fence == 0) {
                 if (sample.buffer == 0) {
                     sample.buffer=glCreateBuffers(); glNamedBufferData(sample.buffer,16,GL_STREAM_READ);
                 }
                 glClearNamedBufferData(sample.buffer,GL_R32UI,GL_RED_INTEGER,GL_UNSIGNED_INT,new int[]{0});
-                activeSample=sample; sample.frame=frame; break;
+                activeSample=sample; sample.frame=frame; sample.submissionFrame=submissionFrame;
+                sample.mdiQuads=sample.directQuads=0; break;
             }
             glUseProgram(filter);
             glUniformMatrix4fv(transformUniform,false,transform.get(new float[16]));
@@ -192,6 +212,17 @@ final class PredictionOcclusionCuller implements AutoCloseable {
             PredictionRenderTimings.gpuEnd(timingQuery);
             PredictionRenderTimings.end(PredictionRenderTimings.Stage.HZB_REDUCE, timingStart);
         }
+    }
+
+    /**
+     * Rebuild the current-frame pyramid only when the owning render period has
+     * budget left. The unbudgeted overload remains available to focused GPU
+     * tests and standalone callers.
+     */
+    boolean rebuildBudgeted(long renderToken) {
+        if (!PredictionHiZBudget.acquire(renderToken)) return false;
+        rebuild();
+        return true;
     }
 
     int filter(int bounds, int input, int output, int commands) {
@@ -249,11 +280,19 @@ final class PredictionOcclusionCuller implements AutoCloseable {
         state.restore(); state=null;
     }
 
+    void tagSubmission(long frame) { submissionFrame=frame; }
+    void sampleContext(long mdiQuads, long directQuads) {
+        if(activeSample!=null) { activeSample.mdiQuads=mdiQuads; activeSample.directQuads=directQuads; }
+    }
+
     private void poll() {
         for(Sample s:samples) if(s.fence!=0) {
             int status=glClientWaitSync(s.fence,0,0);
             if(status==GL_ALREADY_SIGNALED || status==GL_CONDITION_SATISFIED) {
-                if(s.frame>sampleFrame) { glGetNamedBufferSubData(s.buffer,0,lastStats); sampleFrame=s.frame; }
+                if(s.frame>sampleFrame) {
+                    glGetNamedBufferSubData(s.buffer,0,lastStats); sampleFrame=s.frame;
+                    sampleSubmissionFrame=s.submissionFrame; sampleMdiQuads=s.mdiQuads; sampleDirectQuads=s.directQuads;
+                }
                 glDeleteSync(s.fence); s.fence=0;
             }
         }
@@ -270,6 +309,10 @@ final class PredictionOcclusionCuller implements AutoCloseable {
     String diagnostics() {
         return ",occlusion="+(failed?"fallback":lastRebuilds>0?"current-frame-hiz":"off")
                 +",hizBuilds="+lastRebuilds+",sampleAge="+(sampleFrame==0?-1:frame-sampleFrame)
+                +",occlusionFrame="+frame+",sampleFrame="+sampleFrame+",sampleSubmissionFrame="+sampleSubmissionFrame
+                +",sampleMdiQuads="+sampleMdiQuads+",sampleDirectQuads="+sampleDirectQuads
+                +",sampleCandidateQuads="+(sampleMdiQuads+sampleDirectQuads)
+                +",sampleAfterHizQuads="+(sampleSubmissionFrame==0?-1:sampleMdiQuads+sampleDirectQuads-Integer.toUnsignedLong(lastStats[3]))
                 +",testedCommands="+Integer.toUnsignedLong(lastStats[0])+",hiddenCommands="+Integer.toUnsignedLong(lastStats[1])
                 +",testedQuads="+Integer.toUnsignedLong(lastStats[2])+",hiddenQuads="+Integer.toUnsignedLong(lastStats[3]);
     }
@@ -290,7 +333,7 @@ final class PredictionOcclusionCuller implements AutoCloseable {
         if(reduce!=0)glDeleteProgram(reduce); if(filter!=0)glDeleteProgram(filter); if(pyramid!=0)glDeleteTextures(pyramid);
         for(Sample s:samples) { if(s.fence!=0)glDeleteSync(s.fence); if(s.buffer!=0)glDeleteBuffers(s.buffer); }
     }
-    private static final class Sample { int buffer; long fence,frame; }
+    private static final class Sample { int buffer; long fence,frame,submissionFrame,mdiQuads,directQuads; }
 
     /** Save once per opaque pass. Restore the ownership sampler before every terrain draw. */
     private static final class State {

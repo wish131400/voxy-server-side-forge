@@ -165,8 +165,7 @@ class PredictionMeshCodecTest {
         assertNotNull(record);
         assertTrue(record.surfaceCompleted());
         assertArrayEquals(mesh.gpuPayload().restoreWords(), record.mesh().gpuPayload().restoreWords());
-        byte[] legacy = Arrays.copyOf(complete, complete.length - 1);
-        java.nio.ByteBuffer.wrap(legacy).putInt(8);
+        byte[] legacy = PredictionMeshCacheTestRecords.recode(complete, 8);
         record = PredictionMeshCodec.decodeBaseRecord(legacy, identity, mesh.cellAxis());
         assertNotNull(record);
         assertFalse(record.surfaceCompleted(), "version 8 never proved that every surface source was gathered");
@@ -174,7 +173,8 @@ class PredictionMeshCodecTest {
         assertNull(PredictionMeshCodec.decodeBaseRecord(complete, changed, mesh.cellAxis()));
         assertThrows(java.io.IOException.class, () -> PredictionMeshCodec.decodeBaseRecord(complete, identity, mesh.cellAxis() / 2));
         assertThrows(java.io.IOException.class, () -> PredictionMeshCodec.encode(mesh, identity, identity, false, true));
-        complete[complete.length - 1] = 2;
-        assertThrows(java.io.IOException.class, () -> PredictionMeshCodec.decodeBaseRecord(complete, identity, mesh.cellAxis()));
+        byte[] invalidCompletion = PredictionMeshCacheTestRecords.recode(complete, 9);
+        invalidCompletion[invalidCompletion.length - 1] = 2;
+        assertThrows(java.io.IOException.class, () -> PredictionMeshCodec.decodeBaseRecord(invalidCompletion, identity, mesh.cellAxis()));
     }
 }

@@ -45,7 +45,7 @@ class PredictionSegmentedMeshGpuTest {
             int[] canonical = payload.restoreWords();
             payload.prepareGpuStorage();
             assertArrayEquals(canonical, payload.restoreWords());
-            int[] expected = payload.restoreUploadWords();
+            int[] expected = payload.opaqueUploadWords();
             for (boolean fallback : new boolean[]{false, true}) {
                 System.setProperty("vss.disableIndirect", Boolean.toString(fallback));
                 try (var gpu = new PredictionGpuTile(key)) {

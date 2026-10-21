@@ -1,8 +1,8 @@
 package dev.xantha.vss.networking.server.storage;
 
+import dev.xantha.vss.networking.server.runtime.ServerLifecycleGuard;
 
 import dev.xantha.vss.networking.server.runtime.DiskTaskRuntime;
-import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.common.processing.EncodedColumnData;
@@ -15,7 +15,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 
+/**
+ * 合并列写入、失效水位和缓存维护；文件 I/O 交给共享 DiskTaskRuntime。
+ * <p>异步任务捕获生命周期 epoch，写入前核对失效水位，防止旧列覆盖新数据。
+ * 完成回调可能同步执行或来自磁盘线程，调用方负责游戏线程交接；本类不拥有执行器。
+ */
 public final class PersistentColumnWriter {
+    private final ServerLifecycleGuard lifecycle;
     private final PersistentColumnLodStore persistentStore;
     private final DiskTaskRuntime diskRuntime;
     private long nextMaintenanceNanos;
@@ -23,21 +29,23 @@ public final class PersistentColumnWriter {
     private final Map<ResourceKey<Level>, Long2LongLinkedOpenHashMap> pendingInvalidations = new HashMap<>();
     private final Map<ResourceKey<Level>, Long2LongLinkedOpenHashMap> invalidationWatermarks = new HashMap<>();
 
-    public PersistentColumnWriter(PersistentColumnLodStore persistentStore, DiskTaskRuntime diskRuntime) {
+    public PersistentColumnWriter(PersistentColumnLodStore persistentStore, DiskTaskRuntime diskRuntime,
+            ServerLifecycleGuard lifecycle) {
+        this.lifecycle = java.util.Objects.requireNonNull(lifecycle, "lifecycle");
         this.persistentStore = persistentStore;
         this.diskRuntime = diskRuntime;
     }
 
     public void write(MinecraftServer server, ResourceKey<Level> dimension, EncodedColumnData columnData) {
-        if (VSSServerNetworking.isServerStopping()
+        if (lifecycle.isStopping()
                 || !persistentStore.enabled()
                 || columnData == null
                 || !isWriteFresh(dimension, columnData)) {
             return;
         }
-        long lifecycleEpoch = VSSServerNetworking.lifecycleEpoch();
+        long lifecycleEpoch = lifecycle.currentEpoch();
         diskRuntime.submitWrite(VSSServerConfig.CONFIG.persistentColumnCacheWriteQueueLimit, () -> {
-            if (!VSSServerNetworking.isLifecycleStale(lifecycleEpoch) && isWriteFresh(dimension, columnData)) {
+            if (!lifecycle.isStale(lifecycleEpoch) && isWriteFresh(dimension, columnData)) {
                 persistentStore.write(server, dimension, columnData);
             }
         }, e -> VSSLogger.debug("Persistent LOD write rejected: " + e.getMessage()));
@@ -46,16 +54,16 @@ public final class PersistentColumnWriter {
     /** Unlike opportunistic writes, explicit pre-generation waits for disk acknowledgement. */
     public boolean writeConfirmed(MinecraftServer server, ResourceKey<Level> dimension,
             EncodedColumnData columnData, java.util.function.Consumer<Boolean> completion) {
-        if (VSSServerNetworking.isServerStopping() || !persistentStore.enabled()
+        if (lifecycle.isStopping() || !persistentStore.enabled()
                 || columnData == null || !isWriteFresh(dimension, columnData)) {
             completion.accept(false);
             return true;
         }
-        long epoch = VSSServerNetworking.lifecycleEpoch();
+        long epoch = lifecycle.currentEpoch();
         return diskRuntime.submitWriteUnrestricted(() -> {
             boolean saved = false;
             try {
-                saved = !VSSServerNetworking.isLifecycleStale(epoch) && isWriteFresh(dimension, columnData)
+                saved = !lifecycle.isStale(epoch) && isWriteFresh(dimension, columnData)
                         && persistentStore.writeConfirmed(server, dimension, columnData);
             } finally {
                 completion.accept(saved);
@@ -64,7 +72,7 @@ public final class PersistentColumnWriter {
     }
 
     public synchronized void invalidate(ResourceKey<Level> dimension, int cx, int cz, long dirtyTimestamp) {
-        if (VSSServerNetworking.isServerStopping() || !persistentStore.enabled()) {
+        if (lifecycle.isStopping() || !persistentStore.enabled()) {
             return;
         }
         long packed = PositionUtil.packPosition(cx, cz);
@@ -83,16 +91,16 @@ public final class PersistentColumnWriter {
     }
 
     public void flushInvalidations(MinecraftServer server) {
-        if (VSSServerNetworking.isServerStopping() || !persistentStore.enabled()) {
+        if (lifecycle.isStopping() || !persistentStore.enabled()) {
             return;
         }
         InvalidationBatch batch = drainInvalidations(VSSServerConfig.CONFIG.persistentColumnInvalidationBatchSize);
         if (batch.isEmpty()) {
             return;
         }
-        long lifecycleEpoch = VSSServerNetworking.lifecycleEpoch();
+        long lifecycleEpoch = lifecycle.currentEpoch();
         boolean submitted = diskRuntime.submitWrite(VSSServerConfig.CONFIG.persistentColumnCacheWriteQueueLimit, () -> {
-            if (VSSServerNetworking.isLifecycleStale(lifecycleEpoch)) {
+            if (lifecycle.isStale(lifecycleEpoch)) {
                 restoreInvalidations(batch);
                 return;
             }
@@ -104,12 +112,12 @@ public final class PersistentColumnWriter {
     }
 
     public void scheduleMaintenance(MinecraftServer server) {
-        if (!persistentStore.enabled() || VSSServerNetworking.isServerStopping()) return;
+        if (!persistentStore.enabled() || lifecycle.isStopping()) return;
         long now = System.nanoTime();
         if (now < nextMaintenanceNanos || !maintenancePending.compareAndSet(false, true)) return;
-        long epoch = VSSServerNetworking.lifecycleEpoch();
+        long epoch = lifecycle.currentEpoch();
         boolean accepted = diskRuntime.submitWrite(VSSServerConfig.CONFIG.persistentColumnCacheWriteQueueLimit, () -> {
-            try { if (!VSSServerNetworking.isLifecycleStale(epoch)) persistentStore.maintain(server); }
+            try { if (!lifecycle.isStale(epoch)) persistentStore.maintain(server); }
             finally { maintenancePending.set(false); }
         }, error -> maintenancePending.set(false));
         if (accepted) nextMaintenanceNanos = now + java.util.concurrent.TimeUnit.SECONDS.toNanos(60);

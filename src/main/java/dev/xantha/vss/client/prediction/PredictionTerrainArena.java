@@ -26,6 +26,20 @@ final class PredictionTerrainArena {
             Math.min(MAX_PAGES, Integer.getInteger("vss.indirectWaterPages", 2)));
     static final PredictionTerrainArena SHARED = new PredictionTerrainArena(MAX_PAGES, "opaque");
     static final PredictionTerrainArena WATER = new PredictionTerrainArena(WATER_MAX_PAGES, "water");
+    /** The overflow replaces per-tile buffers once the large-page arena fills.
+     * Small lazy pages cap stranded capacity while retaining MDI and mask storage.
+     * These bytes are included in the existing residency budget and retirement. */
+    static final PredictionTerrainArena OVERFLOW = new PredictionTerrainArena(64, "overflow", 8 * 1024 * 1024);
+
+    static Slice uploadOpaque(ByteBuffer data, int cells) {
+        Slice slice = SHARED.upload(data, cells);
+        return slice != null || Boolean.getBoolean("vss.disableIndirectOverflow")
+                ? slice : OVERFLOW.upload(data, cells);
+    }
+
+    static long committedBytes() {
+        return SHARED.allocatedBytes() + WATER.allocatedBytes() + OVERFLOW.allocatedBytes();
+    }
 
     private static int configuredMaxPages() {
         int mib = Integer.getInteger("vss.indirectArenaMiB", 2048);
@@ -36,11 +50,16 @@ final class PredictionTerrainArena {
     private final ArrayDeque<Slice> retired = new ArrayDeque<>();
     private final int maxPages;
     private final String name;
+    private final int pageBytes;
     private int alignment;
 
     private PredictionTerrainArena(int maxPages, String name) {
+        this(maxPages, name, PAGE_BYTES);
+    }
+    private PredictionTerrainArena(int maxPages, String name, int pageBytes) {
         this.maxPages = maxPages;
         this.name = name;
+        this.pageBytes = pageBytes;
     }
     static boolean supported() {
         try { return !Boolean.getBoolean("vss.disableIndirect") && org.lwjgl.opengl.GL.getCapabilities().OpenGL46; }
@@ -50,11 +69,11 @@ final class PredictionTerrainArena {
         final int buffer, texture;
         final TreeMap<Integer,Integer> free = new TreeMap<>();
         int live;
-        Page() {
+        Page(int bytes) {
             buffer=glGenBuffers();texture=glGenTextures();
-            glBindBuffer(GL_TEXTURE_BUFFER,buffer);glBufferData(GL_TEXTURE_BUFFER,PAGE_BYTES,GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_TEXTURE_BUFFER,buffer);glBufferData(GL_TEXTURE_BUFFER,bytes,GL_DYNAMIC_DRAW);
             glBindTexture(GL_TEXTURE_BUFFER,texture);glTexBuffer(GL_TEXTURE_BUFFER,GL_RGBA32UI,buffer);
-            free.put(0,PAGE_BYTES);
+            free.put(0,bytes);
         }
         int allocate(int bytes) {
             for(var e:free.entrySet())if(e.getValue()>=bytes){
@@ -73,37 +92,63 @@ final class PredictionTerrainArena {
         void close(){glDeleteTextures(texture);glDeleteBuffers(buffer);}
     }
     static final class Slice {
+        final PredictionTerrainArena arena;
         final Page page;final int offset,length,texture,maskOffset;
         long fence;
-        Slice(Page page,int offset,int length,int texture,int maskOffset){this.page=page;this.offset=offset;this.length=length;this.texture=texture;this.maskOffset=maskOffset;}
+        Slice(PredictionTerrainArena arena,Page page,int offset,int length,int texture,int maskOffset){this.arena=arena;this.page=page;this.offset=offset;this.length=length;this.texture=texture;this.maskOffset=maskOffset;}
     }
     Slice upload(ByteBuffer data,int cells) {
         if(!supported())return null;
         reap();
         if(alignment==0) {
-            if(glGetInteger(GL_MAX_TEXTURE_BUFFER_SIZE)<PAGE_BYTES/16)return null;
+            if(glGetInteger(GL_MAX_TEXTURE_BUFFER_SIZE)<pageBytes/16)return null;
             alignment=Math.max(16,glGetInteger(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT));
         }
         int payload=(data.remaining()+15)/16*16;
         int length=(payload+cells*4+alignment-1)/alignment*alignment;
-        if(length>PAGE_BYTES/2)return null;
+        if(length>pageBytes/2)return null;
         Page selected=null;int offset=-1;
         for(Page page:pages)if((offset=page.allocate(length))>=0){selected=page;break;}
-        if(selected==null){if(pages.size()>=maxPages)return null;selected=new Page();pages.add(selected);offset=selected.allocate(length);}
+        if(selected==null){if(pages.size()>=maxPages)return null;selected=new Page(pageBytes);pages.add(selected);offset=selected.allocate(length);}
         int texture=glGenTextures();
         try {
             glBindBuffer(GL_TEXTURE_BUFFER,selected.buffer);glBufferSubData(GL_TEXTURE_BUFFER,offset,data);
             glBindTexture(GL_TEXTURE_BUFFER,texture);glTexBufferRange(GL_TEXTURE_BUFFER,GL_RGBA32UI,selected.buffer,offset,payload);
-            return new Slice(selected,offset,length,texture,offset+payload);
+            return new Slice(this,selected,offset,length,texture,offset+payload);
         }catch(RuntimeException|Error failure){glDeleteTextures(texture);selected.release(offset,length);throw failure;}
         finally{glBindBuffer(GL_TEXTURE_BUFFER,0);glBindTexture(GL_TEXTURE_BUFFER,0);}
     }
     void mask(Slice slice,int[] values){
+        if((long)values.length*4>slice.length-(slice.maskOffset-slice.offset)) throw new IllegalArgumentException("Ownership exceeds arena slice");
         glBindBuffer(GL_TEXTURE_BUFFER,slice.page.buffer);
         try{glBufferSubData(GL_TEXTURE_BUFFER,slice.maskOffset,values);}finally{glBindBuffer(GL_TEXTURE_BUFFER,0);}
     }
+    /** Grow only on ownership topology changes, preserving the resident geometry on the GPU. */
+    Slice resizeMask(Slice slice,int cells) {
+        if((long)cells*4<=slice.length-(slice.maskOffset-slice.offset)) return slice;
+        if(slice.arena!=this) return slice.arena.resizeMask(slice,cells);
+        int payload=slice.maskOffset-slice.offset;
+        int length=(payload+cells*4+alignment-1)/alignment*alignment;
+        if(length>pageBytes/2) return null;
+        Page selected=null; int offset=-1;
+        for(Page page:pages) if((offset=page.allocate(length))>=0) { selected=page;break; }
+        if(selected==null) {
+            if(pages.size()>=maxPages) return null;
+            selected=new Page(pageBytes);pages.add(selected);offset=selected.allocate(length);
+        }
+        int texture=glGenTextures();
+        try {
+            glBindBuffer(GL_COPY_READ_BUFFER,slice.page.buffer);glBindBuffer(GL_COPY_WRITE_BUFFER,selected.buffer);
+            glCopyBufferSubData(GL_COPY_READ_BUFFER,GL_COPY_WRITE_BUFFER,slice.offset,offset,payload);
+            glBindTexture(GL_TEXTURE_BUFFER,texture);glTexBufferRange(GL_TEXTURE_BUFFER,GL_RGBA32UI,selected.buffer,offset,payload);
+            var grown=new Slice(this,selected,offset,length,texture,offset+payload);
+            retire(slice);return grown;
+        } catch(RuntimeException|Error failure) { glDeleteTextures(texture);selected.release(offset,length);throw failure; }
+        finally { glBindBuffer(GL_COPY_READ_BUFFER,0);glBindBuffer(GL_COPY_WRITE_BUFFER,0);glBindTexture(GL_TEXTURE_BUFFER,0); }
+    }
     void retire(Slice slice) {
         if(slice==null)return;
+        if(slice.arena!=this){slice.arena.retire(slice);return;}
         glDeleteTextures(slice.texture);
         slice.fence=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);retired.addLast(slice);
         reap();
@@ -119,7 +164,7 @@ final class PredictionTerrainArena {
     }
     void reap(){
         reapLocal();
-        if (this == SHARED) WATER.reapLocal();
+        if (this == SHARED) { WATER.reapLocal(); OVERFLOW.reapLocal(); }
     }
     private void closeLocal(){
         for(Slice slice:retired)glDeleteSync(slice.fence);retired.clear();
@@ -129,10 +174,10 @@ final class PredictionTerrainArena {
         closeLocal();
         // Existing callers historically closed SHARED directly. Keep that
         // lifecycle contract while also disposing the dedicated water pool.
-        if (this == SHARED) WATER.closeLocal();
+        if (this == SHARED) { WATER.closeLocal(); OVERFLOW.closeLocal(); }
     }
-    private String diagnosticsLocal(){return "arena="+name+"{pages="+pages.size()+",bytes="+(long)pages.size()*PAGE_BYTES
-            +",budgetBytes="+(long)maxPages*PAGE_BYTES+",retired="+retired.size()+"}";}
-    String diagnostics(){return diagnosticsLocal()+","+WATER.diagnosticsLocal();}
-    long allocatedBytes() { return (long) pages.size() * PAGE_BYTES; }
+    private String diagnosticsLocal(){return "arena="+name+"{pages="+pages.size()+",bytes="+allocatedBytes()
+            +",budgetBytes="+(long)maxPages*pageBytes+",retired="+retired.size()+"}";}
+    String diagnostics(){return diagnosticsLocal()+","+WATER.diagnosticsLocal()+","+OVERFLOW.diagnosticsLocal();}
+    long allocatedBytes() { return (long) pages.size() * pageBytes; }
 }

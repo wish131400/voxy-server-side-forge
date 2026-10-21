@@ -87,7 +87,7 @@ class PredictionProgressiveLoadingTest {
         }, false);
     }
 
-    @Test void cachedRestoreKeepsTwoSlotsAndRefillsWithoutPlannerTicks() throws Exception {
+    @Test void cachedRestoreKeepsFourSlotsAndRefillsWithoutPlannerTicks() throws Exception {
         var config=VSSClientConfig.CONFIG;
         boolean trees=config.predictionTrees, structures=config.predictionStructures;
         config.predictionTrees=false; config.predictionStructures=false;
@@ -124,7 +124,11 @@ class PredictionProgressiveLoadingTest {
                 field=PredictionTileManager.class.getDeclaredField("cacheCandidates"); field.setAccessible(true);
                 ((java.util.ArrayDeque<PredictionTileManager.PredictionTileKey>)field.get(manager)).addAll(keys);
                 var restore=PredictionTileManager.class.getDeclaredMethod("restoreCached",int.class,int.class);
-                restore.setAccessible(true); restore.invoke(manager,0,0);
+                restore.setAccessible(true);
+                long admissionDeadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+                while (manager.pendingCount()<4 && System.nanoTime()<admissionDeadline) {
+                    restore.invoke(manager,0,0); Thread.sleep(1);
+                }
                 assertEquals(4,manager.pendingCount(),"restoration must keep only the bounded warm-cache window");
                 gate.countDown();
                 long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(10);
@@ -184,7 +188,13 @@ class PredictionProgressiveLoadingTest {
                 for (var key:keys) candidates.add(request.newInstance(key,false,1000,0D));
                 var refill=PredictionTileManager.class.getDeclaredMethod("refillScope",int.class,int.class);
                 refill.setAccessible(true); refill.invoke(manager,0,0);
-                assertTrue(entered.await(5,TimeUnit.SECONDS),manager.surfaceDiagnostics());
+                long admissionDeadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+                // Admission has a bounded time slice; fill the window through
+                // repeated scope pumps before releasing the blocked workers.
+                while (entered.getCount()>0 && System.nanoTime()<admissionDeadline) {
+                    refill.invoke(manager,0,0); entered.await(10,TimeUnit.MILLISECONDS);
+                }
+                assertEquals(0,entered.getCount(),manager.surfaceDiagnostics());
                 assertEquals(limit,manager.pendingCount(),"scope work must not flood all worker slots");
                 gate.countDown();
                 long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(15);
@@ -219,8 +229,12 @@ class PredictionProgressiveLoadingTest {
         try (var manager=new PredictionTileManager(PROFILE.levelKey(),sampler,budget,null)) {
             var executorField=PredictionTileManager.class.getDeclaredField("executor");executorField.setAccessible(true);
             executor=(ThreadPoolExecutor)executorField.get(manager);
-            replan(manager);
-            assertTrue(deferred.await(5,TimeUnit.SECONDS));
+            long planDeadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+            // Client ticks must collect the asynchronous plan and schedule.
+            while (deferred.getCount()>0 && System.nanoTime()<planDeadline) {
+                replan(manager); deferred.await(10,TimeUnit.MILLISECONDS);
+            }
+            assertEquals(0,deferred.getCount(),manager.surfaceDiagnostics());
             var field=PredictionTileManager.class.getDeclaredField("deferredUntil");field.setAccessible(true);
             var retries=(java.util.Map<?,?>)field.get(manager);
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
@@ -294,8 +308,11 @@ class PredictionProgressiveLoadingTest {
                 var enqueue=PredictionTileManager.class.getDeclaredMethod("enqueue",PredictionTileManager.PredictionTileKey.class,int.class,int.class,boolean.class);
                 enqueue.setAccessible(true);enqueue.invoke(manager,root,0,0,false);
             }
-            replan(manager,surface);
-            assertTrue(entered.await(5, TimeUnit.SECONDS), "fixture must keep one far horizon job unfinished");
+            long planDeadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);
+            while (entered.getCount()>0 && System.nanoTime()<planDeadline) {
+                replan(manager,surface); entered.await(10,TimeUnit.MILLISECONDS);
+            }
+            assertEquals(0,entered.getCount(), "fixture must keep one far horizon job unfinished");
             if (!surface) {
                 for (int i=0;i<20;i++) { replan(manager,false); Thread.sleep(10); }
                 assertFalse(hasNearDetail(manager,false), "ordinary local fine terrain waits for medium horizon coverage");

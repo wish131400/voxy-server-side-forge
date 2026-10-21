@@ -50,7 +50,7 @@ class PredictionFirstCoverageTest {
         assertFalse(manager.hasReadyTiles());
     }
 
-    @Test void optionalTerrainWaitsForIdleAndFrameBudgetThenPublishesWithoutLosingParent() throws Exception {
+    @Test void optionalTerrainWaitsForIdleAndCpuBudgetThenPreservesOrdinaryReadiness() throws Exception {
         try (var manager = manager(sampler(new AtomicInteger(), null, null, 32), null)) {
             var root = new PredictionTileKey(PROFILE.levelKey(), -1, -1, manager.layout().levelCount() - 1);
             desire(manager, root, true);
@@ -67,13 +67,16 @@ class PredictionFirstCoverageTest {
             assertEquals(32, manager.readyTiles().iterator().next().cellAxis());
             var allowed = PredictionTileManager.class.getDeclaredField("idleAllowed"); allowed.setAccessible(true);
             allowed.setBoolean(manager, true);
+            PredictionDemandTestSupport.loading(manager, System.nanoTime());
+            var ordinaryProgress = manager.loadingProgress();
+            assertTrue(ordinaryProgress.ready(95));
             PredictionFramePace.resetForTesting();
             enqueue(manager, root); awaitIdle(manager);
-            assertEquals(32, manager.readyTiles().iterator().next().cellAxis(), "unknown frame pace cannot admit optional work");
-            long now = System.nanoTime();
-            for (int i = 60; i >= 0; i--) PredictionFramePace.recordFrame(now - i * 10_000_000L);
-            enqueue(manager, root); awaitIdle(manager);
             assertEquals(64, manager.readyTiles().iterator().next().cellAxis());
+            assertTrue(PredictionFramePace.averageFps() < 0,
+                    "CPU admission must not depend on the diagnostic FPS window");
+            assertSame(ordinaryProgress, manager.loadingProgress(),
+                    "optional publication must preserve completed ordinary readiness");
             assertTrue(manager.surfaceDiagnostics().contains("pending=0"));
             long built = manager.builtTileCount();
             enqueue(manager, root); awaitIdle(manager);
@@ -96,7 +99,8 @@ class PredictionFirstCoverageTest {
             var optionalResidents = PredictionTileManager.class.getDeclaredField("idleResidents");
             optionalResidents.setAccessible(true);
             long until = System.nanoTime() + TimeUnit.SECONDS.toNanos(25);
-            while (((java.util.Map<?, ?>) optionalResidents.get(manager)).isEmpty() && System.nanoTime() < until) {
+            while ((((java.util.Map<?, ?>) optionalResidents.get(manager)).isEmpty()
+                    || !manager.loadingProgress().ready(95)) && System.nanoTime() < until) {
                 PredictionFramePace.resetForTesting();
                 long now = System.nanoTime();
                 for (int i = 60; i >= 0; i--) PredictionFramePace.recordFrame(now - i * 10_000_000L);
@@ -155,6 +159,7 @@ class PredictionFirstCoverageTest {
             targets.set(manager, java.util.Map.of(first, 64, second, 64));
             var allowed = PredictionTileManager.class.getDeclaredField("idleAllowed"); allowed.setAccessible(true);
             allowed.setBoolean(manager, true);
+            PredictionDemandTestSupport.loading(manager, System.nanoTime());
             PredictionFramePace.resetForTesting();
             long now = System.nanoTime();
             for (int i = 60; i >= 0; i--) PredictionFramePace.recordFrame(now - i * 10_000_000L);
@@ -192,12 +197,10 @@ class PredictionFirstCoverageTest {
             coverage.set(manager, new PredictionMediumCoverage(Set.of(root, target), Set.of(target)));
             var pending = PredictionTileManager.class.getDeclaredField("mediumCoveragePending"); pending.setAccessible(true);
             pending.setBoolean(manager, true);
-            var reclaim = PredictionTileManager.class.getDeclaredMethod("makeRoomForSurface", int.class, int.class);
-            reclaim.setAccessible(true);
             free.set(154L * mib);
             for (int tick = 0; tick < 30; tick++) {
                 clock.addAndGet(1_000_000_000L);
-                reclaim.invoke(manager, 0, 0);
+                PredictionDemandTestSupport.reclaim(manager, 0, 0);
                 assertEquals(before, manager.readyTiles().stream().map(PredictionTileManager.PredictionTile::key)
                         .collect(java.util.stream.Collectors.toSet()), "a small detail cache cannot pay for external heap pressure");
             }
@@ -205,7 +208,7 @@ class PredictionFirstCoverageTest {
             assertEquals(0, bias.getInt(manager));
             assertEquals(0, manager.pendingCount());
             free.set(4096L * mib);
-            assertEquals(false, reclaim.invoke(manager, 0, 0));
+            assertFalse(PredictionDemandTestSupport.reclaim(manager, 0, 0));
             enqueue(manager, target); awaitIdle(manager);
             assertTrue(manager.readyTiles().stream().anyMatch(tile -> tile.key().equals(target)));
             assertTrue(manager.readyTiles().stream().anyMatch(tile -> tile.key().equals(detail)));
@@ -540,8 +543,8 @@ class PredictionFirstCoverageTest {
             enqueue(manager, root); awaitIdle(manager);
             enqueue(manager, root);
             assertTrue(refining.await(10, TimeUnit.SECONDS));
-            // This column lies between even the final grid's sample lines.
-            for (int i = 0; i < 20; i++) manager.capturedTerrainChanged(-3, -3);
+            // This column is outside the tile and its halo. In-area captures now contribute to area mips.
+            for (int i = 0; i < 20; i++) manager.capturedTerrainChanged(4096, 4096);
             release.countDown(); awaitIdle(manager);
             assertEquals(16, manager.readyTiles().iterator().next().cellAxis(),
                     "Unrelated exact-column traffic discarded a complete refinement stage");
@@ -743,6 +746,11 @@ class PredictionFirstCoverageTest {
         if (leaf) {
             var leaves = PredictionTileManager.class.getDeclaredField("terrainLeaves"); leaves.setAccessible(true);
             ((Set<PredictionTileKey>) leaves.get(manager)).add(key);
+            // Production planning publishes leaf membership and its target together.
+            var targets = PredictionTileManager.class.getDeclaredField("terrainTargets"); targets.setAccessible(true);
+            var next = new java.util.HashMap<>((java.util.Map<PredictionTileKey, Integer>) targets.get(manager));
+            next.putIfAbsent(key, manager.layout().cellAxis(key.lod()));
+            targets.set(manager, java.util.Map.copyOf(next));
         }
     }
     private static void enqueue(PredictionTileManager manager, PredictionTileKey key) throws Exception {

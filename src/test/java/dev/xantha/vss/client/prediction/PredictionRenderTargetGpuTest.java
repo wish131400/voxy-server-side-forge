@@ -697,7 +697,7 @@ class PredictionRenderTargetGpuTest {
         terrain.setTile(-4, -1, -20, 8, 1, true);
         terrain.setOpaqueAlpha(1);
         terrain.setRealCoverage(0, 0, 0, 0);
-        terrain.setVoxyOwnershipDistance(0);
+
         main.bindWrite(true); glClearDepth(iris ? 0 : 1); glClear(GL_DEPTH_BUFFER_BIT);
         target.bindWrite(true); terrain.bindMainDepth(main.getDepthTextureId(), projection);
         int low = 32768, high = 32768 + 2 * 4;
@@ -744,7 +744,7 @@ class PredictionRenderTargetGpuTest {
         terrain.setTile(-128, -160, -128, 256, 1, true);
         terrain.setRealCoverage(0, 0, 0, 0);
         terrain.setRealRenderDistance(8192);
-        terrain.setVoxyOwnershipDistance(480);
+
         main.bindWrite(true); glClearDepth(iris ? 0 : 1); glClear(GL_DEPTH_BUFFER_BIT);
         target.bindWrite(true); terrain.bindMainDepth(main.getDepthTextureId(), projection);
         try {
@@ -774,7 +774,7 @@ class PredictionRenderTargetGpuTest {
             }
         } finally {
             RenderSystem.disableBlend(); terrain.setOpaqueAlpha(1);
-            terrain.setVoxyOwnershipDistance(0); glUniform3f(exactGrid, 0, 0, 0); glDeleteTextures(exact);
+            glUniform3f(exactGrid, 0, 0, 0); glDeleteTextures(exact);
         }
         System.out.println("PASS: missing Voxy pixels retain the opaque background under transparent water; Iris=" + iris);
     }
@@ -801,7 +801,7 @@ class PredictionRenderTargetGpuTest {
         terrain.setTile(-8192, -152, -8192, 8, 1, true);
         terrain.setRealCoverage(0, 0, 0, 0);
         terrain.setRealRenderDistance(8192);
-        terrain.setVoxyOwnershipDistance(480);
+
         terrain.setOpaqueAlpha(1);
         try {
             for (int frame = 0; frame < 120; frame++) {
@@ -819,11 +819,12 @@ class PredictionRenderTargetGpuTest {
                     int red = pixels.get((py * 64 + px) * 4) & 255;
                     double worldX = ((px + .5) / 32 - 1) * (152 - 96) * Math.tan(Math.toRadians(35));
                     double worldZ = -((py + .5) / 32 - 1) * (152 - 96) * Math.tan(Math.toRadians(35));
-                    // Existing ground preference also owns the indexed edge
-                    // when both ray endpoints are within 32 blocks in X/Z.
+                    // Stored interior and edge columns use the same ground
+                    // proof. A distant pixel outside the local ray footprint
+                    // cannot replace the coarse foreground merely by existing.
                     boolean groundPreference = fluid == 0 && worldX >= 0
                             && Math.max(Math.abs(worldX), Math.abs(worldZ)) * (1024.0 / 56 - 1) <= 32;
-                    if (frame % 2 != 0 && (worldX >= 16 && fluid != 1 || groundPreference)) assertEquals(0, red, "actual ground/interior ownership must still win; frame=" + frame);
+                    if (frame % 2 != 0 && groundPreference) assertEquals(0, red, "nearby actual ground ownership must still win; frame=" + frame);
                     else assertTrue(red > 100, "missing/index-edge terrain, clear-depth interior and water with absent/distant actual depth retain fallback; frame=" + frame);
                 }
             }
@@ -849,9 +850,8 @@ class PredictionRenderTargetGpuTest {
             assertEquals(0, terrainPixels().get((32 * 64 + 36) * 4) & 255,
                     "indexed edge gives way to actual nearby ground even when prediction is higher");
             main.bindWrite(true); glClearDepth(iris ? 0 : 1); glClear(GL_DEPTH_BUFFER_BIT); target.bindWrite(true);
-            terrain.setVoxyOwnershipDistance(0);
-            assertTrue((terrainPixels().get((32 * 64 + 32) * 4) & 255) > 100, "disabling Voxy range restores prediction");
-            terrain.setVoxyOwnershipDistance(480);
+
+
             terrain.setTile(-8192, -1000, -8192, 8, 1, true);
             assertTrue((terrainPixels().get((32 * 64 + 32) * 4) & 255) > 100, "high altitude cannot yield to out-of-range Voxy");
             terrain.setTile(-8192, -152, -8192, 8, 1, true);
@@ -862,9 +862,9 @@ class PredictionRenderTargetGpuTest {
             }
             assertTrue((terrainPixels().get((32 * 64 + 32) * 4) & 255) > 100, "definite index removal restores pixels without mesh rebuild");
         } finally {
-            terrain.setVoxyOwnershipDistance(0); glUniform3f(exactGrid, 0, 0, 0); glDeleteTextures(texture);
+            glUniform3f(exactGrid, 0, 0, 0); glDeleteTextures(texture);
         }
-        System.out.println("PASS: spatial index solid ownership, depth-tested water and edge fallback, 120 stable terrain/fluid frames, partial tiles, range/altitude exit and removal; Iris=" + iris);
+        System.out.println("PASS: spatial index with depth/ground proof, 120 stable terrain/fluid frames, partial tiles, altitude exit and removal; Iris=" + iris);
     }
 
     private static void verifyNearbyCutWallHandoff(PredictionTerrainProgram terrain, TextureTarget target,
@@ -1813,7 +1813,7 @@ class PredictionRenderTargetGpuTest {
                     java.util.Map.of(a.key(),a,b.key(),b),java.util.Map.of());
             var residentState=new PredictionRenderResidency();residentState.retain(initial);
             residentState.uploaded(a);residentState.uploaded(b);initial=residentState.snapshot(initial);
-            var scene=new PredictionRenderer.Scene();
+            var scene=new PredictionRenderer.Scene(Runnable::run);
             var camera=new net.minecraft.world.phys.Vec3(0,100,0);
             var view=new PredictionRenderer.CoverageView(0,0,1300,null);
             var matrix=new Matrix4f();
@@ -1829,8 +1829,9 @@ class PredictionRenderTargetGpuTest {
             var next=new PredictionTileManager.RenderSnapshot(initial.dimension(),layout,
                     java.util.Map.of(a.key(),a,b.key(),replacement),java.util.Map.of(b.key(),1L));
             residentState.retain(next);residentState.uploaded(replacement);next=residentState.snapshot(next);
-            var updated=scene.prepare(next,residentState.drainChanges(),view,camera,4096,32,matrix,matrix,null);
-            assertEquals(world+1,scene.worldVisits(),"one uploaded tile updates one terrain entry");
+            var updated=scene.prepare(next,residentState.drainChanges(),view,camera.add(0, 1, 0),4096,32,
+                    new Matrix4f().rotateY(.25F),matrix,null);
+            assertEquals(world+1,scene.worldVisits(),"upload while moving/turning only updates its affected owners");
             assertSame(oldA,updated.stream().filter(draw->!draw.seam() && draw.tile()==a).findFirst().orElseThrow());
             assertTrue(updated.stream().anyMatch(draw->draw.tile()==replacement));
             long after=scene.worldVisits();
@@ -1907,7 +1908,7 @@ class PredictionRenderTargetGpuTest {
             var residency = new PredictionRenderResidency();
             residency.retain(source); residency.uploaded(a); residency.uploaded(b);
             var snapshot = residency.snapshot(source);
-            var scene = new PredictionRenderer.Scene();
+            var scene = new PredictionRenderer.Scene(Runnable::run);
             var camera = new net.minecraft.world.phys.Vec3(0, 100, 0);
             var view = new PredictionRenderer.CoverageView(0, 0, 1300, null);
             var matrix = new Matrix4f();
@@ -2002,12 +2003,18 @@ class PredictionRenderTargetGpuTest {
         var tile = PredictionLodSeamsTest.tile(0, 0, 2, 64);
         var allowed = new boolean[64 * 64]; java.util.Arrays.fill(allowed, true);
         var patch = new PredictionLodSeams.Patch(new PredictionLodSeams.Surface(tile, allowed), tile.mesh().gpuPayload());
-        var patches = java.util.List.of(patch);
-        var first = batch.prepare(patches);
-        assertEquals(1, first.size());
-        assertSame(first, batch.prepare(patches), "unchanged seam list skips GPU preparation");
-        assertTrue(batch.prepare(java.util.List.of()).isEmpty(), "removed seams stop drawing immediately");
-        assertNotSame(first, batch.prepare(patches), "reappearing seam is prepared again");
+        var change = new PredictionLodSeams.Changes(java.util.Map.of(tile.key(), patch),
+                java.util.Set.of(), java.util.Set.of(), java.util.Set.of());
+        assertEquals(java.util.Set.of(tile.key()), batch.apply(change));
+        assertTrue(batch.requiresTerrain(tile.key(), null));
+        long updates = batch.updates();
+        assertTrue(batch.apply(change).isEmpty(), "unchanged patch skips GPU preparation");
+        assertEquals(updates, batch.updates());
+        assertEquals(java.util.Set.of(tile.key()), batch.apply(new PredictionLodSeams.Changes(
+                java.util.Map.of(), java.util.Set.of(tile.key()), java.util.Set.of(), java.util.Set.of())));
+        assertFalse(batch.requiresTerrain(tile.key(), null), "removed seams stop drawing immediately");
+        assertEquals(java.util.Set.of(tile.key()), batch.apply(change));
+        assertEquals(updates + 1, batch.updates(), "reappearing seam is prepared again");
         batch.clear();
         try {
             var drain = PredictionRenderer.class.getDeclaredMethod("drainRetiredTiles"); drain.setAccessible(true);

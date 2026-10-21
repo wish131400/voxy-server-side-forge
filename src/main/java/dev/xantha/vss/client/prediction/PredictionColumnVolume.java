@@ -21,6 +21,9 @@ public final class PredictionColumnVolume {
         this.runs = runs.clone();
     }
 
+    /** Public LOD integration factory; intervals are [bottom, top, block registry ID, fluid kind]. */
+    public static PredictionColumnVolume ofRuns(int[] runs) { return new PredictionColumnVolume(runs); }
+
     /** Takes ownership of an array built by the sampler; the array is never mutated afterwards. */
     private PredictionColumnVolume(int[] runs, boolean owned) {
         validate(runs);

@@ -21,6 +21,7 @@ class PredictionCompactGpuTest {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,4);glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,6);
         long window=glfwCreateWindow(128,128,"production batch",0,0);assertNotEquals(0,window);
         var gpuTiles=new ArrayList<PredictionGpuTile>();var textures=new ArrayList<Integer>();
+        String oldRectangle = System.getProperty("vss.disableRectangleGpu");
         try {
             glfwMakeContextCurrent(window);GL.createCapabilities();RenderSystem.initRenderThread();
             PredictionMeshCodecTest.bootstrap();
@@ -29,14 +30,16 @@ class PredictionCompactGpuTest {
                 int ebo=glGenBuffers();glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
                 var rawEntries=new ArrayList<PredictionRenderer.Draw>();var entries=new ArrayList<PredictionRenderer.Draw>();int max=0;
                 for(int encoding=0;encoding<2;encoding++) for(int t=0;t<128;t++) {
+                    System.setProperty("vss.disableRectangleGpu", Boolean.toString(encoding == 0 || t % 5 == 0));
                     var mesh=PredictionMeshCodecTest.fixture();int n=(mesh.cellAxis()+1)*(mesh.cellAxis()+1);
                     var key=new PredictionTileManager.PredictionTileKey(net.minecraft.world.level.Level.OVERWORLD,t%4,t/4,0);
                     var tile=new PredictionTileManager.PredictionTile(key,new int[n],new int[n],new ClientColumnSample[n],mesh,
                             new PredictionDepthBound(60,80),0,t+1,mesh.cellAxis(),1);
                     float[] morph = new float[n]; for(int j=0;j<n;j++) morph[j]=(j%11-5)*0.25f;
                     mesh.gpuPayload().morph(morph, 40, 100);
-                    if(encoding==1 && t%5!=0) {mesh.gpuPayload().prepareGpuStorage();assertTrue(mesh.gpuPayload().paletteBaseTexel()>0);}
+                    mesh.gpuPayload().prepareGpuStorage(); assertTrue(mesh.gpuPayload().paletteBaseTexel()>0);
                     var gpu=new PredictionGpuTile(key);gpuTiles.add(gpu);assertTrue(gpu.ensureMesh(tile));assertNotNull(gpu.arenaSlice());
+                    if (encoding == 1 && t % 5 != 0) assertTrue(gpu.paletteBaseTexel() < 0);
                     boolean[] allowed=new boolean[mesh.cellCount()];Arrays.fill(allowed,true);gpu.updateCoverage(allowed);
                     byte[] mask=new byte[allowed.length];for(int i=0;i<mask.length;i++)mask[i]=(byte)((i+t)%7==0?0:128);
                     gpu.updateBoundaryCoverage(mask);
@@ -134,6 +137,7 @@ class PredictionCompactGpuTest {
                 glDeleteBuffers(ebo);glDeleteVertexArrays(vao);
             }
         } finally {
+            if (oldRectangle == null) System.clearProperty("vss.disableRectangleGpu"); else System.setProperty("vss.disableRectangleGpu", oldRectangle);
             for(var gpu:gpuTiles)gpu.close();glFinish();PredictionTerrainArena.SHARED.reap();PredictionTerrainArena.SHARED.close();
             for(int texture:textures)glDeleteTextures(texture);glfwDestroyWindow(window);glfwTerminate();
         }

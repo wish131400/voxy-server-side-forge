@@ -24,6 +24,6 @@ record PredictionMediumCoverage(Set<PredictionTileKey> frontier, Set<PredictionT
                     leaf.tileZ() >> shift, leaf.lod() + shift));
         }
         return new PredictionMediumCoverage(Set.copyOf(frontier),
-                Set.copyOf(PredictionTileManager.withCoarseCoverage(List.copyOf(frontier), layout)));
+                Set.copyOf(PredictionLodPlanner.withCoarseCoverage(List.copyOf(frontier), layout)));
     }
 }

@@ -63,10 +63,12 @@ class PredictionCityMeshCacheTest {
         byte[] raw = new byte[32], full = new byte[32]; full[0] = 8;
         byte[] base = PredictionMeshCodec.withCityBuildings(raw, city);
         byte[] bytes = PredictionMeshCodec.encode(mesh, full, base, true, true, raw, city);
+        assertEquals(PredictionMeshCodec.PREPARED_CITY_RECORD_VERSION, java.nio.ByteBuffer.wrap(bytes).getInt());
         var unknown = new LostCityHints(Level.OVERWORLD, 17, true);
         var restored = PredictionMeshCodec.decodeCityBaseRecord(bytes, raw, raw, mesh.cellAxis(),
                 stored -> unknown.agrees(stored, 0, 0, 64));
         assertNotNull(restored); assertTrue(restored.surfaceCompleted()); assertEquals(city, restored.cities());
+        assertTrue(restored.prepared());
         assertArrayEquals(mesh.gpuPayload().cacheWords(), restored.mesh().gpuPayload().cacheWords());
         assertNotNull(PredictionMeshCodec.decode(bytes, full, mesh.cellAxis()), "full identity path stays compatible");
         byte[] changed = raw.clone(); changed[0] = 1;
@@ -77,6 +79,25 @@ class PredictionCityMeshCacheTest {
         byte[] truncated = Arrays.copyOf(bytes, bytes.length - 1);
         assertThrows(IOException.class, () -> PredictionMeshCodec.decodeCityBaseRecord(truncated, raw, raw, mesh.cellAxis(), stored -> true));
     }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(ints = {10, 12})
+    void legacyCityFootersRemainReadableWithCanonicalAndMergedGeometry(int version) throws Exception {
+        var mesh = PredictionMeshCodecTest.fixture(); var city = city();
+        byte[] raw = new byte[32], base = PredictionMeshCodec.withCityBuildings(raw, city);
+        byte[] canonical = PredictionMeshCacheTestRecords.legacy(mesh, IDENTITY, base, true, true, version);
+        byte[] cities = PredictionCityMeshCache.encode(city);
+        var bytes = new java.io.ByteArrayOutputStream();
+        bytes.write(canonical);
+        try (var out = new java.io.DataOutputStream(bytes)) {
+            out.write(raw); out.write(cities); out.writeInt(32 + cities.length);
+        }
+        var record = PredictionMeshCodec.decodeCityBaseRecord(bytes.toByteArray(), raw, raw, mesh.cellAxis(), stored -> true);
+        assertNotNull(record); assertFalse(record.prepared()); assertEquals(city, record.cities());
+        assertArrayEquals(mesh.gpuPayload().quads(), record.mesh().gpuPayload().quads());
+    }
+
+    private static final byte[] IDENTITY = new byte[32];
 
     private static LostCityHintsS2CPayload empty(int x, int z) {
         return new LostCityHintsS2CPayload(Level.OVERWORLD.location(), x, z, 17, true,

@@ -49,7 +49,8 @@ final class PredictionTileTable<V> extends AbstractMap<PredictionTileKey,V> {
             if(next[page]==null) next[page]=new Long2ObjectOpenHashMap<>();
             next[page].put(at,new Item<>(key,entry.getValue()));if(old==null) nextSize++;
         }
-        return new PredictionTileTable<>(dimension,next,nextSize);
+        for (boolean changed : copied) if (changed) return new PredictionTileTable<>(dimension,next,nextSize);
+        return this;
     }
     private static <V> void copy(Long2ObjectOpenHashMap<Item<V>>[] next,boolean[] copied,int page) {
         if(copied[page]) return;
@@ -63,17 +64,33 @@ final class PredictionTileTable<V> extends AbstractMap<PredictionTileKey,V> {
         long key=pack(x,z);var values=pages[page(lod,key)];var entry=values==null?null:values.get(key);
         return entry==null?null:entry.value();
     }
+    /** Enumerates one existing snapshot level without building a parallel spatial index. */
+    void forEachInBounds(int lod, int minX, int minZ, int maxX, int maxZ, java.util.function.Consumer<V> visit) {
+        if ((long) (maxX - minX + 1) * (maxZ - minZ + 1) <= 64) {
+            for (int z = minZ; z <= maxZ; z++) for (int x = minX; x <= maxX; x++) {
+                V value = at(x, z, lod); if (value != null) visit.accept(value);
+            }
+        } else for (int bucket = 0; bucket < BUCKETS; bucket++) {
+            var values = pages[lod * BUCKETS + bucket];
+            if (values != null) for (var item : values.values())
+                if (item.key().tileX() >= minX && item.key().tileX() <= maxX
+                        && item.key().tileZ() >= minZ && item.key().tileZ() <= maxZ) visit.accept(item.value());
+        }
+    }
     /** Shared pages need no inspection; report only added, removed or replaced values. */
     void forEachDifference(PredictionTileTable<V> previous, java.util.function.Consumer<PredictionTileKey> changed) {
         for (int page = 0; page < pages.length; page++) {
             var before = previous.pages[page]; var after = pages[page];
             if (before == after) continue;
-            if (before != null) for (var entry : before.long2ObjectEntrySet()) {
+            if (before != null) for (var iterator = before.long2ObjectEntrySet().fastIterator(); iterator.hasNext();) {
+                var entry = iterator.next();
                 var replacement = after == null ? null : after.get(entry.getLongKey());
                 if (replacement == null || replacement.value() != entry.getValue().value()) changed.accept(entry.getValue().key());
             }
-            if (after != null) for (var entry : after.long2ObjectEntrySet())
+            if (after != null) for (var iterator = after.long2ObjectEntrySet().fastIterator(); iterator.hasNext();) {
+                var entry = iterator.next();
                 if (before == null || !before.containsKey(entry.getLongKey())) changed.accept(entry.getValue().key());
+            }
         }
     }
     @Override public V get(Object key) {

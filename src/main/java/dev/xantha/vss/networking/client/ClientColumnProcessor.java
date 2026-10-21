@@ -250,9 +250,9 @@ final class ClientColumnProcessor {
         return new VoxelColumnData(
                 decodedSections.toArray(VoxelColumnData.SectionData[]::new),
                 column.columnTimestamp(),
-                column.replaceMissingSections(),
+                column.replaceMissingSections() && !column.finalPart().coverage().isFiltered(),
                 replacementSectionYs,
-                true);
+                true, column.finalPart().coverage());
     }
 
     void invalidatePositions(ResourceKey<Level> dimension, long[] packedPositions) {

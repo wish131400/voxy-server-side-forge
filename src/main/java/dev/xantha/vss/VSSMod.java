@@ -18,6 +18,8 @@ import net.minecraftforge.fml.common.Mod;
 @Mod(VSSConstants.MOD_ID)
 public final class VSSMod {
     public VSSMod() {
+        VSSLogger.configureDebug(() -> dev.xantha.vss.config.VSSClientConfig.CONFIG.debugLogging
+                || dev.xantha.vss.config.VSSServerConfig.CONFIG.debugLogging);
         VSSNetworking.register();
         MinecraftForge.EVENT_BUS.register(VSSServerNetworking.class);
         MinecraftForge.EVENT_BUS.register(FarPlayerBroadcaster.class);
@@ -28,6 +30,8 @@ public final class VSSMod {
 
     private static final class ClientInit {
         private static void init() {
+            dev.xantha.vss.api.VSSApi.bindClientSession(
+                    new dev.xantha.vss.networking.client.ClientLodSessionAdapter());
             VSSClientConfigScreens.register();
             registerEmbeddiumOptionsBridge();
             ModCompat.init();

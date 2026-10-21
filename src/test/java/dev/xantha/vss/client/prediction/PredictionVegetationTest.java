@@ -61,6 +61,27 @@ class PredictionVegetationTest {
                 .getHolder(BuiltInRegistries.BLOCK.getId(block)).orElseThrow()).toList();
     }
 
+    @Test void deferredTemplateFeatureRollsBackAndDoesNotCacheAnEmptyOrPartialSurface() {
+        var ready = new java.util.concurrent.atomic.AtomicBoolean();
+        var feature = new Feature<NoneFeatureConfiguration>(NoneFeatureConfiguration.CODEC) {
+            @Override public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
+                context.level().setBlock(new BlockPos(1, 64, 1), Blocks.OAK_PLANKS.defaultBlockState(), 19);
+                if (!ready.get()) throw new PredictionWorkDeferred();
+                context.level().setBlock(new BlockPos(1, 65, 1), Blocks.OAK_LEAVES.defaultBlockState(), 19);
+                return true;
+            }
+        };
+        var configured = new ConfiguredFeature<>(feature, NoneFeatureConfiguration.INSTANCE);
+        var base = sampler(42, Blocks.GRASS_BLOCK, List.of(placed(configured, 1)));
+        var prediction = new PredictionVegetation(base, null, false);
+        assertThrows(PredictionWorkDeferred.class, () -> prediction.chunk(0, 0));
+        ready.set(true);
+        var blocks = prediction.chunk(0, 0);
+        assertTrue(blocks.values().stream().anyMatch(state -> state.is(Blocks.OAK_LEAVES)), prediction.diagnostics());
+        assertTrue(prediction.diagnostics().contains("skippedFeatures=0"), prediction.diagnostics());
+        assertTrue(prediction.diagnostics().contains("unsupportedFeatures=0"), prediction.diagnostics());
+    }
+
     @Test void nativeDownloadPreservesUnsyncedJavaWritesAndRollbackMarkers() {
         var sampler = sampler(42, Blocks.GRASS_BLOCK, List.of());
         var level = new PredictionDecorationLevel(sampler, sampler, RegistryAccess.EMPTY, 0, 0);

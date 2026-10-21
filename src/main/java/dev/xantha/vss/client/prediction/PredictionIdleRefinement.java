@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import dev.xantha.vss.client.prediction.PredictionTileManager.PredictionTileKey;
 
-/** Bounded, optional quality improvements layered over the ordinary plan. Render-thread owned. */
+/** Bounded, optional quality improvements; a private copy may be prepared off-thread. */
 final class PredictionIdleRefinement {
     static final int MAX_TARGETS = 128;
     static final long MAX_RESIDENT_BYTES = 64L * PredictionMemoryBudget.MIB;
@@ -19,6 +19,13 @@ final class PredictionIdleRefinement {
     private String state = "settling";
 
     String state() { return state; }
+
+    PredictionIdleRefinement copy() {
+        var copy = new PredictionIdleRefinement();
+        copy.targets.putAll(targets); copy.settledAt = settledAt; copy.nextPromotion = nextPromotion;
+        copy.anchorX = anchorX; copy.anchorZ = anchorZ; copy.state = state;
+        return copy;
+    }
 
     boolean settled(long now, boolean available, double x, double z) {
         if (!available) { settledAt = Long.MIN_VALUE; return false; }
@@ -38,8 +45,18 @@ final class PredictionIdleRefinement {
         // promotions do not delete resident meshes or invalidate disk entries.
         targets.keySet().removeIf(key -> owner(key, leaves, layout.levelCount()) == null
                 || baseTargets.getOrDefault(key, 0) >= targets.get(key));
+        // Optional requests outside the scheduling window must not exhaust the
+        // target budget after repeated turns. Existing resident meshes remain.
+        Set<PredictionTileKey> retained = new java.util.HashSet<>();
+        for (var key : targets.keySet()) if (eligible.test(key)) {
+            for (var parent = key; parent.lod() < layout.levelCount(); parent = new PredictionTileKey(
+                    key.dimension(), parent.tileX() >> 1, parent.tileZ() >> 1, parent.lod() + 1))
+                retained.add(parent);
+        }
+        targets.keySet().retainAll(retained);
         if (!advance) return Map.copyOf(targets);
-        if (targets.entrySet().stream().anyMatch(e -> residentAxes.getOrDefault(e.getKey(), 0) < e.getValue())) {
+        if (targets.entrySet().stream().anyMatch(e -> eligible.test(e.getKey())
+                && residentAxes.getOrDefault(e.getKey(), 0) < e.getValue())) {
             state = "refining";
             return Map.copyOf(targets);
         }

@@ -28,6 +28,25 @@ final class PredictionRealBoundarySeams {
     private List<PredictionLodSeams.Patch> patches=List.of();
     private long examinedEdges;
     long examinedEdges() { return examinedEdges; }
+    List<PredictionLodSeams.Patch> patchesSnapshot() { return List.copyOf(patchByKey.values()); }
+
+    /** Metadata-only replacements already proved equal by the LOD dependency check. */
+    void rebind(PredictionLodSeams.Index index, Set<PredictionTileKey> keys) {
+        for (var key : keys) {
+            var old = cache.get(key); var surface = indexSurface(index, key, old);
+            if (old == null || surface == null || old.input().surface() == surface) continue;
+            var patch = old.patch() == null ? null : old.patch().rebind(surface);
+            cache.put(key, new Cached(new Input(surface, old.input().edges()), old.mesh(), patch));
+            if (patch != null) patchByKey.put(key, patch);
+        }
+    }
+
+    private static PredictionLodSeams.Surface indexSurface(PredictionLodSeams.Index index, PredictionTileKey key, Cached old) {
+        if (old == null || old.input().edges().isEmpty()) return null;
+        var edge = old.input().edges().get(0);
+        var surface = index.at(edge.x() + edge.nx(), edge.z() + edge.nz());
+        return surface != null && surface.tile().key().equals(key) ? surface : null;
+    }
 
     List<PredictionLodSeams.Patch> update(List<PredictionLodSeams.Surface> surfaces,List<Edge> edges) {
         var changed=new HashSet<PredictionTileKey>();
@@ -35,7 +54,8 @@ final class PredictionRealBoundarySeams {
         for(var surface:surfaces) {
             var key=surface.tile().key();removed.remove(key);
             var old=previous.get(key);
-            if(old==null || old.tile()!=surface.tile() || !Arrays.equals(old.allowed(),surface.allowed())) {
+            if(old==null || old.tile()!=surface.tile() || !Arrays.equals(old.allowed(),surface.allowed())
+                    || !PredictionCoverageGrid.same(old.grid(),surface.grid())) {
                 previous.put(key,surface);adapterIndex.put(surface);changed.add(key);
             }
         }

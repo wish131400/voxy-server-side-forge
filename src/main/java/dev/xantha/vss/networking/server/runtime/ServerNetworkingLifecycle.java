@@ -17,6 +17,11 @@ import dev.xantha.vss.common.VSSLogger;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * 共享服务端组件的启停协调器；业务对象由装配入口创建，本类控制其生命周期顺序。
+ * <p>由服务端生命周期线程调用。开始/停止推进同一 guard 的版本；关闭执行器、
+ * 注册表和存储后，异步完成路径仍须检查原 epoch 与玩家状态身份。
+ */
 public final class ServerNetworkingLifecycle {
     private final PlayerRequestRegistry playerRegistry;
     private final ChunkGenerationService generationService;

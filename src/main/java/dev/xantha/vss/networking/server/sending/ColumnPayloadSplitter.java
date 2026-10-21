@@ -39,7 +39,7 @@ public final class ColumnPayloadSplitter {
 
         byte[] rawSections = payload.decompressedSections();
         ParsedSections parsed = readSections(level, payload, rawSections);
-        if (payload.completeColumn() && replacementSectionYs.length == 0 && parsed.valid()) {
+        if (payload.isDeliverable() && replacementSectionYs.length == 0 && parsed.valid()) {
             replacementSectionYs = replacementSectionYs(parsed.sections());
             normalized = payload.withTransferMetadata(
                     payload.transferId(),
@@ -90,7 +90,7 @@ public final class ColumnPayloadSplitter {
                     groups.get(partIndex),
                     partIndex,
                     groups.size(),
-                    finalPart && payload.completeColumn() ? replacementSectionYs : new int[0]);
+                    finalPart && payload.isDeliverable() ? replacementSectionYs : new int[0]);
         }
         return splitPayloads;
     }
@@ -193,7 +193,7 @@ public final class ColumnPayloadSplitter {
                 source.transferId(),
                 partIndex,
                 partCount,
-                replacementSectionYs));
+                replacementSectionYs, source.coverage()));
     }
 
     private static byte[] writeGroup(List<SerializedSection> sections) {

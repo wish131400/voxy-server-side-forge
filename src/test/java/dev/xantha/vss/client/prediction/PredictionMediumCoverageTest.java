@@ -45,7 +45,7 @@ class PredictionMediumCoverageTest {
         };
         try (var manager = new PredictionTileManager(profile.levelKey(),sampler,
                 new PredictionMemoryBudget(1024L*PredictionMemoryBudget.MIB,0,()->Long.MAX_VALUE,System::nanoTime,2),null)) {
-            manager.setWorkView(PredictionWorkView.of(32,altitude,32,1,0,0,70,16D/9));
+            // Isolate local medium prerequisites from directional admission, tested by PredictionScreenDetailTest.
             int lod = manager.layout().levelCount()-4;
             var near = new PredictionTileKey(profile.levelKey(),0,0,0);
             var localParent = new PredictionTileKey(profile.levelKey(),0,0,1);
@@ -54,7 +54,7 @@ class PredictionMediumCoverageTest {
             var farParent = new PredictionTileKey(profile.levelKey(),-3,0,lod+1);
             var leaves = List.of(near,far);
             var desired = (Set<PredictionTileKey>)get(manager,"desiredKeys");
-            desired.addAll(PredictionTileManager.withCoarseCoverage(leaves,manager.layout()));
+            desired.addAll(PredictionLodPlanner.withCoarseCoverage(leaves,manager.layout()));
             ((Set<PredictionTileKey>)get(manager,"terrainLeaves")).addAll(leaves);
             set(manager,"terrainTargets",Map.of(near,64,far,32));
             var ready = (Map<PredictionTileKey,PredictionTile>)get(manager,"ready");
@@ -189,7 +189,7 @@ class PredictionMediumCoverageTest {
                 new PredictionMemoryBudget(1024L*PredictionMemoryBudget.MIB,0,()->Long.MAX_VALUE,System::nanoTime,2),null)) {
             set(manager, "layout", layout);
             var desired = (Set<PredictionTileKey>) get(manager, "desiredKeys");
-            desired.addAll(PredictionTileManager.withCoarseCoverage(leaves, layout));
+            desired.addAll(PredictionLodPlanner.withCoarseCoverage(leaves, layout));
             ((Set<PredictionTileKey>) get(manager, "terrainLeaves")).addAll(leaves);
             set(manager, "terrainTargets", Map.of(target, 32));
             var ready = (Map<PredictionTileKey,PredictionTile>) get(manager, "ready");

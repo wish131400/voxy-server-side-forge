@@ -120,6 +120,13 @@ final class PredictionSeamMesh {
     float topY(int cell) { return topY[cell]; }
     int topColor(int cell) { return topColors[cell]; }
     static long builds() { return BUILDS.sum(); }
+    /** Called once for a replacement on the boundary worker, never per rendered frame. */
+    boolean sameContent(PredictionSeamMesh other) {
+        return this == other || Arrays.equals(topY, other.topY)
+                && Arrays.equals(topColors, other.topColors) && Arrays.equals(tops, other.tops)
+                && Arrays.equals(planes, other.planes) && Arrays.equals(offsets, other.offsets)
+                && walls.sameContent(other.walls);
+    }
     long retainedHeapBytes() {
         return 256L + tops.length + topY.length * 4L + topColors.length * 4L
                 + planes.length * 8L + offsets.length * 4L + walls.retainedHeapBytes();
@@ -153,8 +160,21 @@ final class PredictionSeamMesh {
                         : owner / tile.cellAxis() * tile.cellAxis() + along;
             }
             if (owner < 0 || owner >= surface.allowed().length || !surface.allowed()[owner]) continue;
-            if ((flags & TERRAIN_WALL) != 0 && PredictionBoundaryWalls.replaced(replaced, owner, tile.cellAxis(), tile.spacingBlocks(),
-                    nx != 0 ? lx : lz, nx != 0)) continue;
+            int node=owner;
+            if(surface.grid()!=null) {
+                int insideX=nx!=0?lx-nx:start+length/2,insideZ=nz!=0?lz-nz:start+length/2;
+                node=surface.grid().nodeAt(insideX,insideZ);
+                if(node<0 || !surface.owns(node)) continue;
+            }
+            if ((flags & TERRAIN_WALL) != 0) {
+                if(surface.grid()==null) {
+                    if(PredictionBoundaryWalls.replaced(replaced, owner, tile.cellAxis(), tile.spacingBlocks(), nx != 0 ? lx : lz, nx != 0)) continue;
+                } else if(replaced!=null) {
+                    int origin=nx!=0?surface.x(node):surface.z(node),planeAt=nx!=0?lx:lz;
+                    int direction=planeAt==origin?(nx!=0?0:2):planeAt==origin+surface.step(node)?(nx!=0?1:3):-1;
+                    if(direction>=0 && (replaced[node] & 1<<direction)!=0) continue;
+                }
+            }
             int bottom, top;
             if (stride == 5) { bottom = records[at + 2]; top = records[at + 3]; }
             else { int heights = records[at + stride - 2]; bottom = base + (heights & 65535); top = base + (heights >>> 16); }

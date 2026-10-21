@@ -12,6 +12,12 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 
+/**
+ * 拥有服务端磁盘读写执行器、容量计数与共享读取的运行时。
+ * <p>执行器只处理安全的文件/编码工作；需要玩家或世界的完成回调由调用方切回服务端线程。
+ * 手动完成许可必须在成功、拒绝、取消和异常路径成对归还，不能以丢弃结果代替清理。
+ * 启停由 ServerNetworkingLifecycle 驱动，旧任务由共享生命周期版本阻止回流。
+ */
 public final class DiskTaskRuntime {
     public interface PendingDiskTask {
         void complete();

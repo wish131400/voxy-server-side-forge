@@ -147,6 +147,9 @@ final class ClientWorldgenRegistries {
         registries.freezeOptional(registries.templatePools);
         registries.freezeOptional(registries.structures);
         registries.freezeOptional(registries.structureSets);
+        if (!registries.disabledCustom.contains(Registries.TEMPLATE_POOL))
+            PredictionTemplatePoolRuntime.initialize(registries.templatePools,
+                    net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool.class.getClassLoader());
         return registries;
     }
 

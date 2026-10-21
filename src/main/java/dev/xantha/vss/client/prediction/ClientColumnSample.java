@@ -47,8 +47,16 @@ public record ClientColumnSample(
     public static final int FLAG_APPROXIMATE = 1 << 27;
     /** Interpolated-density display surface, distinct from the raw first preview. */
     public static final int FLAG_DISPLAY = 1 << 26;
+    /**
+     * Same-source column mip, never an exact worldgen/capture sample.
+     * Bit 25 belongs to persisted wall evidence; parent mips are transient and
+     * must not change the provenance of checked worldgen/captured columns.
+     */
+    public static final int FLAG_PARENT_LOD = 1 << 18;
     /** City-plan heights are render summaries, never inputs to noise refinement. */
     public static final int FLAG_CITY_GROUND = 1 << 20;
+    /** Area-reduced real terrain; never promote this summary into an exact column. */
+    public static final int FLAG_CAPTURE_MIP = 1 << 19;
     public static final int PREFILLED = 0xFF;
 
     public boolean hasFluid() {
@@ -71,9 +79,9 @@ public record ClientColumnSample(
                 && groundFeatureKind == 0 && underBlockIndex == deepBlockIndex && volume == null;
     }
     boolean reusableFor(boolean preview) {
-        return !cityGround() && (preview || captured() || (!approximate() && (flags & FLAG_DISPLAY) == 0));
+        return (flags & (FLAG_PARENT_LOD | FLAG_CAPTURE_MIP)) == 0 && !cityGround() && (preview || captured() || (!approximate() && (flags & FLAG_DISPLAY) == 0));
     }
-    boolean reusableForDisplay() { return !cityGround() && (!approximate() || captured() || (flags & FLAG_DISPLAY) != 0); }
+    boolean reusableForDisplay() { return (flags & (FLAG_PARENT_LOD | FLAG_CAPTURE_MIP)) == 0 && !cityGround() && (!approximate() || captured() || (flags & FLAG_DISPLAY) != 0); }
 
     ClientColumnSample withoutVegetationHints() {
         return new ClientColumnSample(surfaceY, fluidY, biomeIndex, topBlockIndex,

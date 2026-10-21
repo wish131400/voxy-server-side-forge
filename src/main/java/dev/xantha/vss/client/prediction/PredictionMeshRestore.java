@@ -69,12 +69,15 @@ final class PredictionMeshRestore {
             });
         } catch (RejectedExecutionException full) { PENDING.remove(mesh); pendingBytes -= bytes; }
     }
-    static synchronized void clear() {
-        epoch++;
-        PredictionUploadStaging.SHARED.clear();
-        READY.keySet().forEach(PredictionPackedMesh::releaseUploadStorage);
-        READY.clear(); readyBytes = 0;
-        // Queued jobs observe the epoch and release their reservation in finally.
+    static void clear() {
+        PredictionCompressionRetry.clear();
+        synchronized (PredictionMeshRestore.class) {
+            epoch++;
+            PredictionUploadStaging.SHARED.clear();
+            READY.keySet().forEach(PredictionPackedMesh::releaseUploadStorage);
+            READY.clear(); readyBytes = 0;
+            // Queued jobs observe the epoch and release their reservation in finally.
+        }
     }
     static synchronized long readyBytes() { return readyBytes; }
     static synchronized long pendingBytes() { return pendingBytes; }

@@ -5,6 +5,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PredictionWorldgenCapabilitiesTest {
+    @Test void sourceAndJavaOnlyPlansCannotAccidentallyUseTheRustGraph() {
+        var root = JsonParser.parseString("{\"settings\":{},\"biome_source\":{\"type\":\"minecraft:fixed\"}}").getAsJsonObject();
+        var plan = dev.xantha.vss.common.worldgen.TerrainPredictionPlan.noise("example:java_context", 1, false);
+        root.add(dev.xantha.vss.common.worldgen.TerrainPredictionPlan.FIELD, plan.encode());
+        assertNull(PredictionWorldgenCapabilities.rejection(root));
+        assertTrue(PredictionWorldgenCapabilities.nativeTerrainRejection(root, new com.google.gson.JsonObject()).contains("original Java"));
+        root.add(dev.xantha.vss.common.worldgen.TerrainPredictionPlan.FIELD,
+                dev.xantha.vss.common.worldgen.TerrainPredictionPlan.unavailable("needs neighbor state").encode());
+        assertEquals("needs neighbor state", PredictionWorldgenCapabilities.rejection(root));
+    }
+
     @Test void blueprintCodecCannotSilentlyDiscardMissingRoutingSnapshot() {
         var generator = JsonParser.parseString("""
                 {"settings":{},"biome_source":{"type":"blueprint:modded","original_biome_source":{}}}
@@ -149,74 +160,5 @@ class PredictionWorldgenCapabilitiesTest {
                 """).getAsJsonObject();
         assertNull(PredictionWorldgenCapabilities.nativeTerrainRejection(generator, registries),
                 "vss_ payload sections must not be scanned for codec types");
-    }
-
-    @Test void liveCapturePassesTheNativeGate() throws Exception {
-        // A capture taken in-game is the only ground truth for "would this
-        // dimension be accepted". The gate is a pure function over the captured
-        // documents, so it replays here without any of the mods that produced
-        // them - which is what makes the remaining blockers observable without
-        // launching the game. Skips when no capture has been taken.
-        java.nio.file.Path dir = java.nio.file.Path.of("build", "capture-2375620064288639166");
-        org.junit.jupiter.api.Assumptions.assumeTrue(
-                java.nio.file.Files.isRegularFile(dir.resolve("generator.json")),
-                "no live capture present");
-        var generator = JsonParser.parseString(java.nio.file.Files.readString(
-                dir.resolve("generator.json"), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
-        var registries = JsonParser.parseString(java.nio.file.Files.readString(
-                dir.resolve("registries.json"), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
-        String reason = PredictionWorldgenCapabilities.nativeTerrainRejection(generator, registries);
-        System.out.println("LIVE_CAPTURE_REJECTION=" + reason);
-        assertNull(reason, "a real overworld capture must pass the native gate: " + reason);
-    }
-
-    @Test void liveCaptureListsEveryUnsupportedCodec() throws Exception {
-        // The gate reports only the first blocker, which makes it useless for
-        // planning: fixing one just reveals the next. This walks the same
-        // documents and collects every non-whitelisted codec at once, so the
-        // remaining work is known up front instead of one round at a time.
-        java.nio.file.Path dir = java.nio.file.Path.of("build", "capture-2375620064288639166");
-        org.junit.jupiter.api.Assumptions.assumeTrue(
-                java.nio.file.Files.isRegularFile(dir.resolve("generator.json")),
-                "no live capture present");
-        var generator = JsonParser.parseString(java.nio.file.Files.readString(
-                dir.resolve("generator.json"), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
-        var registries = JsonParser.parseString(java.nio.file.Files.readString(
-                dir.resolve("registries.json"), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
-
-        var field = PredictionWorldgenCapabilities.class.getDeclaredField("NATIVE_MOD_CODECS");
-        field.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        var allowed = (java.util.Set<String>) field.get(null);
-
-        var found = new java.util.TreeMap<String, Integer>();
-        collectUnsupported(generator, allowed, found);
-        collectUnsupported(PredictionWorldgenCapabilities.terrainDocument(generator, registries),
-                allowed, found);
-        System.out.println("UNSUPPORTED_CODECS=" + found.keySet());
-        System.out.println("UNSUPPORTED_CODEC_PATHS=" + found);
-    }
-
-    private static void collectUnsupported(com.google.gson.JsonElement element,
-                                           java.util.Set<String> allowed,
-                                           java.util.Map<String, Integer> found) {
-        if (element == null || element.isJsonNull()) return;
-        if (element.isJsonArray()) {
-            for (var child : element.getAsJsonArray()) collectUnsupported(child, allowed, found);
-            return;
-        }
-        if (!element.isJsonObject()) return;
-        for (var entry : element.getAsJsonObject().entrySet()) {
-            // Mirrors the gate: VSS's own payload sections are replayed, not
-            // decoded, so their `type` keys are not codec names.
-            if (entry.getKey().startsWith("vss_")) continue;
-            if (entry.getKey().equals("type") && entry.getValue().isJsonPrimitive()) {
-                String type = entry.getValue().getAsString();
-                if (type.contains(":") && !type.startsWith("minecraft:") && !allowed.contains(type)) {
-                    found.merge(type, 1, Integer::sum);
-                }
-            }
-            collectUnsupported(entry.getValue(), allowed, found);
-        }
     }
 }

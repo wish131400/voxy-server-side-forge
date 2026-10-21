@@ -25,6 +25,9 @@ public class ClientTerrainSampler implements AutoCloseable {
     private final DimensionProfile profile;
     private long dimensionSalt;
     private java.util.function.Supplier<String> legacyCacheIdentity;
+    private String predictionBackend = "kind=legacy";
+    private String predictionCacheNamespace;
+    private String terrainBackendOverride;
     private final NoiseBasedChunkGenerator generator;
     private final RandomState randomState;
     private final LevelHeightAccessor heights;
@@ -40,6 +43,7 @@ public class ClientTerrainSampler implements AutoCloseable {
     private final PredictionBiomeCache biomeCache;
     private final Map<Holder<Biome>, Integer> biomeIndices;
     private net.minecraft.core.RegistryAccess decorationAccess;
+    private net.minecraft.world.level.dimension.DimensionType decorationDimensionType;
     private com.google.gson.JsonObject structureTemplates = new com.google.gson.JsonObject();
     private final int floorY;
     private final int ceilingY;
@@ -59,6 +63,24 @@ public class ClientTerrainSampler implements AutoCloseable {
     @FunctionalInterface
     public interface TerrainFunction {
         int surfaceY(int blockX, int blockZ);
+    }
+
+    private volatile Map<net.minecraft.resources.ResourceLocation, Integer> captureBiomeNames;
+
+    int captureBiomeIndex(Holder<Biome> biome, int fallback) {
+        if (biome == null) return fallback;
+        var context = decorationContext();
+        if (context != this) return context.captureBiomeIndex(biome, fallback);
+        Integer known = biomeIndices.get(biome);
+        if (known != null) return known;
+        var names = captureBiomeNames;
+        if (names == null) {
+            var prepared = new HashMap<net.minecraft.resources.ResourceLocation, Integer>();
+            biomeIndices.forEach((holder, index) -> holder.unwrapKey().ifPresent(key -> prepared.put(key.location(), index)));
+            captureBiomeNames = names = Map.copyOf(prepared);
+        }
+        var key = biome.unwrapKey().orElse(null);
+        return key == null ? fallback : names.getOrDefault(key.location(), fallback);
     }
 
     public ClientTerrainSampler(long seed, DimensionProfile profile) {
@@ -134,6 +156,9 @@ public class ClientTerrainSampler implements AutoCloseable {
         this.seed = source.seed;
         this.profile = source.profile;
         this.dimensionSalt = source.dimensionSalt;
+        this.predictionBackend = source.predictionBackend;
+        this.predictionCacheNamespace = source.predictionCacheNamespace;
+        this.terrainBackendOverride = source.terrainBackendOverride;
         this.generator = source.generator;
         this.randomState = source.randomState;
         this.heights = source.heights;
@@ -150,6 +175,7 @@ public class ClientTerrainSampler implements AutoCloseable {
         this.biomeCache = source.biomeCache;
         this.biomeIndices = source.biomeIndices;
         this.decorationAccess = source.decorationAccess;
+        this.decorationDimensionType = source.decorationDimensionType;
         this.structureTemplates = source.structureTemplates;
         this.floorY = source.floorY;
         this.ceilingY = source.ceilingY;
@@ -213,6 +239,18 @@ public class ClientTerrainSampler implements AutoCloseable {
     public DimensionProfile profile() {
         return profile;
     }
+
+    final void bindPredictionBackend(String diagnostics, String cacheNamespace) {
+        predictionBackend = diagnostics;
+        predictionCacheNamespace = cacheNamespace;
+    }
+    public final String predictionBackendDiagnostics() { return predictionBackend; }
+    final String predictionCacheNamespace() { return predictionCacheNamespace; }
+    final void terrainBackendOverride(String id) { terrainBackendOverride = id; }
+    final String terrainBackendOverride() { return terrainBackendOverride; }
+
+    boolean sampleLodGrid(int x, int z, int step, int width, int height, ClientColumnSample[] target,
+                         int offset, int stride, boolean preview) { return false; }
 
     long cacheFingerprint() { return dimensionSalt ^ profile.dimension().hashCode(); }
 
@@ -393,6 +431,27 @@ public class ClientTerrainSampler implements AutoCloseable {
 
     net.minecraft.core.RegistryAccess decorationAccess() {
         return decorationAccess;
+    }
+
+    void bindDimensionType(com.google.gson.JsonObject generatorRoot) {
+        if (generatorRoot != null && generatorRoot.has("vss_dimension_type"))
+            decorationContext().decorationDimensionType = net.minecraft.world.level.dimension.DimensionType.DIRECT_CODEC
+                    .parse(com.mojang.serialization.JsonOps.INSTANCE, generatorRoot.get("vss_dimension_type")).getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
+    }
+
+    net.minecraft.world.level.dimension.DimensionType dimensionTypeContext() {
+        if (decorationDimensionType != null) return decorationDimensionType;
+        // Compatibility with old snapshots. A custom dimension may share a
+        // differently named type, so never silently substitute the overworld.
+        var access = decorationAccess();
+        if (access != null) {
+            var registry = access.registry(net.minecraft.core.registries.Registries.DIMENSION_TYPE);
+            if (registry.isPresent()) {
+                var type = registry.get().getOptional(profile.dimension());
+                if (type.isPresent()) return type.get();
+            }
+        }
+        throw new UnsupportedOperationException("Missing prediction dimension type snapshot for " + profile.dimension());
     }
 
     /** Stable resource-colormap identity, or unavailable for opaque color providers. */

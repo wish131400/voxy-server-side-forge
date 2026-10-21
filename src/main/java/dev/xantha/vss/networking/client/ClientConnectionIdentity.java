@@ -23,6 +23,7 @@ public final class ClientConnectionIdentity {
 
     private static volatile SessionIdentity currentSession;
     private static volatile ServerStorageIdentity pendingStorageIdentity;
+    private static volatile String columnFilterKey = "";
 
     private ClientConnectionIdentity() {
     }
@@ -43,11 +44,15 @@ public final class ClientConnectionIdentity {
                 storageIdentity);
     }
 
-    public static void acceptServerIdentity(ServerIdentityS2CPayload payload) {
+    public static synchronized void acceptServerIdentity(ServerIdentityS2CPayload payload) {
         acceptServerIdentity(payload.serverIdentity(), payload.sharedWorld(), payload.nodeIdentity());
+        columnFilterKey = payload.columnFilterKey();
     }
 
+    static String columnFilterKey() { return columnFilterKey; }
+
     static synchronized void acceptServerIdentity(String serverIdentity, boolean sharedWorld, String nodeIdentity) {
+        columnFilterKey = "";
         ServerStorageIdentity storageIdentity = ServerStorageIdentity.create(
                 serverIdentity,
                 sharedWorld,
@@ -91,6 +96,7 @@ public final class ClientConnectionIdentity {
     }
 
     public static synchronized void endSession() {
+        columnFilterKey = "";
         currentSession = null;
         pendingStorageIdentity = null;
     }

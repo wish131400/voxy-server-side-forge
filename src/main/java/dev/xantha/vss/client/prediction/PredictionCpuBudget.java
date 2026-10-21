@@ -25,46 +25,48 @@ public final class PredictionCpuBudget {
     private static final long RECOVERY_NANOS = 3_000_000_000L;
     private static final long GENERATION_STALE_NANOS = 2_000_000_000L;
     private static final long DETAIL_TRICKLE_NANOS = 2_000_000_000L;
+    private static final long ADMISSION_RETRY_NANOS = 100_000_000L;
     private final IntSupplier configuredLimit;
-    private final DoubleSupplier systemLoad, processLoad, frameRate;
+    private final DoubleSupplier systemLoad, processLoad;
     private final LongSupplier clock;
     private final boolean adaptive;
     private final boolean backgroundSampling;
     private long sampledAt, recoverySince, lastDetailAt;
     private boolean sampled, recovering, detailDelayed;
-    private double cpu = -1, fps = -1;
+    private double cpu = -1;
     private int pressure, active, activeDetail, generationInFlight;
     private int reserved, reservedDetail;
     /** Reservations admitted into a bounded executor queue beyond active CPU capacity. */
     private int queuedOverflow, queuedOverflowDetail;
     private long generationAt;
     private long deferrals;
+    private final boolean[] admissionDelayed = new boolean[2];
+    private final long[] admissionRejectedAt = new long[2];
     private volatile MetricSample latestSample;
     private final AtomicLong sampleSequence = new AtomicLong();
     private long appliedSampleSequence;
 
     PredictionCpuBudget(IntSupplier configuredLimit, DoubleSupplier systemLoad,
-                        DoubleSupplier processLoad, DoubleSupplier frameRate, LongSupplier clock) {
+                        DoubleSupplier processLoad, LongSupplier clock) {
         // Keep the package-private constructor deterministic for existing tests and
         // callers that provide a fake clock. The runtime singleton opts into the
         // daemon sampler explicitly below.
-        this(configuredLimit, systemLoad, processLoad, frameRate, clock, true, false);
+        this(configuredLimit, systemLoad, processLoad, clock, true, false);
     }
 
     /** Deterministic/manual constructor used by fake-clock tests. */
     PredictionCpuBudget(IntSupplier configuredLimit, DoubleSupplier systemLoad,
-                        DoubleSupplier processLoad, DoubleSupplier frameRate,
+                        DoubleSupplier processLoad,
                         LongSupplier clock, boolean backgroundSampling) {
-        this(configuredLimit, systemLoad, processLoad, frameRate, clock, true, backgroundSampling);
+        this(configuredLimit, systemLoad, processLoad, clock, true, backgroundSampling);
     }
 
     private PredictionCpuBudget(IntSupplier configuredLimit, DoubleSupplier systemLoad,
-                                DoubleSupplier processLoad, DoubleSupplier frameRate,
+                                DoubleSupplier processLoad,
                                 LongSupplier clock, boolean adaptive, boolean backgroundSampling) {
         this.configuredLimit = configuredLimit;
         this.systemLoad = systemLoad;
         this.processLoad = processLoad;
-        this.frameRate = frameRate;
         this.clock = clock;
         this.adaptive = adaptive;
         this.backgroundSampling = adaptive && backgroundSampling;
@@ -75,7 +77,7 @@ public final class PredictionCpuBudget {
     }
 
     static PredictionCpuBudget fixed(int workers) {
-        return new PredictionCpuBudget(() -> workers, () -> -1, () -> -1, () -> -1,
+        return new PredictionCpuBudget(() -> workers, () -> -1, () -> -1,
                 System::nanoTime, false, false);
     }
 
@@ -86,7 +88,7 @@ public final class PredictionCpuBudget {
         return new PredictionCpuBudget(() -> PredictionPerformanceProfile.current().poolSize(processors),
                 () -> extended == null ? -1 : extended.getCpuLoad(),
                 () -> extended == null ? -1 : extended.getProcessCpuLoad(),
-                PredictionFramePace::averageFps, System::nanoTime, true);
+                System::nanoTime, true);
     }
 
     private static double validLoad(double value) {
@@ -98,27 +100,17 @@ public final class PredictionCpuBudget {
         // management getter must never delay an admission query.
         long now;
         double sampledCpu = Math.max(readLoad(systemLoad), readLoad(processLoad));
-        double sampledFps = readFrameRate(frameRate);
         try {
             now = clock.getAsLong();
         } catch (Throwable ignored) {
             return;
         }
-        latestSample = new MetricSample(sampleSequence.incrementAndGet(), now, sampledCpu, sampledFps);
+        latestSample = new MetricSample(sampleSequence.incrementAndGet(), now, sampledCpu);
     }
 
     private static double readLoad(DoubleSupplier supplier) {
         try {
             return validLoad(supplier.getAsDouble());
-        } catch (Throwable ignored) {
-            return -1;
-        }
-    }
-
-    private static double readFrameRate(DoubleSupplier supplier) {
-        try {
-            double value = supplier.getAsDouble();
-            return Double.isFinite(value) && value > 0 ? value : -1;
         } catch (Throwable ignored) {
             return -1;
         }
@@ -134,7 +126,7 @@ public final class PredictionCpuBudget {
                 appliedSampleSequence = sample.sequence;
                 sampled = true;
                 sampledAt = sample.sampledAt;
-                applyMetrics(sample.sampledAt, sample.cpu, sample.fps);
+                applyMetrics(sample.sampledAt, sample.cpu);
             }
             return;
         }
@@ -151,27 +143,25 @@ public final class PredictionCpuBudget {
             sequence = sampleSequence.incrementAndGet();
         }
         double sampledCpu = Math.max(readLoad(systemLoad), readLoad(processLoad));
-        double sampledFps = readFrameRate(frameRate);
         now = clock.getAsLong();
         synchronized (this) {
             if (sequence <= appliedSampleSequence) return;
             appliedSampleSequence = sequence;
-            applyMetrics(now, sampledCpu, sampledFps);
+            applyMetrics(now, sampledCpu);
         }
     }
 
     /** Applies one already-collected sample. Caller must hold this monitor. */
-    private void applyMetrics(long now, double sampledCpu, double sampledFps) {
+    private void applyMetrics(long now, double sampledCpu) {
         cpu = sampledCpu;
-        fps = sampledFps;
-        int observed = cpu >= .95 || fps > 0 && fps < 30 ? 2
-                : cpu >= .85 || fps > 0 && fps < 45 ? 1 : 0;
+        // FPS can be capped or generated externally; only CPU load drives admission.
+        int observed = cpu >= .95 ? 2 : cpu >= .85 ? 1 : 0;
         if (observed > pressure) {
             pressure = observed;
             recovering = false;
             lastDetailAt = now;
             detailDelayed = true;
-        } else if (observed < pressure && (cpu < 0 || cpu < .80) && (fps <= 0 || fps >= 50)) {
+        } else if (observed < pressure && (cpu < 0 || cpu < .80)) {
             if (!recovering) { recoverySince = now; recovering = true; }
             if (now - recoverySince >= RECOVERY_NANOS) {
                 pressure--;
@@ -180,7 +170,7 @@ public final class PredictionCpuBudget {
         } else recovering = false;
     }
 
-    private record MetricSample(long sequence, long sampledAt, double cpu, double fps) { }
+    private record MetricSample(long sequence, long sampledAt, double cpu) { }
 
     private boolean detailWaiting() {
         long elapsed = clock.getAsLong() - lastDetailAt;
@@ -201,7 +191,7 @@ public final class PredictionCpuBudget {
         return tryAcquire(urgent, false);
     }
 
-    /** A paused tier may complete current targets, with the same bounded trickle as saturation. */
+    /** CPU saturation may complete current targets, with the same bounded trickle as saturation. */
     Lease tryAcquire(boolean urgent, boolean pausedDetail) {
         refresh();
         synchronized (this) {
@@ -215,6 +205,9 @@ public final class PredictionCpuBudget {
                     || !urgent && (activeDetail + localGeneration() >= detailCap
                         || trickle && detailWaiting())) {
                 deferrals++;
+                int lane = urgent ? 0 : 1;
+                admissionDelayed[lane] = true;
+                admissionRejectedAt[lane] = clock.getAsLong();
                 return null;
             }
             active++;
@@ -236,6 +229,7 @@ public final class PredictionCpuBudget {
     Reservation tryReserve(boolean urgent, boolean pausedDetail) {
         refresh();
         synchronized (this) {
+            if (admissionWaiting(urgent, pausedDetail)) { deferrals++; return null; }
             int cap = limit();
             boolean trickle = adaptive && (pressure >= 2 || pausedDetail);
             int detailCap = !adaptive ? cap : trickle ? 1 : cap > 1 ? cap - 1 : 1;
@@ -275,7 +269,7 @@ public final class PredictionCpuBudget {
         refresh();
         synchronized (this) {
             int limit = Math.max(1, queueLimit);
-            if (queuedOverflow >= limit) {
+            if (admissionWaiting(urgent, pausedDetail) || queuedOverflow >= limit) {
                 deferrals++;
                 return null;
             }
@@ -285,15 +279,48 @@ public final class PredictionCpuBudget {
         }
     }
 
+    /** Shared by all tile managers: a refused worker must not immediately refill its queue.
+     * Successful work releasing capacity wakes admission immediately; the timeout also
+     * covers external generation expiring or a configured capacity increase. */
+    private boolean admissionWaiting(boolean urgent, boolean pausedDetail) {
+        if (!urgent && adaptive) {
+            boolean trickle = pressure >= 2 || pausedDetail;
+            int cap = limit(), detailCap = trickle ? 1 : cap > 1 ? cap - 1 : 1;
+            if (activeDetail + localGeneration() >= detailCap || trickle && detailWaiting()) return true;
+        }
+        int lane = urgent ? 0 : 1;
+        long elapsed = clock.getAsLong() - admissionRejectedAt[lane];
+        return admissionDelayed[lane] && elapsed >= 0 && elapsed < ADMISSION_RETRY_NANOS;
+    }
+
     boolean allowsDetail() {
         refresh();
         synchronized (this) {
-            // A persistent GPU bottleneck must not make detail completion impossible.
+            // CPU saturation still allows bounded progress on current detail targets.
             return pressure < 2 || activeDetail == 0 && !detailWaiting();
         }
     }
 
-    /** Planning hint for an important current target during a tier's PAUSE.
+    enum ThrottleLevel { NONE, REDUCE, PAUSE }
+
+    /** Scheduling hints use the same sampled CPU pressure as final worker admission. */
+    ThrottleLevel currentThrottle() {
+        refresh();
+        synchronized (this) {
+            return pressure >= 2 ? ThrottleLevel.PAUSE
+                    : pressure >= 1 ? ThrottleLevel.REDUCE : ThrottleLevel.NONE;
+        }
+    }
+
+    /** Optional quality waits for CPU headroom; frame caps do not affect it. */
+    boolean allowsIdleRefinement() {
+        refresh();
+        synchronized (this) {
+            return pressure == 0 && (cpu < 0 || cpu < .80);
+        }
+    }
+
+    /** Planning hint for an important current target during CPU saturation.
      *  The worker must still acquire its bounded detail lease before doing work. */
     boolean allowsDetailTrickle() {
         refresh();
@@ -343,8 +370,8 @@ public final class PredictionCpuBudget {
         refresh();
         synchronized (this) {
             return String.format(Locale.ROOT,
-                    "cpu=%.3f,fps=%.1f,pressure=%d,limit=%d,active=%d,detail=%d,localGeneration=%d,deferrals=%d",
-                    cpu, fps, pressure, limit(), active, activeDetail, localGeneration(), deferrals);
+                    "mode=cpu-only,cpu=%.3f,pressure=%d,limit=%d,active=%d,detail=%d,localGeneration=%d,deferrals=%d",
+                    cpu, pressure, limit(), active, activeDetail, localGeneration(), deferrals);
         }
     }
 
@@ -358,6 +385,7 @@ public final class PredictionCpuBudget {
                 closed = true;
                 active--;
                 if (detail) activeDetail--;
+                admissionDelayed[0] = admissionDelayed[1] = false;
             }
         }
     }

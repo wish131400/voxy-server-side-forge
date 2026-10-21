@@ -106,6 +106,7 @@ dependencies {
     // 这些依赖只进入 test classpath，不影响主 mod 构建或 ForgeGradle 的 reobf 流程。
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.mockito:mockito-core:5.14.2'
+    testImplementation 'com.tngtech.archunit:archunit:1.3.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -143,6 +144,8 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : mod_authors,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'VSS-Protocol'            : (file('src/main/java/dev/xantha/vss/common/VSSConstants.java').text =~ /PROTOCOL_VERSION = (\d+)/)[0][1],
+                'VSS-Build-Id'            : providers.gradleProperty('vssBuildId').getOrElse('dev'),
                 'MixinConfigs'            : 'vss.compat.mixins.json,vss.strict.mixins.json,vss.lostcities.mixins.json'
         ])
     }
@@ -187,3 +190,6 @@ tasks.named('test', Test).configure {
 // supplies none of them behaves exactly as before. `gpu-tests.gradle` is
 // deliberately not applied: it sets `vss.gpuTests=true` unconditionally.
 apply from: 'tools/prediction/compat-tests.gradle'
+
+// Shared verification entry points; test-only dependencies never enter the mod JAR.
+apply from: 'tools/verification/modules.gradle'

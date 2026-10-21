@@ -78,16 +78,30 @@ public final class VssLodSampleCache {
 
     private void evictOverflow() {
         synchronized (evictionLock) {
-            int oversize = entries.size() - evictTarget;
-            if (oversize <= 0) {
+            if (entries.size() <= capacity) {
                 return;
             }
+            int oversize = entries.size() - evictTarget;
             Iterator<Map.Entry<Long, ClientColumnSample>> iterator =
                     entries.entrySet().iterator();
-            while (oversize-- > 0 && iterator.hasNext()) {
-                iterator.next();
-                iterator.remove();
-                evictions.incrementAndGet();
+            while (oversize > 0 && iterator.hasNext()) {
+                var entry = iterator.next();
+                // Predicted columns are recomputable; an authoritative capture
+                // may be the only copy when terrain memory is disabled. Also
+                // avoid deleting a capture that replaced this entry meanwhile.
+                if (!entry.getValue().captured() && entries.remove(entry.getKey(), entry.getValue())) {
+                    oversize--; evictions.incrementAndGet();
+                }
+            }
+            // Captures still share the finite cache budget. A cache containing
+            // only captures must remain bounded rather than pinning old worlds.
+            if (entries.size() > capacity) {
+                iterator = entries.entrySet().iterator();
+                oversize = entries.size() - evictTarget;
+                while (oversize > 0 && iterator.hasNext()) {
+                    var entry = iterator.next();
+                    if (entries.remove(entry.getKey(), entry.getValue())) { oversize--; evictions.incrementAndGet(); }
+                }
             }
         }
     }
@@ -101,6 +115,16 @@ public final class VssLodSampleCache {
         int baseX = chunkX * 16, baseZ = chunkZ * 16;
         for (int z = baseZ; z < baseZ + 16; z++) for (int x = baseX; x < baseX + 16; x++)
             entries.remove((long) x << 32 | z & 0xffffffffL);
+    }
+
+    /** Dirty notifications withdraw predictions, while the last real snapshot remains a valid fallback. */
+    public void removePredictedChunk(int chunkX, int chunkZ) {
+        int baseX = chunkX * 16, baseZ = chunkZ * 16;
+        for (int z = baseZ; z < baseZ + 16; z++) for (int x = baseX; x < baseX + 16; x++) {
+            long key = (long) x << 32 | z & 0xffffffffL;
+            var sample = entries.get(key);
+            if (sample != null && !sample.captured()) entries.remove(key, sample);
+        }
     }
 
     public void clear() {

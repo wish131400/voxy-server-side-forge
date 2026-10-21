@@ -1,9 +1,9 @@
 package dev.xantha.vss.networking.server.sending;
 
+import dev.xantha.vss.networking.server.runtime.ServerLifecycleGuard;
 
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
-import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.common.BandwidthLimiter;
 import dev.xantha.vss.common.VSSConstants;
 import dev.xantha.vss.common.VSSLogger;
@@ -20,7 +20,14 @@ import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * 服务端 tick 的发送窗口：轮询玩家队列，应用带宽、优先级与确认窗口规则。
+ * <p>列内容与请求归属由玩家状态持有，本类只拥有发送游标和带宽计数。
+ * 发送前通过交付服务复核范围；停止或重置时清理自身调度状态，不关闭共享服务。
+ */
 public final class QueuedColumnSender {
+    private final ServerLifecycleGuard lifecycle;
+    private final ColumnDeliveryService delivery;
     private final PlayerRequestRegistry playerRegistry;
     private final int priorityColumnsPerTick;
     private final long diagnosticIntervalNanos;
@@ -35,7 +42,11 @@ public final class QueuedColumnSender {
     public QueuedColumnSender(
             PlayerRequestRegistry playerRegistry,
             int priorityColumnsPerTick,
-            long diagnosticIntervalNanos) {
+            long diagnosticIntervalNanos,
+            ServerLifecycleGuard lifecycle,
+            ColumnDeliveryService delivery) {
+        this.lifecycle = java.util.Objects.requireNonNull(lifecycle, "lifecycle");
+        this.delivery = java.util.Objects.requireNonNull(delivery, "delivery");
         this.playerRegistry = playerRegistry;
         this.priorityColumnsPerTick = priorityColumnsPerTick;
         this.diagnosticIntervalNanos = diagnosticIntervalNanos;
@@ -53,7 +64,7 @@ public final class QueuedColumnSender {
     }
 
     public void flush(MinecraftServer server) {
-        if (VSSServerNetworking.isServerStopping()) {
+        if (lifecycle.isStopping()) {
             return;
         }
         long configuredLimit = VSSServerConfig.CONFIG.totalBandwidthBytesPerSecond();
@@ -340,8 +351,8 @@ public final class QueuedColumnSender {
                         1));
     }
 
-    private static boolean isPayloadStillRelevant(ServerPlayer player, VoxelColumnS2CPayload payload) {
-        return VSSServerNetworking.isColumnStillRelevant(player, payload.dimension(), payload.chunkX(), payload.chunkZ());
+    private boolean isPayloadStillRelevant(ServerPlayer player, VoxelColumnS2CPayload payload) {
+        return delivery.isColumnStillRelevant(player, payload.dimension(), payload.chunkX(), payload.chunkZ());
     }
 
     private void logColumnSend(

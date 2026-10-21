@@ -3,8 +3,9 @@ package dev.xantha.vss.networking.server.generation;
 import dev.xantha.vss.common.processing.EncodedColumnData;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.IntSupplier;
 
-/** A lazy area cursor with no admission quota; background readers claim positions as they run. */
+/** A lazy area cursor with an optional bound on all outstanding pipeline work. */
 final class ChunkyWorkQueue {
     enum Stage { READING, GENERATION, GENERATING, PERSIST, IMPORTING, WRITING }
 
@@ -27,6 +28,7 @@ final class ChunkyWorkQueue {
     }
 
     private final ChunkyArea area;
+    private final IntSupplier limitSupplier;
     private final Map<Integer, Work> inFlight = new LinkedHashMap<>();
     private long nextIndex;
     private long completed;
@@ -34,10 +36,23 @@ final class ChunkyWorkQueue {
     private long failed;
     private boolean closed;
 
-    ChunkyWorkQueue(ChunkyArea area) { this.area = area; }
+    ChunkyWorkQueue(ChunkyArea area) { this(area, () -> 0); }
+
+    ChunkyWorkQueue(ChunkyArea area, IntSupplier limitSupplier) {
+        this.area = area;
+        this.limitSupplier = limitSupplier;
+    }
+
+    synchronized boolean hasCapacity() {
+        int limit = limitSupplier.getAsInt();
+        return !closed && nextIndex < area.columnCount()
+                && (limit <= 0 || inFlight.size() < limit);
+    }
 
     synchronized Work reserve() {
-        if (closed || nextIndex >= area.columnCount()) return null;
+        // Check and claim under the same lock so concurrent readers cannot
+        // overrun the configured bound or skip a position when the queue is full.
+        if (!hasCapacity()) return null;
         long index = nextIndex++;
         Work work = new Work((int) index + 1, area.chunkX(index), area.chunkZ(index));
         inFlight.put(work.requestId, work);

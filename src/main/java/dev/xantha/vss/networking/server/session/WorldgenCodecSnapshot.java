@@ -11,6 +11,10 @@ import dev.xantha.vss.common.worldgen.DensityFunctionSnapshot;
 import dev.xantha.vss.common.worldgen.DensityFunctionReferences;
 import dev.xantha.vss.common.worldgen.FreeTerraForgedVariant;
 import dev.xantha.vss.common.worldgen.WorldgenRegistryDependencies;
+import dev.xantha.vss.common.worldgen.TerrainPredictionPlan;
+import dev.xantha.vss.common.worldgen.GeneratorTerrainCapabilities;
+import dev.xantha.vss.api.worldgen.TerrainSnapshots;
+import dev.xantha.vss.api.worldgen.TerrainSnapshotContext;
 import java.util.Map;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -77,9 +81,10 @@ final class WorldgenCodecSnapshot {
                 access, ops, Registries.PLACED_FEATURE, PlacedFeature.DIRECT_CODEC));
         root.add("configured_features", encodeOptional(
                 access, ops, Registries.CONFIGURED_FEATURE, ConfiguredFeature.DIRECT_CODEC));
-        root.add("structure_sets", encodeOptional(
-                access, ops, Registries.STRUCTURE_SET, StructureSet.DIRECT_CODEC));
-        root.add("structures", encodeOptionalStructures(access, ops));
+        JsonObject structures = encodeOptional(access, ops, Registries.STRUCTURE, Structure.DIRECT_CODEC);
+        root.add("structures", structures);
+        root.add("structure_sets", filterStructureSets(structures, encodeOptional(
+                access, ops, Registries.STRUCTURE_SET, StructureSet.DIRECT_CODEC)));
         root.add("processor_lists", encodeOptional(access, ops, Registries.PROCESSOR_LIST,
                 net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType.DIRECT_CODEC));
         root.add("template_pools", encodeOptional(access, ops, Registries.TEMPLATE_POOL,
@@ -123,25 +128,7 @@ final class WorldgenCodecSnapshot {
     }
 
     private static JsonObject encodeTemplates(net.minecraft.server.packs.resources.ResourceManager resources) {
-        JsonObject templates = new JsonObject();
-        int total = 0;
-        // Stay below the existing 8 MiB compressed metadata limit. Vanilla's
-        // complete template set is about 3.5 MiB. Missing mod templates fail
-        // closed on the client, rather than inventing a replacement building.
-        for (var entry : resources.listResources("structures", id -> id.getPath().endsWith(".nbt"))
-                .entrySet().stream().sorted(Map.Entry.comparingByKey()).toList()) {
-            try (var input = entry.getValue().open()) {
-                byte[] bytes = input.readNBytes(524_289);
-                if (bytes.length > 524_288 || total + bytes.length > 5 * 1024 * 1024) continue;
-                total += bytes.length;
-                String path = entry.getKey().getPath();
-                ResourceLocation id = entry.getKey().withPath(path.substring("structures/".length(), path.length() - 4));
-                templates.addProperty(id.toString(), java.util.Base64.getEncoder().encodeToString(bytes));
-            } catch (java.io.IOException exception) {
-                dev.xantha.vss.common.VSSLogger.debug("VSS structure template unavailable: " + entry.getKey());
-            }
-        }
-        return templates;
+        return WorldgenTemplateCatalog.snapshot(resources).manifest();
     }
 
     static Encoded encodeGenerator(ChunkGenerator generator, RegistryAccess access, DensityFunctionReferences references,
@@ -151,9 +138,28 @@ final class WorldgenCodecSnapshot {
 
     static Encoded encodeGenerator(ChunkGenerator generator, RegistryAccess access, DensityFunctionReferences references,
                                    WorldgenRegistryDependencies dependencies, String terrablenderRegionType) {
+        var extension = TerrainSnapshots.capture(new TerrainSnapshotContext(generator, access, dependencies));
+        if (extension.isPresent() && extension.get().plan().kind() == TerrainPredictionPlan.Kind.NOISE_GRAPH)
+            return encodeOtherGenerator(generator, access, dependencies, extension);
         if (!(generator instanceof NoiseBasedChunkGenerator noise)) {
-            return Encoded.empty();
+            return encodeOtherGenerator(generator, access, dependencies, extension);
         }
+        try {
+            return encodeNoiseGenerator(generator, noise, access, references, dependencies, terrablenderRegionType, extension);
+        } catch (java.util.concurrent.CancellationException cancelled) {
+            throw cancelled;
+        } catch (RuntimeException | LinkageError failure) {
+            if (extension.isEmpty()) throw failure;
+            VSSLogger.warn("VSS optional noise context unavailable; retaining the explicit LOD source", failure);
+            return encodeOtherGenerator(generator, access, dependencies, extension);
+        }
+    }
+
+    private static Encoded encodeNoiseGenerator(ChunkGenerator generator, NoiseBasedChunkGenerator noise,
+            RegistryAccess access, DensityFunctionReferences references, WorldgenRegistryDependencies dependencies,
+            String terrablenderRegionType, java.util.Optional<dev.xantha.vss.api.worldgen.TerrainSnapshot> extension) {
+        boolean inheritedNoise = GeneratorTerrainCapabilities.inheritsImplementation(
+                generator.getClass(), NoiseBasedChunkGenerator.class);
         RegistryOps<JsonElement> ops = dependencies.ops();
         JsonObject root = new JsonObject();
         NoiseGeneratorSettings settings = noise.generatorSettings().value();
@@ -162,7 +168,7 @@ final class WorldgenCodecSnapshot {
                 .encodeStart(ops, settings)
                 .getOrThrow(false, message -> { throw new IllegalArgumentException(message); }).getAsJsonObject();
         root.add("settings", requiresAppliedDensityGraph() ? references.settings(encodedSettings) : encodedSettings);
-        if (generator.getClass() != NoiseBasedChunkGenerator.class) {
+        if (!inheritedNoise) {
             root.addProperty("vss_unsupported_reason", "Custom noise generator requires a registered backend: "
                     + generator.getClass().getName());
         }
@@ -182,7 +188,7 @@ final class WorldgenCodecSnapshot {
             // client backend can replay the routing; untagged dimensions are
             // never initialized by TerraBlender and keep vanilla behavior.
             JsonObject regions = TerraBlenderRegionSnapshot.capture(terrablenderRegionType, access);
-            if (regions != null && generator.getClass() == NoiseBasedChunkGenerator.class) {
+            if (regions != null && inheritedNoise) {
                 root.add("vss_terrablender", regions);
             } else if (regions == null) {
                 root.addProperty("vss_unsupported_reason",
@@ -199,7 +205,7 @@ final class WorldgenCodecSnapshot {
             JsonObject blueprint = BlueprintBiomeSnapshot.capture(noise.getBiomeSource(), access, ops,
                     mods.isLoaded("terrablender") ? terrablenderRegionType : null);
             if (blueprint != null) {
-                if (generator.getClass() == NoiseBasedChunkGenerator.class) {
+                if (inheritedNoise) {
                     root.add("vss_blueprint", blueprint);
                 } else {
                     root.addProperty("vss_unsupported_reason",
@@ -207,7 +213,18 @@ final class WorldgenCodecSnapshot {
                 }
             }
         }
+        TerrainPredictionPlan plan = root.has("vss_unsupported_reason")
+                ? TerrainPredictionPlan.unavailable(root.get("vss_unsupported_reason").getAsString())
+                : TerrainPredictionPlan.noise("vss:noise_graph", 1, true);
+        plan = applyExtension(root, plan, extension);
+        root.add(TerrainPredictionPlan.FIELD, plan.encode());
+        if (generator.getClass() != NoiseBasedChunkGenerator.class) snapshotActualGenerator(root, generator, access, dependencies);
         Encoded encoded = compress(root);
+        if (root.has("vss_generator") && exceedsHeadroom(encoded)) {
+            root.remove("vss_generator");
+            root.addProperty("vss_generator_error", "Optional generator codec exceeds snapshot budget");
+            encoded = compress(root);
+        }
         // The generator payload has hard caps (see WorldgenProfileS2CPayload):
         // exceeding them throws while the profile is built, which would cost
         // the whole dimension's prediction rather than just this backend. A
@@ -220,12 +237,93 @@ final class WorldgenCodecSnapshot {
                 || encoded.rawSize() > GENERATOR_RAW_BYTES_HEADROOM)) {
             root.remove("vss_blueprint");
             root.addProperty("vss_unsupported_reason", "Blueprint biome slice snapshot exceeds payload budget");
+            root.add(TerrainPredictionPlan.FIELD, TerrainPredictionPlan.unavailable(
+                    "Blueprint biome slice snapshot exceeds payload budget").encode());
             VSSLogger.warn("VSS dropped the Blueprint slice snapshot to stay inside the generator"
                     + " payload budget (" + encoded.bytes().length + " B compressed, "
                     + encoded.rawSize() + " B raw); prediction unavailable for this dimension");
             encoded = compress(root);
         }
-        return encoded;
+        return exceedsHeadroom(encoded) ? unavailableSnapshot("Terrain projection exceeds snapshot budget") : encoded;
+    }
+
+    private static TerrainPredictionPlan applyExtension(JsonObject root, TerrainPredictionPlan fallback,
+            java.util.Optional<dev.xantha.vss.api.worldgen.TerrainSnapshot> extension) {
+        if (extension.isEmpty()) return fallback;
+        var snapshot = extension.get();
+        if (snapshot.plan().kind() == TerrainPredictionPlan.Kind.NOISE_GRAPH) {
+            root.entrySet().clear();
+            snapshot.parameters().entrySet().forEach(entry -> root.add(entry.getKey(), entry.getValue()));
+        } else root.add("vss_lod_parameters", snapshot.parameters());
+        root.remove("vss_unsupported_reason");
+        return snapshot.plan();
+    }
+
+    private static Encoded encodeOtherGenerator(ChunkGenerator generator, RegistryAccess access,
+            WorldgenRegistryDependencies dependencies,
+            java.util.Optional<dev.xantha.vss.api.worldgen.TerrainSnapshot> extension) {
+        var root = new JsonObject();
+        TerrainPredictionPlan plan = TerrainPredictionPlan.unavailable(
+                "Generator needs a noise projection or LOD source: " + generator.getClass().getName());
+        if (extension.isEmpty() && generator instanceof net.minecraft.world.level.levelgen.FlatLevelSource flat
+                && GeneratorTerrainCapabilities.inheritsImplementation(generator.getClass(),
+                        net.minecraft.world.level.levelgen.FlatLevelSource.class)) {
+            var data = new JsonObject();
+            data.addProperty("biome", flat.settings().getBiome().unwrapKey().orElseThrow().location().toString());
+            var layers = new JsonArray();
+            for (var layer : flat.settings().getLayersInfo()) {
+                var encoded = new JsonObject();
+                encoded.addProperty("height", layer.getHeight());
+                encoded.add("state", net.minecraft.world.level.block.state.BlockState.CODEC
+                        .encodeStart(dependencies.ops(), layer.getBlockState()).getOrThrow(false, message -> { throw new IllegalArgumentException(message); }));
+                layers.add(encoded);
+            }
+            data.add("layers", layers);
+            root.add("flat_layers", data);
+            plan = new TerrainPredictionPlan(TerrainPredictionPlan.Kind.FLAT_LAYERS, "vss:flat_layers", 1, false,
+                    "Layered base terrain; custom features require their own decoration context");
+        }
+        plan = applyExtension(root, plan, extension);
+        root.add(TerrainPredictionPlan.FIELD, plan.encode());
+        if (plan.kind() == TerrainPredictionPlan.Kind.UNAVAILABLE) root.addProperty("vss_unsupported_reason", plan.reason());
+        snapshotActualGenerator(root, generator, access, dependencies);
+        var encoded = compress(root);
+        if (root.has("vss_generator") && exceedsHeadroom(encoded)) {
+            root.remove("vss_generator");
+            root.addProperty("vss_generator_error", "Optional generator codec exceeds snapshot budget");
+            encoded = compress(root);
+        }
+        return exceedsHeadroom(encoded) ? unavailableSnapshot("Terrain projection exceeds snapshot budget") : encoded;
+    }
+
+    private static void snapshotActualGenerator(JsonObject root, ChunkGenerator generator, RegistryAccess access,
+            WorldgenRegistryDependencies dependencies) {
+        try {
+            JsonElement encoded = ChunkGenerator.CODEC.encodeStart(dependencies.ops(), generator).getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
+            if (generator instanceof NoiseBasedChunkGenerator noise && encoded.isJsonObject()) {
+                // The client does not necessarily have the server's noise-settings registry.
+                var settings = noise.generatorSettings().value();
+                if (requiresAppliedDensityGraph()) settings = DensityFunctionSnapshot.applied(settings);
+                encoded.getAsJsonObject().add("settings", NoiseGeneratorSettings.DIRECT_CODEC
+                        .encodeStart(dependencies.ops(), settings).getOrThrow(false, message -> { throw new IllegalArgumentException(message); }));
+                encoded.getAsJsonObject().add("biome_source", encodeBiomeSource(noise.getBiomeSource(), access, dependencies.ops()));
+            }
+            root.add("vss_generator", encoded);
+        } catch (java.util.concurrent.CancellationException cancelled) {
+            throw cancelled;
+        } catch (RuntimeException | LinkageError failure) {
+            root.addProperty("vss_generator_error", failure.getClass().getSimpleName());
+            VSSLogger.debug("VSS optional generator codec unavailable for " + generator.getClass().getName() + ": " + failure);
+        }
+    }
+    private static boolean exceedsHeadroom(Encoded encoded) {
+        return encoded.bytes().length > GENERATOR_BYTES_HEADROOM || encoded.rawSize() > GENERATOR_RAW_BYTES_HEADROOM;
+    }
+    private static Encoded unavailableSnapshot(String reason) {
+        var root = new JsonObject();
+        root.add(TerrainPredictionPlan.FIELD, TerrainPredictionPlan.unavailable(reason).encode());
+        root.addProperty("vss_unsupported_reason", reason);
+        return compress(root);
     }
 
     static void snapshotFreeTerraForged(JsonObject root, RegistryAccess access,
@@ -343,30 +441,25 @@ final class WorldgenCodecSnapshot {
         for (Map.Entry<ResourceKey<T>, T> entry : access.registryOrThrow(registryKey).entrySet()) {
             JsonElement encoded;
             try {
-                encoded = codec.encodeStart(ops, entry.getValue()).getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
+                encoded = encodeEntry(ops, codec, entry.getValue());
             } catch (RuntimeException exception) {
                 throw new IllegalStateException("Cannot snapshot " + registryKey.location()
                         + " entry " + entry.getKey().location(), exception);
-            }
-            if (entry.getValue() instanceof ConfiguredFeature<?, ?> feature) {
-                encoded = dev.xantha.vss.common.worldgen.VanillaFeatureSnapshot.correct(feature, encoded);
             }
             object.add(entry.getKey().location().toString(), encoded);
         }
         return object;
     }
 
-    private static JsonObject encodeStructures(RegistryAccess access, RegistryOps<JsonElement> ops) {
-        JsonObject object = new JsonObject();
-        Registry<Structure> registry = access.registryOrThrow(Registries.STRUCTURE);
-        for (Structure structureValue : registry) {
-            Map.Entry<ResourceKey<Structure>, Structure> entry = Map.entry(registry.getResourceKey(structureValue).orElseThrow(), structureValue);
-            JsonObject encoded = Structure.DIRECT_CODEC.encodeStart(ops, entry.getValue())
-                    .getOrThrow(false, message -> { throw new IllegalArgumentException(message); }).getAsJsonObject();
-            encoded.add("biomes", structureBiomeIds(entry.getValue().biomes().stream()));
-            object.add(entry.getKey().location().toString(), encoded);
+    private static <T> JsonElement encodeEntry(RegistryOps<JsonElement> ops, Codec<T> codec, T value) {
+        JsonElement encoded = codec.encodeStart(ops, value).getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
+        if (value instanceof ConfiguredFeature<?, ?> feature) {
+            encoded = dev.xantha.vss.common.worldgen.VanillaFeatureSnapshot.correct(feature, encoded);
         }
-        return object;
+        if (value instanceof Structure structure) {
+            encoded.getAsJsonObject().add("biomes", structureBiomeIds(structure.biomes().stream()));
+        }
+        return encoded;
     }
 
     static JsonArray structureBiomeIds(java.util.stream.Stream<Holder<Biome>> holders) {
@@ -380,29 +473,87 @@ final class WorldgenCodecSnapshot {
         return biomes;
     }
 
-    private static <T> JsonObject encodeOptional(RegistryAccess access, RegistryOps<JsonElement> ops,
-                                                 ResourceKey<? extends Registry<T>> key,
-                                                 Codec<T> codec) {
+    static <T> JsonObject encodeOptional(RegistryAccess access, RegistryOps<JsonElement> ops,
+                                        ResourceKey<? extends Registry<T>> key, Codec<T> codec) {
+        JsonObject result = new JsonObject();
+        Registry<T> registry;
         try {
-            return encodeRegistry(access, ops, key, codec);
-        } catch (RuntimeException exception) {
-            return new JsonObject();
+            registry = access.registryOrThrow(key);
+        } catch (RuntimeException | LinkageError failure) {
+            VSSLogger.warn("VSS optional worldgen registry unavailable: " + key.location() + ": " + failure);
+            return result;
         }
+        for (var entry : registry.entrySet()) {
+            try {
+                result.add(entry.getKey().location().toString(), encodeEntry(ops, codec, entry.getValue()));
+            } catch (RuntimeException | LinkageError failure) {
+                // Mod codecs can throw IllegalAccessError/NoClassDefFoundError,
+                // not just a DFU error. One optional entry must not abort login
+                // or erase the other entries from this prediction snapshot.
+                VSSLogger.warn("VSS omitted optional worldgen entry " + key.location()
+                        + " / " + entry.getKey().location() + ": " + failure);
+            }
+        }
+        return result;
     }
 
-    private static JsonObject encodeOptionalStructures(RegistryAccess access,
-                                                       RegistryOps<JsonElement> ops) {
-        try {
-            return encodeStructures(access, ops);
-        } catch (RuntimeException exception) {
-            return new JsonObject();
+    static JsonObject filterStructureSets(JsonObject structures, JsonObject encodedSets) {
+        JsonObject sets = encodedSets.deepCopy();
+        boolean removed;
+        do {
+            removed = false;
+            for (String id : java.util.List.copyOf(sets.keySet())) {
+                String missing = missingStructureDependency(sets.getAsJsonObject(id), structures, sets);
+                if (missing == null) continue;
+                // Drop the entire set: removing one member would change its
+                // weights and predict a different building at the same start.
+                sets.remove(id);
+                removed = true;
+                VSSLogger.warn("VSS omitted prediction structure set " + id
+                        + " because its snapshot is missing " + missing);
+            }
+            // Exclusion zones can refer to a set omitted in the previous pass.
+        } while (removed);
+        return sets;
+    }
+
+    private static String missingStructureDependency(JsonObject set, JsonObject structures, JsonObject sets) {
+        for (JsonElement entry : set.getAsJsonArray("structures")) {
+            JsonElement structure = entry.getAsJsonObject().get("structure");
+            if (structure.isJsonPrimitive() && structure.getAsJsonPrimitive().isString()
+                    && !structures.has(structure.getAsString())) {
+                return "structure " + structure.getAsString();
+            }
         }
+        JsonObject placement = set.getAsJsonObject("placement");
+        if (!placement.has("exclusion_zone")) return null;
+        JsonElement other = placement.getAsJsonObject("exclusion_zone").get("other_set");
+        if (other.isJsonPrimitive() && other.getAsJsonPrimitive().isString()
+                && !sets.has(other.getAsString())) return "structure set " + other.getAsString();
+        return other.isJsonObject() ? missingStructureDependency(other.getAsJsonObject(), structures, sets) : null;
     }
 
     private static Encoded compress(JsonObject object) {
         byte[] raw = dev.xantha.vss.common.worldgen.WorldgenJson.bytes(object);
         LodByteCompression.Result compressed = LodByteCompression.compressForNetwork(raw, false);
         return new Encoded(compressed.method(), compressed.originalLength(), compressed.bytes());
+    }
+
+    /** Optional JSON metadata keeps the wire format compatible with older clients. */
+    static Encoded withDimensionType(Encoded generator, net.minecraft.world.level.dimension.DimensionType type) {
+        if (generator.bytes().length == 0) return generator;
+        try {
+            byte[] raw = LodByteCompression.decompress(generator.bytes(), generator.compression(), generator.rawSize(),
+                    dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload.MAX_GENERATOR_RAW_BYTES);
+            JsonObject root = com.google.gson.JsonParser.parseString(new String(raw,
+                    java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            root.add("vss_dimension_type", net.minecraft.world.level.dimension.DimensionType.DIRECT_CODEC
+                    .encodeStart(JsonOps.INSTANCE, type).getOrThrow(false, message -> { throw new IllegalArgumentException(message); }));
+            Encoded encoded = compress(root);
+            return exceedsHeadroom(encoded) ? unavailableSnapshot("Dimension type metadata exceeds snapshot budget") : encoded;
+        } catch (java.io.IOException failure) {
+            throw new IllegalStateException("Cannot append prediction dimension type", failure);
+        }
     }
 
     record Encoded(int compression, int rawSize, byte[] bytes) {

@@ -134,7 +134,7 @@ class PredictionRefinementOptimizationsTest {
     }
 
     private static Object field(Object target, String name) throws Exception {
-        var field = target.getClass().getDeclaredField(name); field.setAccessible(true); return field.get(target);
+        return PredictionPlanningTestSupport.get(target, name);
     }
 
     @Test void segmentedTreesPreserveEveryFaceAboveFormerWholeTileLimit() throws Exception {

@@ -18,6 +18,16 @@ public final class PredictionNormalDepthBridge {
         String unproject = "vec4(SCREEN2NDC(clip),1.0f)";
         String clamp = "depth = REDUCTION2(FAR+CLOSER_SIGN*(2.0f/((1<<24)-1)), depth);";
         String project = "depth = NDC2SCREEN_DEPTH(depth);";
+        String sourceClip = "SCREEN2NDC(clip)", destinationDepth = "NDC2SCREEN_DEPTH(depth)";
+        if (!source.contains(unproject) || !source.contains(clamp) || !source.contains(project)) {
+            // The Forge 0.2.14 port uses the same final-blit contract with
+            // literal depth expressions, before Voxy introduced depthutils.
+            unproject = "vec4(clip*2.0f-1.0f,1.0f)";
+            clamp = "depth = min(1.0f-(2.0f/((1<<24)-1)), depth);";
+            project = "depth = depth * 0.5f + 0.5f;";
+            sourceClip = "clip * 2.0 - 1.0";
+            destinationDepth = "depth * 0.5 + 0.5";
+        }
         // Only the known normal final-blit contract is changed. Shader packs
         // and unknown layouts retain their own projection conventions.
         if (!source.contains("vec3 rev3d(vec3 clip)") || !source.contains(unproject)
@@ -31,7 +41,7 @@ public final class PredictionNormalDepthBridge {
                 uniform sampler2D VssPredictionSeedDepth;
                 vec3 rev3d(vec3 clip)""")
                 .replace(unproject, "vec4(VssNormalDepthBridge ? vec3(clip.xy * 2.0 - 1.0, "
-                        + "clip.z * VssSourceDepthTransform.x + VssSourceDepthTransform.y) : SCREEN2NDC(clip), 1.0)")
+                        + "clip.z * VssSourceDepthTransform.x + VssSourceDepthTransform.y) : " + sourceClip + ", 1.0)")
                 .replace("depth = projDepth(point);", """
                         if (VssPredictionBeforeWater) {
                             float predicted = texelFetch(VssPredictionOpaqueDepth, ivec2(gl_FragCoord.xy), 0).r;
@@ -52,8 +62,7 @@ public final class PredictionNormalDepthBridge {
                         // independently of the source Voxy projection or GL clip mode.
                         depth = VssNormalDepthBridge
                                 ? clamp(depth * 0.5 + 0.5, 0.0, 1.0 - 1.0 / 16777215.0)
-                                : NDC2SCREEN_DEPTH(depth);
-                        """);
+                                : """ + destinationDepth + ";\n");
     }
 
     public static void bind(boolean sourceZeroToOne) {

@@ -40,7 +40,8 @@ public final class NbtSectionSerializer {
             int cx,
             int cz,
             Optional<CompoundTag> optionalTag) {
-        return serializeTag(level.registryAccess(), level.getMinBuildHeight(), level.getHeight(), cx, cz, optionalTag);
+        return ColumnFilterPipeline.apply(ColumnFilterPipeline.Context.capture(level),
+                serializeTag(level.registryAccess(), level.getMinBuildHeight(), level.getHeight(), cx, cz, optionalTag));
     }
 
     static LoadedColumnData serializeTag(

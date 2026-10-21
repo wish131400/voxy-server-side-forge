@@ -3,7 +3,6 @@ package dev.xantha.vss.client.prediction;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.config.VSSClientConfig;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -150,7 +149,18 @@ public final class PredictionIrisBridge {
             Object taaBody = field(data, "TAA");
             String taa = taaBody == null ? "vec2 vssTaaShift() { return vec2(0.0); }"
                     : (String) call(pipeline, "taaFunction", "vssTaaShift");
-            opaque = PredictionTerrainProgram.createIris(taa, source -> patch("patchOpaqueShader", source));
+            String opaqueSource = patch("patchOpaqueShader", PredictionTerrainProgram.irisFragment());
+            // Current adapters reserve 10+ for pack SSBOs; 7 is our record table.
+            // Unknown layouts keep the existing direct shader.
+            boolean batchLayout = call(data, "getSsboSet") == null
+                    || opaqueSource.contains("#define BUFFER_BINDING_INDEX_BASE 10");
+            if (batchLayout) {
+                try { opaque = PredictionTerrainProgram.createIrisBatch(taa, source -> patch("patchOpaqueShader", source)); }
+                catch (RuntimeException failure) {
+                    VSSLogger.warn("VSS Iris opaque batching unavailable; using direct submissions", failure);
+                }
+            }
+            if (opaque == null) opaque = PredictionTerrainProgram.createIris(taa, source -> patch("patchOpaqueShader", source));
             String translucent = (String) call(data, "translucentFragPatch");
             if (translucent != null) {
                 water = PredictionTerrainProgram.createIris(taa, source -> patch("patchTranslucentShader", source));
@@ -258,24 +268,11 @@ public final class PredictionIrisBridge {
     }
 
     private static Object field(Object object, String name) throws ReflectiveOperationException {
-        for (Class<?> type = object.getClass(); type != null; type = type.getSuperclass()) {
-            try {
-                Field field = type.getDeclaredField(name);
-                field.setAccessible(true);
-                return field.get(object);
-            } catch (NoSuchFieldException ignored) { }
-        }
-        throw new NoSuchFieldException(name);
+        return dev.xantha.vss.common.ReflectionAccess.field(object, name);
     }
 
     private static Object call(Object object, String name, Object... args) throws ReflectiveOperationException {
-        for (Method method : object.getClass().getMethods()) {
-            if (method.getName().equals(name) && method.getParameterCount() == args.length) {
-                method.setAccessible(true);
-                return method.invoke(object, args);
-            }
-        }
-        throw new NoSuchMethodException(name);
+        return dev.xantha.vss.common.ReflectionAccess.call(object, name, args);
     }
 
     /** Restore raw pass state; isolated Voxy callbacks leave Minecraft/Iris caches untouched. */

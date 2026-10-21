@@ -57,6 +57,7 @@ final class PredictionRenderTarget implements AutoCloseable {
             uniform vec3 VoxyDepthTransform;
             uniform vec4 VoxyDistanceNumerator;
             uniform vec4 VoxyDistanceDenominator;
+            """ + PredictionVoxyDepth.RESOLVE_GLSL + """
             void main() {
                 float depth = texelFetch(MainDepth, ivec2(gl_FragCoord.xy), 0).r;
                 // Minecraft's clear value and Voxy's far-plane clamp cannot
@@ -73,19 +74,11 @@ final class PredictionRenderTarget implements AutoCloseable {
                 // Voxy's final colour/depth blit discards zero-alpha pixels.
                 // Its offscreen depth alone is not evidence of a visible
                 // surface; only refine pixels actually present in main depth.
-                if (VoxyDepthAvailable && depth < 1.0) {
-                    float raw = texelFetch(VoxyDepth, ivec2(gl_FragCoord.xy), 0).r;
-                    if (raw > 0.0 && raw < 1.0) {
-                        vec2 uv = gl_FragCoord.xy / vec2(textureSize(VoxyDepth, 0));
-                        vec4 clip = vec4(uv * 2.0 - 1.0,
-                                raw * VoxyDepthTransform.x + VoxyDepthTransform.y, 1.0);
-                        float denominator = dot(VoxyDistanceDenominator, clip);
-                        if (abs(denominator) > 1e-10) {
-                            float distance = dot(VoxyDistanceNumerator, clip) / denominator;
-                            if (distance > 0.0 && distance < 1e30)
-                                reversedDepth = max(reversedDepth, clamp(1.0 / distance, 0.0, 1.0));
-                        }
-                    }
+                float distance, voxyMainDepth;
+                if (vssResolveVoxyDepth(depth, VanillaPlanes, false, distance, voxyMainDepth)) {
+                    // The coarse D24 reconstruction can be spuriously nearer.
+                    // Once the pixel matches Voxy's blit, replace that value.
+                    reversedDepth = clamp(1.0 / distance, 0.0, 1.0);
                 }
                 gl_FragDepth = reversedDepth;
             }
@@ -96,6 +89,7 @@ final class PredictionRenderTarget implements AutoCloseable {
     private int seedTexture = -1;
     private int colorTexture = -1;
     private int fullscreenVertexArray = -1;
+    private final PredictionWaterDepthHistory waterDepthHistory = new PredictionWaterDepthHistory();
     private GlProgram writeDepth;
     private GlProgram copyDepth;
     private int width;
@@ -118,6 +112,7 @@ final class PredictionRenderTarget implements AutoCloseable {
             return;
         }
         ensurePrograms();
+        waterDepthHistory.close();
         if (seedTexture != -1) { GL11.glDeleteTextures(seedTexture); seedTexture = -1; }
         if (framebuffer == -1) {
             framebuffer = GlStateManager.glGenFramebuffers();
@@ -164,6 +159,8 @@ final class PredictionRenderTarget implements AutoCloseable {
 
     int seedTextureId() { return seedTexture; }
 
+    PredictionWaterDepthHistory waterDepthHistory() { return waterDepthHistory; }
+
     /** Distinguish new prediction pixels from quantized real depth during Voxy's later water blit. */
     void captureSeed() {
         if (seedTexture == -1) {
@@ -178,6 +175,7 @@ final class PredictionRenderTarget implements AutoCloseable {
 
     /** Clears prediction depth; the terrain shader tests main depth separately. */
     void beginOpaque(RenderTarget main) {
+        waterDepthHistory.reset();
         if (!available() || main == null) {
             return;
         }
@@ -201,6 +199,7 @@ final class PredictionRenderTarget implements AutoCloseable {
     /** Seeds prediction depth from the vanilla target and, when available, Voxy's unclamped depth. */
     void beginOpaque(RenderTarget main, VssLodProjection.MatrixData projection,
                      PredictionVoxyDepth.Frame voxy, Matrix4f mainMvp) {
+        waterDepthHistory.reset();
         if (!available() || main == null) {
             return;
         }
@@ -280,9 +279,16 @@ final class PredictionRenderTarget implements AutoCloseable {
 
     /** Converts the closest reversed prediction depth back to main depth. */
     void writeDepth(RenderTarget main, VssLodProjection.MatrixData projection) {
+        writeDepth(main, projection, false);
+    }
+
+    /** Keep exact before/after main depth only when this frame has deferred water. */
+    void writeDepth(RenderTarget main, VssLodProjection.MatrixData projection, boolean deferredWater) {
+        waterDepthHistory.reset();
         if (!available() || main == null) {
             return;
         }
+        if (deferredWater) waterDepthHistory.beforeExport(main);
         main.bindWrite(false);
         RenderSystem.viewport(0, 0, main.width, main.height);
         PredictionGlState.enableDepthTest();
@@ -301,6 +307,7 @@ final class PredictionRenderTarget implements AutoCloseable {
         PredictionGlState.colorMask(true, true, true, true);
         unbindTexture();
         GlProgram.unuse();
+        if (deferredWater) waterDepthHistory.afterExport(main);
     }
 
     private void ensurePrograms() {
@@ -337,6 +344,7 @@ final class PredictionRenderTarget implements AutoCloseable {
 
     @Override
     public void close() {
+        waterDepthHistory.close();
         if (writeDepth != null) {
             writeDepth.close();
             writeDepth = null;

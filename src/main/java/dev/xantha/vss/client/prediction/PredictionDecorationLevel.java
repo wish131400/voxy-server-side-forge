@@ -24,6 +24,17 @@ final class PredictionDecorationLevel extends FeatureStampLevel {
     private static final int BIOME_QUERY_CACHE_SIZE = 1 << 15;
     private final ClientTerrainSampler terrain;
     private final ClientTerrainSampler context;
+    private PredictionStructureTemplates templateManager;
+
+    PredictionStructureTemplates templateManager() {
+        if (templateManager == null) {
+            try { templateManager = PredictionStructureTemplates.open(context.structureTemplates()); }
+            catch (java.io.IOException failure) {
+                throw new IllegalStateException("Prediction tree template manager unavailable", failure);
+            }
+        }
+        return templateManager;
+    }
     private final int originX;
     private final int originZ;
     private final BiomeManager biomes;
@@ -118,6 +129,10 @@ final class PredictionDecorationLevel extends FeatureStampLevel {
         this.originZ = chunkZ * 16;
         this.biomes = new BiomeManager(this, BiomeManager.obfuscateSeed(getSeed()));
         this.sharedColumns = sharedColumns;
+    }
+
+    @Override public net.minecraft.world.level.dimension.DimensionType dimensionType() {
+        return context.dimensionTypeContext();
     }
 
     ClientColumnSample column(int x, int z) {

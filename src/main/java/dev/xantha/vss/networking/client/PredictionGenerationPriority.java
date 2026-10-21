@@ -22,7 +22,7 @@ final class PredictionGenerationPriority {
         return limit(configured, enabled, progress, configured, now);
     }
 
-    /** availableBudget includes local CPU/frame headroom; remote generation may pass configured. */
+    /** availableBudget includes local CPU headroom; remote generation may pass configured. */
     int limit(int configured, boolean enabled, PredictionLoadingProgress progress, int availableBudget, long now) {
         int cap = Math.min(Math.max(0, configured), Math.max(0, availableBudget));
         lastBudget = cap;

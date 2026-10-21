@@ -144,6 +144,8 @@ final class PredictionSurfaceStructures {
                 }
                 placedStarts.increment();
                 success = true;
+            } catch (PredictionWorkDeferred | java.util.concurrent.CancellationException deferred) {
+                throw deferred;
             } catch (RuntimeException failure) {
                 if (PredictionMissingRegistry.permanent(failure, access)) missingRegistryFailures.add(start.getStructure());
                 failedStarts.increment();
@@ -182,6 +184,8 @@ final class PredictionSurfaceStructures {
                             context.randomStateContext(), templates, context.profile().seed(), pos, 0,
                             LevelHeightAccessor.create(context.profile().minY(), context.profile().height()), structure.biomes()::contains);
                     if (result.isValid()) break;
+                } catch (PredictionWorkDeferred | java.util.concurrent.CancellationException deferred) {
+                    throw deferred;
                 } catch (RuntimeException failure) {
                     if (PredictionMissingRegistry.permanent(failure, access))
                         missingRegistryFailures.add(entry.structure().value());

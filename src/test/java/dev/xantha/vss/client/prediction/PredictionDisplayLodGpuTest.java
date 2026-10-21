@@ -25,7 +25,8 @@ class PredictionDisplayLodGpuTest {
         try {
             glfwMakeContextCurrent(window); GL.createCapabilities(); RenderSystem.initRenderThread();
             PredictionMeshCodecTest.bootstrap();
-            int[] words = PredictionDisplayGeometryTest.grid(PredictionPackedMesh.FLAG_CUTOUT);
+            for (int geometryFlags : new int[]{PredictionPackedMesh.FLAG_CUTOUT, 0}) {
+            int[] words = PredictionDisplayGeometryTest.grid(geometryFlags);
             for (int q = 0; q < 1024; q++) words[q * 12 + 9] |= 1 << 24;
             // Put canonical water between original and appended opaque records.
             // Every far-layer submission now exercises the pass-local index shift.
@@ -34,11 +35,19 @@ class PredictionDisplayLodGpuTest {
                 System.arraycopy(words, (q - 1024) * 12, words, q * 12, 12);
                 words[q * 12 + 6] = 1 << PredictionPackedMesh.FLAGS_FLUID_SHIFT;
             }
-            var payload = new PredictionPackedMesh(words, 64, 1024, new int[5],new int[]{1024,0,0,0,0},
-                    new int[]{1024,1152,1152,1152,1152},new int[]{128,0,0,0,0},false,0);
+            var payload = PredictionPackedMesh.scanMerged(words, 64, 1024, new int[5],new int[]{1024,0,0,0,0},
+                    new int[]{1024,0,0,0,0},new int[]{128,0,0,0,0},false,0);
             payload.prepareGpuStorage();
             var source = PredictionMeshCodecTest.fixture(64);
             var mesh = PredictionMesh.restored(1024 * 6, 0, payload, source.seamMesh());
+            int[] expected = payload.quads().clone();
+            byte[] identity = new byte[32];
+            byte[] cached = PredictionMeshCodec.encode(mesh, identity);
+            assertEquals(PredictionMeshCodec.PREPARED_RECORD_VERSION, java.nio.ByteBuffer.wrap(cached).getInt());
+            mesh = PredictionMeshCodec.decode(cached, identity, 64);
+            payload = mesh.gpuPayload();
+            assertArrayEquals(expected, payload.quads());
+            payload.prepareGpuStorage();
             var key = new PredictionTileManager.PredictionTileKey(Level.OVERWORLD, 0, 0, 0);
             var tile = new PredictionTileManager.PredictionTile(key, new int[4225], new int[4225],
                     new ClientColumnSample[4225], mesh, new PredictionDepthBound(80, 80), 0, 1, 64, 1);
@@ -102,8 +111,9 @@ class PredictionDisplayLodGpuTest {
                         if (mask != 1) { int colored = 0; for (int i = 0; i < reference.length; i += 4) if (reference[i] != 0) colored++; assertTrue(colored > 100, "nonblank mask=" + mask + " colored=" + colored); }
                     }
                     assertEquals(GL_NO_ERROR, glGetError());
-                    System.out.println("DISPLAY_GPU near/far tiers 0-3, direct/MDI and missing/mixed ownership are pixel-exact");
+                    System.out.println("DISPLAY_GPU flags=" + geometryFlags + " near/far tiers 0-3, direct/MDI and missing/mixed ownership are pixel-exact");
                 } finally { target.destroyBuffers(); glDeleteBuffers(indices); glDeleteVertexArrays(vao); }
+            }
             }
         } finally { for (int texture : textures) glDeleteTextures(texture); glfwDestroyWindow(window); glfwTerminate(); }
     }

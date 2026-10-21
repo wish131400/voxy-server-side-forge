@@ -101,7 +101,7 @@ public final class PredictionSampleStore implements AutoCloseable {
         }
     }
 
-    @FunctionalInterface private interface IdMapper { int map(int id) throws IOException; }
+    @FunctionalInterface interface IdMapper { int map(int id) throws IOException; }
     @FunctionalInterface private interface NameDecoder { int decode(String name) throws IOException; }
 
     private static int bounded(int count, int max) throws IOException {
@@ -124,7 +124,7 @@ public final class PredictionSampleStore implements AutoCloseable {
         return palette[id];
     }
 
-    private static ClientColumnSample remap(ClientColumnSample sample, IdMapper biome, IdMapper block) throws IOException {
+    static ClientColumnSample remap(ClientColumnSample sample, IdMapper biome, IdMapper block) throws IOException {
         var source = sample.volume();
         PredictionColumnVolume volume = null;
         if (source != null) {
@@ -142,7 +142,7 @@ public final class PredictionSampleStore implements AutoCloseable {
                 sample.lowerTop(), sample.lowerBottom(), sample.spanFloor(), volume);
     }
 
-    private static ClientColumnSample readSample(DataInputStream input, boolean volumes) throws IOException {
+    static ClientColumnSample readSample(DataInputStream input, boolean volumes) throws IOException {
         var sample = new ClientColumnSample(
                 input.readInt(), input.readInt(), input.readInt(), input.readInt(),
                 input.readInt(), input.readInt(), input.readInt(), input.readInt(),
@@ -161,7 +161,7 @@ public final class PredictionSampleStore implements AutoCloseable {
                 sample.lowerTop(),sample.lowerBottom(),sample.spanFloor(),new PredictionColumnVolume(words));
     }
 
-    private static void writeSample(DataOutputStream output, ClientColumnSample sample)
+    static void writeSample(DataOutputStream output, ClientColumnSample sample)
             throws IOException {
         output.writeInt(sample.surfaceY());
         output.writeInt(sample.fluidY());

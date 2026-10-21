@@ -15,7 +15,7 @@ class PredictionVoxyCoverageInvalidationTest {
         StrictLodVisibility.reset();
         try {
             var view = new PredictionRenderer.CoverageView(0, 0, 1400, null).ownership(false);
-            var cached = new PredictionRenderer.CachedCoverage(1, 2, 0, view, null);
+            var cached = new PredictionRenderer.CachedCoverage(1, 2, view, null);
             for (int edit = 0; edit < 10_000; edit++) StrictLodVisibility.workChanged();
             assertTrue(cached.matchesOwnership(1, 2, view));
             StrictLodVisibility.updateRenderWindow(Level.OVERWORLD, 0, 0, 64);

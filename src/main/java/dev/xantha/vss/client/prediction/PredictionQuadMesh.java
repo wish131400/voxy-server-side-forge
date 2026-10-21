@@ -16,6 +16,8 @@ public final class PredictionQuadMesh {
     public static final int WATER_TOP = 1;
     private static final int LOD_TEXTURE_SCALE = 0x40;
     private static final int TERRAIN_WALL = 0x80;
+    private static final int FEATURE = 0x20;
+    private static final int PREVIEW = 0x10;
 
     private final float[] positions;
     private final float[] normals;
@@ -133,7 +135,9 @@ public final class PredictionQuadMesh {
                 // Repeated per-cell gradients and bilinear/nonlinear fields remain separate.
                 TopSignature signature = completeTops[cell] && flat
                         && (mesh.affineTintSafe || c0 == c1 && c0 == c2 && c0 == c3)
-                        ? topSignature(y0, cell % cellAxis, cell / cellAxis, c0, c1, c2, c3) : null;
+                         && !preview(mesh, first, cell)
+                         ? topSignature(y0, cell % cellAxis, cell / cellAxis, c0, c1, c2, c3,
+                                mesh.terrainEnds != null && first >= mesh.terrainEnds[cell]) : null;
                 if (signature != null) {
                     final int materialId = nextMaterial++;
                     topKeys[cell] = topMaterials.computeIfAbsent(signature,
@@ -187,6 +191,8 @@ public final class PredictionQuadMesh {
             int group = VssLodFaceGroup.ofNormal(mesh.normalX(first), mesh.normalY(first), mesh.normalZ(first));
             if (completeTops[cell]) group |= LOD_TEXTURE_SCALE;
             else if (mesh.normalY(first) == 0 && mesh.terrainEnds != null && first < mesh.terrainEnds[cell]) group |= TERRAIN_WALL;
+            if (mesh.terrainEnds != null && first >= mesh.terrainEnds[cell]) group |= FEATURE;
+            if (preview(mesh, first, cell)) group |= PREVIEW;
             terrain.append(mesh, first, fX + 1, fXZ + 2, fZ + 5,
                     cell, rect.width(), rect.height(), group, 0, 0);
         }
@@ -229,6 +235,8 @@ public final class PredictionQuadMesh {
                 } else {
                     int group = VssLodFaceGroup.ofNormal(mesh.normalX(source),
                             mesh.normalY(source), mesh.normalZ(source));
+                    if (mesh.terrainEnds != null && source >= mesh.terrainEnds[cell]) group |= FEATURE;
+                    if (preview(mesh, source, cell)) group |= PREVIEW;
                     terrain.append(mesh, source, source + 1, source + 2, source + 5,
                             cell, 1, 1, group, 0, 0);
                 }
@@ -328,17 +336,17 @@ public final class PredictionQuadMesh {
             System.arraycopy(source, quad * 3, target, (offset + quad) * 12 + corner * 3, 3);
     }
 
-    private record TopSignature(int y, int sprite, long red, long green, long blue) {
+    private record TopSignature(int y, int sprite, long red, long green, long blue, boolean feature) {
     }
 
-    private static TopSignature topSignature(int y, int x, int z, int c0, int c1, int c2, int c3) {
+    private static TopSignature topSignature(int y, int x, int z, int c0, int c1, int c2, int c3, boolean feature) {
         int sprite = c0 >>> 24;
         if (sprite != c1 >>> 24 || sprite != c2 >>> 24 || sprite != c3 >>> 24) return null;
         long red = colorPlane(16, x, z, c0, c1, c2, c3);
         long green = colorPlane(8, x, z, c0, c1, c2, c3);
         long blue = colorPlane(0, x, z, c0, c1, c2, c3);
         return red == Long.MIN_VALUE || green == Long.MIN_VALUE || blue == Long.MIN_VALUE
-                ? null : new TopSignature(y, sprite, red, green, blue);
+                ? null : new TopSignature(y, sprite, red, green, blue, feature);
     }
 
     private static long colorPlane(int shift, int x, int z, int c0, int c1, int c2, int c3) {
@@ -366,6 +374,8 @@ public final class PredictionQuadMesh {
      */
     private static WallQuad wallQuad(PredictionMesh mesh, int source, int cell,
                                      boolean water) {
+        // A preview's complete footprint must keep one ownership proof across all faces.
+        if (!water && preview(mesh, source, cell)) return null;
         if (!water && VssLodSpriteTable.modelFace((mesh.color(source) >>> 24) & 255)) return null;
         float y0 = water ? mesh.waterY(source) : mesh.y(source);
         float y1 = water ? mesh.waterY(source + 1) : mesh.y(source + 1);
@@ -435,6 +445,7 @@ public final class PredictionQuadMesh {
         int group = water ? VssLodFaceGroup.ofFluidNormal(nx, ny, nz)
                 : VssLodFaceGroup.ofNormal(nx, ny, nz);
         if (!water && mesh.terrainEnds != null && source < mesh.terrainEnds[cell]) group |= TERRAIN_WALL;
+        if (!water && mesh.terrainEnds != null && source >= mesh.terrainEnds[cell]) group |= FEATURE;
         WallKey key = new WallKey(rounded(y0), rounded(y2),
                 Float.floatToRawIntBits(nx), Float.floatToRawIntBits(ny),
                 Float.floatToRawIntBits(nz), colors[0], colors[1], colors[2],
@@ -551,6 +562,13 @@ public final class PredictionQuadMesh {
 
     boolean terrainWall(int quad) {
         return (groups[quad] & TERRAIN_WALL) != 0;
+    }
+
+    boolean feature(int quad) { return (groups[quad] & FEATURE) != 0; }
+    boolean preview(int quad) { return (groups[quad] & PREVIEW) != 0; }
+
+    private static boolean preview(PredictionMesh mesh, int vertex, int cell) {
+        return mesh.previewStarts != null && vertex >= mesh.previewStarts[cell];
     }
 
     /** Cell index used by non-merged geometry at coverage boundaries. */

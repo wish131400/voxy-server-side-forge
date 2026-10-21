@@ -29,14 +29,15 @@ final class IntegratedPregenImporter {
             LodRequestManager manager, BooleanSupplier valid, Consumer<Boolean> completed) {
         var level = Minecraft.getInstance().level;
         if (!supports(server) || manager == null || level == null || !level.dimension().equals(dimension)
-                || !data.completeColumn() || !data.hasBody()) return false;
+                || !data.isDeliverable() || !data.hasBody()
+                || !data.coverage().filterKey().equals(ClientConnectionIdentity.columnFilterKey())) return false;
         return TASKS.offer(data.encodedSize(), () -> {
             if (!valid.getAsBoolean() || !supports(server) || Minecraft.getInstance().level != level
                     || VSSClientNetworking.currentPregenManager() != manager) return false;
             if (data.encodedCrc32c() != EncodedColumnData.crc32c(data.encodedBytes())) return false;
             var part = new VoxelColumnS2CPayload(-1, dimension, data, 0L, 0, 1, data.sectionYs());
             var assembled = new ClientColumnTransferAssembler.AssembledColumn(-1, 0L,
-                    data.chunkX(), data.chunkZ(), dimension, data.columnStamp(), false, true,
+                    data.chunkX(), data.chunkZ(), dimension, data.columnStamp(), false, data.completeColumn(),
                     List.of(part), data.encodedSize());
             var decoded = ClientColumnProcessor.decodeColumn(assembled, level.registryAccess().registryOrThrow(Registries.BIOME));
             if (!valid.getAsBoolean() || !supports(server) || Minecraft.getInstance().level != level
@@ -47,7 +48,9 @@ final class IntegratedPregenImporter {
                         boolean accepted = VSSApi.dispatchColumnAndReport(level, dimension, data.chunkX(), data.chunkZ(), decoded);
                         if (accepted) {
                             manager.recordStrictSections(data.chunkX(), data.chunkZ(), decoded);
-                            ClientPredictionState.onExactColumn(dimension, data.chunkX(), data.chunkZ(), decoded);
+                            if (decoded.authoritative()) {
+                                ClientPredictionState.onExactColumn(dimension, data.chunkX(), data.chunkZ(), decoded);
+                            }
                         }
                         return accepted;
                     });

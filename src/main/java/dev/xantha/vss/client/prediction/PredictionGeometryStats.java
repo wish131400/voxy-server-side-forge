@@ -3,15 +3,29 @@ package dev.xantha.vss.client.prediction;
 /** Worker-built census of rectangles that can retain all four corners exactly.
  * The 12-byte coordinate estimate excludes mixed-format addressing and alignment;
  * it is a potential saving, not an implemented GPU format. */
-record PredictionGeometryStats(long quads, long rectangles, long waterRectangles) {
+record PredictionGeometryStats(long quads, long rectangles, long waterRectangles,
+                               long sourceQuads, long displayVariantQuads, long sourceTerrain,
+                               long sourceFeatures, long sourcePreviews, long sourceWater) {
     static PredictionGeometryStats measure(int[] words) {
+        return measure(words, words.length);
+    }
+    static PredictionGeometryStats measure(int[] words, int sourceWords) {
         long rectangles = 0, water = 0;
+        long terrain = 0, features = 0, previews = 0, sourceWater = 0;
         for (int p = 0; p < words.length; p += PredictionPackedMesh.STRIDE_INTS) {
+            if(p < sourceWords) {
+                if((words[p+6] >>> PredictionPackedMesh.FLAGS_FLUID_SHIFT & 3)!=0) sourceWater++;
+                else if((words[p+10]&PredictionPackedMesh.FEATURE)==0) terrain++;
+                else if((words[p+10]&PredictionPackedMesh.PREVIEW)!=0) previews++;
+                else features++;
+            }
             if (!rectangle(words, p)) continue;
             rectangles++;
             if ((words[p + 6] >>> PredictionPackedMesh.FLAGS_FLUID_SHIFT & 3) != 0) water++;
         }
-        return new PredictionGeometryStats(words.length / PredictionPackedMesh.STRIDE_INTS, rectangles, water);
+        return new PredictionGeometryStats(words.length / PredictionPackedMesh.STRIDE_INTS, rectangles, water,
+                sourceWords / PredictionPackedMesh.STRIDE_INTS, (words.length - sourceWords) / PredictionPackedMesh.STRIDE_INTS,
+                terrain, features, previews, sourceWater);
     }
 
     private static boolean rectangle(int[] words, int p) {

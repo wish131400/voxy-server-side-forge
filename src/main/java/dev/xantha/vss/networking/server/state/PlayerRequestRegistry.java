@@ -9,6 +9,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * 当前运行时唯一的玩家请求状态注册表。
+ * <p>重连以新的 PlayerRequestState 替换对象，异步结果须用 isCurrent 验证原会话。
+ * 集合查询返回快照；同步只保护容器，不授权调用者读取玩家可变世界状态。
+ */
 public final class PlayerRequestRegistry {
     private final Map<UUID, PlayerRequestState> states = new HashMap<>();
 

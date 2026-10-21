@@ -33,6 +33,10 @@ final class PredictionWorldgenCapabilities {
             "reterraforged:power", "reterraforged:clamp", "reterraforged:map", "reterraforged:alpha",
             "reterraforged:threshold");
     static String rejection(JsonObject generator) {
+        var plan = dev.xantha.vss.common.worldgen.TerrainPredictionPlan.read(generator);
+        if (plan.kind() == dev.xantha.vss.common.worldgen.TerrainPredictionPlan.Kind.UNAVAILABLE) return plan.reason();
+        if (plan.kind() != dev.xantha.vss.common.worldgen.TerrainPredictionPlan.Kind.NOISE_GRAPH)
+            return "terrain requires " + plan.kind() + " executor";
         if (generator.has("vss_unsupported_reason")) return generator.get("vss_unsupported_reason").getAsString();
         if (!generator.has("settings") || !generator.has("biome_source")) return "missing noise settings/biome source";
         if (generator.get("biome_source").isJsonObject()
@@ -48,6 +52,8 @@ final class PredictionWorldgenCapabilities {
 
     /** Decoration codecs run in Java and are not dependencies of the Rust terrain graph. */
     static String nativeTerrainRejection(JsonObject generator, JsonObject registries) {
+        var plan = dev.xantha.vss.common.worldgen.TerrainPredictionPlan.read(generator);
+        if (!plan.nativeCompatible()) return "terrain plan requires its original Java/source evaluator: " + plan.backend();
         String reason = nativeRejection(generator, "generator");
         if (reason != null) return reason;
         if (registries.has("vss_force_java") && registries.get("vss_force_java").getAsBoolean()) {

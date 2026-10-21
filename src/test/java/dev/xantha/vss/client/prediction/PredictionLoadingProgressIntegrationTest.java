@@ -176,9 +176,7 @@ class PredictionLoadingProgressIntegrationTest {
 
     private static PredictionLoadingProgress refresh(PredictionTileManager manager,
                                                      List<PredictionTileKey> leaves) throws Exception {
-        var method = PredictionTileManager.class.getDeclaredMethod("refreshLoadingProgress", List.class, double.class, double.class);
-        method.setAccessible(true);
-        method.invoke(manager, leaves, 8.0D, 8.0D);
+        PredictionDemandTestSupport.loading(manager, leaves, 8.0D, 8.0D, System.nanoTime());
         return manager.loadingProgress();
     }
 

@@ -1,5 +1,7 @@
 package dev.xantha.vss.networking.server.request;
 
+import dev.xantha.vss.networking.server.runtime.ServerLifecycleGuard;
+import dev.xantha.vss.networking.server.sending.ColumnDeliveryService;
 
 import dev.xantha.vss.networking.server.diagnostics.ServerRequestStats;
 import dev.xantha.vss.networking.server.dirty.DirtyColumnBroadcaster;
@@ -7,7 +9,6 @@ import dev.xantha.vss.networking.server.runtime.DiskTaskRuntime;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
 import dev.xantha.vss.networking.server.storage.ColumnLodCache;
-import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.common.VSSConstants;
 import dev.xantha.vss.common.VSSLogger;
@@ -19,7 +20,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.LevelChunk;
 
+/**
+ * 服务端线程上的批量请求入口：校验请求、处理内存命中并汇总即时响应。
+ * <p>磁盘读取和生成回退交给 ColumnStorageReadPipeline，已完成列交给交付服务；
+ * 共享 registry 与 lifecycle 由装配入口注入，不能自行创建另一份请求状态。
+ */
 public final class ColumnRequestBatchHandler {
+    private final ServerLifecycleGuard lifecycle;
+    private final ColumnDeliveryService delivery;
     private final PlayerRequestRegistry playerRegistry;
     private final ColumnLodCache columnCache;
     private final ColumnStorageReadPipeline storageReadPipeline;
@@ -34,7 +42,11 @@ public final class ColumnRequestBatchHandler {
             ColumnStorageReadPipeline storageReadPipeline,
             ServerRequestStats requestStats,
             DiskTaskRuntime diskRuntime,
-            long diagnosticIntervalNanos) {
+            long diagnosticIntervalNanos,
+            ServerLifecycleGuard lifecycle,
+            ColumnDeliveryService delivery) {
+        this.lifecycle = java.util.Objects.requireNonNull(lifecycle, "lifecycle");
+        this.delivery = java.util.Objects.requireNonNull(delivery, "delivery");
         this.playerRegistry = playerRegistry;
         this.columnCache = columnCache;
         this.storageReadPipeline = storageReadPipeline;
@@ -44,7 +56,7 @@ public final class ColumnRequestBatchHandler {
     }
 
     public void handle(ServerPlayer player, BatchChunkRequestC2SPayload payload) {
-        if (VSSServerNetworking.isServerStopping()) {
+        if (lifecycle.isStopping()) {
             return;
         }
         PlayerRequestState state = playerRegistry.get(player.getUUID());
@@ -151,7 +163,7 @@ public final class ColumnRequestBatchHandler {
             long dirtyTimestamp,
             boolean priorityRefresh) {
         ColumnLodCache.Entry cachedColumn = columnCache.get(level.dimension(), cx, cz);
-        if (cachedColumn != null && !cachedColumn.completeColumn()) {
+        if (cachedColumn != null && !cachedColumn.isDeliverable()) {
             columnCache.invalidate(level.dimension(), cx, cz);
             cachedColumn = null;
         }
@@ -172,7 +184,7 @@ public final class ColumnRequestBatchHandler {
         }
 
         requestStats.recordCacheHit();
-        VSSServerNetworking.queueColumn(player, state, new VoxelColumnS2CPayload(
+        delivery.queueColumn(player, state, new VoxelColumnS2CPayload(
                 requestId,
                 level.dimension(),
                 cachedColumn.columnData().withColumnStamp(requiredTimestamp)), priorityRefresh);

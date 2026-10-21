@@ -42,6 +42,10 @@ final class VssLodSpriteTable {
     static long materialRevision() { return materialRevision; }
     /** Cached representative block ids for the current material table. */
     private static volatile int[] materialBlocksCache;
+    private static volatile int[] leafSpritesCache;
+    private static volatile boolean[] vegetationSpritesCache;
+    private static volatile boolean[] groundCoverSpritesCache;
+    private static final byte[] restoredMaterialKinds = new byte[256];
     private static final ResourceLocation[] MATERIAL_NAMES = new ResourceLocation[256];
     private static final ModelUvKey[] MATERIAL_MODELS = new ModelUvKey[256];
     // A full GPU row table must not erase CPU material colour. Modpacks can
@@ -52,6 +56,9 @@ final class VssLodSpriteTable {
     private static void touchMaterialRevision() {
         materialRevision++;
         materialBlocksCache = null;
+        leafSpritesCache = null;
+        vegetationSpritesCache = null;
+        groundCoverSpritesCache = null;
     }
 
     private static int[] materialBlocksSnapshot() {
@@ -87,6 +94,36 @@ final class VssLodSpriteTable {
     static int materialBlock(int row) {
         return row <= 0 || row >= 256 ? -1 : materialBlocksSnapshot()[row];
     }
+    /** Leaf-only rows can follow fast graphics without making shared plant/model textures solid.
+     * Rebuild only after material mappings change, never per mesh or per frame. */
+    static int[] leafSprites() {
+        int[] cached = leafSpritesCache;
+        if (cached != null) return cached;
+        synchronized (VssLodSpriteTable.class) {
+            if (leafSpritesCache != null) return leafSpritesCache;
+            boolean[] leaves = new boolean[256], other = new boolean[256];
+            INDEX_BY_BLOCK.forEach((block, row) -> classifyLeafRow(block, row, leaves, other));
+            SIDE_INDEX_BY_BLOCK.forEach((block, row) -> classifyLeafRow(block, row, leaves, other));
+            SIDE_INDEX_BY_FACE_BLOCK.forEach((key, row) -> classifyLeafRow((int)(key >> 3), row, leaves, other));
+            INDEX_BY_STATE_FACE.forEach((key, row) -> classifyLeafRow(
+                    BuiltInRegistries.BLOCK.getId(Block.stateById((int)(key >> 3)).getBlock()), row, leaves, other));
+            MODEL_BLOCKS.forEach((row, block) -> classifyLeafRow(block, row, leaves, other));
+            for (int row = 1; row < FLAT; row++) {
+                leaves[row] |= (restoredMaterialKinds[row] & 1) != 0;
+                other[row] |= (restoredMaterialKinds[row] & 2) != 0;
+            }
+            int[] mask = new int[8];
+            for (int row = 1; row < FLAT; row++) if (leaves[row] && !other[row]) mask[row >> 5] |= 1 << (row & 31);
+            return leafSpritesCache = mask;
+        }
+    }
+
+    private static void classifyLeafRow(int blockId, int row, boolean[] leaves, boolean[] other) {
+        if (row <= 0 || row >= FLAT) return;
+        Block block = blockId < 0 ? null : BuiltInRegistries.BLOCK.byId(blockId);
+        if (block instanceof net.minecraft.world.level.block.LeavesBlock) leaves[row] = true;
+        else other[row] = true;
+    }
     /** Immutable worker snapshot; unrecognized resource/model rows retain full geometry. */
     static synchronized boolean[] aquaticSprites() {
         boolean[] result = new boolean[256];
@@ -112,6 +149,114 @@ final class VssLodSpriteTable {
                 };
             }
         });
+        return result;
+    }
+
+    /** Materials which may be thinned by a display LOD. Unknown decorations
+     * and shared custom rows remain exact. */
+    static boolean[] vegetationSprites() {
+        boolean[] cached = vegetationSpritesCache;
+        if (cached != null) return cached;
+        synchronized (VssLodSpriteTable.class) {
+            if (vegetationSpritesCache != null) return vegetationSpritesCache;
+            return vegetationSpritesCache = buildVegetationSprites();
+        }
+    }
+
+    private static boolean[] buildVegetationSprites() {
+        boolean[] result = new boolean[256];
+        boolean[] other = new boolean[256];
+        INDEX_BY_BLOCK.forEach((block, row) -> classifyVegetationRow(block, row, result, other));
+        SIDE_INDEX_BY_BLOCK.forEach((block, row) -> classifyVegetationRow(block, row, result, other));
+        SIDE_INDEX_BY_FACE_BLOCK.forEach((key, row) -> classifyVegetationRow((int)(key >> 3), row, result, other));
+        INDEX_BY_STATE_FACE.forEach((key, row) -> classifyVegetationRow(
+                BuiltInRegistries.BLOCK.getId(Block.stateById((int)(key >> 3)).getBlock()), row, result, other));
+        MODEL_BLOCKS.forEach((row, block) -> classifyVegetationRow(block, row, result, other));
+        // These rows are unambiguous even before a representative block has
+        // been restored from disk.  Shared rows still lose the optimization
+        // when a non-vegetation representative is known.
+        boolean[] aquatic = aquaticSprites();
+        boolean[] land = landPlantSprites();
+        int[] leaves = leafSprites();
+        for (int row = 1; row < FLAT; row++) {
+            result[row] |= aquatic[row] || land[row] || (leaves[row >> 5] & (1 << (row & 31))) != 0;
+            result[row] |= (restoredMaterialKinds[row] & 4) != 0;
+            if (other[row] || (restoredMaterialKinds[row] & 8) != 0) result[row] = false;
+        }
+        return result;
+    }
+
+    private static void classifyVegetationRow(int blockId, int row, boolean[] vegetation, boolean[] other) {
+        if (row <= 0 || row >= FLAT) return;
+        Block block = blockId < 0 ? null : BuiltInRegistries.BLOCK.byId(blockId);
+        if (isVegetationBlock(block)) vegetation[row] = true;
+        else other[row] = true;
+    }
+
+    /** Immutable worker snapshot. Shared tree/solid/unknown rows never disappear. */
+    static boolean[] groundCoverSprites() {
+        boolean[] cached = groundCoverSpritesCache;
+        if (cached != null) return cached;
+        synchronized (VssLodSpriteTable.class) {
+            if (groundCoverSpritesCache != null) return groundCoverSpritesCache;
+            boolean[] plants = landPlantSprites(), other = new boolean[256];
+            INDEX_BY_BLOCK.forEach((block, row) -> classifyGroundCoverRow(block, row, plants, other));
+            SIDE_INDEX_BY_BLOCK.forEach((block, row) -> classifyGroundCoverRow(block, row, plants, other));
+            SIDE_INDEX_BY_FACE_BLOCK.forEach((key, row) -> classifyGroundCoverRow((int)(key >> 3), row, plants, other));
+            INDEX_BY_STATE_FACE.forEach((key, row) -> classifyGroundCoverRow(
+                    BuiltInRegistries.BLOCK.getId(Block.stateById((int)(key >> 3)).getBlock()), row, plants, other));
+            MODEL_BLOCKS.forEach((row, block) -> classifyGroundCoverRow(block, row, plants, other));
+            for (int row = 1; row < FLAT; row++) {
+                plants[row] |= (restoredMaterialKinds[row] & 16) != 0;
+                if (other[row] || (restoredMaterialKinds[row] & 32) != 0) plants[row] = false;
+            }
+            return groundCoverSpritesCache = plants;
+        }
+    }
+
+    private static void classifyGroundCoverRow(int blockId, int row, boolean[] plants, boolean[] other) {
+        if (row <= 0 || row >= FLAT) return;
+        if (isGroundCoverBlock(blockId < 0 ? null : BuiltInRegistries.BLOCK.byId(blockId))) plants[row] = true;
+        else other[row] = true;
+    }
+
+    private static boolean isGroundCoverBlock(Block block) {
+        return block != null && (block == net.minecraft.world.level.block.Blocks.GRASS
+                || block == net.minecraft.world.level.block.Blocks.TALL_GRASS
+                || block == net.minecraft.world.level.block.Blocks.FERN
+                || block == net.minecraft.world.level.block.Blocks.LARGE_FERN
+                || block instanceof net.minecraft.world.level.block.FlowerBlock
+                || block instanceof net.minecraft.world.level.block.TallFlowerBlock);
+    }
+
+    private static boolean isVegetationBlock(Block block) {
+        if (block == null) return false;
+        var state = block.defaultBlockState();
+        return block instanceof net.minecraft.world.level.block.LeavesBlock
+                || state.is(net.minecraft.tags.BlockTags.FLOWERS)
+                || state.is(net.minecraft.tags.BlockTags.SAPLINGS)
+                || state.is(net.minecraft.tags.BlockTags.CROPS)
+                || block == net.minecraft.world.level.block.Blocks.GRASS
+                || block == net.minecraft.world.level.block.Blocks.TALL_GRASS
+                || block == net.minecraft.world.level.block.Blocks.FERN
+                || block == net.minecraft.world.level.block.Blocks.LARGE_FERN
+                || block == net.minecraft.world.level.block.Blocks.KELP
+                || block == net.minecraft.world.level.block.Blocks.KELP_PLANT
+                || block == net.minecraft.world.level.block.Blocks.SEAGRASS
+                || block == net.minecraft.world.level.block.Blocks.TALL_SEAGRASS;
+    }
+
+    /** Only tagged foliage and snow may use approximate feature geometry.
+     * Shared/custom model rows and alpha-tested sprites remain exact. */
+    static boolean[] displayApproximationSprites() {
+        boolean[] result = new boolean[256];
+        int[] blocks = materialBlocksSnapshot();
+        for (int row = 1; row < FLAT; row++) if (blocks[row] >= 0) {
+            var block = BuiltInRegistries.BLOCK.byId(blocks[row]);
+            result[row] = block != null && (block.defaultBlockState().is(net.minecraft.tags.BlockTags.LEAVES)
+                    || block instanceof net.minecraft.world.level.block.SnowLayerBlock
+                    || block == net.minecraft.world.level.block.Blocks.SNOW_BLOCK);
+        }
         return result;
     }
     private static final Map<ResourceLocation, Integer> INDEX_BY_SPRITE = new HashMap<>();
@@ -279,6 +424,9 @@ final class VssLodSpriteTable {
             STATIC_FIRE.clear();
             MODEL_ROWS.clear();
             MODEL_BLOCKS.clear();
+            java.util.Arrays.fill(restoredMaterialKinds, (byte)0);
+            vegetationSpritesCache = null;
+            groundCoverSpritesCache = null;
             java.util.Arrays.fill(MATERIAL_NAMES, null);
             java.util.Arrays.fill(MATERIAL_MODELS, null);
             modelFlags = new byte[256];
@@ -647,6 +795,9 @@ final class VssLodSpriteTable {
         // A plain sprite row does not otherwise change the legacy material
         // revision, but it can become a representative row later.
         materialBlocksCache = null;
+        leafSpritesCache = null;
+        vegetationSpritesCache = null;
+        groundCoverSpritesCache = null;
         dirty = true;
         return index;
     }
@@ -764,6 +915,16 @@ final class VssLodSpriteTable {
         // A different registration order may fill this session's table first;
         // preserve geometry/colour instead of rebuilding the whole tile.
         if (row == FLAT) return FLAT;
+        int kind = representative >= 0 && BuiltInRegistries.BLOCK.byId(representative)
+                instanceof net.minecraft.world.level.block.LeavesBlock ? 1 : 2;
+        kind |= representative >= 0 && isVegetationBlock(BuiltInRegistries.BLOCK.byId(representative)) ? 4 : 8;
+        kind |= representative >= 0 && isGroundCoverBlock(BuiltInRegistries.BLOCK.byId(representative)) ? 16 : 32;
+        if ((restoredMaterialKinds[row] & kind) != kind) {
+            restoredMaterialKinds[row] |= (byte)kind;
+            leafSpritesCache = null;
+            vegetationSpritesCache = null;
+            groundCoverSpritesCache = null;
+        }
         if (representative >= 0 && !MODEL_BLOCKS.containsKey(row)) { MODEL_BLOCKS.put(row, representative); touchMaterialRevision(); }
         return row;
     }
@@ -966,6 +1127,7 @@ final class VssLodSpriteTable {
             STATIC_FIRE.clear();
             MODEL_ROWS.clear();
             MODEL_BLOCKS.clear();
+            java.util.Arrays.fill(restoredMaterialKinds, (byte)0);
             java.util.Arrays.fill(MATERIAL_NAMES, null);
             java.util.Arrays.fill(MATERIAL_MODELS, null);
             modelFlags = new byte[256];

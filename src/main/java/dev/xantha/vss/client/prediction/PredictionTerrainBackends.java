@@ -21,6 +21,7 @@ public final class PredictionTerrainBackends {
         BACKENDS.add(backend);
         BACKENDS.sort(Comparator.comparingInt(PredictionTerrainBackend::priority).reversed());
     }
+    public static void unregister(String id) { BACKENDS.removeIf(backend -> backend.id().equals(id)); }
 
     public static Optional<ClientTerrainSampler> open(DimensionProfile profile, long seed,
                                                       RegistryAccess registries) {
@@ -37,9 +38,14 @@ public final class PredictionTerrainBackends {
         for (PredictionTerrainBackend backend : BACKENDS) {
             try {
                 Optional<ClientTerrainSampler> result = backend.open(profile, seed, registries, worldgen, inputs);
-                if (result.isPresent()) return result;
-            } catch (RuntimeException ignored) {
-                // A failed optional backend must not disable the vanilla sampler.
+                if (result.isPresent()) {
+                    result.get().terrainBackendOverride(backend.id());
+                    return result;
+                }
+            } catch (java.util.concurrent.CancellationException cancelled) {
+                throw cancelled;
+            } catch (RuntimeException | LinkageError failure) {
+                dev.xantha.vss.common.VSSLogger.warn("VSS optional terrain backend " + backend.id() + " unavailable", failure);
             }
         }
         return Optional.empty();

@@ -32,7 +32,7 @@ class PredictionUploadHandoffTest {
 
     @Test void existingGpuParentDefersFineUploadButMissingRegionDoesNot() {
         var state = new PredictionRenderResidency();
-        var parent = tile(0, 0, 1, 1);
+        var parent = PredictionLodSeamsTest.tile(0, 0, 2, 64);
         var source = source(Map.of(parent.key(), parent));
         state.retain(source);
         assertFalse(state.hasResidentCover(new PredictionTileKey(Level.OVERWORLD, 0, 0, 0), LAYOUT));

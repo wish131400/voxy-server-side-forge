@@ -24,6 +24,11 @@ public final class VssLodProjection {
         return Math.max(1, viewportHeight) * Math.abs(projection.m11()) * 0.5D;
     }
 
+    /** Match visible refinement to rendered pixels while honoring disabled spyglass loading. */
+    static double refinementScale(double renderedScale, double baseScale, boolean scoped, boolean spyglassLoading) {
+        return scoped && !spyglassLoading ? baseScale : renderedScale;
+    }
+
     static double unscopedScale(double fovDegrees, int viewportHeight) {
         return Math.max(1, viewportHeight)
                 / (2.0D * Math.tan(Math.toRadians(Math.max(1.0D, fovDegrees)) * 0.5D));

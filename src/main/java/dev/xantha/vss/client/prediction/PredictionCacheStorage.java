@@ -2,7 +2,7 @@ package dev.xantha.vss.client.prediction;
 
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.config.VSSClientConfig;
-import dev.xantha.vss.networking.client.ClientConnectionIdentity;
+import dev.xantha.vss.api.VSSApi;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -24,7 +24,7 @@ record PredictionCacheStorage(Path base, Path legacyBase) {
             var server = minecraft.getSingleplayerServer();
             String address = minecraft.getCurrentServer() == null ? null : minecraft.getCurrentServer().ip;
             return forWorld(minecraft.gameDirectory.toPath(), server == null ? null : server.getWorldPath(LevelResource.ROOT),
-                    ClientConnectionIdentity.currentPredictionScope(), address);
+                    VSSApi.clientSession().currentPredictionScope(), address);
         } catch (RuntimeException unavailable) {
             return null;
         }
@@ -51,8 +51,10 @@ record PredictionCacheStorage(Path base, Path legacyBase) {
 
     Path directory(ClientTerrainSampler sampler) {
         var profile = sampler.profile();
-        return base.resolve(profile.dimension().getNamespace()).resolve(profile.dimension().getPath())
+        Path dimension = base.resolve(profile.dimension().getNamespace()).resolve(profile.dimension().getPath())
                 .resolve("seed-" + Long.toUnsignedString(profile.seed(), 16));
+        String backend = sampler.predictionCacheNamespace();
+        return backend == null ? dimension : dimension.resolve("backend-" + digest(backend.getBytes(StandardCharsets.UTF_8)));
     }
 
     static long fingerprint(dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload.DimensionProfile profile) {
@@ -74,7 +76,7 @@ record PredictionCacheStorage(Path base, Path legacyBase) {
 
     private PredictionDiskCache openWorld(ClientTerrainSampler sampler, Path target) throws IOException {
         if (!Files.exists(target, LinkOption.NOFOLLOW_LINKS)) {
-            var source = PredictionCacheMigration.find(base, legacyBase, sampler);
+            var source = sampler.predictionCacheNamespace() == null ? PredictionCacheMigration.find(base, legacyBase, sampler) : null;
             if (source != null) {
                 writeWorld(source.directory(), sampler, source.fingerprint(), true);
                 migrate(source.directory(), target);
@@ -97,7 +99,9 @@ record PredictionCacheStorage(Path base, Path legacyBase) {
         Files.deleteIfExists(target.resolve("worldgen.identity"));
         if (VSSClientConfig.CONFIG.debugLogging) VSSLogger.debug("VSS prediction world cache: seed="
                 + sampler.profile().seed() + ", recordFingerprint=" + fingerprint + ", directory=" + target);
-        return new PredictionDiskCache(target, fingerprint, mappings);
+        var templates = sampler.decorationContext().structureTemplates();
+        String catalog = templates.has("_vss_catalog") ? templates.get("_vss_catalog").getAsString() : null;
+        return new PredictionDiskCache(target, fingerprint, mappings, catalog);
     }
 
     private static void writeWorld(Path directory, ClientTerrainSampler sampler, long fingerprint, boolean legacy) throws IOException {

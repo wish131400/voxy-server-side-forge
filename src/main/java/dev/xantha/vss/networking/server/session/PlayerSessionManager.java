@@ -1,10 +1,10 @@
 package dev.xantha.vss.networking.server.session;
 
+import dev.xantha.vss.networking.server.runtime.ServerLifecycleGuard;
 
 import dev.xantha.vss.networking.server.preload.ExistingColumnPreloader;
 import dev.xantha.vss.networking.server.state.PlayerRequestRegistry;
 import dev.xantha.vss.networking.server.state.PlayerRequestState;
-import dev.xantha.vss.networking.server.VSSServerNetworking;
 import dev.xantha.vss.common.VSSConstants;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.common.processing.LodByteCompression;
@@ -18,7 +18,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * 服务端线程负责握手、协商配置、重握手与维度切换时的会话刷新。
+ * <p>玩家状态唯一保存在注入的 registry；配置刷新更新 revision 并沿用原清理路径。
+ * 会话激活通过回调通知装配入口，不反向访问网络门面取得服务。
+ */
 public final class PlayerSessionManager {
+    private final ServerLifecycleGuard lifecycle;
     private final PlayerRequestRegistry playerRegistry;
     private final ExistingColumnPreloader existingColumnPreloader;
     private final Runnable onSessionActive;
@@ -27,14 +33,16 @@ public final class PlayerSessionManager {
     public PlayerSessionManager(
             PlayerRequestRegistry playerRegistry,
             ExistingColumnPreloader existingColumnPreloader,
-            Runnable onSessionActive) {
+            Runnable onSessionActive,
+            ServerLifecycleGuard lifecycle) {
+        this.lifecycle = java.util.Objects.requireNonNull(lifecycle, "lifecycle");
         this.playerRegistry = playerRegistry;
         this.existingColumnPreloader = existingColumnPreloader;
         this.onSessionActive = onSessionActive;
     }
 
     public void handleHandshake(ServerPlayer player, HandshakeC2SPayload payload) {
-        if (VSSServerNetworking.isServerStopping()) {
+        if (lifecycle.isStopping()) {
             return;
         }
         SessionConfigS2CPayload config = configurePlayerSession(
@@ -57,7 +65,7 @@ public final class PlayerSessionManager {
     }
 
     public void refresh(MinecraftServer server) {
-        if (VSSServerNetworking.isServerStopping()) {
+        if (lifecycle.isStopping()) {
             return;
         }
         for (UUID uuid : playerRegistry.playerIds()) {
@@ -86,7 +94,7 @@ public final class PlayerSessionManager {
             int clientProtocolVersion,
             int clientCapabilities,
             String logPrefix) {
-        if (VSSServerNetworking.isServerStopping()) {
+        if (lifecycle.isStopping()) {
             return createSessionConfig(false);
         }
         VSSServerConfig config = VSSServerConfig.CONFIG;
@@ -124,7 +132,7 @@ public final class PlayerSessionManager {
         VSSServerConfig config = VSSServerConfig.CONFIG;
         return new SessionConfigS2CPayload(
                 VSSConstants.PROTOCOL_VERSION,
-                enabled && !VSSServerNetworking.isServerStopping(),
+                enabled && !lifecycle.isStopping(),
                 config.effectiveColumnSyncDistanceChunks(),
                 serverCapabilities(),
                 config.nearSyncRateLimitPerTick,
@@ -150,21 +158,27 @@ public final class PlayerSessionManager {
 
     public void dimensionChanged(ServerPlayer player) {
         PlayerRequestState state = playerRegistry.get(player.getUUID());
-        if (!VSSServerNetworking.isServerStopping() && state != null && state.supportsPredictiveWorldgen()
+        if (!lifecycle.isStopping() && state != null && state.supportsPredictiveWorldgen()
                 && VSSServerConfig.CONFIG.enabled && VSSServerConfig.CONFIG.enablePredictionSync)
             sendWorldgenProfile(player.server, player);
     }
 
     private void sendWorldgenProfile(MinecraftServer server, ServerPlayer player) {
+        sendWorldgenProfile(player.getGameProfile().getName(),
+                () -> WorldgenProfileHolder.payloadFor(server, configRevision.get(), player.level().dimension()),
+                payload -> VSSNetworking.sendToPlayer(player, payload));
+    }
+
+    static void sendWorldgenProfile(String playerName,
+            java.util.function.Supplier<WorldgenProfileS2CPayload> profile,
+            java.util.function.Consumer<WorldgenProfileS2CPayload> sender) {
         try {
-            WorldgenProfileS2CPayload payload = WorldgenProfileHolder.payloadFor(server, configRevision.get(), player.level().dimension());
-            VSSNetworking.sendToPlayer(player, payload);
-        } catch (RuntimeException exception) {
-            // A third-party generator may expose a density codec unavailable
-            // to this runtime. Keep the VSS session alive and fall back to
-            // authoritative columns instead of failing the login.
-            VSSLogger.warn("VSS could not encode the worldgen profile for "
-                    + player.getGameProfile().getName() + "; predictive LOD disabled", exception);
+            sender.accept(profile.get());
+        } catch (RuntimeException | LinkageError failure) {
+            // This boundary is shared by login, dimension changes and refresh
+            // broadcasts. Mod linkage failures must not escape into server tick.
+            VSSLogger.warn("VSS could not prepare or send the worldgen profile for "
+                    + playerName + "; authoritative LOD sync remains active", failure);
         }
     }
 

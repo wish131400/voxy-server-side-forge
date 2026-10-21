@@ -5,6 +5,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PredictionGenerationPriorityTest {
+    @Test void currentViewGpuCompletionResumesGenerationDespiteDeferredRearDebt() {
+        var gate = new PredictionGenerationPriority();
+        var waiting = new PredictionLoadingProgress(10, 10, 100, 1, 100, 1, 100, 1, true,
+                new PredictionLoadingProgress.ViewProgress(1, 1, 1, 1, 0, 99));
+        var ready = new PredictionLoadingProgress(10, 10, 100, 1, 100, 1, 100, 1, true,
+                new PredictionLoadingProgress.ViewProgress(1, 1, 1, 1, 1, 99));
+        assertEquals(0, gate.limit(4, true, waiting, 0));
+        assertTrue(gate.diagnostics().contains("view-upload"));
+        assertEquals(0, gate.limit(4, true, ready, 2*S));
+        assertEquals(1, gate.limit(4, true, ready, 3*S));
+        assertEquals(4, gate.limit(4, true, ready, 6*S));
+        var turned = new PredictionLoadingProgress(10, 10, 100, 1, 100, 1, 100, 1, true,
+                new PredictionLoadingProgress.ViewProgress(1, 0, 1, 0, 0, 99));
+        assertEquals(4, gate.limit(4, true, turned, 7*S));
+        assertEquals(0, gate.limit(4, true, turned, 9*S),
+                "sustained missing detail in the new view must reacquire prediction priority");
+    }
+
     private static final long S = 1_000_000_000L;
     private static final PredictionLoadingProgress LOADING = progress(20, 20);
     private static final PredictionLoadingProgress READY = progress(95, 95);

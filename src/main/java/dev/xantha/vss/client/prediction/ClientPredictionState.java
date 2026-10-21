@@ -1,10 +1,10 @@
 package dev.xantha.vss.client.prediction;
 
+import dev.xantha.vss.api.VSSApi;
 import dev.xantha.vss.common.PositionUtil;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.config.VSSClientConfig;
 import dev.xantha.vss.compat.ModCompat;
-import dev.xantha.vss.networking.client.VSSClientNetworking;
 import dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload;
 import dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload.DimensionProfile;
 import java.util.ArrayList;
@@ -27,7 +27,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import dev.xantha.vss.api.VoxelColumnData;
 
-/** Owns VSS prediction sessions and the exact-column replacement boundary. */
+/**
+ * 客户端预测会话与维度管理器的所有者，同时维护真实列替换交接入口。
+ * <p>网络状态从 ClientLodSession 查询；真实覆盖来自兼容层，不能在此复制握手或 Voxy 索引。
+ * 客户端事件负责捕获世界数据，后台计算只消费安全快照；断线/重载关闭旧管理器，
+ * GPU 资源的释放仍由渲染线程执行。
+ */
 public final class ClientPredictionState {
     private static final Map<ResourceKey<Level>, PredictionTileManager> MANAGERS = new ConcurrentHashMap<>();
     private static volatile long seed;
@@ -73,6 +78,10 @@ public final class ClientPredictionState {
     }
 
     static long exactCoverageDataRevision() { return exactCoverageRevision.get(); }
+
+    static PredictionExactCoverageIndex.View planningCoverage(ResourceKey<Level> dimension, long now) {
+        return exactCoverage.planningView(dimension, now);
+    }
     /** Background discovery resumes within separate near/far time budgets. */
     private static final long SWEEP_INTERVAL_NANOS = 200_000_000L;
     private static final PredictionCoverageSweep coverageSweep = new PredictionCoverageSweep();
@@ -164,7 +173,7 @@ public final class ClientPredictionState {
 
     /** Called on the client thread, including before the first manager is ready. */
     private static void requestCurrentDimension(Minecraft minecraft, long requestedNanos) {
-        if (!VSSClientConfig.CONFIG.enablePrediction || minecraft.level == null) return;
+        if (!VSSClientConfig.CONFIG.isPredictionLoadingEnabled() || minecraft.level == null) return;
         ResourceKey<Level> key = minecraft.level.dimension();
         // Some modded transfers omit the server dimension-change event. Returning
         // to a visited dimension must not depend on another profile packet.
@@ -212,7 +221,7 @@ public final class ClientPredictionState {
                         }
                         var previous = MANAGERS.put(dimension, manager);
                         if (previous != null) previous.close();
-                        manager.setPaused(!VSSClientConfig.CONFIG.enablePrediction);
+                        manager.setPaused(!VSSClientConfig.CONFIG.isPredictionLoadingEnabled());
                         profileReady = true;
                         VSSLogger.info("VSS prediction dimension ready: dimension=" + dimension.location()
                                 + ", rust=" + (sampler instanceof RustTerrainSampler)
@@ -298,7 +307,7 @@ public final class ClientPredictionState {
             try {
                 VssLodFocus picked = pickResidentViewFocus(resident, origin, direction,
                         predictionHorizonBlocks(), tanHalf, scale);
-                if (picked == null) picked = pickViewFocus(samplerRef, origin, direction,
+                if (picked == null && VSSClientConfig.CONFIG.isPredictionLoadingEnabled()) picked = pickViewFocus(samplerRef, origin, direction,
                         predictionHorizonBlocks(), tanHalf, scale);
                 VssLodFocus selected = picked;
                 minecraft.execute(() -> {
@@ -395,11 +404,16 @@ public final class ClientPredictionState {
                         VSSClientConfig.CONFIG.predictionDistanceBlocks));
     }
 
+    /** Loading can pause without discarding the manager's resident meshes or render snapshot. */
+    static void updateLoadingState(ResourceKey<Level> currentDimension) {
+        boolean loading = VSSClientConfig.CONFIG.isPredictionLoadingEnabled();
+        MANAGERS.forEach((key, manager) -> manager.setPaused(!loading || !key.equals(currentDimension)));
+    }
+
     public static void tick() {
         Minecraft current = Minecraft.getInstance();
         requestCurrentDimension(current, System.nanoTime());
-        MANAGERS.forEach((key, manager) -> manager.setPaused(!VSSClientConfig.CONFIG.enablePrediction
-                || current.level == null || !key.equals(current.level.dimension())));
+        updateLoadingState(current.level == null ? null : current.level.dimension());
         if (!profileReady || !VSSClientConfig.CONFIG.enablePrediction) {
             return;
         }
@@ -441,16 +455,19 @@ public final class ClientPredictionState {
         // Keep the exact-coverage cache warm off-thread: the render thread
         // reads it without probing, so a stale entry only means prediction
         // keeps drawing (the safe default) until the sweep refreshes it.
-        int nearChunks = VSSClientNetworking.getEffectiveLodDistanceChunks();
+        int nearChunks = VSSApi.clientSession().getEffectiveLodDistanceChunks();
         int voxyRender = ModCompat.isVoxyLoaded()
                 ? ModCompat.getVoxyViewDistanceChunks().orElse(nearChunks) : nearChunks;
         sweepExactCoverage(level, player.getBlockX() >> 4, player.getBlockZ() >> 4,
                 Math.max(nearChunks, voxyRender));
         PredictionTileManager manager = MANAGERS.get(level.dimension());
         if (manager != null) {
+            captureLocalColumns(level, manager);
+            manager.serviceCaptures();
             PredictionMotionPace.record(level.dimension(), player.getX(), player.getZ(),
                     player.isSprinting(), System.nanoTime());
-            manager.tickCityHints(player.getBlockX() >> 4, player.getBlockZ() >> 4);
+            if (VSSClientConfig.CONFIG.isPredictionLoadingEnabled())
+                manager.tickCityHints(player.getBlockX() >> 4, player.getBlockZ() >> 4);
             double pixelsPerBlock = PredictionRenderer.basePixelsPerBlock(minecraft);
             VssLodFocus focus = combinedFocus(minecraft, player);
             lastFocus = focus;
@@ -471,6 +488,25 @@ public final class ClientPredictionState {
         });
     }
 
+    static void publishWorkView(ResourceKey<Level> dimension, PredictionWorkView view) {
+        var manager = MANAGERS.get(dimension);
+        if (manager != null) manager.setRenderWorkView(view);
+    }
+
+    static void publishVisibilityFeedback(ResourceKey<Level> dimension, PredictionVisibilityFeedback.Snapshot feedback) {
+        var manager = MANAGERS.get(dimension);
+        if (manager != null) manager.setVisibilityFeedback(feedback);
+    }
+
+    static void clearVisibilityFeedback() {
+        MANAGERS.values().forEach(manager -> manager.setVisibilityFeedback(PredictionVisibilityFeedback.Snapshot.EMPTY));
+    }
+
+    static void publishDrawableSnapshot(PredictionTileManager.RenderSnapshot snapshot) {
+        var manager = MANAGERS.get(snapshot.dimension());
+        if (manager != null) manager.setDrawableSnapshot(snapshot);
+    }
+
     public static PredictionLoadingProgress loadingProgress(ResourceKey<Level> dimension) {
         PredictionTileManager manager = dimension == null ? null : MANAGERS.get(dimension);
         return manager == null ? PredictionLoadingProgress.INITIALIZING : manager.loadingProgress();
@@ -489,6 +525,42 @@ public final class ClientPredictionState {
             CellKey key = new CellKey(dimension, PositionUtil.packPosition(chunkX, chunkZ));
             cellStates.remove(key, CellState.REQUESTED);
             requestTimes.remove(key);
+        }
+    }
+
+    /** Hooks only enqueue coordinates; block-edit callbacks never scan terrain. */
+    public static void onLocalColumnChanged(ClientLevel level, int chunkX, int chunkZ, boolean edited) {
+        if (!VSSClientConfig.CONFIG.enablePrediction || level != Minecraft.getInstance().level) return;
+        var manager = MANAGERS.get(level.dimension());
+        if (manager != null) manager.localCaptures.changed(chunkX, chunkZ, edited, System.nanoTime());
+    }
+
+    public static void beforeLocalColumnUnload(ClientLevel level, int chunkX, int chunkZ) {
+        var manager = MANAGERS.get(level.dimension());
+        if (manager == null || !VSSClientConfig.CONFIG.enablePrediction) return;
+        var request = manager.localCaptures.beforeUnload(chunkX, chunkZ, System.nanoTime());
+        if (request != null) captureLocalColumn(level, manager, request);
+    }
+
+    private static void captureLocalColumns(ClientLevel level, PredictionTileManager manager) {
+        // One detached chunk per tick; heavy extraction, mip reduction and compression stay on workers.
+        var request = manager.localCaptures.next(System.nanoTime());
+        if (request != null) captureLocalColumn(level, manager, request);
+    }
+
+    private static void captureLocalColumn(ClientLevel level, PredictionTileManager manager,
+                                           PredictionLocalCaptures.Request request) {
+        if (!manager.acceptsLocalCapture()) return;
+        int x = (int) (request.key() >> 32), z = (int) request.key();
+        var real = level.getChunkSource().getChunk(x, z, net.minecraft.world.level.chunk.ChunkStatus.FULL, false);
+        if (real == null) {
+            manager.localCaptures.completed(request); return;
+        }
+        var data = PredictionLocalCaptures.snapshot(real);
+        if (data == null) return;
+        if (manager.captureLocalColumn(x, z, data, request.edited())) {
+            manager.localCaptures.snapshots++;
+            manager.localCaptures.completed(request);
         }
     }
 
@@ -729,6 +801,11 @@ public final class ClientPredictionState {
         return manager == null ? "unavailable" : manager.surfaceDiagnostics();
     }
 
+    static java.util.Map<String,Object> demandSnapshot(ResourceKey<Level> dimension) {
+        PredictionTileManager manager = MANAGERS.get(dimension);
+        return manager == null ? java.util.Map.of() : manager.demandSnapshot();
+    }
+
     public static String diagnostics() {
         int ready = 0;
         int pending = 0;
@@ -764,6 +841,7 @@ public final class ClientPredictionState {
             lodBands.append(lod).append(':').append(lodCounts[lod]);
         }
         return "enabled=" + VSSClientConfig.CONFIG.enablePrediction
+                + ",loading=" + VSSClientConfig.CONFIG.isPredictionLoadingEnabled()
                 + ",profile=" + profileReady
                 + ",revision=" + revision
                 + ",seed=" + (profileReady ? "set" : "none")

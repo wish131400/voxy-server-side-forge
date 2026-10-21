@@ -9,6 +9,8 @@ import net.minecraft.world.phys.AABB;
 import org.junit.jupiter.api.Test;
 
 class PredictionAquaticSubmissionTest {
+    @org.junit.jupiter.api.BeforeEach void resetMaterials() { VssLodSpriteTable.close(); }
+    @org.junit.jupiter.api.AfterEach void clearMaterials() { VssLodSpriteTable.close(); }
     @Test void landGrassSharesStableWholeStalkPrefixes() throws Exception {
         ClientTerrainSamplerTest.bootstrapMinecraft();
         Field field = VssLodSpriteTable.class.getDeclaredField("INDEX_BY_SPRITE"); field.setAccessible(true);
@@ -53,11 +55,18 @@ class PredictionAquaticSubmissionTest {
             prepare.invoke(pass, draws, 1L, far);
             assertEquals(1, ((PredictionDrawRanges) ranges.invoke(pass, draw)).quads);
             Object cached = ranges.invoke(pass, draw);
+            Method rangeMap = type.getDeclaredMethod("rangesByDraw"); rangeMap.setAccessible(true);
+            Method entries = type.getDeclaredMethod("entries"); entries.setAccessible(true);
+            Object cachedMap = rangeMap.invoke(pass);
+            Object cachedEntry = ((List<?>) entries.invoke(pass)).get(0);
             prepare.invoke(pass, draws, 1L, far);
             assertSame(cached, ranges.invoke(pass, draw));
+            prepare.invoke(pass, draws, 2L, far);
+            assertSame(cachedMap, rangeMap.invoke(pass), "unrelated upload must keep page grouping stable");
+            assertSame(cachedEntry, ((List<?>) entries.invoke(pass)).get(0), "preparation must reuse entry storage");
             // Upload completion can replace the payload without changing the draw list or camera.
             var replacement = plants(); payload.set(gpu, replacement);
-            prepare.invoke(pass, draws, 2L, far);
+            prepare.invoke(pass, draws, 3L, far);
             assertEquals(3, replacement.aquaticLod.tier());
             assertEquals(1, ((PredictionDrawRanges) ranges.invoke(pass, draw)).quads);
             scope.setBoolean(null, true);
@@ -76,8 +85,11 @@ class PredictionAquaticSubmissionTest {
 
     private static PredictionPackedMesh plants() {
         int[] records = new int[64 * 12];
-        for (int i = 0; i < 64; i++) PredictionSpatialOrderTest.quad(records, i, i % 8, i / 8,
-                50, 253 | PredictionPackedMesh.FLAG_UNSHADED | PredictionPackedMesh.FLAG_CUTOUT);
+        for (int i = 0; i < 64; i++) {
+            PredictionSpatialOrderTest.quad(records, i, i % 8, i / 8,
+                    50, 253 | PredictionPackedMesh.FLAG_UNSHADED | PredictionPackedMesh.FLAG_CUTOUT);
+            records[i * 12 + 10] |= PredictionPackedMesh.FEATURE;
+        }
         return PredictionPackedMesh.terrainRecords(records, 64);
     }
 }

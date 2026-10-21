@@ -3,6 +3,7 @@ package dev.xantha.vss.networking.client;
 import static org.junit.jupiter.api.Assertions.*;
 import dev.xantha.vss.api.VoxelColumnData;
 import dev.xantha.vss.common.PositionUtil;
+import dev.xantha.vss.common.StrictLodFrontier;
 import dev.xantha.vss.compat.ModCompat;
 import dev.xantha.vss.compat.StrictLodVisibility;
 import dev.xantha.vss.config.VSSClientConfig;

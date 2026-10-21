@@ -5,6 +5,44 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 
 class PredictionPassStorageTest {
+    @Test void compressedUploadedMeshesKeepDisplayPlansWithoutPinningCanonicalCoordinates() throws Exception {
+        PredictionMeshCodecTest.bootstrap();
+        PredictionMeshRestore.clear();
+        for (boolean seam : new boolean[]{false, true}) {
+            int[] source = new int[4096 * 12];
+            for (int q = 0; q < 4096; q++) {
+                PredictionSpatialOrderTest.quad(source, q, q % 64, q / 64, 80, PredictionPackedMesh.FLAG_CUTOUT);
+                for (int offset : new int[]{7,9,10,11}) source[q * 12 + offset] = 0x556633;
+            }
+            var mesh = seam ? PredictionPackedMesh.seamRecords(source, 64) : PredictionPackedMesh.terrainRecords(source, 64);
+            var field = PredictionPackedMesh.class.getDeclaredField("displayGeometry");
+            field.setAccessible(true);
+            var plan = (PredictionDisplayGeometry.Result)field.get(mesh);
+            assertNull(plan.words(), "a retained display plan must not keep the worker's full coordinate array");
+            if (!seam) assertTrue(mesh.hasDisplayLod());
+            int[] canonical = mesh.quads().clone();
+            var stats=mesh.geometryStats();
+            assertEquals(4096, stats.sourceQuads(), "resident variants must not inflate source geometry counts");
+            assertEquals(mesh.quadCount()-4096L, stats.displayVariantQuads());
+            assertEquals(stats.sourceQuads(), stats.sourceTerrain()+stats.sourceFeatures()+stats.sourcePreviews()+stats.sourceWater());
+            assertEquals(mesh.quadCount(), stats.sourceQuads()+stats.displayVariantQuads());
+            var ranges = mesh.drawRanges(false, VssLodFaceGroup.ALL, 0, 1);
+            float[] errors = mesh.displayErrors().clone();
+            mesh.prepareGpuStorage();
+            mesh.prepareStorage();
+            assertTrue(mesh.compressed());
+            mesh.uploaded();
+            var coordinates = PredictionPackedMesh.class.getDeclaredField("quads");
+            coordinates.setAccessible(true);
+            assertNull(coordinates.get(mesh), "canonical storage is released after compression");
+            assertNull(plan.words());
+            assertSame(ranges, mesh.drawRanges(false, VssLodFaceGroup.ALL, 0, 1));
+            assertArrayEquals(errors, mesh.displayErrors());
+            assertArrayEquals(canonical, mesh.restoreWords(), "cold restoration retains original and display geometry");
+            assertEquals(0, PredictionMeshRestore.readyBytes());
+        }
+    }
+
     @Test void rawAndCompactPassesPreserveOrderFlagsColorsAndAppendedGeometry() {
         for (boolean compact : new boolean[]{false, true}) {
             int[] words = new int[320 * 12];

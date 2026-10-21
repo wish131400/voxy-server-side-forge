@@ -2,6 +2,7 @@ package dev.xantha.vss.client.prediction;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Packed quad payload for one prediction tile.
@@ -20,7 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * i7: corner 0 rgb (24) | skylight loss (bits 28-31)
  * i8: source cell index
  * i9: corner 1 rgb (24) | source-cell coverage (24) | real boundary/lower (25/26) | terrain wall (27) | skylight loss (28-31)
- * i10: corner 2 rgb (24) + skylight loss     i11: corner 3 rgb (24) + skylight loss
+ * i10: corner 2 rgb (24) | feature (24), display (25), preview (26) | skylight loss (28-31)
+ * i11: corner 3 rgb (24) + skylight loss
  * </pre>
  *
  * <p>GPU storage may replace repeated four-corner color/light words with an exact
@@ -40,6 +42,12 @@ final class PredictionPackedMesh {
     // independently of X/Z scale, including tiles wider than 4096 blocks.
     static final int FLAG_FLUID_FINE_Y = 1 << 21;
     static final int FLAG_CUTOUT = 1 << 26;
+    /** Word 10, independent of the material flags in word 6. */
+    static final int FEATURE = 1 << 24;
+    /** GPU display copies only; ownership is selected at the displaced pixel. */
+    static final int DISPLAY_APPROXIMATE = 1 << 25;
+    /** Temporary biome representatives; complete trees and city templates never carry this bit. */
+    static final int PREVIEW = 1 << 26;
     static final int FLAG_UNSHADED = 1 << 27;
     static final int FLAG_UV_Y_POS = 1 << 28;
     static final int FLAG_BANK = 1 << 29;
@@ -59,6 +67,14 @@ final class PredictionPackedMesh {
 
     /** Boundary patches already use the production packed-quad contract. */
     static PredictionPackedMesh terrainRecords(int[] words, int cellAxis) {
+        return terrainRecords(words, cellAxis, true);
+    }
+
+    static PredictionPackedMesh seamRecords(int[] words, int cellAxis) {
+        return terrainRecords(words, cellAxis, false);
+    }
+
+    private static PredictionPackedMesh terrainRecords(int[] words, int cellAxis, boolean displayLod) {
         int[] first = new int[VssLodFaceGroup.COUNT], count = new int[VssLodFaceGroup.COUNT];
         int quads = words.length / STRIDE_INTS;
         for (int i = 0; i < quads; i++) count[recordGroup(words[i * STRIDE_INTS + 6])]++;
@@ -68,8 +84,8 @@ final class PredictionPackedMesh {
             int group = recordGroup(words[i * STRIDE_INTS + 6]);
             System.arraycopy(words, i * STRIDE_INTS, sorted, cursor[group]++ * STRIDE_INTS, STRIDE_INTS);
         }
-        return new PredictionPackedMesh(sorted, cellAxis, quads, first, count,
-                new int[VssLodFaceGroup.COUNT], new int[VssLodFaceGroup.COUNT], false, 0);
+        return scanMerged(sorted, cellAxis, quads, first, count,
+                new int[VssLodFaceGroup.COUNT], new int[VssLodFaceGroup.COUNT], false, 0, 0, displayLod);
     }
 
     private static int recordGroup(int flags) {
@@ -84,6 +100,13 @@ final class PredictionPackedMesh {
     private float[] morph;
     private int morphMinY, morphMaxY;
     private float morphDeltaMin, morphDeltaMax;
+    private volatile long submissionRevision;
+    private final long submissionId = PredictionSubmissionChanges.newId();
+    long submissionId() { return submissionId; }
+    private volatile boolean submissionTracked;
+    static long submissionEpoch() { return PredictionSubmissionChanges.MESH.epoch(); }
+    void trackSubmission() { submissionTracked = true; }
+    long submissionRevision() { return submissionRevision; }
     void morph(float[] field, int minY, int maxY) {
         morph=field; morphMinY=minY; morphMaxY=maxY;
         morphDeltaMin=morphDeltaMax=0;
@@ -91,6 +114,8 @@ final class PredictionPackedMesh {
             morphDeltaMin=Math.min(morphDeltaMin,delta);
             morphDeltaMax=Math.max(morphDeltaMax,delta);
         }
+        submissionRevision++;
+        if (submissionTracked) PredictionSubmissionChanges.MESH.publish(submissionId);
     }
     float morphDeltaMin() { return morphDeltaMin; }
     float morphDeltaMax() { return morphDeltaMax; }
@@ -98,7 +123,11 @@ final class PredictionPackedMesh {
     long uploadBytes() { return gpuStorageBytes() + (morph == null ? 0 : (morph.length+3)/4*16L); }
     long retainedHeapBytes() {
         var blob = compressed;
-        return 4096L + displayRangeBytes + occlusionBounds.values.length * 4L + ownershipRuns.ends.length * 28L
+        return 4096L + (cacheMaterialKinds == null ? 0 : 16L + cacheMaterialKinds.length)
+                + displayRangeBytes + (gpuRepresentations == null ? 0 : gpuRepresentations.retainedBytes())
+                + occlusionBounds.renderEnds.length * 5L
+                + (vegetationRanges == null ? 0 : vegetationRanges.retainedHeapBytes()) + displayGeometry.vegetationBytes()
+                + (occlusionBounds.values.length + occlusionBounds.directions.length + occlusionBounds.extent.length) * 4L
                 + (blob == null ? storageWordCount * 4L + passHeapBytes() : blob.bytes().length)
                 + (morph == null ? 0L : morph.length * 4L);
     }
@@ -108,10 +137,32 @@ final class PredictionPackedMesh {
     private volatile int[] quads;
     private final int wordCount;
     private final int sourceWordCount;
+    /** True when the persisted source prefix already passed PredictionScanMerge. */
+    private final boolean cacheWordsMerged;
+    private final int cachePolicy;
+    private final byte[] cacheMaterialKinds;
     private final PredictionDrawRanges[][] displayRanges;
+    private final PredictionDisplayGeometry.Result displayGeometry;
+    final PredictionDisplayLod displayLod = new PredictionDisplayLod();
+    final PredictionDisplayLod vegetationLod = new PredictionDisplayLod();
+    final PredictionGroundCoverLod groundCoverLod = new PredictionGroundCoverLod();
+    private final PredictionVegetationRanges vegetationRanges;
+    boolean hasFeatureVoxelLod() { return displayGeometry.voxelFeatures() != null; }
+    boolean hasVegetationLod() { return vegetationRanges != null && vegetationRanges.hasPlants(); }
+    boolean hasGroundCoverLod() { return vegetationRanges != null && vegetationRanges.hasGroundCover(); }
+    float[] displayErrors() { return displayGeometry.errors(); }
     private final long displayRangeBytes;
     final PredictionMeshletBounds occlusionBounds;
-    final PredictionOwnershipRuns ownershipRuns;
+    private PredictionGpuRepresentations gpuRepresentations;
+    PredictionGpuRepresentations gpuRepresentations() {
+        if (gpuRepresentations == null) {
+            var tiers = new PredictionDrawRanges[4];
+            for (int t = 0; t < 4; t++) tiers[t] = drawRanges(false, VssLodFaceGroup.ALL, t, t, t, 0, false);
+            gpuRepresentations = new PredictionGpuRepresentations(tiers);
+        }
+        return gpuRepresentations;
+    }
+    final boolean hasFeatures;
     private int storageWordCount, paletteBaseTexel;
     private volatile int[] opaqueStorage;
     private boolean opaqueAliasesSource;
@@ -125,6 +176,7 @@ final class PredictionPackedMesh {
     int paletteBaseTexel() { return paletteBaseTexel; }
     int opaquePaletteBaseTexel() { return opaquePaletteBaseTexel; }
     int waterPaletteBaseTexel() { return waterPaletteBaseTexel; }
+    int waterQuadCount() { return waterQuadCount; }
     int morphBaseTexel() { return opaqueStorageWordCount / 4; }
     long storageBytes() { return storageWordCount * 4L; }
     long gpuStorageBytes() { return (opaqueStorageWordCount + (long) waterStorageWordCount) * 4; }
@@ -141,6 +193,7 @@ final class PredictionPackedMesh {
 
     /** Publishing worker only, before CPU compression and before entering any renderer snapshot. */
     void prepareGpuStorage() {
+        gpuRepresentations(); // Worker builds static range membership before publication.
         if (opaqueStorage != null) return;
         if (compressed != null) return;
         if (Boolean.getBoolean("vss.disableCompactGpu")) {
@@ -159,19 +212,52 @@ final class PredictionPackedMesh {
     }
     private volatile PredictionMeshCompression.Blob compressed;
     private static final java.util.concurrent.Semaphore COMPRESSORS = new java.util.concurrent.Semaphore(2);
+    private volatile boolean uploadCompleted;
+    private static final AtomicLong COMPRESSED_PAYLOADS = new AtomicLong(), COMPRESSED_SAVED_BYTES = new AtomicLong(),
+            COMPRESSION_BUSY = new AtomicLong(), COMPRESSION_UNPROFITABLE = new AtomicLong();
 
     /** Publishing worker only. At most two bounded compression workspaces; busy builders keep raw words. */
     void prepareStorage() {
         int[] source = quads;
-        if (compressed != null || source == null || !COMPRESSORS.tryAcquire()) return;
+        if (compressed != null || source == null) return;
+        if (!COMPRESSORS.tryAcquire()) {
+            COMPRESSION_BUSY.incrementAndGet(); PredictionCompressionRetry.request(this); return;
+        }
         try {
             if (opaqueStorage == null) preparePassStorage(source);
             var blob = PredictionMeshCompression.compress(source);
-            if (blob == null) return;
-            compressed = blob;
-            PredictionMeshRestore.stage(this, source);
-            quads = null;
+            if (blob == null) { COMPRESSION_UNPROFITABLE.incrementAndGet(); return; }
+            publishCompressed(source, blob);
         } finally { COMPRESSORS.release(); }
+    }
+    /** Only this bounded background worker waits for a compressor slot. */
+    boolean retryCompression(long generation) {
+        try { COMPRESSORS.acquire(); }
+        catch (InterruptedException stopped) { Thread.currentThread().interrupt(); return false; }
+        try {
+            int[] source = quads;
+            if (source == null || compressed != null || !PredictionCompressionRetry.current(generation)) return false;
+            var blob = PredictionMeshCompression.compress(source);
+            if (blob == null) { COMPRESSION_UNPROFITABLE.incrementAndGet(); return false; }
+            // Serialize reset and publication so old worlds cannot refill the restore cache.
+            synchronized (PredictionCompressionRetry.class) {
+                if (!PredictionCompressionRetry.current(generation)) return false;
+                publishCompressed(source, blob); return true;
+            }
+        } finally { COMPRESSORS.release(); }
+    }
+    private synchronized void publishCompressed(int[] source, PredictionMeshCompression.Blob blob) {
+        if (compressed != null || quads != source) return;
+        compressed = blob;
+        if (!uploadCompleted) PredictionMeshRestore.stage(this, source);
+        else releaseUploadStorage();
+        quads = null;
+        COMPRESSED_PAYLOADS.incrementAndGet(); COMPRESSED_SAVED_BYTES.addAndGet(source.length * 4L - blob.bytes().length);
+    }
+    static String compressionDiagnostics() {
+        return "compressed=" + COMPRESSED_PAYLOADS.get() + ",savedBytes=" + COMPRESSED_SAVED_BYTES.get()
+                + ",busy=" + COMPRESSION_BUSY.get() + ",unprofitable=" + COMPRESSION_UNPROFITABLE.get()
+                + ",retry={" + PredictionCompressionRetry.diagnostics() + "}";
     }
     boolean compressed() { return compressed != null; }
     int[] uploadWords() {
@@ -186,9 +272,12 @@ final class PredictionPackedMesh {
         int[] opaque = opaqueStorage, water = waterStorage;
         if (opaque != null && water != null) PredictionUploadStaging.SHARED.stage(this, opaque, water, morph, epoch);
     }
-    boolean uploadReady() { return PredictionUploadStaging.SHARED.contains(this)
-            || opaqueUploadWords() != null && waterUploadWords() != null; }
-    void uploaded() {
+    boolean uploadReady() {
+        return PredictionUploadStaging.SHARED.contains(this)
+                || opaqueUploadWords() != null && waterUploadWords() != null;
+    }
+    synchronized void uploaded() {
+        uploadCompleted = true;
         PredictionUploadStaging.SHARED.discard(this);
         PredictionMeshRestore.uploaded(this); releaseUploadStorage();
     }
@@ -211,17 +300,41 @@ final class PredictionPackedMesh {
     // Render-thread-only plans. No direct/native buffers retained per mesh.
     private final PredictionDrawRanges[][] drawRanges = new PredictionDrawRanges[2][32];
     private final int[][] aquaticCounts;
-    private final PredictionDrawRanges[][] aquaticRanges = new PredictionDrawRanges[4][32];
     final PredictionAquaticLod aquaticLod = new PredictionAquaticLod();
-    boolean hasAquaticLod() { return !Arrays.equals(aquaticCounts[0], aquaticCounts[3]); }
-    boolean hasDisplayLod() { return hasAquaticLod() || displayRanges != null; }
+    boolean hasAquaticLod() { return vegetationRanges != null && !Arrays.equals(aquaticCounts[0], aquaticCounts[3]); }
+    boolean hasDisplayLod() { return hasAquaticLod() || displayRanges != null || hasVegetationLod() || hasGroundCoverLod(); }
+    boolean hasTerrainDisplayLod() { return displayRanges != null; }
+    boolean hasTerrainOnlyDisplayLod() { return displayGeometry.sharedFeatures() != null; }
     PredictionDrawRanges drawRanges(boolean water, int visible, int aquaticTier) {
-        if (!water && aquaticTier > 0 && displayRanges != null && morph == null) return displayRanges[aquaticTier][visible];
-        if (water || aquaticTier == 0 || !hasAquaticLod()) return drawRanges(water, visible);
-        var result = aquaticRanges[aquaticTier][visible];
-        if (result == null) aquaticRanges[aquaticTier][visible] = result = new PredictionDrawRanges(
-                terrainRangeFirst, aquaticCounts[aquaticTier], visible);
-        return result;
+        return drawRanges(water, visible, aquaticTier, aquaticTier);
+    }
+    PredictionDrawRanges drawRanges(boolean water, int visible, int aquaticTier, int displayTier) {
+        return drawRanges(water, visible, aquaticTier, displayTier, aquaticTier);
+    }
+    PredictionDrawRanges drawRanges(boolean water, int visible, int aquaticTier, int displayTier, int plantTier) {
+        return drawRanges(water, visible, aquaticTier, displayTier, plantTier, false);
+    }
+    PredictionDrawRanges drawRanges(boolean water, int visible, int aquaticTier, int displayTier, int plantTier,
+                                    boolean terrainOnly) {
+        return drawRanges(water, visible, aquaticTier, displayTier, plantTier, plantTier, terrainOnly);
+    }
+    PredictionDrawRanges drawRanges(boolean water, int visible, int aquaticTier, int displayTier, int plantTier,
+                                    int groundCoverTier, boolean terrainOnly) {
+        // The renderer checks the upload's live transition before selecting a
+        // display tier. Retained morph data outlives the 350 ms animation and
+        // must not permanently disable the already uploaded representations.
+        if (!water && displayTier > 0 && displayRanges != null) {
+            if (terrainOnly && displayGeometry.voxelFeatures() != null)
+                return displayGeometry.voxelFeatures().original(displayTier,aquaticTier,visible,plantTier,groundCoverTier);
+            if (terrainOnly && displayGeometry.sharedFeatures() != null) {
+                var split = displayGeometry.sharedFeatures().range(displayTier, aquaticTier, visible, plantTier, groundCoverTier);
+                if (split != null) return split;
+            }
+            var display = displayGeometry.range(displayTier, aquaticTier, visible, plantTier, groundCoverTier);
+            if (display != null) return display;
+        }
+        if (water || vegetationRanges == null || aquaticTier == 0 && plantTier == 0 && groundCoverTier == 0) return drawRanges(water, visible);
+        return vegetationRanges.range(visible, plantTier, aquaticTier, groundCoverTier);
     }
     /** Production workers precompute both passes. Cold compressed restores use
      * PredictionMeshRestore; no decompression or palette construction in a frame. */
@@ -244,12 +357,16 @@ final class PredictionPackedMesh {
                 terrainQuadCount, waterQuadCount, false, compact);
         var water = PredictionGpuEncoding.selectPass(source, paletteBaseTexel, quadCount(),
                 terrainQuadCount, waterQuadCount, true, compact);
+        opaque = PredictionGpuEncoding.rectangles(opaque, quadCount() - waterQuadCount);
+        water = PredictionGpuEncoding.rectangles(water, waterQuadCount);
         opaqueStorageWordCount = opaque.words().length;
         opaqueAliasesSource = opaque.words() == source;
         opaquePaletteBaseTexel = opaque.paletteBaseTexel();
         waterStorageWordCount = water.words().length;
         waterPaletteBaseTexel = water.paletteBaseTexel();
         waterStorage = water.words();
+        submissionRevision++;
+        if (submissionTracked) PredictionSubmissionChanges.MESH.publish(submissionId);
         opaqueStorage = opaque.words(); // Volatile publication after all pass metadata.
     }
 
@@ -280,24 +397,114 @@ final class PredictionPackedMesh {
                                  int terrainQuadCount, int[] terrainFirst, int[] terrainCount,
                                  int[] waterFirst, int[] waterCount, boolean downFaces,
                                  int spriteQuadCount) {
+        this(quads, cellAxis, terrainQuadCount, terrainFirst, terrainCount, waterFirst, waterCount,
+                downFaces, spriteQuadCount, true, false);
+    }
+
+    /** Workers and restored disk records share the plane merger. The raw
+     * constructor keeps explicit fixture/seam ranges intact. */
+    static PredictionPackedMesh scanMerged(int[] words, int cellAxis, int terrain,
+                                          int[] first, int[] counts, int[] waterFirst, int[] waterCounts,
+                                          boolean down, int sprites) {
+        return scanMerged(words, cellAxis, terrain, first, counts, waterFirst, waterCounts, down, sprites, 0, true);
+    }
+
+    static PredictionPackedMesh scanMerged(int[] words, int cellAxis, int terrain,
+                                          int[] first, int[] counts, int[] waterFirst, int[] waterCounts,
+                                          boolean down, int sprites, int spacing) {
+        return scanMerged(words, cellAxis, terrain, first, counts, waterFirst, waterCounts, down, sprites, spacing, true);
+    }
+
+    private static PredictionPackedMesh scanMerged(int[] words, int cellAxis, int terrain,
+                                                   int[] first, int[] counts, int[] waterFirst, int[] waterCounts,
+                                                   boolean down, int sprites, int spacing, boolean displayLod) {
+        var merged = displayLod ? PredictionScanMerge.merge(words, first, counts, cellAxis, spacing, true, 16)
+                : new PredictionScanMerge.Result(words, first, counts);
+        if (merged.words() != words) {
+            terrain = Arrays.stream(merged.count()).sum();
+            waterFirst = new int[waterCounts.length]; ranges(waterFirst, waterCounts, terrain);
+            sprites = 0;
+            for (int p = 6; p < merged.words().length; p += STRIDE_INTS)
+                if ((merged.words()[p] & FLAG_SPRITE_MASK) != 0) sprites++;
+        }
+        return new PredictionPackedMesh(merged.words(), cellAxis, terrain, merged.first(), merged.count(),
+                waterFirst, waterCounts, down, sprites, displayLod, true);
+    }
+
+    /** Restore a cache record whose canonical source prefix was merged when it was written. */
+    static PredictionPackedMesh restoreMerged(int[] words, int cellAxis, int terrain,
+                                              int[] first, int[] counts, int[] waterFirst, int[] waterCounts,
+                                              boolean down, int sprites, int spacing) {
+        return new PredictionPackedMesh(words, cellAxis, terrain, first, counts, waterFirst, waterCounts,
+                down, sprites, true, true);
+    }
+
+    static PredictionPackedMesh restorePrepared(int[] words, int cellAxis, int terrain,
+                                                int[] first, int[] counts, int[] waterFirst, int[] waterCounts,
+                                                boolean down, int sprites, PredictionMeshDerivedCache.Plan plan) {
+        return new PredictionPackedMesh(words, cellAxis, terrain, first, counts, waterFirst, waterCounts,
+                down, sprites, true, true, plan);
+    }
+
+    private PredictionPackedMesh(int[] quads, int cellAxis,
+                                 int terrainQuadCount, int[] terrainFirst, int[] terrainCount,
+                                 int[] waterFirst, int[] waterCount, boolean downFaces,
+                                 int spriteQuadCount, boolean displayLod) {
+        this(quads, cellAxis, terrainQuadCount, terrainFirst, terrainCount, waterFirst, waterCount,
+                downFaces, spriteQuadCount, displayLod, false);
+    }
+
+    private PredictionPackedMesh(int[] quads, int cellAxis,
+                                 int terrainQuadCount, int[] terrainFirst, int[] terrainCount,
+                                 int[] waterFirst, int[] waterCount, boolean downFaces,
+                                 int spriteQuadCount, boolean displayLod, boolean cacheWordsMerged) {
+        this(quads, cellAxis, terrainQuadCount, terrainFirst, terrainCount, waterFirst, waterCount,
+                downFaces, spriteQuadCount, displayLod, cacheWordsMerged, null);
+    }
+
+    private PredictionPackedMesh(int[] quads, int cellAxis,
+                                 int terrainQuadCount, int[] terrainFirst, int[] terrainCount,
+                                 int[] waterFirst, int[] waterCount, boolean downFaces,
+                                 int spriteQuadCount, boolean displayLod, boolean cacheWordsMerged,
+                                 PredictionMeshDerivedCache.Plan prepared) {
         // Also reorder restored caches after their material IDs have been remapped.
         // Complete canonical records are preserved; water and all face-range boundaries stay put.
-        boolean[] plants = VssLodSpriteTable.aquaticSprites();
-        boolean[] land = VssLodSpriteTable.landPlantSprites();
-        for (int i = 0; i < plants.length; i++) plants[i] |= land[i];
-        this.aquaticCounts = PredictionSpatialOrder.arrange(quads, terrainFirst, terrainCount, plants);
-        this.sourceWordCount = quads.length;
-        var display = PredictionDisplayGeometry.build(quads, terrainFirst, terrainCount, aquaticCounts, cellAxis);
+        this.cachePolicy = PredictionMeshDerivedCache.policy();
+        this.cacheMaterialKinds = displayLod ? PredictionMeshDerivedCache.materialKinds() : null;
+        PredictionDisplayGeometry.Result display;
+        if (prepared != null) {
+            this.aquaticCounts = prepared.aquatic();
+            this.vegetationRanges = prepared.vegetation();
+            this.sourceWordCount = prepared.sourceWords();
+            var metadata = prepared.display();
+            display = new PredictionDisplayGeometry.Result(quads, metadata.ranges(), metadata.errors(),
+                    metadata.vegetation(), metadata.sharedFeatures(), metadata.voxelFeatures());
+        } else {
+            boolean[] plants = VssLodSpriteTable.aquaticSprites();
+            boolean[] land = VssLodSpriteTable.landPlantSprites();
+            for (int i = 0; i < plants.length; i++) plants[i] |= land[i];
+            this.aquaticCounts = PredictionSpatialOrder.arrange(quads, terrainFirst, terrainCount, plants);
+            this.vegetationRanges = displayLod ? PredictionVegetationRanges.arrange(quads, terrainFirst, terrainCount,
+                    VssLodSpriteTable.vegetationSprites(), VssLodSpriteTable.aquaticSprites(), VssLodSpriteTable.groundCoverSprites()) : null;
+            this.sourceWordCount = quads.length;
+            display = displayLod ? PredictionDisplayGeometry.build(quads, terrainFirst, terrainCount, aquaticCounts, cellAxis, vegetationRanges)
+                    : new PredictionDisplayGeometry.Result(quads, null);
+        }
+        this.cacheWordsMerged = cacheWordsMerged;
         this.displayRanges = display.ranges();
+        this.displayGeometry = display.metadataOnly();
         long rangeBytes = 0;
         if (displayRanges != null) for (var level : displayRanges) for (var range : level)
             if (range != null) rangeBytes += 64L + range.first.length * 8L;
         this.displayRangeBytes = rangeBytes;
         this.quads = display.words();
         this.wordCount = this.quads.length;
-        this.geometryStats = PredictionGeometryStats.measure(this.quads);
+        this.geometryStats = PredictionGeometryStats.measure(this.quads, sourceWordCount);
         this.occlusionBounds = new PredictionMeshletBounds(this.quads);
-        this.ownershipRuns = new PredictionOwnershipRuns(this.quads);
+        boolean features = false;
+        for (int p = 10; p < this.quads.length && !features; p += STRIDE_INTS)
+            features = (this.quads[p] & FEATURE) != 0;
+        this.hasFeatures = features;
         this.storageWordCount = this.quads.length;
         this.cellAxis = cellAxis;
         this.terrainQuadCount = terrainQuadCount;
@@ -343,6 +550,61 @@ final class PredictionPackedMesh {
         return words.length == sourceWordCount ? words : Arrays.copyOf(words, sourceWordCount);
     }
 
+    boolean cacheWordsMerged() {
+        return cacheWordsMerged;
+    }
+
+    PredictionMeshDerivedCache.Plan cachePlan() {
+        return !cacheWordsMerged || vegetationRanges == null ? null : new PredictionMeshDerivedCache.Plan(
+                sourceWordCount, cachePolicy, cacheMaterialKinds, aquaticCounts, vegetationRanges, displayGeometry);
+    }
+
+    /** Worker-only: keep the old decoration while advancing this tile's ground grid. */
+    PredictionPackedMesh withFeaturesFrom(PredictionPackedMesh previous, int spacing, int previousSpacing) {
+        var payload = withFeaturesFrom(cacheWords(), cellAxis, terrainQuadCount, waterQuadCount,
+                waterRangeCount, spacing, previous, previousSpacing);
+        payload.morph(morph, Math.min(morphMinY, previous.morphMinY), Math.max(morphMaxY, previous.morphMaxY));
+        return payload;
+    }
+
+    private static PredictionPackedMesh withFeaturesFrom(int[] ground, int cellAxis, int terrainQuadCount,
+            int waterQuadCount, int[] waterCounts, int spacing, PredictionPackedMesh previous, int previousSpacing) {
+        int[] features = previous.cacheWords();
+        int[] counts = new int[VssLodFaceGroup.COUNT];
+        for (int p = 0; p < terrainQuadCount * STRIDE_INTS; p += STRIDE_INTS)
+            if ((ground[p + 10] & FEATURE) == 0) counts[recordGroup(ground[p + 6])]++;
+        for (int p = 0; p < previous.terrainQuadCount * STRIDE_INTS; p += STRIDE_INTS)
+            if ((features[p + 10] & FEATURE) != 0) counts[recordGroup(features[p + 6])]++;
+        int total = Arrays.stream(counts).sum();
+        int[] first = new int[counts.length], waterFirst = new int[counts.length];
+        ranges(first, counts, 0); ranges(waterFirst, waterCounts, total);
+        int[] result = new int[Math.multiplyExact(total + waterQuadCount, STRIDE_INTS)], cursor = first.clone();
+        int sprites = 0;
+        boolean down = false;
+        for (int pass = 0; pass < 2; pass++) {
+            int[] words = pass == 0 ? ground : features;
+            int quads = pass == 0 ? terrainQuadCount : previous.terrainQuadCount;
+            for (int p = 0; p < quads * STRIDE_INTS; p += STRIDE_INTS) {
+                boolean feature = (words[p + 10] & FEATURE) != 0;
+                if (feature != (pass == 1)) continue;
+                int out = cursor[recordGroup(words[p + 6])]++ * STRIDE_INTS;
+                System.arraycopy(words, p, result, out, STRIDE_INTS);
+                if (feature) {
+                    int cell = words[p + 8];
+                    int x = Math.min(cellAxis - 1, cell % previous.cellAxis * previousSpacing / spacing);
+                    int z = Math.min(cellAxis - 1, cell / previous.cellAxis * previousSpacing / spacing);
+                    result[out + 8] = z * cellAxis + x;
+                }
+                down |= (words[p + 6] & FLAG_BANK) != 0;
+                if ((words[p + 6] & FLAG_SPRITE_MASK) != 0) sprites++;
+            }
+        }
+        System.arraycopy(ground, terrainQuadCount * STRIDE_INTS, result, total * STRIDE_INTS, waterQuadCount * STRIDE_INTS);
+        for (int p = total * STRIDE_INTS; p < result.length; p += STRIDE_INTS)
+            if ((result[p + 6] & FLAG_SPRITE_MASK) != 0) sprites++;
+        return scanMerged(result, cellAxis, total, first, counts, waterFirst, waterCounts, down, sprites, spacing, true);
+    }
+
     boolean downFaces() {
         return downFaces;
     }
@@ -365,6 +627,10 @@ final class PredictionPackedMesh {
 
     /** Packs sampled voxel geometry; coverage handover never displaces faces. */
     static PredictionPackedMesh pack(PredictionTileManager.PredictionTile tile) {
+        return pack(tile, null);
+    }
+
+    static PredictionPackedMesh pack(PredictionTileManager.PredictionTile tile, PredictionTileManager.PredictionTile retainedFeatures) {
         if (tile.mesh().gpuPayload() != null) return tile.mesh().gpuPayload();
         PredictionQuadMesh src = tile.mesh().packed();
         int cellAxis = src.cellAxis();
@@ -404,8 +670,10 @@ final class PredictionPackedMesh {
             System.arraycopy(record, 0, flat, at * STRIDE_INTS, STRIDE_INTS);
             if ((record[6] & FLAG_SPRITE_MASK) != 0) spriteQuads++;
         }
-        return new PredictionPackedMesh(flat, cellAxis, terrainQuads,
-                terrainFirst, terrainCount, waterFirst, waterCount, downFaces, spriteQuads);
+        if (retainedFeatures != null) return withFeaturesFrom(flat, cellAxis, terrainQuads, waterQuads,
+                waterCount, tile.spacingBlocks(), retainedFeatures.mesh().gpuPayload(), retainedFeatures.spacingBlocks());
+        return scanMerged(flat, cellAxis, terrainQuads,
+                terrainFirst, terrainCount, waterFirst, waterCount, downFaces, spriteQuads, tile.spacingBlocks(), true);
     }
 
     private static void packQuad(PredictionQuadMesh src, int quad, boolean water, int horizontalShift,
@@ -542,6 +810,8 @@ final class PredictionPackedMesh {
         }
         packed[9] |= sourceCoverage << 24;
         if (!water && src.terrainWall(quad)) packed[9] |= 1 << 27;
+        if (!water && src.feature(quad)) packed[10] |= FEATURE;
+        if (!water && src.preview(quad)) packed[10] |= FEATURE | PREVIEW;
     }
 
     private static void packWaterLight(int[] words, PredictionTileManager.PredictionTile tile,
