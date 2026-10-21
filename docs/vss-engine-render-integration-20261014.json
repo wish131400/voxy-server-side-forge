@@ -1,0 +1,2186 @@
+{
+  "date": "2026-10-14",
+  "liveClientProfile": false,
+  "productionChange": "PredictionGpuSelectionInput",
+  "canopyProxyEnabled": false,
+  "platforms": {
+    "neoforge": {
+      "tests": {
+        "resident-record": {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "loading-benefit": {
+          "tests": 282,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "resident-maintenance-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "loading-benefit-gpu": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "gpu-selection-fallback": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "canopy-surface": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "canopy-material-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "resident-coverage": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "uniqueTests": 305,
+      "sourceSha256": "f9df139c1405f43eb35201ac79bf601105e1752853ed3aed0a4a09341ef0a6ec",
+      "baselineSha256": {
+        "PredictionGpuSelectionInput": "1f13765c676a9cdcafd9d850cad88afd26503278997780618a1a238f4a6e7da2",
+        "PredictionIndirectBatch": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+        "PredictionPackedMesh": "399baee5629430363bcbe2935848ad581c1c5dcf42745f1b2311e6d850a31c1b"
+      },
+      "jar": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\engine-integration-20261014\\vss-0.3.5-neoforge-1.21.1.jar",
+        "sha256": "855e9433a687afbe833ac2a935c65e7fead0e343e07bba1fb1729ca0146c1a6a",
+        "bytes": 6077998,
+        "classMajor": 65,
+        "natives": [
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+        ]
+      },
+      "input": [
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 100.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 100.0,
+            "p10": 0.0,
+            "p90": 100.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 151500.0,
+            "p10": 124000.0,
+            "p90": 206700.0
+          },
+          "allocated_bytes": {
+            "median": 245832.0,
+            "p10": 245832.0,
+            "p90": 245832.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 192300.0,
+            "p10": 94800.0,
+            "p90": 371300.0
+          },
+          "allocated_bytes": {
+            "median": 32872.0,
+            "p10": 32872.0,
+            "p90": 32872.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 94000.0,
+            "p10": 80500.0,
+            "p90": 123800.0
+          },
+          "allocated_bytes": {
+            "median": 245832.0,
+            "p10": 245832.0,
+            "p90": 245832.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 82800.0,
+            "p10": 69600.0,
+            "p90": 105300.0
+          },
+          "allocated_bytes": {
+            "median": 34360.0,
+            "p10": 34360.0,
+            "p90": 34360.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 130800.0,
+            "p10": 91500.0,
+            "p90": 169000.0
+          },
+          "allocated_bytes": {
+            "median": 245832.0,
+            "p10": 245832.0,
+            "p90": 245832.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 126600.0,
+            "p10": 79500.0,
+            "p90": 183800.0
+          },
+          "allocated_bytes": {
+            "median": 229432.0,
+            "p10": 229432.0,
+            "p90": 229432.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 100.0,
+            "p10": 100.0,
+            "p90": 200.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 100.0,
+            "p10": 100.0,
+            "p90": 200.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 53100.0,
+            "p10": 43500.0,
+            "p90": 69400.0
+          },
+          "allocated_bytes": {
+            "median": 120960.0,
+            "p10": 120960.0,
+            "p90": 120960.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 19100.0,
+            "p10": 16000.0,
+            "p90": 33200.0
+          },
+          "allocated_bytes": {
+            "median": 4200.0,
+            "p10": 4200.0,
+            "p90": 4200.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 49200.0,
+            "p10": 42500.0,
+            "p90": 72500.0
+          },
+          "allocated_bytes": {
+            "median": 120960.0,
+            "p10": 120960.0,
+            "p90": 120960.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 19300.0,
+            "p10": 16700.0,
+            "p90": 32600.0
+          },
+          "allocated_bytes": {
+            "median": 5688.0,
+            "p10": 5688.0,
+            "p90": 5688.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 58000.0,
+            "p10": 43300.0,
+            "p90": 114000.0
+          },
+          "allocated_bytes": {
+            "median": 120960.0,
+            "p10": 120960.0,
+            "p90": 120960.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 28300.0,
+            "p10": 20200.0,
+            "p90": 48200.0
+          },
+          "allocated_bytes": {
+            "median": 28760.0,
+            "p10": 28760.0,
+            "p90": 28760.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 200.0,
+            "p10": 100.0,
+            "p90": 200.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 200.0,
+            "p10": 200.0,
+            "p90": 300.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 218300.0,
+            "p10": 191400.0,
+            "p90": 310100.0
+          },
+          "allocated_bytes": {
+            "median": 491568.0,
+            "p10": 491568.0,
+            "p90": 491568.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 174900.0,
+            "p10": 140700.0,
+            "p90": 226900.0
+          },
+          "allocated_bytes": {
+            "median": 65640.0,
+            "p10": 65640.0,
+            "p90": 65640.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 217800.0,
+            "p10": 184500.0,
+            "p90": 319600.0
+          },
+          "allocated_bytes": {
+            "median": 491568.0,
+            "p10": 491568.0,
+            "p90": 491568.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 181500.0,
+            "p10": 141600.0,
+            "p90": 243200.0
+          },
+          "allocated_bytes": {
+            "median": 67128.0,
+            "p10": 67128.0,
+            "p90": 67128.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 305900.0,
+            "p10": 200200.0,
+            "p90": 386100.0
+          },
+          "allocated_bytes": {
+            "median": 491568.0,
+            "p10": 491568.0,
+            "p90": 491568.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 281200.0,
+            "p10": 174400.0,
+            "p90": 377800.0
+          },
+          "allocated_bytes": {
+            "median": 458760.0,
+            "p10": 458760.0,
+            "p90": 458760.0
+          }
+        }
+      ],
+      "prepared": [
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 1864900.0,
+            "p10": 1618500.0,
+            "p90": 2179400.0
+          },
+          "allocated_bytes": {
+            "median": 803192.0,
+            "p10": 803192.0,
+            "p90": 803192.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 866000.0,
+            "p10": 747800.0,
+            "p90": 1133100.0
+          },
+          "allocated_bytes": {
+            "median": 197088.0,
+            "p10": 197088.0,
+            "p90": 197088.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 1.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 1865000.0,
+            "p10": 1644300.0,
+            "p90": 2197000.0
+          },
+          "allocated_bytes": {
+            "median": 803192.0,
+            "p10": 803192.0,
+            "p90": 803192.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 818700.0,
+            "p10": 723500.0,
+            "p90": 1021000.0
+          },
+          "allocated_bytes": {
+            "median": 201552.0,
+            "p10": 201552.0,
+            "p90": 201552.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 32.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 2038500.0,
+            "p10": 1703700.0,
+            "p90": 2674000.0
+          },
+          "allocated_bytes": {
+            "median": 803192.0,
+            "p10": 803160.0,
+            "p90": 803192.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 1986400.0,
+            "p10": 1710800.0,
+            "p90": 2552900.0
+          },
+          "allocated_bytes": {
+            "median": 786768.0,
+            "p10": 786736.0,
+            "p90": 786768.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 328400.0,
+            "p10": 290100.0,
+            "p90": 474100.0
+          },
+          "allocated_bytes": {
+            "median": 100864.0,
+            "p10": 100832.0,
+            "p90": 100896.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 172700.0,
+            "p10": 134300.0,
+            "p90": 255700.0
+          },
+          "allocated_bytes": {
+            "median": 25192.0,
+            "p10": 25160.0,
+            "p90": 25224.0
+          },
+          "range_builds": {
+            "median": 1.0,
+            "p10": 1.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 289800.0,
+            "p10": 262200.0,
+            "p90": 417800.0
+          },
+          "allocated_bytes": {
+            "median": 100800.0,
+            "p10": 100800.0,
+            "p90": 100800.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 151200.0,
+            "p10": 128400.0,
+            "p90": 233300.0
+          },
+          "allocated_bytes": {
+            "median": 29592.0,
+            "p10": 29592.0,
+            "p90": 29592.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 32.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 318300.0,
+            "p10": 271400.0,
+            "p90": 450900.0
+          },
+          "allocated_bytes": {
+            "median": 100832.0,
+            "p10": 100800.0,
+            "p90": 100832.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 302300.0,
+            "p10": 268000.0,
+            "p90": 457200.0
+          },
+          "allocated_bytes": {
+            "median": 98744.0,
+            "p10": 98712.0,
+            "p90": 98744.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 4364500.0,
+            "p10": 3952600.0,
+            "p90": 5016400.0
+          },
+          "allocated_bytes": {
+            "median": 1605832.0,
+            "p10": 1605832.0,
+            "p90": 1605832.0
+          },
+          "range_builds": {
+            "median": 8191.0,
+            "p10": 8191.0,
+            "p90": 8191.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 1744500.0,
+            "p10": 1470800.0,
+            "p90": 2131600.0
+          },
+          "allocated_bytes": {
+            "median": 393664.0,
+            "p10": 393664.0,
+            "p90": 393664.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 1.0,
+            "p90": 8192.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 4187600.0,
+            "p10": 3873900.0,
+            "p90": 4866200.0
+          },
+          "allocated_bytes": {
+            "median": 1605832.0,
+            "p10": 1605832.0,
+            "p90": 1605832.0
+          },
+          "range_builds": {
+            "median": 8191.0,
+            "p10": 8191.0,
+            "p90": 8191.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 1750200.0,
+            "p10": 1517700.0,
+            "p90": 2176300.0
+          },
+          "allocated_bytes": {
+            "median": 398128.0,
+            "p10": 398128.0,
+            "p90": 398128.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 32.0,
+            "p90": 8192.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 4172700.0,
+            "p10": 3574300.0,
+            "p90": 4975400.0
+          },
+          "allocated_bytes": {
+            "median": 1605928.0,
+            "p10": 1605928.0,
+            "p90": 1605928.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 8192.0,
+            "p90": 8192.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 4095100.0,
+            "p10": 3521100.0,
+            "p90": 4714500.0
+          },
+          "allocated_bytes": {
+            "median": 1573120.0,
+            "p10": 1573120.0,
+            "p90": 1573120.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 8192.0,
+            "p90": 8192.0
+          }
+        }
+      ],
+      "submission": [
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 14549000.0,
+            "p10": 13591800.0,
+            "p90": 15655400.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 13999000.0,
+            "p10": 13361900.0,
+            "p90": 15334300.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 161962000.0,
+            "p10": 154746600.0,
+            "p90": 181517800.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 76882000.0,
+            "p10": 70451300.0,
+            "p90": 90702900.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 56509700.0,
+            "p10": 51694000.0,
+            "p90": 61956900.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 62445300.0,
+            "p10": 56454000.0,
+            "p90": 68752200.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 236638800.0,
+            "p10": 219718000.0,
+            "p90": 273088700.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 104597000.0,
+            "p10": 81679300.0,
+            "p90": 154888400.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        }
+      ],
+      "alphaCanopyQuality": [
+        {
+          "mode": "1",
+          "samples": 48,
+          "iou": {
+            "median": 0.8186147186147186,
+            "p10": 0.7142857142857143,
+            "p90": 0.9014084507042254
+          },
+          "added_fraction": {
+            "median": 0.22157622739018087,
+            "p10": 0.0,
+            "p90": 0.36363636363636365
+          },
+          "lost_fraction": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          },
+          "rgb_mae": {
+            "median": 0.045118275991867615,
+            "p10": 0.0,
+            "p90": 0.0789760348583878
+          }
+        },
+        {
+          "mode": "2",
+          "samples": 24,
+          "iou": {
+            "median": 0.6551724137931034,
+            "p10": 0.5161290322580645,
+            "p90": 0.78125
+          },
+          "added_fraction": {
+            "median": 0.5263157894736842,
+            "p10": 0.23529411764705882,
+            "p90": 0.8181818181818182
+          },
+          "lost_fraction": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          },
+          "rgb_mae": {
+            "median": 0.08541124565465338,
+            "p10": 0.05172735760971055,
+            "p90": 0.14830659536541888
+          }
+        }
+      ],
+      "surfaceCanopy": [
+        {
+          "mesh": "1511",
+          "source_faces": "50865",
+          "leaf_faces": "23969",
+          "union_faces": "23266",
+          "leaf_removed_fraction": "0.029329550669614957",
+          "projected_additional_bytes": "1116768",
+          "accepted": "false",
+          "builder_cpu_ns": "18833500"
+        },
+        {
+          "mesh": "739",
+          "source_faces": "46187",
+          "leaf_faces": "21959",
+          "union_faces": "21478",
+          "leaf_removed_fraction": "0.021904458308666164",
+          "projected_additional_bytes": "1030944",
+          "accepted": "false",
+          "builder_cpu_ns": "14077200"
+        },
+        {
+          "mesh": "732",
+          "source_faces": "28750",
+          "leaf_faces": "13299",
+          "union_faces": "12930",
+          "leaf_removed_fraction": "0.02774644710128582",
+          "projected_additional_bytes": "620640",
+          "accepted": "false",
+          "builder_cpu_ns": "8770700"
+        },
+        {
+          "mesh": "1476",
+          "source_faces": "28588",
+          "leaf_faces": "11411",
+          "union_faces": "11118",
+          "leaf_removed_fraction": "0.02567697835421956",
+          "projected_additional_bytes": "533664",
+          "accepted": "false",
+          "builder_cpu_ns": "13666400"
+        },
+        {
+          "mesh": "2001",
+          "source_faces": "17840",
+          "leaf_faces": "4208",
+          "union_faces": "4049",
+          "leaf_removed_fraction": "0.03778517110266155",
+          "projected_additional_bytes": "194352",
+          "accepted": "false",
+          "builder_cpu_ns": "6761100"
+        },
+        {
+          "mesh": "359",
+          "source_faces": "7610",
+          "leaf_faces": "1800",
+          "union_faces": "1800",
+          "leaf_removed_fraction": "0.0",
+          "projected_additional_bytes": "86400",
+          "accepted": "false",
+          "builder_cpu_ns": "1742800"
+        }
+      ],
+      "colorDepthPairs": {
+        "resident": 12,
+        "alphaCanopy": 216
+      }
+    },
+    "forge": {
+      "tests": {
+        "resident-record": {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "loading-benefit": {
+          "tests": 280,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "resident-maintenance-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "loading-benefit-gpu": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "gpu-selection-fallback": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "canopy-surface": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "canopy-material-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "resident-coverage": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "uniqueTests": 303,
+      "sourceSha256": "f9df139c1405f43eb35201ac79bf601105e1752853ed3aed0a4a09341ef0a6ec",
+      "baselineSha256": {
+        "PredictionGpuSelectionInput": "1f13765c676a9cdcafd9d850cad88afd26503278997780618a1a238f4a6e7da2",
+        "PredictionIndirectBatch": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+        "PredictionPackedMesh": "399baee5629430363bcbe2935848ad581c1c5dcf42745f1b2311e6d850a31c1b"
+      },
+      "jar": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\engine-integration-20261014\\vss-0.3.5-forge-1.20.1.jar",
+        "sha256": "de486568b96154759dd6c18ad3910855d7eeecfa2433cfb011979f00b8fd5dba",
+        "bytes": 6748296,
+        "classMajor": 61,
+        "natives": [
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+        ]
+      },
+      "input": [
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 100.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 100.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 188100.0,
+            "p10": 147200.0,
+            "p90": 237400.0
+          },
+          "allocated_bytes": {
+            "median": 770144.0,
+            "p10": 770144.0,
+            "p90": 770144.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 246500.0,
+            "p10": 134100.0,
+            "p90": 403300.0
+          },
+          "allocated_bytes": {
+            "median": 32872.0,
+            "p10": 32872.0,
+            "p90": 32872.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 148200.0,
+            "p10": 134300.0,
+            "p90": 210000.0
+          },
+          "allocated_bytes": {
+            "median": 770144.0,
+            "p10": 770144.0,
+            "p90": 770144.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 87900.0,
+            "p10": 76300.0,
+            "p90": 123000.0
+          },
+          "allocated_bytes": {
+            "median": 34360.0,
+            "p10": 34360.0,
+            "p90": 34360.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 201500.0,
+            "p10": 145800.0,
+            "p90": 293800.0
+          },
+          "allocated_bytes": {
+            "median": 770144.0,
+            "p10": 770144.0,
+            "p90": 770144.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 146200.0,
+            "p10": 93700.0,
+            "p90": 250300.0
+          },
+          "allocated_bytes": {
+            "median": 229432.0,
+            "p10": 229432.0,
+            "p90": 229432.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 100.0,
+            "p10": 100.0,
+            "p90": 200.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 100.0,
+            "p10": 100.0,
+            "p90": 200.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 40800.0,
+            "p10": 23700.0,
+            "p90": 48900.0
+          },
+          "allocated_bytes": {
+            "median": 120960.0,
+            "p10": 120960.0,
+            "p90": 120960.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 26700.0,
+            "p10": 15800.0,
+            "p90": 33200.0
+          },
+          "allocated_bytes": {
+            "median": 4200.0,
+            "p10": 4200.0,
+            "p90": 4200.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 27700.0,
+            "p10": 23400.0,
+            "p90": 44600.0
+          },
+          "allocated_bytes": {
+            "median": 120960.0,
+            "p10": 120960.0,
+            "p90": 120960.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 19200.0,
+            "p10": 16200.0,
+            "p90": 32700.0
+          },
+          "allocated_bytes": {
+            "median": 5688.0,
+            "p10": 5688.0,
+            "p90": 5688.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 43300.0,
+            "p10": 24900.0,
+            "p90": 59300.0
+          },
+          "allocated_bytes": {
+            "median": 120960.0,
+            "p10": 120960.0,
+            "p90": 120960.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 27200.0,
+            "p10": 21100.0,
+            "p90": 41500.0
+          },
+          "allocated_bytes": {
+            "median": 28760.0,
+            "p10": 28760.0,
+            "p90": 28760.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 100.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 100.0,
+            "p10": 100.0,
+            "p90": 200.0
+          },
+          "allocated_bytes": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 417200.0,
+            "p10": 305300.0,
+            "p90": 502500.0
+          },
+          "allocated_bytes": {
+            "median": 1540144.0,
+            "p10": 1540144.0,
+            "p90": 1540144.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 253100.0,
+            "p10": 194100.0,
+            "p90": 485500.0
+          },
+          "allocated_bytes": {
+            "median": 65640.0,
+            "p10": 65640.0,
+            "p90": 65640.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 460800.0,
+            "p10": 342200.0,
+            "p90": 548100.0
+          },
+          "allocated_bytes": {
+            "median": 1540144.0,
+            "p10": 1540144.0,
+            "p90": 1540144.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 272100.0,
+            "p10": 203000.0,
+            "p90": 306400.0
+          },
+          "allocated_bytes": {
+            "median": 67128.0,
+            "p10": 67128.0,
+            "p90": 67128.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 424300.0,
+            "p10": 323800.0,
+            "p90": 646300.0
+          },
+          "allocated_bytes": {
+            "median": 1540144.0,
+            "p10": 1540144.0,
+            "p90": 1540144.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns": {
+            "median": 332700.0,
+            "p10": 197500.0,
+            "p90": 550400.0
+          },
+          "allocated_bytes": {
+            "median": 458760.0,
+            "p10": 458760.0,
+            "p90": 458760.0
+          }
+        }
+      ],
+      "prepared": [
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 2379900.0,
+            "p10": 1906400.0,
+            "p90": 3434500.0
+          },
+          "allocated_bytes": {
+            "median": 1327480.0,
+            "p10": 1327480.0,
+            "p90": 1327480.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 959500.0,
+            "p10": 769600.0,
+            "p90": 1366700.0
+          },
+          "allocated_bytes": {
+            "median": 197088.0,
+            "p10": 197088.0,
+            "p90": 197088.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 1.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 3355800.0,
+            "p10": 2376400.0,
+            "p90": 3810600.0
+          },
+          "allocated_bytes": {
+            "median": 1327480.0,
+            "p10": 1327480.0,
+            "p90": 1327480.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 1347500.0,
+            "p10": 960000.0,
+            "p90": 1603800.0
+          },
+          "allocated_bytes": {
+            "median": 201552.0,
+            "p10": 201552.0,
+            "p90": 201552.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 32.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 2701900.0,
+            "p10": 1989300.0,
+            "p90": 3513300.0
+          },
+          "allocated_bytes": {
+            "median": 1327480.0,
+            "p10": 1327480.0,
+            "p90": 1327480.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 2478700.0,
+            "p10": 1806400.0,
+            "p90": 3135500.0
+          },
+          "allocated_bytes": {
+            "median": 786768.0,
+            "p10": 786768.0,
+            "p90": 786768.0
+          },
+          "range_builds": {
+            "median": 4096.0,
+            "p10": 4096.0,
+            "p90": 4096.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 370000.0,
+            "p10": 325000.0,
+            "p90": 556600.0
+          },
+          "allocated_bytes": {
+            "median": 166432.0,
+            "p10": 166368.0,
+            "p90": 166432.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 196400.0,
+            "p10": 139800.0,
+            "p90": 281700.0
+          },
+          "allocated_bytes": {
+            "median": 25224.0,
+            "p10": 25160.0,
+            "p90": 25224.0
+          },
+          "range_builds": {
+            "median": 1.0,
+            "p10": 1.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 393600.0,
+            "p10": 287200.0,
+            "p90": 489100.0
+          },
+          "allocated_bytes": {
+            "median": 166336.0,
+            "p10": 166336.0,
+            "p90": 166336.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 217200.0,
+            "p10": 145600.0,
+            "p90": 260700.0
+          },
+          "allocated_bytes": {
+            "median": 29592.0,
+            "p10": 29592.0,
+            "p90": 29592.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 32.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 334900.0,
+            "p10": 288300.0,
+            "p90": 624100.0
+          },
+          "allocated_bytes": {
+            "median": 166336.0,
+            "p10": 166336.0,
+            "p90": 166368.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 327400.0,
+            "p10": 274200.0,
+            "p90": 507600.0
+          },
+          "allocated_bytes": {
+            "median": 98712.0,
+            "p10": 98712.0,
+            "p90": 98744.0
+          },
+          "range_builds": {
+            "median": 512.0,
+            "p10": 512.0,
+            "p90": 512.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 5599600.0,
+            "p10": 4946500.0,
+            "p90": 6736600.0
+          },
+          "allocated_bytes": {
+            "median": 2654440.0,
+            "p10": 2654440.0,
+            "p90": 2654440.0
+          },
+          "range_builds": {
+            "median": 8191.0,
+            "p10": 8191.0,
+            "p90": 8191.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 2229700.0,
+            "p10": 1858000.0,
+            "p90": 3183700.0
+          },
+          "allocated_bytes": {
+            "median": 393696.0,
+            "p10": 393696.0,
+            "p90": 393696.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 1.0,
+            "p90": 8192.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 5597700.0,
+            "p10": 4886400.0,
+            "p90": 7055900.0
+          },
+          "allocated_bytes": {
+            "median": 2654440.0,
+            "p10": 2654440.0,
+            "p90": 2654440.0
+          },
+          "range_builds": {
+            "median": 8191.0,
+            "p10": 8191.0,
+            "p90": 8191.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 2011700.0,
+            "p10": 1713900.0,
+            "p90": 2806400.0
+          },
+          "allocated_bytes": {
+            "median": 398160.0,
+            "p10": 398160.0,
+            "p90": 398160.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 32.0,
+            "p90": 8192.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 5499900.0,
+            "p10": 4406900.0,
+            "p90": 7113600.0
+          },
+          "allocated_bytes": {
+            "median": 2654536.0,
+            "p10": 2654536.0,
+            "p90": 2654536.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 8192.0,
+            "p90": 8192.0
+          }
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns": {
+            "median": 5111800.0,
+            "p10": 4078300.0,
+            "p90": 6611400.0
+          },
+          "allocated_bytes": {
+            "median": 1573152.0,
+            "p10": 1573152.0,
+            "p90": 1573152.0
+          },
+          "range_builds": {
+            "median": 8192.0,
+            "p10": 8192.0,
+            "p90": 8192.0
+          }
+        }
+      ],
+      "submission": [
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 40909300.0,
+            "p10": 28323200.0,
+            "p90": 72994600.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 46457000.0,
+            "p10": 24604900.0,
+            "p90": 69521500.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 201903600.0,
+            "p10": 165917800.0,
+            "p90": 260489600.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 90814100.0,
+            "p10": 69883600.0,
+            "p90": 139229300.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 35161700.0,
+            "p10": 26965300.0,
+            "p90": 39195700.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 35029400.0,
+            "p10": 27256600.0,
+            "p90": 39160700.0
+          },
+          "selected_frames": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 240244800.0,
+            "p10": 156845300.0,
+            "p90": 292401800.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns": {
+            "median": 83726000.0,
+            "p10": 60719900.0,
+            "p90": 135126500.0
+          },
+          "selected_frames": {
+            "median": 32.0,
+            "p10": 32.0,
+            "p90": 32.0
+          }
+        }
+      ],
+      "alphaCanopyQuality": [
+        {
+          "mode": "1",
+          "samples": 48,
+          "iou": {
+            "median": 0.8186147186147186,
+            "p10": 0.7142857142857143,
+            "p90": 0.9014084507042254
+          },
+          "added_fraction": {
+            "median": 0.22157622739018087,
+            "p10": 0.0,
+            "p90": 0.36363636363636365
+          },
+          "lost_fraction": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          },
+          "rgb_mae": {
+            "median": 0.045118275991867615,
+            "p10": 0.0,
+            "p90": 0.0789760348583878
+          }
+        },
+        {
+          "mode": "2",
+          "samples": 24,
+          "iou": {
+            "median": 0.6551724137931034,
+            "p10": 0.5161290322580645,
+            "p90": 0.78125
+          },
+          "added_fraction": {
+            "median": 0.5263157894736842,
+            "p10": 0.23529411764705882,
+            "p90": 0.8181818181818182
+          },
+          "lost_fraction": {
+            "median": 0.0,
+            "p10": 0.0,
+            "p90": 0.0
+          },
+          "rgb_mae": {
+            "median": 0.08541124565465338,
+            "p10": 0.05172735760971055,
+            "p90": 0.14830659536541888
+          }
+        }
+      ],
+      "surfaceCanopy": [
+        {
+          "mesh": "1511",
+          "source_faces": "50865",
+          "leaf_faces": "23969",
+          "union_faces": "23266",
+          "leaf_removed_fraction": "0.029329550669614957",
+          "projected_additional_bytes": "1116768",
+          "accepted": "false",
+          "builder_cpu_ns": "22355300"
+        },
+        {
+          "mesh": "739",
+          "source_faces": "46187",
+          "leaf_faces": "21959",
+          "union_faces": "21478",
+          "leaf_removed_fraction": "0.021904458308666164",
+          "projected_additional_bytes": "1030944",
+          "accepted": "false",
+          "builder_cpu_ns": "17564600"
+        },
+        {
+          "mesh": "732",
+          "source_faces": "28750",
+          "leaf_faces": "13299",
+          "union_faces": "12930",
+          "leaf_removed_fraction": "0.02774644710128582",
+          "projected_additional_bytes": "620640",
+          "accepted": "false",
+          "builder_cpu_ns": "10584300"
+        },
+        {
+          "mesh": "1476",
+          "source_faces": "28588",
+          "leaf_faces": "11411",
+          "union_faces": "11118",
+          "leaf_removed_fraction": "0.02567697835421956",
+          "projected_additional_bytes": "533664",
+          "accepted": "false",
+          "builder_cpu_ns": "9552600"
+        },
+        {
+          "mesh": "2001",
+          "source_faces": "17840",
+          "leaf_faces": "4208",
+          "union_faces": "4049",
+          "leaf_removed_fraction": "0.03778517110266155",
+          "projected_additional_bytes": "194352",
+          "accepted": "false",
+          "builder_cpu_ns": "6110200"
+        },
+        {
+          "mesh": "359",
+          "source_faces": "7610",
+          "leaf_faces": "1800",
+          "union_faces": "1800",
+          "leaf_removed_fraction": "0.0",
+          "projected_additional_bytes": "86400",
+          "accepted": "false",
+          "builder_cpu_ns": "2045000"
+        }
+      ],
+      "colorDepthPairs": {
+        "resident": 12,
+        "alphaCanopy": 216
+      }
+    }
+  },
+  "limits": [
+    "Input and PreparedPass CPU comparisons exclude scene/world generation and GL submission.",
+    "Whole submissions deliberately change a tracked unrelated mesh epoch every frame; not game FPS.",
+    "Static cases do not exercise resident selection; differences are control-run variation.",
+    "Foliage GPU inputs use the same alpha-tested flags and vanilla atlas for source and proxies.",
+    "Captured forest tiles are six selected historical samples, not a random full-world sample.",
+    "The exact planar foliage experiment failed residency/savings admission and is not packaged.",
+    "No stable GPU Scene ID, dirty-scene queue, Nanite, Mesh Shader or general zero-scan pipeline is claimed.",
+    "GPU tests were run serially across platforms on the same RTX 4070 Ti SUPER."
+  ]
+}

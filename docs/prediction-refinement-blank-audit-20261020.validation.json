@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-20",
+  "scope": "Audit only; expected invariant failure reproduces missing replacement GPU boundary mask",
+  "productionModified": false,
+  "gameLaunched": false,
+  "repositories": [
+    {
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "head": "1c9fd92c25db18605ba62d3ecbaf703248953f73",
+      "tests": 2,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "output": [
+        "AUDIT_GRID_REFINEMENT waitingFrames=20 oldDrawRetained=true finalMask=128",
+        "AUDIT_SAME_SEAMS oldMask=128 newMask=255 intended=128 changedMasks=0 removedEastWall=true",
+        "AUDIT_WALL_PIXEL alphaBefore=255 alphaAfter=0",
+        "AUDIT_RECOVERY unchangedFrames=20 alpha=0 laterSeamChangeAlpha=255"
+      ],
+      "productionHashes": {
+        "PredictionLodSeams.java": "46CB37383226DCCBBC8746480E36CBC7A265FF8C32D8396847EDAD8BAD5EDFE5",
+        "PredictionRenderer.java": "A7A24324C92F617663A6CB9B1348AF0785EC1C482E0AE08D7DAF2FCBB22C61DA",
+        "PredictionRenderResidency.java": "95D7DD2CA7B7A3FB5C5F81916A9CD661101E4188A209C889B3AE5AD54BCCA305",
+        "PredictionSeamPreparation.java": "6F65E8BD5A7F5212C77A318D0A6BB9A94345DA3E8B02AD5AFF0476296F26E561",
+        "PredictionGpuTile.java": "292B41D197FEC5BE57DDA97F69B38CC052D37635F9F2561C0DEB4FEDF905A9D1",
+        "PredictionTerrainProgram.java": "461116760D8E0CAABF90BAA2D816A974B5495EFEE29D9D6C26B0F772F2A9A58C"
+      }
+    },
+    {
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "head": "8c6e8f6d74f6b84f27cbe0225060fb94c39345c7",
+      "tests": 2,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "output": [
+        "AUDIT_GRID_REFINEMENT waitingFrames=20 oldDrawRetained=true finalMask=128",
+        "AUDIT_SAME_SEAMS oldMask=128 newMask=255 intended=128 changedMasks=0 removedEastWall=true",
+        "AUDIT_WALL_PIXEL alphaBefore=255 alphaAfter=0",
+        "AUDIT_RECOVERY unchangedFrames=20 alpha=0 laterSeamChangeAlpha=255"
+      ],
+      "productionHashes": {
+        "PredictionLodSeams.java": "46CB37383226DCCBBC8746480E36CBC7A265FF8C32D8396847EDAD8BAD5EDFE5",
+        "PredictionRenderer.java": "B261A1D2139EDEE87CABCDD453F5E21B7D7EAB24D7B8F3FAC56371F3BD0ECABC",
+        "PredictionRenderResidency.java": "95D7DD2CA7B7A3FB5C5F81916A9CD661101E4188A209C889B3AE5AD54BCCA305",
+        "PredictionSeamPreparation.java": "6F65E8BD5A7F5212C77A318D0A6BB9A94345DA3E8B02AD5AFF0476296F26E561",
+        "PredictionGpuTile.java": "292B41D197FEC5BE57DDA97F69B38CC052D37635F9F2561C0DEB4FEDF905A9D1",
+        "PredictionTerrainProgram.java": "461116760D8E0CAABF90BAA2D816A974B5495EFEE29D9D6C26B0F772F2A9A58C"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1126 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-10",
+  "investigationOnly": true,
+  "productionSourceChanged": false,
+  "clientJarReplaced": false,
+  "githubChanged": false,
+  "installedPackages": {
+    "vss": {
+      "file": "vss-0.3.5-neoforge-1.21.1.jar",
+      "sha256": "6C7AD3159E1DE7E2ED6C4DA04200D9A40E98EFDCAB87649C5BF84BC674AEB35A"
+    },
+    "voxy": {
+      "file": "voxy-0.2.15-beta.jar",
+      "sha256": "802D49EDC07C4E4A7AF15FFD59337A82AF383DFD551B67C278233098737E2F52"
+    }
+  },
+  "mainWindow": {
+    "startLocal": "2026-10-10T19:02:06.483000+08:00",
+    "endLocal": "2026-10-10T19:02:36.507000+08:00",
+    "startEpochMs": 1791630126483,
+    "endEpochMs": 1791630156507,
+    "seconds": 30.0239681,
+    "frames": 1582.0,
+    "actualFps": 52.691236372583276,
+    "gameFpsRange": [
+      50,
+      55
+    ],
+    "paused": false,
+    "screen": null,
+    "stationaryView": true,
+    "runtimeConfigurationCapturedInThisWindow": false,
+    "viewBefore": {
+      "x": 896.9284869848923,
+      "y": 265.6199998855591,
+      "z": 540.0149115314858,
+      "dx": 0.9066618154892825,
+      "dy": -0.30028462025943814,
+      "dz": 0.2962996779770831,
+      "observedAt": 23806120356700,
+      "pixelScale": 1472.0
+    },
+    "viewAfter": {
+      "x": 896.9284869848923,
+      "y": 265.6199998855591,
+      "z": 540.0149115314858,
+      "dx": 0.9066618154892825,
+      "dy": -0.30028462025943814,
+      "dz": 0.2962996779770831,
+      "observedAt": 23836115632700,
+      "pixelScale": 1472.0
+    },
+    "counters": {
+      "frameStarts": 1582.0,
+      "preparedPlans": 201.0,
+      "reusedPlans": 1382.0,
+      "meshUploads": 212.0,
+      "drawCalls": 301561.0,
+      "indirectCalls": 301561.0,
+      "indirectTiles": 7660456.0,
+      "multiDrawCalls": 0.0,
+      "quads": 21372666149.0,
+      "visibilityVisits": 2276.0,
+      "worldVisits": 1255.0,
+      "orderEdits": 2269.0,
+      "listPublications": 184.0,
+      "planHits": 3165.0,
+      "planMisses": 347.0,
+      "planReplayBatches": 292502.0,
+      "planIdentityHits": 7338370.0,
+      "planContentChecks": 332.0
+    },
+    "perFrame": {
+      "frameStarts": 1.0,
+      "preparedPlans": 0.12705436156763592,
+      "reusedPlans": 0.8735777496839444,
+      "meshUploads": 0.13400758533501897,
+      "drawCalls": 190.62010113780025,
+      "indirectCalls": 190.62010113780025,
+      "indirectTiles": 4842.260429835651,
+      "multiDrawCalls": 0.0,
+      "quads": 13509902.749051834,
+      "visibilityVisits": 1.438685208596713,
+      "worldVisits": 0.793299620733249,
+      "orderEdits": 1.4342604298356512,
+      "listPublications": 0.11630847029077118,
+      "planHits": 2.0006321112515804,
+      "planMisses": 0.2193426042983565,
+      "planReplayBatches": 184.89380530973452,
+      "planIdentityHits": 4638.666245259165,
+      "planContentChecks": 0.20986093552465235
+    },
+    "timings": {
+      "PREPARE": {
+        "cpuCount": 53,
+        "cpuMs": 0.5626792452830189,
+        "gpuCount": 0,
+        "gpuMs": null
+      },
+      "COVERAGE": {
+        "cpuCount": 28,
+        "cpuMs": 0.211125,
+        "gpuCount": 0,
+        "gpuMs": null
+      },
+      "SEAMS": {
+        "cpuCount": 3,
+        "cpuMs": 4.263466666666667,
+        "gpuCount": 0,
+        "gpuMs": null
+      },
+      "UPLOAD": {
+        "cpuCount": 6,
+        "cpuMs": 0.6124,
+        "gpuCount": 0,
+        "gpuMs": null
+      },
+      "OPAQUE": {
+        "cpuCount": 53,
+        "cpuMs": 2.7903132075471695,
+        "gpuCount": 53,
+        "gpuMs": 10.302947018867926
+      },
+      "WATER": {
+        "cpuCount": 53,
+        "cpuMs": 0.2227735849056604,
+        "gpuCount": 53,
+        "gpuMs": 0.04559698113207548
+      },
+      "DEPTH_COPY": {
+        "cpuCount": 53,
+        "cpuMs": 0.03248679245283019,
+        "gpuCount": 53,
+        "gpuMs": 0.20906988679245284
+      },
+      "STATE": {
+        "cpuCount": 318,
+        "cpuMs": 0.011677358490566038,
+        "gpuCount": 0,
+        "gpuMs": null
+      },
+      "ANTIALIAS": {
+        "cpuCount": 53,
+        "cpuMs": 0.04213396226415094,
+        "gpuCount": 53,
+        "gpuMs": 0.15209298113207548
+      },
+      "HZB_REDUCE": {
+        "cpuCount": 413,
+        "cpuMs": 0.018514285714285712,
+        "gpuCount": 413,
+        "gpuMs": 0.0872259564164649
+      },
+      "GPU_FILTER": {
+        "cpuCount": 413,
+        "cpuMs": 0.061150363196125906,
+        "gpuCount": 413,
+        "gpuMs": 0.03687639709443099
+      },
+      "INDIRECT_BUILD": {
+        "cpuCount": 106,
+        "cpuMs": 1.426404716981132,
+        "gpuCount": 0,
+        "gpuMs": null
+      },
+      "INDIRECT_UPLOAD": {
+        "cpuCount": 212,
+        "cpuMs": 0.009057547169811322,
+        "gpuCount": 0,
+        "gpuMs": null
+      },
+      "INDIRECT_SUBMIT": {
+        "cpuCount": 0,
+        "cpuMs": null,
+        "gpuCount": 848,
+        "gpuMs": 0.18097509433962264
+      }
+    },
+    "threadGroups": {
+      "render": {
+        "cpuSeconds": 18.34375,
+        "allocatedBytes": 1408203720,
+        "cpuCores": 0.6109702068328536,
+        "allocationMiBPerSecond": 44.729854346992134
+      },
+      "other": {
+        "cpuSeconds": 1.609375,
+        "allocatedBytes": 20119160,
+        "cpuCores": 0.05360300792485854,
+        "allocationMiBPerSecond": 0.6390603032804304
+      },
+      "c2me": {
+        "cpuSeconds": 0.0,
+        "allocatedBytes": 39632,
+        "cpuCores": 0.0,
+        "allocationMiBPerSecond": 0.0012588615995702613
+      },
+      "integrated_server": {
+        "cpuSeconds": 1.84375,
+        "allocatedBytes": 393684928,
+        "cpuCores": 0.06140927121488648,
+        "allocationMiBPerSecond": 12.50491618360878
+      },
+      "other_vss": {
+        "cpuSeconds": 4.34375,
+        "allocatedBytes": 219163376,
+        "cpuCores": 0.1446760796418512,
+        "allocationMiBPerSecond": 6.961454331817183
+      },
+      "prediction_workers": {
+        "cpuSeconds": 209.515625,
+        "allocatedBytes": 5499339280,
+        "cpuCores": 6.978278963732312,
+        "allocationMiBPerSecond": 174.6797295771187
+      },
+      "diagnostic": {
+        "cpuSeconds": 0.03125,
+        "allocatedBytes": 2195360,
+        "cpuCores": 0.0010408351053370589,
+        "allocationMiBPerSecond": 0.06973290273598529
+      }
+    },
+    "renderThreadCpuMsPerFrame": 11.595290771175726,
+    "executorActiveRange": [
+      4,
+      10
+    ],
+    "gauges": {
+      "liveBytes": {
+        "first": 1491146528,
+        "last": 1550726960,
+        "min": 1491146528,
+        "max": 1550726960,
+        "delta": 59580432
+      },
+      "committedGeometryBytes": {
+        "first": 2214592512,
+        "last": 2214592512,
+        "min": 2214592512,
+        "max": 2214592512,
+        "delta": 0
+      },
+      "gpuTiles": {
+        "first": 4881,
+        "last": 4881,
+        "min": 4881,
+        "max": 4881,
+        "delta": 0
+      },
+      "quads": {
+        "first": 42357286,
+        "last": 43961972,
+        "min": 42357286,
+        "max": 43961972,
+        "delta": 1604686
+      },
+      "rectangles": {
+        "first": 37693372,
+        "last": 39297916,
+        "min": 37693372,
+        "max": 39297916,
+        "delta": 1604544
+      },
+      "budgetEvictions": {
+        "first": 14215,
+        "last": 14224,
+        "min": 14215,
+        "max": 14224,
+        "delta": 9
+      },
+      "restoreRequests": {
+        "first": 12935,
+        "last": 12944,
+        "min": 12935,
+        "max": 12944,
+        "delta": 9
+      },
+      "coldTiles": {
+        "first": 1035,
+        "last": 1035,
+        "min": 1035,
+        "max": 1035,
+        "delta": 0
+      }
+    },
+    "timingCaveats": [
+      "CPU stages overlap; CPU and GPU overlap.",
+      "GPU timestamps measure stage intervals, including possible command-supply gaps.",
+      "Candidate quads are not final visible/rasterized quads.",
+      "Background refinement remained active; this is not a workers-idle control."
+    ],
+    "jfr": {
+      "renderExecutionSamples": 2192,
+      "renderNativeSamples": 191,
+      "renderMonitorMs": 0.0,
+      "maxRenderMonitorMs": 0.0,
+      "renderParkMs": 0.0,
+      "maxRenderParkMs": 0.0,
+      "gcCount": 10,
+      "gcMs": 74.7157,
+      "maxGcMs": 16.1971,
+      "renderMethodSamplesOverlapping": {
+        "dev.xantha.vss.client.prediction.PredictionNormalTranslucencyBridge.beforeTranslucent": 1344,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStage": 1341,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderBeforeVoxyWater": 1341,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked": 1335,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawPasses": 539,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass": 449,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onClientTick": 380,
+        "dev.xantha.vss.client.prediction.ClientPredictionState.tick": 374,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.tick": 358,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.add": 339,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare": 238,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.apply": 160,
+        "dev.xantha.vss.client.prediction.PredictionGpuResidency.used": 145,
+        "dev.xantha.vss.client.prediction.PredictionGpuTile.morphStartSeconds": 144,
+        "dev.xantha.vss.client.prediction.PredictionMorph.startSeconds": 144,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.stitch": 144,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.matches": 143,
+        "dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.equals": 123,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.terrainRecords": 123,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.<init>": 122,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.preparePass": 122,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare": 122,
+        "dev.xantha.vss.client.prediction.PredictionDisplayGeometry.build": 115,
+        "dev.xantha.vss.client.prediction.PredictionDisplayGeometry.join": 95,
+        "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail": 93,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.scheduleWork": 92,
+        "dev.xantha.vss.client.prediction.PredictionLodPlanner.plan": 87,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.tileWithinHorizon": 87,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.hasPendingUploads": 81,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$$Lambda.0x000000000b56b400.test": 79,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.lambda$renderStageUnpacked$0": 79,
+        "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.sample": 77,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.onRenderLevel": 72,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderDeferredWater": 72,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onRenderLevel": 72,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.pruneReady": 65,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.maintainGpuResidency": 57,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshViewWork": 57,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.occludedWork": 55,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.resolveCoverage": 54,
+        "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot.hidden": 54,
+        "dev.xantha.vss.client.prediction.PredictionVoxyBoundaryBridge.bind": 51,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.voxyBoundaryCoverage": 51,
+        "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.poll": 48,
+        "dev.xantha.vss.client.prediction.PredictionDisplayGeometry.coordinate": 43,
+        "dev.xantha.vss.client.prediction.PredictionLodPlanner$$Lambda.0x000000000b3e3c00.applyAsInt": 41,
+        "dev.xantha.vss.client.prediction.PredictionLodPlanner.lambda$plan$7": 41,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.drawRanges": 40,
+        "dev.xantha.vss.client.prediction.PredictionDrawRanges.<init>": 40,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.retireCovered": 39,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.pendingUploads": 37,
+        "dev.xantha.vss.client.prediction.PredictionTileResidencyPolicy.shouldRetirePinned": 32,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.intersects": 32,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.band": 32,
+        "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$History.observe": 31,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshVoxyOwnership": 31,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.contains": 30,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.lambda$pendingUploads$2": 30
+      },
+      "monitorAndParkEventThresholdMs": 2,
+      "sourceFile": "forest.jfr"
+    }
+  },
+  "geometrySnapshot": {
+    "snapshotEpochMs": 1791630438011,
+    "captureMs": 71.189,
+    "runtimeConfig": {
+      "predictionDistanceBlocks": 8192,
+      "predictionFineDistanceBlocks": 1536,
+      "predictionSurfaceDistanceBlocks": 512,
+      "predictionVegetationDensity": "medium",
+      "performanceTier": "high",
+      "predictionTrees": true,
+      "predictionAntialiasing": true
+    },
+    "snapshotIsSeparateFromJfrWindow": true,
+    "counts": {
+      "all": 15761848,
+      "terrain": 12178348,
+      "leaves": 758658,
+      "otherFeatures": 2777262,
+      "water": 47580
+    },
+    "perType": {
+      "all": {
+        "quads": 15761848,
+        "rectangles": 15629526,
+        "cutout": 132615,
+        "modelUv": 0,
+        "diagonalOrUnshaded": 132322,
+        "sourceCellFixed": 14660982,
+        "specialBoundary": 0
+      },
+      "terrain": {
+        "quads": 12178348,
+        "rectangles": 12178348,
+        "cutout": 0,
+        "modelUv": 0,
+        "diagonalOrUnshaded": 0,
+        "sourceCellFixed": 11115681,
+        "specialBoundary": 0
+      },
+      "leaves": {
+        "quads": 758658,
+        "rectangles": 758658,
+        "cutout": 0,
+        "modelUv": 0,
+        "diagonalOrUnshaded": 0,
+        "sourceCellFixed": 758658,
+        "specialBoundary": 0
+      },
+      "otherFeatures": {
+        "quads": 2777262,
+        "rectangles": 2644940,
+        "cutout": 132615,
+        "modelUv": 0,
+        "diagonalOrUnshaded": 132322,
+        "sourceCellFixed": 2777262,
+        "specialBoundary": 0
+      },
+      "water": {
+        "quads": 47580,
+        "rectangles": 47580,
+        "cutout": 0,
+        "modelUv": 0,
+        "diagonalOrUnshaded": 0,
+        "sourceCellFixed": 9381,
+        "specialBoundary": 0
+      }
+    },
+    "bySpacing": {
+      "1": {
+        "all": 4393857,
+        "terrain": 2576732,
+        "leaves": 373003,
+        "otherFeatures": 1441984,
+        "water": 2138
+      },
+      "4": {
+        "all": 6054313,
+        "terrain": 5816136,
+        "leaves": 35626,
+        "otherFeatures": 172533,
+        "water": 30018
+      },
+      "2": {
+        "all": 4443192,
+        "terrain": 2933691,
+        "leaves": 346809,
+        "otherFeatures": 1159525,
+        "water": 3167
+      },
+      "16": {
+        "all": 160899,
+        "terrain": 157446,
+        "leaves": 0,
+        "otherFeatures": 0,
+        "water": 3453
+      },
+      "8": {
+        "all": 528576,
+        "terrain": 517722,
+        "leaves": 3220,
+        "otherFeatures": 3220,
+        "water": 4414
+      },
+      "32": {
+        "all": 157122,
+        "terrain": 153682,
+        "leaves": 0,
+        "otherFeatures": 0,
+        "water": 3440
+      },
+      "512": {
+        "all": 1457,
+        "terrain": 1300,
+        "leaves": 0,
+        "otherFeatures": 0,
+        "water": 157
+      },
+      "1024": {
+        "all": 1039,
+        "terrain": 939,
+        "leaves": 0,
+        "otherFeatures": 0,
+        "water": 100
+      },
+      "128": {
+        "all": 21393,
+        "terrain": 20700,
+        "leaves": 0,
+        "otherFeatures": 0,
+        "water": 693
+      }
+    },
+    "byDisplayTier": {
+      "1": {
+        "all": 1879183,
+        "terrain": 1067244,
+        "leaves": 441455,
+        "otherFeatures": 368248,
+        "water": 2236
+      },
+      "0": {
+        "all": 12023991,
+        "terrain": 9764826,
+        "leaves": 111975,
+        "otherFeatures": 2107952,
+        "water": 39238
+      },
+      "3": {
+        "all": 356442,
+        "terrain": 345231,
+        "leaves": 3894,
+        "otherFeatures": 3894,
+        "water": 3423
+      },
+      "2": {
+        "all": 1502232,
+        "terrain": 1001047,
+        "leaves": 201334,
+        "otherFeatures": 297168,
+        "water": 2683
+      }
+    },
+    "displayExcluded": 398441,
+    "ownershipExcluded": 90225,
+    "displayDistance": 738,
+    "meshes": 3890,
+    "meshCounts": {
+      "compact": 2019,
+      "morph": 1,
+      "displayVariants": 30
+    },
+    "selectedOnMorphMeshes": 2201,
+    "selectedOnDisplayVariantMeshes": 23810,
+    "encodedStorageBytes": {
+      "compact": 744126448,
+      "raw": 10335840
+    },
+    "topMaterials": [
+      {
+        "sprite": 24,
+        "quads": 4200164,
+        "name": "minecraft:block/stone",
+        "blockId": 1,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 30,
+        "quads": 3919603,
+        "name": "minecraft:block/snow",
+        "blockId": 249,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 22,
+        "quads": 1697639,
+        "name": "minecraft:block/grass_block_top",
+        "blockId": 8,
+        "blockClass": "net.minecraft.world.level.block.GrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 45,
+        "quads": 1392295,
+        "name": "minecraft:block/gravel",
+        "blockId": 37,
+        "blockClass": "net.minecraft.world.level.block.ColoredFallingBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 25,
+        "quads": 1258624,
+        "name": "minecraft:block/sand",
+        "blockId": 34,
+        "blockClass": "net.minecraft.world.level.block.ColoredFallingBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 51,
+        "quads": 754504,
+        "name": "minecraft:block/grass_block_side",
+        "blockId": 8,
+        "blockClass": "net.minecraft.world.level.block.GrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 23,
+        "quads": 751697,
+        "name": "minecraft:block/dirt",
+        "blockId": 9,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 40,
+        "quads": 476402,
+        "name": "minecraft:block/spruce_leaves",
+        "blockId": 83,
+        "blockClass": "net.minecraft.world.level.block.LeavesBlock",
+        "leafClass": true
+      },
+      {
+        "sprite": 56,
+        "quads": 268603,
+        "name": "minecraft:block/packed_ice",
+        "blockId": 496,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 31,
+        "quads": 209071,
+        "name": "minecraft:block/oak_leaves",
+        "blockId": 82,
+        "blockClass": "net.minecraft.world.level.block.LeavesBlock",
+        "leafClass": true
+      },
+      {
+        "sprite": 53,
+        "quads": 110856,
+        "name": "minecraft:block/deepslate",
+        "blockId": 1023,
+        "blockClass": "net.minecraft.world.level.block.RotatedPillarBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 46,
+        "quads": 77979,
+        "name": "minecraft:block/terracotta",
+        "blockId": 494,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 41,
+        "quads": 62552,
+        "name": "minecraft:block/birch_leaves",
+        "blockId": 84,
+        "blockClass": "net.minecraft.world.level.block.LeavesBlock",
+        "leafClass": true
+      },
+      {
+        "sprite": 62,
+        "quads": 51538,
+        "name": "minecraft:block/powder_snow",
+        "blockId": 925,
+        "blockClass": "net.minecraft.world.level.block.PowderSnowBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 49,
+        "quads": 48784,
+        "name": "minecraft:block/podzol_top",
+        "blockId": 11,
+        "blockClass": "net.minecraft.world.level.block.SnowyDirtBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 1,
+        "quads": 48078,
+        "name": "minecraft:block/short_grass",
+        "blockId": 123,
+        "blockClass": "net.minecraft.world.level.block.TallGrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 28,
+        "quads": 45715,
+        "name": "minecraft:block/water_still",
+        "blockId": 32,
+        "blockClass": "net.minecraft.world.level.block.LiquidBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 55,
+        "quads": 28550,
+        "name": "minecraft:block/podzol_side",
+        "blockId": 11,
+        "blockClass": "net.minecraft.world.level.block.SnowyDirtBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 54,
+        "quads": 26857,
+        "name": "minecraft:block/grass_block_snow",
+        "blockId": 8,
+        "blockClass": "net.minecraft.world.level.block.GrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 48,
+        "quads": 26276,
+        "name": "minecraft:block/coarse_dirt",
+        "blockId": 10,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 58,
+        "quads": 22295,
+        "name": "minecraft:block/ice",
+        "blockId": 248,
+        "blockClass": "net.minecraft.world.level.block.IceBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 50,
+        "quads": 22266,
+        "name": "minecraft:block/orange_terracotta",
+        "blockId": 426,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 11,
+        "quads": 21044,
+        "name": "minecraft:block/kelp_plant",
+        "blockId": 679,
+        "blockClass": "net.minecraft.world.level.block.KelpPlantBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 47,
+        "quads": 20569,
+        "name": "minecraft:block/red_sand",
+        "blockId": 36,
+        "blockClass": "net.minecraft.world.level.block.ColoredFallingBlock",
+        "leafClass": false
+      }
+    ],
+    "coordinateSavingUpperBoundBytes": 187554312,
+    "localTime": "2026-10-10T19:07:18.011000+08:00",
+    "reliableCameraRecorded": false,
+    "cameraRecordLimitation": "Exporter overwrote opaque camera with null from water pass; separate snapshot cannot be treated as the same view as JFR.",
+    "captureIsOutsideMainWindow": true,
+    "captureOverheadIsNotGameRegressionEvidence": true,
+    "sizeGuards": {
+      "withinSizeGuard": {
+        "meshes": 2656,
+        "sourceOpaqueQuads": 22375386,
+        "selectedQuads": 15566330
+      },
+      "tooSmall": {
+        "meshes": 1233,
+        "sourceOpaqueQuads": 77828,
+        "selectedQuads": 77828
+      },
+      "tooLarge": {
+        "meshes": 1,
+        "sourceOpaqueQuads": 166651,
+        "selectedQuads": 117690
+      }
+    },
+    "displayJoinEligibility": {
+      "sourceOpaqueQuads": 22619865,
+      "eligibleSourceOpaqueQuads": 8296127,
+      "selectedTerrainQuads": 12178348,
+      "selectedTerrainEligibleQuads": 3153127,
+      "selectedTerrainLodTextureScaleQuads": 9025221,
+      "selectedTerrainBoundaryOrWallQuads": 4714148,
+      "excludedCategoriesOverlap": true,
+      "lodTextureScaleAlsoTagsGenerationStageMergedTerrain": true
+    },
+    "rangeCounts": {
+      "rangeCount": 44597,
+      "meshletCommandsIfSegmented": 104306
+    },
+    "rangeLengthHistogram": {
+      ">256": 4121,
+      "17-64": 1558,
+      "65-256": 1947,
+      "1": 24185,
+      "5-16": 3037,
+      "2-4": 9749
+    },
+    "topOtherFeatureMaterials": [
+      {
+        "sprite": 30,
+        "quads": 2384627,
+        "name": "minecraft:block/snow",
+        "blockId": 249,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 23,
+        "quads": 62442,
+        "name": "minecraft:block/dirt",
+        "blockId": 9,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 1,
+        "quads": 48078,
+        "name": "minecraft:block/short_grass",
+        "blockId": 123,
+        "blockClass": "net.minecraft.world.level.block.TallGrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 25,
+        "quads": 32333,
+        "name": "minecraft:block/sand",
+        "blockId": 34,
+        "blockClass": "net.minecraft.world.level.block.ColoredFallingBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 49,
+        "quads": 22591,
+        "name": "minecraft:block/podzol_top",
+        "blockId": 11,
+        "blockClass": "net.minecraft.world.level.block.SnowyDirtBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 11,
+        "quads": 21044,
+        "name": "minecraft:block/kelp_plant",
+        "blockId": 679,
+        "blockClass": "net.minecraft.world.level.block.KelpPlantBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 33,
+        "quads": 20538,
+        "name": "minecraft:block/oak_log",
+        "blockId": 46,
+        "blockClass": "net.minecraft.world.level.block.RotatedPillarBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 35,
+        "quads": 18103,
+        "name": "minecraft:block/spruce_log",
+        "blockId": 47,
+        "blockClass": "net.minecraft.world.level.block.RotatedPillarBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 55,
+        "quads": 17353,
+        "name": "minecraft:block/podzol_side",
+        "blockId": 11,
+        "blockClass": "net.minecraft.world.level.block.SnowyDirtBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 116,
+        "quads": 14449,
+        "name": "minecraft:block/mossy_cobblestone",
+        "blockId": 169,
+        "blockClass": "net.minecraft.world.level.block.Block",
+        "leafClass": false
+      },
+      {
+        "sprite": 22,
+        "quads": 13910,
+        "name": "minecraft:block/grass_block_top",
+        "blockId": 8,
+        "blockClass": "net.minecraft.world.level.block.GrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 54,
+        "quads": 13801,
+        "name": "minecraft:block/grass_block_snow",
+        "blockId": 8,
+        "blockClass": "net.minecraft.world.level.block.GrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 37,
+        "quads": 10132,
+        "name": "minecraft:block/birch_log",
+        "blockId": 48,
+        "blockClass": "net.minecraft.world.level.block.RotatedPillarBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 43,
+        "quads": 10084,
+        "name": "minecraft:block/dandelion",
+        "blockId": 147,
+        "blockClass": "net.minecraft.world.level.block.FlowerBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 44,
+        "quads": 8070,
+        "name": "minecraft:block/poppy",
+        "blockId": 149,
+        "blockClass": "net.minecraft.world.level.block.FlowerBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 45,
+        "quads": 6964,
+        "name": "minecraft:block/gravel",
+        "blockId": 37,
+        "blockClass": "net.minecraft.world.level.block.ColoredFallingBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 129,
+        "quads": 6676,
+        "name": "minecraft:block/pink_petals",
+        "blockId": 1015,
+        "blockClass": "net.minecraft.world.level.block.PinkPetalsBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 32,
+        "quads": 5295,
+        "name": "minecraft:block/oak_log_top",
+        "blockId": 46,
+        "blockClass": "net.minecraft.world.level.block.RotatedPillarBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 128,
+        "quads": 4472,
+        "name": "minecraft:block/azure_bluet",
+        "blockId": 152,
+        "blockClass": "net.minecraft.world.level.block.FlowerBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 127,
+        "quads": 4450,
+        "name": "minecraft:block/cornflower",
+        "blockId": 158,
+        "blockClass": "net.minecraft.world.level.block.FlowerBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 10,
+        "quads": 3932,
+        "name": "minecraft:block/kelp",
+        "blockId": 678,
+        "blockClass": "net.minecraft.world.level.block.KelpBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 7,
+        "quads": 3868,
+        "name": "minecraft:block/seagrass",
+        "blockId": 126,
+        "blockClass": "net.minecraft.world.level.block.SeagrassBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 36,
+        "quads": 3479,
+        "name": "minecraft:block/birch_log_top",
+        "blockId": 48,
+        "blockClass": "net.minecraft.world.level.block.RotatedPillarBlock",
+        "leafClass": false
+      },
+      {
+        "sprite": 8,
+        "quads": 3214,
+        "name": "minecraft:block/tall_seagrass_top",
+        "blockId": 127,
+        "blockClass": "net.minecraft.world.level.block.TallSeagrassBlock",
+        "leafClass": false
+      }
+    ],
+    "displayVariants": {
+      "ordinaryMeshCount": 3,
+      "seamMeshCount": 27,
+      "ordinaryOpaqueSelectedQuads": 17492,
+      "seamsUseOriginalRangesInProduction": true
+    }
+  },
+  "offlineDisplayReplay": {
+    "sampleKind": "stratified by spacing, eligibility, plus all existing variant meshes; not population-weighted",
+    "meshes": 87,
+    "sourceQuads": 1300213,
+    "skipped": [
+      {
+        "id": 1787,
+        "reason": "original face groups ambiguous for crossed plants"
+      }
+    ],
+    "variantResultsMatched": 87,
+    "hasVariants": 30,
+    "withoutVariants": 57,
+    "joinFailureNames": [
+      "flagsColorsLightOrFeature",
+      "notCoplanar",
+      "ownershipCoordinate",
+      "notAdjacentRectangle",
+      "dimensionLimit"
+    ],
+    "joinFailures": [
+      34867659,
+      56681923,
+      0,
+      5254372,
+      8562
+    ],
+    "tierDecisions": {
+      "fragmented": 66,
+      "insufficientNetReduction": 129,
+      "accepted": 66
+    }
+  },
+  "laterContextSnapshot": {
+    "epochMs": 1791631593793,
+    "paused": false,
+    "fps": 53,
+    "renderTimingsProperty": null,
+    "availableProcessors": 16,
+    "camera": {
+      "look": "(-9.295E-1 -2.296E-1 -2.887E-1)",
+      "x": 894.6335280326738,
+      "y": 262.6199998855591,
+      "z": 538.1613752503395
+    },
+    "viewport": {
+      "width": 3840,
+      "height": 2066
+    },
+    "runtimeConfig": {
+      "predictionDistanceBlocks": 8192,
+      "predictionFineDistanceBlocks": 1536,
+      "predictionSurfaceDistanceBlocks": 512,
+      "predictionVegetationDensity": "medium",
+      "performanceTier": "high",
+      "predictionTrees": true,
+      "predictionAntialiasing": true
+    },
+    "voxyRuntimeConfig": {
+      "enabled": true,
+      "enableRendering": true,
+      "sectionRenderDistance": 16.0,
+      "subDivisionSize": 64.0,
+      "serviceThreads": 5,
+      "ingestEnabled": true,
+      "dontUseSodiumBuilderThreads": false
+    },
+    "voxy": {
+      "source": "(union:/F:/NovaEngineering-World整合包/.minecraft/versions/1.21.1-NeoForge_21.1.249/mods/.connector/voxy-0.2.15-beta_mapped_moj_1.21.1.jar%23494!/ <no signer certificates>)",
+      "pipeline": "me.cortex.voxy.client.core.NormalRenderPipeline",
+      "sectionCount": 2402,
+      "geometryCapacityBytes": 4294966272,
+      "geometryUsedBytes": 26221568
+    },
+    "leafMaterials": [
+      {
+        "cutout": false,
+        "name": "minecraft:block/oak_leaves",
+        "sprite": 31
+      },
+      {
+        "cutout": false,
+        "name": "minecraft:block/spruce_leaves",
+        "sprite": 40
+      },
+      {
+        "cutout": false,
+        "name": "minecraft:block/birch_leaves",
+        "sprite": 41
+      },
+      {
+        "cutout": false,
+        "name": "minecraft:block/jungle_leaves",
+        "sprite": 42
+      },
+      {
+        "cutout": false,
+        "name": "minecraft:block/dark_oak_leaves",
+        "sprite": 88
+      },
+      {
+        "cutout": false,
+        "name": "minecraft:block/acacia_leaves",
+        "sprite": 91
+      },
+      {
+        "cutout": false,
+        "name": "minecraft:block/cherry_leaves",
+        "sprite": 94
+      },
+      {
+        "cutout": false,
+        "name": "minecraft:block/mangrove_leaves",
+        "sprite": 167
+      },
+      {
+        "cutout": true,
+        "name": "minecraft:block/bamboo_small_leaves",
+        "sprite": 196
+      },
+      {
+        "cutout": true,
+        "name": "minecraft:block/bamboo_large_leaves",
+        "sprite": 197
+      }
+    ],
+    "captureMs": 1.9668,
+    "localTime": "2026-10-10T19:26:33.793000+08:00",
+    "separateFromMainAndGeometryWindows": true,
+    "voxySectionAndGeometryMeasurementsArePublishedCpuCounters": true,
+    "voxyGpuTimeAndFinalVisibleFacesMeasured": false,
+    "noEqualCoverageVoxyVssAB": true
+  },
+  "diagnosticsRestored": true,
+  "rawEvidenceRoot": "C:\\Users\\Administrator\\.codex\\tmp\\vss-distance-render-20261010",
+  "revisedPriorities": [
+    "Skip display variant generation for seams that never select it; advance whole-pass/batch replay before per-draw work.",
+    "Implement a compact rectangular geometry format with a generic fallback; exact geometry and ownership remain valid.",
+    "Separate cached fine data from screen-error-based drawing for terrain, snow and trees, with stable versioned handoff.",
+    "Measure a proved lightweight shader path for fixed-cell/clear-ownership remote geometry.",
+    "Use new GPU/CPU measurements to decide command compaction and deeper hierarchy."
+  ]
+}

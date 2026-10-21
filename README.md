@@ -17,7 +17,7 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 - NeoForge 1.21.1 版本：[voxy-server-side-neoforge](https://github.com/wish131400/voxy-server-side-neoforge)
 - 下载：[CurseForge](https://www.curseforge.com/minecraft/mc-mods/voxy-server-side-forge-neoforge)
 
-当前版本为 `0.3.5-forge-1.20.1`，输出文件为 `lib/vss-0.3.5-forge-1.20.1.jar`。当前 Forge 网络协议为 49（0.3.4 源码为 47）。客户端与服务端必须使用同一次 0.3.5 构建；旧协议不兼容。缓存升级按记录校验和迁移，无需清空世界或 Voxy 缓存。
+当前版本为 `0.3.5-forge-1.20.1`，输出文件为 `lib/vss-0.3.5-forge-1.20.1.jar`。当前 Forge 网络协议为 53（0.3.4 源码为 47）。客户端与服务端必须使用同一次 0.3.5 构建；旧协议不兼容。缓存升级按记录校验和迁移，无需清空世界或 Voxy 缓存。
 
 客户端和服务端必须安装协议一致的 VSS，不要混用旧版 jar。
 
@@ -50,7 +50,7 @@ Voxy Server Side（VSS）让服务端负责读取、生成、缓存并发送 Vox
 
 ## VSS 远处预测
 
-客户端收到服务端同步的世界生成信息后，用世界种子在本地预测并渲染远景地形，不必等服务端把远处的 Voxy 列全部传输完成，地平线附近即可显示地形、植被和地表建筑。该功能默认开启，可用 `enablePrediction` 关闭。
+客户端收到服务端同步的世界生成信息后，用世界种子在本地预测并渲染远景地形，不必等服务端把远处的 Voxy 列全部传输完成，地平线附近即可显示地形、植被和地表建筑。该功能标记为 Beta，默认关闭，可用 `enablePrediction` 开启。
 
 预测范围由 `predictionDistanceBlocks` 控制（默认 4096 方块），普通精细地形距离由 `predictionFineDistanceBlocks` 控制（默认 512 方块）。最外层 10% 不强制锁定粗 LOD，仍按屏幕像素误差及可用预算渐进细化。近处地形之外还会按 `predictionSurfaceDistanceBlocks`（默认 768 方块）细化地表内容。植被数量由 `predictionVegetationDensity` 的低、中、高三档控制，分别保留约 25%、50%、100%，默认中档；建筑由 `predictionStructures` 开关控制。望远镜额外加载目标区域由 `predictionSpyglassLoading` 控制，默认开启。地形采样按「原生 Rust → Java」的顺序选择后端：可用时使用随包的原生 Rust 世界生成核心，否则退回解码后的 Java 上下文；Rust 会处理受支持的生物群系、地表规则与装饰放置，未支持的装饰保留 Java 回退；建筑结构沿用 Minecraft 的 Java 布局与模板处理器，并与两种地形后端共享虚拟区块。预测结果默认缓存在本地（`rememberTerrain=true`），重进世界可恢复已有精度。
 
@@ -232,3 +232,7 @@ Rust 样条现在保留数据包内重复/未排序控制点，并按 Minecraft 
 ## License
 
 MIT
+
+## 开发与模块边界
+
+开发前请阅读 [贡献约定](CONTRIBUTING.md) 和 [模块架构](docs/architecture.md)。日常执行 `gradlew verifyModules` 检查依赖方向与关键生命周期回归；各生产包的 `package-info.java` 记录职责、线程和资源所有权。

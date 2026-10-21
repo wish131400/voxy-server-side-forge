@@ -1,0 +1,2170 @@
+{
+  "task": "Sodium/Voxy rendering follow-up based on lNvcOAWHJs; investigation only",
+  "productionChangesThisFollowup": false,
+  "fpsABPerformedThisFollowup": false,
+  "sources": {
+    "sparkUrl": "https://spark.lucko.me/lNvcOAWHJs",
+    "installedVersions": {
+      "vss": "0.3.5-neoforge-1.21.1",
+      "voxy": "0.2.15-beta",
+      "sodium": "0.8.12-beta.2+mc1.21.1",
+      "iris": "1.8.14-beta.1+mc1.21.1"
+    },
+    "artifacts": [
+      {
+        "path": "C:/Users/Administrator/.codex/tmp/vss-render-followup-20261011/lNvcOAWHJs.sparkprofile",
+        "bytes": 1330307,
+        "sha256": "9110c06400bd2e57de10e04c586f9395c70ad13c1ecc4e7942bb632082a80c1d"
+      },
+      {
+        "path": "C:/Users/Administrator/.codex/tmp/vss-render-followup-20261011/lNvcOAWHJs-decoded.json",
+        "bytes": 4547571,
+        "sha256": "4a936df5e46e5076e4ae465e099942252bf58d3609fd62f4d5c0637c59597d75"
+      },
+      {
+        "path": "C:/Users/Administrator/.codex/tmp/vss-render-followup-20261011/lNvcOAWHJs-summary.json",
+        "bytes": 182689,
+        "sha256": "ff669e42cb802cba9669adb14ba421a1f7d6761954c956d038f8ad0e4fdc820d"
+      },
+      {
+        "path": "C:/Users/Administrator/.codex/tmp/vss-render-followup-20261011/lNvcOAWHJs-nodes.json",
+        "bytes": 4428474,
+        "sha256": "9a1fb532270e07231ccca397fed04b06ec0caae93893899a55691cd43abaff86"
+      },
+      {
+        "path": "C:/Users/Administrator/.codex/tmp/vss-render-followup-20261011/counters.ndjson",
+        "bytes": 540495,
+        "sha256": "7d4f1e048b9c2d3282809ece373fcf94ca6279ee2dcc68fdfe4c3c3ca358abf3"
+      },
+      {
+        "path": "C:/Users/Administrator/.codex/tmp/vss-render-followup-20261011/census-1/census.json",
+        "bytes": 3595326,
+        "sha256": "a5347b6025a9c255a9b9099ce628a51899f3209c0bfa3c36952496cd36adcc5e"
+      },
+      {
+        "path": "C:/Users/Administrator/.codex/tmp/vss-render-followup-20261011/census-3/census.json",
+        "bytes": 3913136,
+        "sha256": "075a49aa5be99497da703e058bf8c9a20d9f274d0b816c08a0c978febffa97be"
+      }
+    ],
+    "installedVssSha256": "22db2613e4628b60258f872bfabb7eaa22799f0d0c49957737e6d46ed59502c6",
+    "neoforgeWorkingTreeBase": "1c9fd92c25db18605ba62d3ecbaf703248953f73",
+    "forgeWorkingTreeBase": "8c6e8f6d74f6b84f27cbe0225060fb94c39345c7",
+    "voxy263Commit": "b0207f6fcc0a55fa6b33f5c916932e8560a71845",
+    "sodiumSourceCommit": "ec15afd7c85f850552577739eb30858faea1e592",
+    "sodiumSourceTag": "mc1.21.1-0.8.12-beta.2"
+  },
+  "spark": {
+    "first": "2026-10-11T23:28:54.195+08:00",
+    "last": "2026-10-11T23:30:54.484+08:00",
+    "elapsedSeconds": 120.289,
+    "intervalMicroseconds": 4000,
+    "thread": "Render thread",
+    "totalSampleWeightMs": 120000,
+    "approxSamples": 30000.0,
+    "validation": {
+      "nodes": 10354,
+      "visited": 10354,
+      "refsValid": true,
+      "uniqueParents": true,
+      "minSelf": 0,
+      "totalSelf": [
+        5804,
+        60000,
+        54196
+      ]
+    },
+    "groups": {
+      "VSS": {
+        "ms": 93924,
+        "pct": 78.27,
+        "windowMs": [
+          4252,
+          46236,
+          43436
+        ],
+        "windowPct": [
+          73.25982081323225,
+          77.06,
+          80.14613624621744
+        ]
+      },
+      "Voxy": {
+        "ms": 73900,
+        "pct": 61.583333333333336,
+        "windowMs": [
+          3404,
+          36580,
+          33916
+        ],
+        "windowPct": [
+          58.64920744314266,
+          60.96666666666667,
+          62.58026422614215
+        ]
+      },
+      "Iris": {
+        "ms": 2852,
+        "pct": 2.3766666666666665,
+        "windowMs": [
+          216,
+          1492,
+          1144
+        ],
+        "windowPct": [
+          3.7215713301171607,
+          2.486666666666667,
+          2.110856889807366
+        ]
+      },
+      "Xaero": {
+        "ms": 3992,
+        "pct": 3.3266666666666667,
+        "windowMs": [
+          44,
+          2212,
+          1736
+        ],
+        "windowPct": [
+          0.7580978635423845,
+          3.6866666666666665,
+          3.2031884271901987
+        ]
+      },
+      "Sodium": {
+        "ms": 80308,
+        "pct": 66.92333333333333,
+        "windowMs": [
+          3692,
+          39864,
+          36752
+        ],
+        "windowPct": [
+          63.611302549965544,
+          66.44,
+          67.81312273968558
+        ]
+      },
+      "drawIris": {
+        "ms": 0,
+        "pct": 0,
+        "windowMs": [
+          0,
+          0,
+          0
+        ],
+        "windowPct": [
+          0,
+          0,
+          0
+        ]
+      },
+      "drawNormalPass": {
+        "ms": 16820,
+        "pct": 14.016666666666667,
+        "windowMs": [
+          880,
+          9248,
+          6692
+        ],
+        "windowPct": [
+          15.161957270847692,
+          15.413333333333334,
+          12.347774743523507
+        ]
+      },
+      "ScenePrepare": {
+        "ms": 31052,
+        "pct": 25.876666666666665,
+        "windowMs": [
+          1564,
+          14604,
+          14884
+        ],
+        "windowPct": [
+          26.946933149552034,
+          24.34,
+          27.463281422983247
+        ]
+      },
+      "PreparedPass": {
+        "ms": 10080,
+        "pct": 8.4,
+        "windowMs": [
+          296,
+          4900,
+          4884
+        ],
+        "windowPct": [
+          5.0999310820124055,
+          8.166666666666666,
+          9.01173518340837
+        ]
+      },
+      "submitRanges": {
+        "ms": 1156,
+        "pct": 0.9633333333333334,
+        "windowMs": [
+          80,
+          668,
+          408
+        ],
+        "windowPct": [
+          1.3783597518952446,
+          1.1133333333333333,
+          0.7528230865746549
+        ]
+      },
+      "swap": {
+        "ms": 13280,
+        "pct": 11.066666666666666,
+        "windowMs": [
+          1012,
+          6820,
+          5448
+        ],
+        "windowPct": [
+          17.436250861474846,
+          11.366666666666667,
+          10.052402391320392
+        ]
+      },
+      "glFinish": {
+        "ms": 204,
+        "pct": 0.17,
+        "windowMs": [
+          0,
+          156,
+          48
+        ],
+        "windowPct": [
+          0,
+          0.26,
+          0.08856742194995941
+        ]
+      },
+      "glGetError": {
+        "ms": 0,
+        "pct": 0,
+        "windowMs": [
+          0,
+          0,
+          0
+        ],
+        "windowPct": [
+          0,
+          0,
+          0
+        ]
+      },
+      "VSSgl": {
+        "ms": 18932,
+        "pct": 15.776666666666667,
+        "windowMs": [
+          1076,
+          9248,
+          8608
+        ],
+        "windowPct": [
+          18.53893866299104,
+          15.413333333333334,
+          15.883091003026054
+        ]
+      },
+      "XaeroWorld": {
+        "ms": 2424,
+        "pct": 2.02,
+        "windowMs": [
+          28,
+          1368,
+          1028
+        ],
+        "windowPct": [
+          0.4824259131633356,
+          2.28,
+          1.8968189534282973
+        ]
+      }
+    },
+    "hotspots": [
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare",
+        "inclusive": {
+          "ms": 31052,
+          "pct": 25.876666666666665,
+          "windowMs": [
+            1564,
+            14604,
+            14884
+          ],
+          "windowPct": [
+            26.946933149552034,
+            24.34,
+            27.463281422983247
+          ]
+        },
+        "self": {
+          "ms": 2608,
+          "pct": 2.1733333333333333,
+          "windowMs": [
+            88,
+            1400,
+            1120
+          ],
+          "windowPct": [
+            1.516195727084769,
+            2.3333333333333335,
+            2.0665731788323862
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare",
+        "inclusive": {
+          "ms": 10080,
+          "pct": 8.4,
+          "windowMs": [
+            296,
+            4900,
+            4884
+          ],
+          "windowPct": [
+            5.0999310820124055,
+            8.166666666666666,
+            9.01173518340837
+          ]
+        },
+        "self": {
+          "ms": 4860,
+          "pct": 4.05,
+          "windowMs": [
+            180,
+            2784,
+            1896
+          ],
+          "windowPct": [
+            3.1013094417643003,
+            4.64,
+            3.4984131670233967
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.add",
+        "inclusive": {
+          "ms": 10056,
+          "pct": 8.38,
+          "windowMs": [
+            448,
+            5480,
+            4128
+          ],
+          "windowPct": [
+            7.71881461061337,
+            9.133333333333333,
+            7.616798287696509
+          ]
+        },
+        "self": {
+          "ms": 1516,
+          "pct": 1.2633333333333334,
+          "windowMs": [
+            84,
+            928,
+            504
+          ],
+          "windowPct": [
+            1.447277739490007,
+            1.5466666666666666,
+            0.9299579304745738
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass",
+        "inclusive": {
+          "ms": 16820,
+          "pct": 14.016666666666667,
+          "windowMs": [
+            880,
+            9248,
+            6692
+          ],
+          "windowPct": [
+            15.161957270847692,
+            15.413333333333334,
+            12.347774743523507
+          ]
+        },
+        "self": {
+          "ms": 168,
+          "pct": 0.14,
+          "windowMs": [
+            12,
+            112,
+            44
+          ],
+          "windowPct": [
+            0.2067539627842867,
+            0.18666666666666668,
+            0.08118680345412946
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionLodSeams.apply",
+        "inclusive": {
+          "ms": 7032,
+          "pct": 5.86,
+          "windowMs": [
+            600,
+            2172,
+            4260
+          ],
+          "windowPct": [
+            10.337698139214336,
+            3.62,
+            7.8603586980588975
+          ]
+        },
+        "self": {
+          "ms": 24,
+          "pct": 0.02,
+          "windowMs": [
+            8,
+            8,
+            8
+          ],
+          "windowPct": [
+            0.13783597518952448,
+            0.013333333333333334,
+            0.0147612369916599
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionLodSeams.stitch",
+        "inclusive": {
+          "ms": 5408,
+          "pct": 4.506666666666667,
+          "windowMs": [
+            472,
+            1612,
+            3324
+          ],
+          "windowPct": [
+            8.132322536181944,
+            2.6866666666666665,
+            6.133293970034689
+          ]
+        },
+        "self": {
+          "ms": 504,
+          "pct": 0.42,
+          "windowMs": [
+            48,
+            152,
+            304
+          ],
+          "windowPct": [
+            0.8270158511371468,
+            0.25333333333333335,
+            0.5609270056830763
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionVisiblePlan.selectStable",
+        "inclusive": {
+          "ms": 6116,
+          "pct": 5.096666666666667,
+          "windowMs": [
+            236,
+            3560,
+            2320
+          ],
+          "windowPct": [
+            4.066161268090972,
+            5.933333333333334,
+            4.280758727581372
+          ]
+        },
+        "self": {
+          "ms": 68,
+          "pct": 0.056666666666666664,
+          "windowMs": [
+            0,
+            44,
+            24
+          ],
+          "windowPct": [
+            0,
+            0.07333333333333333,
+            0.044283710974979705
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.resolveCoverage",
+        "inclusive": {
+          "ms": 5184,
+          "pct": 4.32,
+          "windowMs": [
+            232,
+            2284,
+            2668
+          ],
+          "windowPct": [
+            3.9972432804962095,
+            3.8066666666666666,
+            4.922872536718577
+          ]
+        },
+        "self": {
+          "ms": 56,
+          "pct": 0.04666666666666667,
+          "windowMs": [
+            0,
+            36,
+            20
+          ],
+          "windowPct": [
+            0,
+            0.06,
+            0.03690309247914975
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.sample",
+        "inclusive": {
+          "ms": 4544,
+          "pct": 3.7866666666666666,
+          "windowMs": [
+            340,
+            2320,
+            1884
+          ],
+          "windowPct": [
+            5.85802894555479,
+            3.8666666666666667,
+            3.4762713115359065
+          ]
+        },
+        "self": {
+          "ms": 4,
+          "pct": 0.0033333333333333335,
+          "windowMs": [
+            0,
+            0,
+            4
+          ],
+          "windowPct": [
+            0,
+            0,
+            0.00738061849582995
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail",
+        "inclusive": {
+          "ms": 4464,
+          "pct": 3.72,
+          "windowMs": [
+            220,
+            1976,
+            2268
+          ],
+          "windowPct": [
+            3.790489317711923,
+            3.2933333333333334,
+            4.184810687135582
+          ]
+        },
+        "self": {
+          "ms": 1560,
+          "pct": 1.3,
+          "windowMs": [
+            76,
+            740,
+            744
+          ],
+          "windowPct": [
+            1.3094417643004825,
+            1.2333333333333334,
+            1.3727950402243707
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.upload",
+        "inclusive": {
+          "ms": 3668,
+          "pct": 3.0566666666666666,
+          "windowMs": [
+            168,
+            1944,
+            1556
+          ],
+          "windowPct": [
+            2.894555478980014,
+            3.24,
+            2.871060594877851
+          ]
+        },
+        "self": {
+          "ms": 204,
+          "pct": 0.17,
+          "windowMs": [
+            16,
+            128,
+            60
+          ],
+          "windowPct": [
+            0.27567195037904896,
+            0.21333333333333335,
+            0.11070927743744925
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwners.version",
+        "inclusive": {
+          "ms": 2492,
+          "pct": 2.0766666666666667,
+          "windowMs": [
+            120,
+            1072,
+            1300
+          ],
+          "windowPct": [
+            2.067539627842867,
+            1.7866666666666666,
+            2.398701011144734
+          ]
+        },
+        "self": {
+          "ms": 2492,
+          "pct": 2.0766666666666667,
+          "windowMs": [
+            120,
+            1072,
+            1300
+          ],
+          "windowPct": [
+            2.067539627842867,
+            1.7866666666666666,
+            2.398701011144734
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionOwnershipRuns.staticCoverage",
+        "inclusive": {
+          "ms": 2376,
+          "pct": 1.98,
+          "windowMs": [
+            32,
+            308,
+            2036
+          ],
+          "windowPct": [
+            0.5513439007580979,
+            0.5133333333333333,
+            3.756734814377445
+          ]
+        },
+        "self": {
+          "ms": 2376,
+          "pct": 1.98,
+          "windowMs": [
+            32,
+            308,
+            2036
+          ],
+          "windowPct": [
+            0.5513439007580979,
+            0.5133333333333333,
+            3.756734814377445
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem",
+        "inclusive": {
+          "ms": 1192,
+          "pct": 0.9933333333333333,
+          "windowMs": [
+            52,
+            688,
+            452
+          ],
+          "windowPct": [
+            0.895933838731909,
+            1.1466666666666667,
+            0.8340098900287845
+          ]
+        },
+        "self": {
+          "ms": 1192,
+          "pct": 0.9933333333333333,
+          "windowMs": [
+            52,
+            688,
+            452
+          ],
+          "windowPct": [
+            0.895933838731909,
+            1.1466666666666667,
+            0.8340098900287845
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.same",
+        "inclusive": {
+          "ms": 308,
+          "pct": 0.25666666666666665,
+          "windowMs": [
+            4,
+            172,
+            132
+          ],
+          "windowPct": [
+            0.06891798759476223,
+            0.2866666666666667,
+            0.24356041036238837
+          ]
+        },
+        "self": {
+          "ms": 308,
+          "pct": 0.25666666666666665,
+          "windowMs": [
+            4,
+            172,
+            132
+          ],
+          "windowPct": [
+            0.06891798759476223,
+            0.2866666666666667,
+            0.24356041036238837
+          ]
+        }
+      }
+    ],
+    "nativeTopSelf": [
+      {
+        "name": "org.lwjgl.system.JNI.invokePV",
+        "inclusive": {
+          "ms": 13316,
+          "pct": 11.096666666666666,
+          "windowMs": [
+            1012,
+            6844,
+            5460
+          ],
+          "windowPct": [
+            17.436250861474846,
+            11.406666666666666,
+            10.074544246807882
+          ]
+        },
+        "self": {
+          "ms": 13316,
+          "pct": 11.096666666666666,
+          "windowMs": [
+            1012,
+            6844,
+            5460
+          ],
+          "windowPct": [
+            17.436250861474846,
+            11.406666666666666,
+            10.074544246807882
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL15C.nglBufferData",
+        "inclusive": {
+          "ms": 3376,
+          "pct": 2.8133333333333335,
+          "windowMs": [
+            156,
+            1724,
+            1496
+          ],
+          "windowPct": [
+            2.687801516195727,
+            2.8733333333333335,
+            2.7603513174404015
+          ]
+        },
+        "self": {
+          "ms": 3376,
+          "pct": 2.8133333333333335,
+          "windowMs": [
+            156,
+            1724,
+            1496
+          ],
+          "windowPct": [
+            2.687801516195727,
+            2.8733333333333335,
+            2.7603513174404015
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL45C.nglGetNamedBufferSubData",
+        "inclusive": {
+          "ms": 3104,
+          "pct": 2.5866666666666664,
+          "windowMs": [
+            260,
+            1536,
+            1308
+          ],
+          "windowPct": [
+            4.479669193659545,
+            2.56,
+            2.4134622481363937
+          ]
+        },
+        "self": {
+          "ms": 3104,
+          "pct": 2.5866666666666664,
+          "windowMs": [
+            260,
+            1536,
+            1308
+          ],
+          "windowPct": [
+            4.479669193659545,
+            2.56,
+            2.4134622481363937
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL43C.nglMultiDrawElementsIndirect",
+        "inclusive": {
+          "ms": 2988,
+          "pct": 2.49,
+          "windowMs": [
+            192,
+            1532,
+            1264
+          ],
+          "windowPct": [
+            3.3080634045485873,
+            2.5533333333333332,
+            2.3322754446822644
+          ]
+        },
+        "self": {
+          "ms": 2988,
+          "pct": 2.49,
+          "windowMs": [
+            192,
+            1532,
+            1264
+          ],
+          "windowPct": [
+            3.3080634045485873,
+            2.5533333333333332,
+            2.3322754446822644
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL11C.nglDeleteTextures",
+        "inclusive": {
+          "ms": 1752,
+          "pct": 1.46,
+          "windowMs": [
+            52,
+            464,
+            1236
+          ],
+          "windowPct": [
+            0.895933838731909,
+            0.7733333333333333,
+            2.2806111152114545
+          ]
+        },
+        "self": {
+          "ms": 1752,
+          "pct": 1.46,
+          "windowMs": [
+            52,
+            464,
+            1236
+          ],
+          "windowPct": [
+            0.895933838731909,
+            0.7733333333333333,
+            2.2806111152114545
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.system.JNI.invokeV",
+        "inclusive": {
+          "ms": 1212,
+          "pct": 1.01,
+          "windowMs": [
+            72,
+            696,
+            444
+          ],
+          "windowPct": [
+            1.2405237767057202,
+            1.16,
+            0.8192486530371245
+          ]
+        },
+        "self": {
+          "ms": 1168,
+          "pct": 0.9733333333333334,
+          "windowMs": [
+            68,
+            668,
+            432
+          ],
+          "windowPct": [
+            1.171605789110958,
+            1.1133333333333333,
+            0.7971067975496346
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL43C.glDispatchCompute",
+        "inclusive": {
+          "ms": 1148,
+          "pct": 0.9566666666666667,
+          "windowMs": [
+            72,
+            648,
+            428
+          ],
+          "windowPct": [
+            1.2405237767057202,
+            1.08,
+            0.7897261790538047
+          ]
+        },
+        "self": {
+          "ms": 1148,
+          "pct": 0.9566666666666667,
+          "windowMs": [
+            72,
+            648,
+            428
+          ],
+          "windowPct": [
+            1.2405237767057202,
+            1.08,
+            0.7897261790538047
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL14C.nglMultiDrawElements",
+        "inclusive": {
+          "ms": 1104,
+          "pct": 0.92,
+          "windowMs": [
+            80,
+            624,
+            400
+          ],
+          "windowPct": [
+            1.3783597518952446,
+            1.04,
+            0.738061849582995
+          ]
+        },
+        "self": {
+          "ms": 1104,
+          "pct": 0.92,
+          "windowMs": [
+            80,
+            624,
+            400
+          ],
+          "windowPct": [
+            1.3783597518952446,
+            1.04,
+            0.738061849582995
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL32C.glFenceSync",
+        "inclusive": {
+          "ms": 964,
+          "pct": 0.8033333333333333,
+          "windowMs": [
+            80,
+            412,
+            472
+          ],
+          "windowPct": [
+            1.3783597518952446,
+            0.6866666666666666,
+            0.8709129825079341
+          ]
+        },
+        "self": {
+          "ms": 964,
+          "pct": 0.8033333333333333,
+          "windowMs": [
+            80,
+            412,
+            472
+          ],
+          "windowPct": [
+            1.3783597518952446,
+            0.6866666666666666,
+            0.8709129825079341
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL11C.glBindTexture",
+        "inclusive": {
+          "ms": 760,
+          "pct": 0.6333333333333333,
+          "windowMs": [
+            36,
+            396,
+            328
+          ],
+          "windowPct": [
+            0.6202618883528601,
+            0.66,
+            0.6052107166580559
+          ]
+        },
+        "self": {
+          "ms": 760,
+          "pct": 0.6333333333333333,
+          "windowMs": [
+            36,
+            396,
+            328
+          ],
+          "windowPct": [
+            0.6202618883528601,
+            0.66,
+            0.6052107166580559
+          ]
+        }
+      },
+      {
+        "name": "org.lwjgl.opengl.GL20C.glUseProgram",
+        "inclusive": {
+          "ms": 732,
+          "pct": 0.61,
+          "windowMs": [
+            16,
+            396,
+            320
+          ],
+          "windowPct": [
+            0.27567195037904896,
+            0.66,
+            0.590449479666396
+          ]
+        },
+        "self": {
+          "ms": 732,
+          "pct": 0.61,
+          "windowMs": [
+            16,
+            396,
+            320
+          ],
+          "windowPct": [
+            0.27567195037904896,
+            0.66,
+            0.590449479666396
+          ]
+        }
+      }
+    ],
+    "readbackNativeSelf": {
+      "ms": 3104,
+      "percent": 2.5866666666666664,
+      "allPathsFromRefinementPoll": true
+    },
+    "visiblePlanFrustumNativeSelf": {
+      "ms": 4536,
+      "percent": 3.7800000000000002
+    },
+    "batchUploadNativeBufferDataSelf": {
+      "ms": 2536,
+      "percent": 2.1133333333333333
+    },
+    "moduleStacks": {
+      "denominatorMs": 120000,
+      "groups": {
+        "VSSJavaSelf": 41308,
+        "SodiumWithoutVSS": 2444,
+        "XaeroWithoutVSS": 3992,
+        "IrisWithVSS": 4,
+        "IrisWithoutVSS": 192,
+        "VoxyWithoutVSS": 1560,
+        "VoxyWithVSS": 72336,
+        "SodiumWithVSS": 77864
+      },
+      "vssNativeSelf": {
+        "org.lwjgl.opengl.GL15C.nglGetQueryObjectiv": 4,
+        "org.lwjgl.opengl.GL15C.glGetQueryObjecti": 0,
+        "org.lwjgl.opengl.GL15.glGetQueryObjecti": 0,
+        "org.lwjgl.opengl.GL32C.nglClientWaitSync": 76,
+        "org.lwjgl.opengl.GL32C.glClientWaitSync": 0,
+        "org.lwjgl.opengl.GL32C.nglDeleteSync": 48,
+        "org.lwjgl.opengl.GL32C.glDeleteSync": 0,
+        "org.lwjgl.opengl.GL.getCapabilities": 0,
+        "org.lwjgl.opengl.GL15C.nglDeleteBuffers": 268,
+        "org.lwjgl.opengl.GL15C.glDeleteBuffers": 0,
+        "org.lwjgl.opengl.GL15.glDeleteBuffers": 0,
+        "org.lwjgl.opengl.GL11C.nglDeleteTextures": 1752,
+        "org.lwjgl.opengl.GL11C.glDeleteTextures": 0,
+        "org.lwjgl.opengl.GL11.glDeleteTextures": 0,
+        "org.lwjgl.opengl.GL32C.glFenceSync": 548,
+        "org.lwjgl.opengl.GL30C.glBlitFramebuffer": 36,
+        "org.lwjgl.opengl.GL11C.nglGetBooleanv": 16,
+        "org.lwjgl.opengl.GL11C.glGetBooleanv": 0,
+        "org.lwjgl.opengl.GL20C.glUseProgram": 560,
+        "org.lwjgl.opengl.GL20.glUseProgram": 0,
+        "org.lwjgl.opengl.GL30C.glBindFramebuffer": 240,
+        "org.lwjgl.opengl.GL30.glBindFramebuffer": 0,
+        "org.lwjgl.opengl.GL11C.glViewport": 12,
+        "org.lwjgl.opengl.GL11.glViewport": 0,
+        "org.lwjgl.opengl.GL11C.glBindTexture": 688,
+        "org.lwjgl.opengl.GL11.glBindTexture": 0,
+        "org.lwjgl.system.JNI.callPV": 16,
+        "org.lwjgl.opengl.GL11C.glGetIntegerv": 0,
+        "org.lwjgl.opengl.GL11.glGetIntegerv": 0,
+        "org.lwjgl.system.MemoryUtil.memSet64": 4,
+        "org.lwjgl.system.MemoryUtil.memSet": 0,
+        "org.lwjgl.system.MemoryStack.ncalloc": 0,
+        "org.lwjgl.system.MemoryStack.calloc": 0,
+        "org.lwjgl.opengl.GL11C.glGetBoolean": 0,
+        "org.lwjgl.opengl.GL11.glGetBoolean": 0,
+        "org.lwjgl.opengl.GL30C.nglGetIntegeri_v": 36,
+        "org.lwjgl.opengl.GL30C.glGetIntegeri": 8,
+        "org.lwjgl.opengl.GL30.glGetIntegeri": 0,
+        "org.lwjgl.opengl.GL11C.glDrawArrays": 72,
+        "org.lwjgl.opengl.GL30C.glFramebufferTexture2D": 12,
+        "org.lwjgl.opengl.GL13C.glActiveTexture": 76,
+        "org.lwjgl.opengl.GL13.glActiveTexture": 0,
+        "org.lwjgl.opengl.GL15C.glBindBuffer": 540,
+        "org.lwjgl.opengl.GL43C.nglMultiDrawElementsIndirect": 2988,
+        "org.lwjgl.opengl.GL43C.glMultiDrawElementsIndirect": 0,
+        "org.lwjgl.opengl.GL30C.glBindBufferBase": 524,
+        "org.lwjgl.opengl.GL20C.glUniform1i": 556,
+        "org.lwjgl.opengl.GL20.glUniform1i": 8,
+        "org.lwjgl.opengl.GL11C.nglGetIntegerv": 104,
+        "org.lwjgl.opengl.GL11C.glGetInteger": 0,
+        "org.lwjgl.opengl.GL11C.nglDrawElements": 44,
+        "org.lwjgl.opengl.GL11C.glDrawElements": 0,
+        "org.lwjgl.opengl.GL11.glDrawElements": 0,
+        "org.lwjgl.opengl.GL20C.glUniform1fv": 0,
+        "org.lwjgl.opengl.GL20.glUniform1fv": 0,
+        "org.lwjgl.opengl.GL20C.glUniform3f": 136,
+        "org.lwjgl.opengl.GL20.glUniform3f": 0,
+        "org.lwjgl.opengl.GL11C.glTexParameteri": 32,
+        "org.lwjgl.opengl.GL11.glTexParameteri": 0,
+        "org.lwjgl.opengl.GL20C.glUniform1f": 32,
+        "org.lwjgl.opengl.GL20.glUniform1f": 0,
+        "org.lwjgl.opengl.GL30C.glBindVertexArray": 16,
+        "org.lwjgl.opengl.GL30.glBindVertexArray": 0,
+        "org.lwjgl.opengl.GL15C.nglBufferData": 2884,
+        "org.lwjgl.opengl.GL15C.glBufferData": 0,
+        "org.lwjgl.opengl.GL40C.glBlendFuncSeparatei": 8,
+        "org.lwjgl.opengl.GL40.glBlendFuncSeparatei": 0,
+        "org.lwjgl.opengl.GL11C.glEnable": 4,
+        "org.lwjgl.opengl.GL11.glEnable": 0,
+        "org.lwjgl.opengl.GL14C.glBlendFuncSeparate": 4,
+        "org.lwjgl.opengl.GL14.glBlendFuncSeparate": 0,
+        "org.lwjgl.opengl.GL11C.glIsEnabled": 8,
+        "org.lwjgl.opengl.GL11.glIsEnabled": 0,
+        "org.lwjgl.opengl.GL11.glGetInteger": 0,
+        "org.lwjgl.opengl.GL20C.nglGetUniformLocation": 20,
+        "org.lwjgl.opengl.GL20C.glGetUniformLocation": 0,
+        "org.lwjgl.opengl.GL20.glGetUniformLocation": 0,
+        "org.lwjgl.system.libc.LibCString.nmemset": 48,
+        "org.lwjgl.system.MemoryStack.callocInt": 0,
+        "org.lwjgl.opengl.GL30C.glUniform4ui": 4,
+        "org.lwjgl.opengl.GL30.glUniform4ui": 0,
+        "org.lwjgl.opengl.GL20C.nglUniformMatrix4fv": 4,
+        "org.lwjgl.opengl.GL20.nglUniformMatrix4fv": 0,
+        "org.lwjgl.system.MemoryUtil.encodeASCIIUnsafe": 8,
+        "org.lwjgl.system.MemoryStack.nASCII": 0,
+        "org.lwjgl.BufferUtils.createByteBuffer": 0,
+        "org.lwjgl.opengl.GL11C.glGetDouble": 4,
+        "org.lwjgl.opengl.GL30C.glDisablei": 4,
+        "org.lwjgl.opengl.GL30.glDisablei": 0,
+        "org.lwjgl.opengl.GL11C.glPixelStorei": 4,
+        "org.lwjgl.opengl.GL11.glPixelStorei": 0,
+        "org.lwjgl.opengl.GL43C.glCopyImageSubData": 24,
+        "org.lwjgl.opengl.GL43.glCopyImageSubData": 0,
+        "org.lwjgl.opengl.GL11.glDrawArrays": 0,
+        "org.lwjgl.opengl.GL30.glFramebufferTexture2D": 0,
+        "org.lwjgl.opengl.GL15.glBufferData": 0,
+        "org.lwjgl.opengl.GL11C.nglGenTextures": 48,
+        "org.lwjgl.opengl.GL11C.glGenTextures": 0,
+        "org.lwjgl.opengl.GL11.glGenTextures": 0,
+        "org.lwjgl.opengl.GL15.glBindBuffer": 0,
+        "org.lwjgl.opengl.GL15C.nglGenBuffers": 12,
+        "org.lwjgl.opengl.GL15C.glGenBuffers": 0,
+        "org.lwjgl.opengl.GL15.glGenBuffers": 0,
+        "org.lwjgl.opengl.GL31C.glTexBuffer": 8,
+        "org.lwjgl.opengl.GL31.glTexBuffer": 0,
+        "org.lwjgl.opengl.GL43C.glTexBufferRange": 44,
+        "org.lwjgl.opengl.GL15C.nglBufferSubData": 64,
+        "org.lwjgl.opengl.GL15C.glBufferSubData": 0,
+        "org.lwjgl.system.JNI.invokePV": 20,
+        "org.lwjgl.system.jemalloc.JEmalloc.nje_free": 0,
+        "org.lwjgl.system.jemalloc.JEmallocAllocator.free": 0,
+        "org.lwjgl.system.MemoryUtil.nmemFree": 0,
+        "org.lwjgl.system.MemoryUtil.memFree": 0,
+        "org.lwjgl.system.JNI.invokePP": 12,
+        "org.lwjgl.system.jemalloc.JEmalloc.nje_malloc": 0,
+        "org.lwjgl.system.jemalloc.JEmallocAllocator.malloc": 0,
+        "org.lwjgl.system.MemoryUtil.nmemAlloc": 0,
+        "org.lwjgl.system.MemoryUtil.nmemAllocChecked": 0,
+        "org.lwjgl.system.MemoryUtil.memAlloc": 0,
+        "org.lwjgl.opengl.GL43C.glDispatchCompute": 1092,
+        "org.lwjgl.opengl.GL45C.nglGetNamedBufferSubData": 3104,
+        "org.lwjgl.opengl.GL45C.glGetNamedBufferSubData": 0,
+        "org.lwjgl.system.JNI.callPPPV": 244,
+        "org.lwjgl.opengl.GL11C.glDisable": 8,
+        "org.lwjgl.opengl.GL11.glDisable": 0,
+        "org.lwjgl.opengl.GL11C.glColorMask": 4,
+        "org.lwjgl.opengl.GL11.glColorMask": 0,
+        "org.lwjgl.opengl.GL11C.glDepthFunc": 4,
+        "org.lwjgl.opengl.GL11.glDepthFunc": 0,
+        "org.lwjgl.opengl.GL33C.glBindSampler": 24,
+        "org.lwjgl.opengl.GL33.glBindSampler": 0,
+        "org.lwjgl.opengl.GL11C.glDepthMask": 8,
+        "org.lwjgl.opengl.GL11.glDepthMask": 0,
+        "org.lwjgl.opengl.GL45C.glBindTextureUnit": 16,
+        "org.lwjgl.opengl.GL42C.glMemoryBarrier": 36,
+        "org.lwjgl.opengl.GL42C.glBindImageTexture": 16,
+        "org.lwjgl.opengl.GL30C.glUniform1ui": 12,
+        "org.lwjgl.opengl.GL12C.nglTexImage3D": 28,
+        "org.lwjgl.opengl.GL12C.glTexImage3D": 0,
+        "org.lwjgl.opengl.GL12.glTexImage3D": 0,
+        "org.lwjgl.opengl.GL11C.nglTexSubImage2D": 108,
+        "org.lwjgl.opengl.GL11C.glTexSubImage2D": 0,
+        "org.lwjgl.opengl.GL11.glTexSubImage2D": 0,
+        "org.lwjgl.opengl.GL20C.glUniform4f": 4,
+        "org.lwjgl.opengl.GL20.glUniform4f": 0,
+        "org.lwjgl.system.JNI.callPPV": 172,
+        "org.lwjgl.system.CustomBuffer.address": 4,
+        "org.lwjgl.system.MemoryUtil.memAddress": 0,
+        "org.lwjgl.opengl.GL14C.nglMultiDrawElements": 1104,
+        "org.lwjgl.opengl.GL14C.glMultiDrawElements": 0,
+        "org.lwjgl.opengl.GL14.glMultiDrawElements": 0,
+        "org.lwjgl.opengl.GL11C.nglTexImage2D": 232,
+        "org.lwjgl.opengl.GL11C.glTexImage2D": 0,
+        "org.lwjgl.opengl.GL11.glTexImage2D": 0,
+        "org.lwjgl.opengl.GL45C.glClipControl": 4,
+        "org.lwjgl.opengl.GL20C.glStencilMaskSeparate": 4,
+        "org.lwjgl.opengl.GL30C.glIsEnabledi": 4,
+        "org.lwjgl.opengl.GL30.glIsEnabledi": 0
+      }
+    }
+  },
+  "countersFullWindow": {
+    "snapshots": 75,
+    "first": "2026-10-11T23:30:18.325+08:00",
+    "last": "2026-10-11T23:32:46.508+08:00",
+    "elapsedSeconds": 148.183,
+    "pausedSnapshots": 18,
+    "deltas": {
+      "frames": 3348,
+      "preparedPlans": 2720,
+      "reusedPlans": 628,
+      "meshUploads": 5424,
+      "regionHits": 2072652,
+      "regionRebuilds": 706011,
+      "encodedItems": 4552769,
+      "wholePlanHits": 727,
+      "orderEdits": 240021,
+      "listPublications": 2427,
+      "updated": 128954,
+      "coverageResolves": 63101,
+      "budgetEvictions": 1736,
+      "restoreRequests": 706
+    },
+    "renderFramesPerSecond": 22.593684835642417,
+    "fpsReadings": {
+      "min": 6,
+      "median": 23,
+      "max": 39
+    },
+    "snapshotDistributions": {
+      "liveBytes": {
+        "min": 3793947808,
+        "median": 4044019360,
+        "max": 4228230064
+      },
+      "committedGeometryBytes": {
+        "min": 4229201360,
+        "median": 4365619280,
+        "max": 4462032448
+      },
+      "opaquePayloadBytes": {
+        "min": 3595147824,
+        "median": 3864049008,
+        "max": 4009604272
+      },
+      "waterPayloadBytes": {
+        "min": 6130672,
+        "median": 7419104,
+        "max": 7860896
+      },
+      "residentSourceQuads": {
+        "min": 138266489,
+        "median": 147657012,
+        "max": 153749068
+      },
+      "residentDisplayVariantQuads": {
+        "min": 29941329,
+        "median": 33472941,
+        "max": 34861984
+      },
+      "residentSourceTerrain": {
+        "min": 84288950,
+        "median": 92221730,
+        "max": 96984255
+      },
+      "residentSourceFeatures": {
+        "min": 50464868,
+        "median": 54686692,
+        "max": 56659974
+      },
+      "residentSourcePreviews": {
+        "min": 787014,
+        "median": 932430,
+        "max": 1033300
+      },
+      "residentSourceWater": {
+        "min": 254001,
+        "median": 310795,
+        "max": 330876
+      },
+      "mdiCandidateQuads": {
+        "min": 5753343,
+        "median": 9245956,
+        "max": 27067428
+      },
+      "directCandidateQuads": {
+        "min": 1546158,
+        "median": 3166971,
+        "max": 26104706
+      },
+      "directTiles": {
+        "min": 156,
+        "median": 326,
+        "max": 1583
+      },
+      "mdiCommands": {
+        "min": 26168,
+        "median": 42862,
+        "max": 147215
+      },
+      "flushes": {
+        "min": 143,
+        "median": 275,
+        "max": 420
+      },
+      "sourceCandidates": {
+        "min": 5391938,
+        "median": 14373184,
+        "max": 60024062
+      },
+      "afterVoxyCandidates": {
+        "min": 3724101,
+        "median": 11959051,
+        "max": 51456803
+      },
+      "geometricDisplayTiles": {
+        "min": 0,
+        "median": 0,
+        "max": 149
+      }
+    },
+    "timingIntervalMeans": {
+      "cpu": [
+        {
+          "stage": "PREPARE",
+          "samples": 112,
+          "meanMs": 14.055579464285714
+        },
+        {
+          "stage": "COVERAGE",
+          "samples": 2429,
+          "meanMs": 0.08411111568546728
+        },
+        {
+          "stage": "SEAMS",
+          "samples": 87,
+          "meanMs": 5.437832183908046
+        },
+        {
+          "stage": "UPLOAD",
+          "samples": 216,
+          "meanMs": 0.49096481481481485
+        },
+        {
+          "stage": "OPAQUE",
+          "samples": 112,
+          "meanMs": 8.302007142857143
+        },
+        {
+          "stage": "WATER",
+          "samples": 112,
+          "meanMs": 2.6132375
+        },
+        {
+          "stage": "DEPTH_COPY",
+          "samples": 112,
+          "meanMs": 0.03194196428571429
+        },
+        {
+          "stage": "STATE",
+          "samples": 672,
+          "meanMs": 0.012309523809523808
+        },
+        {
+          "stage": "ANTIALIAS",
+          "samples": 112,
+          "meanMs": 0.04516339285714285
+        },
+        {
+          "stage": "HZB_REDUCE",
+          "samples": 862,
+          "meanMs": 0.019477030162412992
+        },
+        {
+          "stage": "GPU_FILTER",
+          "samples": 862,
+          "meanMs": 0.08631102088167053
+        },
+        {
+          "stage": "INDIRECT_BUILD",
+          "samples": 224,
+          "meanMs": 4.023660714285714
+        },
+        {
+          "stage": "INDIRECT_UPLOAD",
+          "samples": 24212,
+          "meanMs": 0.00536540971419131
+        },
+        {
+          "stage": "INDIRECT_SUBMIT",
+          "samples": 0,
+          "meanMs": null
+        }
+      ],
+      "gpu": [
+        {
+          "stage": "PREPARE",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "COVERAGE",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "SEAMS",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "UPLOAD",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "OPAQUE",
+          "samples": 112,
+          "meanMs": 11.469741714285714
+        },
+        {
+          "stage": "WATER",
+          "samples": 112,
+          "meanMs": 2.0149577142857145
+        },
+        {
+          "stage": "DEPTH_COPY",
+          "samples": 112,
+          "meanMs": 0.19787885714285713
+        },
+        {
+          "stage": "STATE",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "ANTIALIAS",
+          "samples": 112,
+          "meanMs": 0.17105371428571428
+        },
+        {
+          "stage": "HZB_REDUCE",
+          "samples": 862,
+          "meanMs": 0.1086734849187935
+        },
+        {
+          "stage": "GPU_FILTER",
+          "samples": 862,
+          "meanMs": 0.07159090487238978
+        },
+        {
+          "stage": "INDIRECT_BUILD",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "INDIRECT_UPLOAD",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "INDIRECT_SUBMIT",
+          "samples": 1792,
+          "meanMs": 0.069028
+        }
+      ]
+    },
+    "occlusionPolicyStates": {
+      "measuring-hiz": 75
+    },
+    "occlusionPolicyZeroBothMeans": 75
+  },
+  "countersSparkOverlap": {
+    "snapshots": 19,
+    "first": "2026-10-11T23:30:18.325+08:00",
+    "last": "2026-10-11T23:30:54.358+08:00",
+    "elapsedSeconds": 36.033,
+    "pausedSnapshots": 0,
+    "deltas": {
+      "frames": 708,
+      "preparedPlans": 709,
+      "reusedPlans": 0,
+      "meshUploads": 1354,
+      "regionHits": 214489,
+      "regionRebuilds": 256308,
+      "encodedItems": 1508945,
+      "wholePlanHits": 0,
+      "orderEdits": 99797,
+      "listPublications": 682,
+      "updated": 26705,
+      "coverageResolves": 11571,
+      "budgetEvictions": 447,
+      "restoreRequests": 175
+    },
+    "renderFramesPerSecond": 19.648655399217382,
+    "fpsReadings": {
+      "min": 6,
+      "median": 21,
+      "max": 27
+    },
+    "snapshotDistributions": {
+      "liveBytes": {
+        "min": 4143023856,
+        "median": 4181802224,
+        "max": 4215682192
+      },
+      "committedGeometryBytes": {
+        "min": 4401089632,
+        "median": 4417489664,
+        "max": 4438328016
+      },
+      "opaquePayloadBytes": {
+        "min": 3931542752,
+        "median": 3969074208,
+        "max": 4002196544
+      },
+      "waterPayloadBytes": {
+        "min": 7389744,
+        "median": 7740816,
+        "max": 7860896
+      },
+      "residentSourceQuads": {
+        "min": 150339753,
+        "median": 152015458,
+        "max": 153749068
+      },
+      "residentDisplayVariantQuads": {
+        "min": 33472941,
+        "median": 33690305,
+        "max": 34025219
+      },
+      "residentSourceTerrain": {
+        "min": 93505254,
+        "median": 96092709,
+        "max": 96984255
+      },
+      "residentSourceFeatures": {
+        "min": 53510241,
+        "median": 54669260,
+        "max": 56659974
+      },
+      "residentSourcePreviews": {
+        "min": 959048,
+        "median": 1014548,
+        "max": 1033300
+      },
+      "residentSourceWater": {
+        "min": 308702,
+        "median": 325313,
+        "max": 330876
+      },
+      "mdiCandidateQuads": {
+        "min": 5816083,
+        "median": 7442609,
+        "max": 25887402
+      },
+      "directCandidateQuads": {
+        "min": 1799087,
+        "median": 2995748,
+        "max": 26104706
+      },
+      "directTiles": {
+        "min": 182,
+        "median": 330,
+        "max": 1583
+      },
+      "mdiCommands": {
+        "min": 26168,
+        "median": 33283,
+        "max": 139501
+      },
+      "flushes": {
+        "min": 143,
+        "median": 216,
+        "max": 418
+      },
+      "sourceCandidates": {
+        "min": 5391938,
+        "median": 12011187,
+        "max": 58546451
+      },
+      "afterVoxyCandidates": {
+        "min": 3724101,
+        "median": 10372910,
+        "max": 51273423
+      },
+      "geometricDisplayTiles": {
+        "min": 0,
+        "median": 0,
+        "max": 109
+      }
+    },
+    "timingIntervalMeans": {
+      "cpu": [
+        {
+          "stage": "PREPARE",
+          "samples": 24,
+          "meanMs": 19.78418333333333
+        },
+        {
+          "stage": "COVERAGE",
+          "samples": 655,
+          "meanMs": 0.09482076335877862
+        },
+        {
+          "stage": "SEAMS",
+          "samples": 24,
+          "meanMs": 6.0858
+        },
+        {
+          "stage": "UPLOAD",
+          "samples": 53,
+          "meanMs": 0.3655188679245283
+        },
+        {
+          "stage": "OPAQUE",
+          "samples": 24,
+          "meanMs": 8.945254166666667
+        },
+        {
+          "stage": "WATER",
+          "samples": 24,
+          "meanMs": 2.6230291666666665
+        },
+        {
+          "stage": "DEPTH_COPY",
+          "samples": 24,
+          "meanMs": 0.031225
+        },
+        {
+          "stage": "STATE",
+          "samples": 144,
+          "meanMs": 0.012152777777777778
+        },
+        {
+          "stage": "ANTIALIAS",
+          "samples": 24,
+          "meanMs": 0.0448625
+        },
+        {
+          "stage": "HZB_REDUCE",
+          "samples": 166,
+          "meanMs": 0.019843975903614457
+        },
+        {
+          "stage": "GPU_FILTER",
+          "samples": 166,
+          "meanMs": 0.08577048192771085
+        },
+        {
+          "stage": "INDIRECT_BUILD",
+          "samples": 48,
+          "meanMs": 3.8856083333333333
+        },
+        {
+          "stage": "INDIRECT_UPLOAD",
+          "samples": 8811,
+          "meanMs": 0.005054443309499489
+        },
+        {
+          "stage": "INDIRECT_SUBMIT",
+          "samples": 0,
+          "meanMs": null
+        }
+      ],
+      "gpu": [
+        {
+          "stage": "PREPARE",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "COVERAGE",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "SEAMS",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "UPLOAD",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "OPAQUE",
+          "samples": 24,
+          "meanMs": 10.838741333333333
+        },
+        {
+          "stage": "WATER",
+          "samples": 24,
+          "meanMs": 2.6872746666666667
+        },
+        {
+          "stage": "DEPTH_COPY",
+          "samples": 24,
+          "meanMs": 0.188416
+        },
+        {
+          "stage": "STATE",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "ANTIALIAS",
+          "samples": 24,
+          "meanMs": 0.16507733333333335
+        },
+        {
+          "stage": "HZB_REDUCE",
+          "samples": 166,
+          "meanMs": 0.09452260240963856
+        },
+        {
+          "stage": "GPU_FILTER",
+          "samples": 166,
+          "meanMs": 0.05728848192771084
+        },
+        {
+          "stage": "INDIRECT_BUILD",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "INDIRECT_UPLOAD",
+          "samples": 0,
+          "meanMs": null
+        },
+        {
+          "stage": "INDIRECT_SUBMIT",
+          "samples": 384,
+          "meanMs": 0.11943733333333333
+        }
+      ]
+    },
+    "occlusionPolicyStates": {
+      "measuring-hiz": 19
+    },
+    "occlusionPolicyZeroBothMeans": 19
+  },
+  "matchedSubmissionSamples": [
+    {
+      "submissionFrame": 14946,
+      "sampleSubmissionFrame": 14932,
+      "sampleMdiQuads": 25886361,
+      "sampleDirectQuads": 23938323,
+      "sampleCandidateQuads": 49824684,
+      "hiddenQuads": 21149461,
+      "sampleAfterHizQuads": 28675223,
+      "observedAt": "2026-10-11T23:30:28.339+08:00"
+    },
+    {
+      "submissionFrame": 15698,
+      "sampleSubmissionFrame": 15652,
+      "sampleMdiQuads": 25740850,
+      "sampleDirectQuads": 25989127,
+      "sampleCandidateQuads": 51729977,
+      "hiddenQuads": 22188361,
+      "sampleAfterHizQuads": 29541616,
+      "observedAt": "2026-10-11T23:30:48.354+08:00"
+    }
+  ],
+  "capture": {
+    "agentSeconds": 150,
+    "snapshotCount": 75,
+    "completed": "completed=2026-10-11T15:32:48.508779400Z",
+    "restoredTimingProperty": "restoredTimingProperty=null",
+    "recordedElapsedNs": {
+      "min": 464000,
+      "median": 74137667100,
+      "max": 148182552100
+    },
+    "recordedReadNs": {
+      "min": 389100,
+      "median": 583900,
+      "max": 8284800
+    }
+  },
+  "pausedCensus": {
+    "observedAt": "2026-10-11T23:45:31.646+08:00",
+    "paused": true,
+    "captureMs": 59.6657,
+    "runtimeConfig": {
+      "predictionDistanceBlocks": 8192,
+      "predictionFineDistanceBlocks": 1536,
+      "predictionSurfaceDistanceBlocks": 512,
+      "predictionVegetationDensity": "medium",
+      "performanceTier": "medium",
+      "predictionTrees": true,
+      "predictionRefinementWorkers": 0
+    },
+    "camera": "(648.1773989259884, 83.61999988555908, 149.22125736627336)",
+    "residentGroups": {
+      "arena:opaque": {
+        "bytes": 1589209472,
+        "tiles": 4309,
+        "sourceQuads": 57470958
+      },
+      "arena:overflow": {
+        "bytes": 430342368,
+        "tiles": 593,
+        "sourceQuads": 16040066
+      },
+      "arena:standalone": {
+        "bytes": 1310169312,
+        "tiles": 1886,
+        "sourceQuads": 48085152
+      },
+      "lod:0": {
+        "bytes": 337953632,
+        "tiles": 1395,
+        "sourceQuads": 12116752
+      },
+      "lod:1": {
+        "bytes": 2148654000,
+        "tiles": 3113,
+        "sourceQuads": 80446493
+      },
+      "lod:2": {
+        "bytes": 605331072,
+        "tiles": 1741,
+        "sourceQuads": 20499269
+      },
+      "lod:3": {
+        "bytes": 146677136,
+        "tiles": 360,
+        "sourceQuads": 5110462
+      },
+      "lod:4": {
+        "bytes": 54714096,
+        "tiles": 111,
+        "sourceQuads": 2025712
+      },
+      "lod:5": {
+        "bytes": 22699312,
+        "tiles": 40,
+        "sourceQuads": 847685
+      },
+      "lod:6": {
+        "bytes": 10543584,
+        "tiles": 20,
+        "sourceQuads": 416118
+      },
+      "lod:7": {
+        "bytes": 3148320,
+        "tiles": 8,
+        "sourceQuads": 133685
+      },
+      "offscreen:standalone": {
+        "bytes": 1185869056,
+        "tiles": 1583,
+        "sourceQuads": 43513204
+      },
+      "policy:false:true:false": {
+        "bytes": 2502944,
+        "tiles": 4,
+        "sourceQuads": 105756
+      },
+      "policy:false:true:true": {
+        "bytes": 2724387584,
+        "tiles": 4952,
+        "sourceQuads": 99260348
+      },
+      "policy:true:false:true": {
+        "bytes": 175031872,
+        "tiles": 447,
+        "sourceQuads": 6486545
+      },
+      "policy:true:true:false": {
+        "bytes": 645376,
+        "tiles": 4,
+        "sourceQuads": 27929
+      },
+      "policy:true:true:true": {
+        "bytes": 427153376,
+        "tiles": 1381,
+        "sourceQuads": 15715598
+      },
+      "reason:offscreenSeam": {
+        "bytes": 2721700000,
+        "tiles": 4947,
+        "sourceQuads": 99164640
+      },
+      "reason:seam": {
+        "bytes": 3140926288,
+        "tiles": 6306,
+        "sourceQuads": 114589219
+      },
+      "spacing:1": {
+        "bytes": 337921056,
+        "tiles": 1394,
+        "sourceQuads": 12115705
+      },
+      "spacing:1024": {
+        "bytes": 35664,
+        "tiles": 3,
+        "sourceQuads": 1386
+      },
+      "spacing:128": {
+        "bytes": 3112656,
+        "tiles": 5,
+        "sourceQuads": 132299
+      },
+      "spacing:16": {
+        "bytes": 54714096,
+        "tiles": 111,
+        "sourceQuads": 2025712
+      },
+      "spacing:2": {
+        "bytes": 2138688160,
+        "tiles": 2925,
+        "sourceQuads": 80152475
+      },
+      "spacing:256": {
+        "bytes": 12368,
+        "tiles": 1,
+        "sourceQuads": 483
+      },
+      "spacing:32": {
+        "bytes": 22686944,
+        "tiles": 39,
+        "sourceQuads": 847202
+      },
+      "spacing:4": {
+        "bytes": 591668128,
+        "tiles": 1674,
+        "sourceQuads": 20040669
+      },
+      "spacing:512": {
+        "bytes": 35296,
+        "tiles": 3,
+        "sourceQuads": 1402
+      },
+      "spacing:64": {
+        "bytes": 10508288,
+        "tiles": 17,
+        "sourceQuads": 414716
+      },
+      "spacing:8": {
+        "bytes": 170338496,
+        "tiles": 616,
+        "sourceQuads": 5864127
+      }
+    },
+    "seamProtected": {
+      "tiles": 6306,
+      "bytes": 3140926288,
+      "sourceQuads": 114589219
+    },
+    "offscreenSeamProtected": {
+      "tiles": 4947,
+      "bytes": 2721700000,
+      "sourceQuads": 99164640
+    },
+    "offscreenSeamWithFallback": {
+      "tiles": 4945,
+      "bytes": 2720457440,
+      "sourceQuads": 99112108
+    },
+    "offscreenSeamWithFallbackExcludingTopTwoLevels": {
+      "tiles": 4938,
+      "bytes": 2716047840,
+      "sourceQuads": 98939746
+    },
+    "residentPolicyFieldsFromLastSweep": true,
+    "drawEntries": 2698,
+    "selectedQuads": 10363210,
+    "drawCategories": {
+      "noDisplayVariant": {
+        "entries": 2330,
+        "quads": 7575790
+      },
+      "mixedOwnershipWithDisplayVariant": {
+        "entries": 40,
+        "quads": 377175
+      },
+      "completeOwnershipWithDisplayVariant": {
+        "entries": 328,
+        "quads": 2410245
+      },
+      "seams": {
+        "entries": 1285,
+        "quads": 151019
+      },
+      "hasMorph": {
+        "entries": 0,
+        "quads": 0
+      }
+    },
+    "displayTiers": {
+      "0": 2698
+    },
+    "hypotheticalExpiredMorphTiers": {
+      "0": 2698
+    }
+  },
+  "interpretationLimits": [
+    "Render-thread sampling only; inclusive groups/methods overlap and are not additive.",
+    "Old and new Spark scenes are not a controlled FPS A/B.",
+    "Only the 36-second counters overlap is aligned with Spark; later snapshots include pause.",
+    "Snapshot distributions of current pass preparation and previous submitted batches can refer to different frames.",
+    "matchedSubmissionSamples use saved candidate/hidden values from the same sampleSubmissionFrame.",
+    "Paused census is after Spark and is not a live workload or FPS comparison.",
+    "Census visible/protected/fallback fields come from the most recent residency sweep, not freshly recomputed frustum tests.",
+    "Protected offscreen bytes are candidate scale, not measured reclaim or performance gain.",
+    "sourceFeatures includes buildings/vegetation and is not equivalent to foliage.",
+    "Timing means include nested stages and different sampling units; CPU/GPU overlap.",
+    "Persistent readback, seam protection changes and GPU direction filtering were not implemented or A/B tested here.",
+    "Adaptive-policy diagnostics show missing completed comparisons; exact reset count was not instrumented."
+  ],
+  "nextExperiments": [
+    {
+      "priority": 1,
+      "candidate": "Visible seam dependencies and cold GPU residency",
+      "source": [
+        "PredictionRenderer.java:763",
+        "PredictionRenderer.java:796",
+        "PredictionGpuResidency.java:68"
+      ],
+      "validate": [
+        "Protect visible patches, near tiles, telescope focus and valid coarse fallback.",
+        "Update upload admission and residency protection together; prevent evict/restore loops.",
+        "Check terrain, features, water, real boundary and seam coverage during turns and Voxy ownership withdrawal.",
+        "Measure live/committed bytes, standalone draws, restores, frame tails and current-frame Hi-Z workload."
+      ]
+    },
+    {
+      "priority": 2,
+      "candidate": "Persistent mapped asynchronous refinement readback",
+      "source": [
+        "PredictionRefinementOcclusion.java:93",
+        "voxy DownloadStream.java:110"
+      ],
+      "validate": [
+        "Fixed small staging slots, copy/barrier/fence, read only after fence completion.",
+        "Skip busy slots without forced GPU waits; preserve revision/view/epoch/expiration checks.",
+        "Measure production readback CPU and GPU copy cost on equivalent probe data."
+      ]
+    },
+    {
+      "priority": 3,
+      "candidate": "Spatial seam candidates and regional prepared-pass updates",
+      "source": [
+        "PredictionRenderer.java:898",
+        "Sodium ChunkRenderList.java:58"
+      ],
+      "validate": [
+        "Index actual seam patch bounds instead of all seam keys or tile bounds.",
+        "Invalidate only affected membership/payload/ownership records; preserve transparent order.",
+        "Replay actual loading/turning sequences and compare preparation, frustum tests and encoded items."
+      ]
+    },
+    {
+      "priority": 4,
+      "candidate": "Earlier conservative face-direction rejection",
+      "source": [
+        "PredictionTerrainProgram.java:643",
+        "PredictionTerrainProgram.java:685",
+        "voxy cmdgen.comp:86"
+      ],
+      "validate": [
+        "Only constant-plane single-sided primitives qualify for early return.",
+        "Keep crossed plants, models, slopes, morphs, water and mixed-winding semantics.",
+        "Require GPU timing gain and matching color/depth before retaining changes."
+      ]
+    },
+    {
+      "priority": 5,
+      "candidate": "Workload-based adaptive policy and screen-space owner selection",
+      "source": [
+        "PredictionOcclusionPolicy.java:19",
+        "PredictionTileManager.java:1876",
+        "voxy traversal_dev.comp:124"
+      ],
+      "validate": [
+        "Do not confuse performance-comparison validity with frame visibility validity.",
+        "Count actual comparison resets and complete comparable trials during loading.",
+        "Screen-dependent parent selection must coordinate terrain/features/water/seams and parent readiness.",
+        "Retain only gains with equivalent quality/coverage and actual scene A/B."
+      ]
+    }
+  ]
+}

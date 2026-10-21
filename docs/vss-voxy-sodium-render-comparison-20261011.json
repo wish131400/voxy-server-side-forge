@@ -1,0 +1,6236 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-11",
+  "report": "vss-voxy-sodium-render-comparison-20261011.md",
+  "scope": "Read-only source/profile investigation; production code, installed jars and GitHub unchanged.",
+  "spark": {
+    "url": "https://spark.lucko.me/CuvzdaFFdW",
+    "sha256": "65a6a8502126ea35c45208c72c8990ccf141474007f07d3e32a94a094e54592a",
+    "startTimeEpochMs": 1791723820026,
+    "endTimeEpochMs": 1791723940481,
+    "intervalMicros": 4000,
+    "sampleWeightMs": 120000,
+    "sampleCount": 30000,
+    "thread": "Render thread",
+    "validation": {
+      "nodes": 9275,
+      "visited": 9275,
+      "refsValid": true,
+      "uniqueParents": true,
+      "minSelf": 0,
+      "totalSelf": [
+        19972,
+        60004,
+        40024
+      ]
+    },
+    "timeWindows": [
+      29862063,
+      29862064,
+      29862065
+    ],
+    "windowStatistics": {
+      "29862063": {
+        "ticks": 399,
+        "cpuProcess": 0.5013118608194894,
+        "cpuSystem": 0.5613916831584013,
+        "tps": 20.00583296734607,
+        "msptMedian": 1.1724,
+        "msptMax": 88.8586,
+        "players": -1,
+        "entities": 123,
+        "tileEntities": -1,
+        "chunks": 188,
+        "startTime": 1791723820026,
+        "endTime": 1791723840000,
+        "duration": 19974
+      },
+      "29862064": {
+        "ticks": 1200,
+        "cpuProcess": 0.43672251971235637,
+        "cpuSystem": 0.4837363234679792,
+        "tps": 19.984334113951956,
+        "msptMedian": 1.1409,
+        "msptMax": 50.3899,
+        "players": -1,
+        "entities": 92,
+        "tileEntities": -1,
+        "chunks": 174,
+        "startTime": 1791723840000,
+        "endTime": 1791723900003,
+        "duration": 60003
+      },
+      "29862065": {
+        "ticks": 801,
+        "cpuProcess": 0.46613106400787563,
+        "cpuSystem": 0.5178496046343333,
+        "tps": 20.002406156111206,
+        "msptMedian": 1.0622,
+        "msptMax": 49.241,
+        "players": -1,
+        "entities": 120,
+        "tileEntities": -1,
+        "chunks": 172,
+        "startTime": 1791723900003,
+        "endTime": 1791723940026,
+        "duration": 40023
+      }
+    },
+    "stackGroups": {
+      "VSS": {
+        "ms": 97084,
+        "pct": 80.90333333333334,
+        "windowMs": [
+          16312,
+          49596,
+          31176
+        ],
+        "windowPct": [
+          81.6743440817144,
+          82.65448970068663,
+          77.89326404157505
+        ]
+      },
+      "Voxy": {
+        "ms": 79916,
+        "pct": 66.59666666666666,
+        "windowMs": [
+          13676,
+          40896,
+          25344
+        ],
+        "windowPct": [
+          68.47586621269778,
+          68.15545630291314,
+          63.32200679592245
+        ]
+      },
+      "Iris": {
+        "ms": 3604,
+        "pct": 3.0033333333333334,
+        "windowMs": [
+          624,
+          1708,
+          1272
+        ],
+        "windowPct": [
+          3.1243741237732827,
+          2.8464769015398974,
+          3.178093144113532
+        ]
+      },
+      "Xaero": {
+        "ms": 3260,
+        "pct": 2.716666666666667,
+        "windowMs": [
+          476,
+          1668,
+          1116
+        ],
+        "windowPct": [
+          2.383336671339876,
+          2.7798146790213987,
+          2.7883270037977215
+        ]
+      },
+      "Sodium": {
+        "ms": 85884,
+        "pct": 71.57,
+        "windowMs": [
+          14384,
+          43936,
+          27564
+        ],
+        "windowPct": [
+          72.02082916082516,
+          73.22178521431904,
+          68.86867879272437
+        ]
+      },
+      "drawIris": {
+        "ms": 0,
+        "pct": 0,
+        "windowMs": [
+          0,
+          0,
+          0
+        ],
+        "windowPct": [
+          0,
+          0,
+          0
+        ]
+      },
+      "drawNormalPass": {
+        "ms": 22268,
+        "pct": 18.55666666666667,
+        "windowMs": [
+          3908,
+          11904,
+          6456
+        ],
+        "windowPct": [
+          19.56739435209293,
+          19.83867742150523,
+          16.130321806915852
+        ]
+      },
+      "ScenePrepare": {
+        "ms": 31960,
+        "pct": 26.633333333333333,
+        "windowMs": [
+          5552,
+          16860,
+          9548
+        ],
+        "windowPct": [
+          27.798918485880233,
+          28.09812679154723,
+          23.85568658804717
+        ]
+      },
+      "PreparedPass": {
+        "ms": 8360,
+        "pct": 6.966666666666667,
+        "windowMs": [
+          1504,
+          4444,
+          2412
+        ],
+        "windowPct": [
+          7.53054275986381,
+          7.406172921805213,
+          6.026384169498301
+        ]
+      },
+      "submitRanges": {
+        "ms": 1624,
+        "pct": 1.3533333333333333,
+        "windowMs": [
+          236,
+          924,
+          464
+        ],
+        "windowPct": [
+          1.1816543160424595,
+          1.5398973401773215,
+          1.1593044173495903
+        ]
+      },
+      "swap": {
+        "ms": 10668,
+        "pct": 8.89,
+        "windowMs": [
+          1632,
+          4400,
+          4636
+        ],
+        "windowPct": [
+          8.171440016022432,
+          7.332844477034865,
+          11.583050169898062
+        ]
+      },
+      "glFinish": {
+        "ms": 88,
+        "pct": 0.07333333333333333,
+        "windowMs": [
+          28,
+          32,
+          28
+        ],
+        "windowPct": [
+          0.14019627478469857,
+          0.05332977801479901,
+          0.06995802518488907
+        ]
+      },
+      "glGetError": {
+        "ms": 12,
+        "pct": 0.01,
+        "windowMs": [
+          0,
+          8,
+          4
+        ],
+        "windowPct": [
+          0,
+          0.013332444503699753,
+          0.009994003597841295
+        ]
+      },
+      "VSSgl": {
+        "ms": 18012,
+        "pct": 15.01,
+        "windowMs": [
+          2804,
+          9072,
+          6136
+        ],
+        "windowPct": [
+          14.039655517724814,
+          15.11899206719552,
+          15.330801519088547
+        ]
+      },
+      "XaeroWorld": {
+        "ms": 1112,
+        "pct": 0.9266666666666666,
+        "windowMs": [
+          212,
+          568,
+          332
+        ],
+        "windowPct": [
+          1.0614860805127178,
+          0.9466035597626825,
+          0.8295022986208275
+        ]
+      }
+    },
+    "vssJavaSelfAndVssExcludedStackGroups": {
+      "VSSJavaSelf": {
+        "ms": 44196,
+        "pct": 36.83,
+        "windowMs": [
+          7876,
+          23088,
+          13232
+        ],
+        "windowPct": [
+          39.43520929301022,
+          38.477434837677485,
+          33.060163901659
+        ]
+      },
+      "VoxyWithoutVSS": {
+        "ms": 2064,
+        "pct": 1.72,
+        "windowMs": [
+          276,
+          932,
+          856
+        ],
+        "windowPct": [
+          1.3819347085920288,
+          1.5532297846810212,
+          2.1387167699380374
+        ]
+      },
+      "SodiumWithoutVSS": {
+        "ms": 2820,
+        "pct": 2.35,
+        "windowMs": [
+          420,
+          1308,
+          1092
+        ],
+        "windowPct": [
+          2.1029441217704785,
+          2.1798546763549096,
+          2.7283629822106734
+        ]
+      },
+      "IrisWithoutVSS": {
+        "ms": 256,
+        "pct": 0.21333333333333335,
+        "windowMs": [
+          4,
+          196,
+          56
+        ],
+        "windowPct": [
+          0.02002803925495694,
+          0.326644890340644,
+          0.13991605036977814
+        ]
+      },
+      "XaeroWithoutVSS": {
+        "ms": 3260,
+        "pct": 2.716666666666667,
+        "windowMs": [
+          476,
+          1668,
+          1116
+        ],
+        "windowPct": [
+          2.383336671339876,
+          2.7798146790213987,
+          2.7883270037977215
+        ]
+      },
+      "VoxyAndVSS": {
+        "ms": 77848,
+        "pct": 64.87333333333333,
+        "windowMs": [
+          13396,
+          39964,
+          24488
+        ],
+        "windowPct": [
+          67.07390346485079,
+          66.60222651823211,
+          61.18329002598441
+        ]
+      },
+      "VSSDrawNormal": {
+        "ms": 22268,
+        "pct": 18.55666666666667,
+        "windowMs": [
+          3908,
+          11904,
+          6456
+        ],
+        "windowPct": [
+          19.56739435209293,
+          19.83867742150523,
+          16.130321806915852
+        ]
+      },
+      "VSSScene": {
+        "ms": 31960,
+        "pct": 26.633333333333333,
+        "windowMs": [
+          5552,
+          16860,
+          9548
+        ],
+        "windowPct": [
+          27.798918485880233,
+          28.09812679154723,
+          23.85568658804717
+        ]
+      },
+      "VSSTick": {
+        "ms": 12852,
+        "pct": 10.71,
+        "windowMs": [
+          2192,
+          6356,
+          4304
+        ],
+        "windowPct": [
+          10.975365511716403,
+          10.592627158189455,
+          10.753547871277233
+        ]
+      },
+      "VSSDeferredWater": {
+        "ms": 144,
+        "pct": 0.12,
+        "windowMs": [
+          12,
+          80,
+          52
+        ],
+        "windowPct": [
+          0.06008411776487082,
+          0.13332444503699753,
+          0.12992204677193683
+        ]
+      },
+      "VSSOther": {
+        "ms": 29860,
+        "pct": 24.883333333333333,
+        "windowMs": [
+          4648,
+          14396,
+          10816
+        ],
+        "windowPct": [
+          23.272581614259963,
+          23.991733884407704,
+          27.023785728562864
+        ]
+      }
+    },
+    "vssMethods": [
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionNormalTranslucencyBridge.beforeTranslucent",
+        "inclusive": {
+          "ms": 75908,
+          "pct": 63.25666666666667,
+          "windowMs": [
+            13072,
+            39128,
+            23708
+          ],
+          "windowPct": [
+            65.45163228519928,
+            65.20898606759549,
+            59.23445932440536
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.renderStage",
+        "inclusive": {
+          "ms": 75640,
+          "pct": 63.03333333333333,
+          "windowMs": [
+            13032,
+            38992,
+            23616
+          ],
+          "windowPct": [
+            65.25135189264971,
+            64.9823345110326,
+            59.004597241655006
+          ]
+        },
+        "self": {
+          "ms": 4,
+          "pct": 0.0033333333333333335,
+          "windowMs": [
+            0,
+            4,
+            0
+          ],
+          "windowPct": [
+            0,
+            0.006666222251849876,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.renderBeforeVoxyWater",
+        "inclusive": {
+          "ms": 75640,
+          "pct": 63.03333333333333,
+          "windowMs": [
+            13032,
+            38992,
+            23616
+          ],
+          "windowPct": [
+            65.25135189264971,
+            64.9823345110326,
+            59.004597241655006
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked",
+        "inclusive": {
+          "ms": 75556,
+          "pct": 62.96333333333333,
+          "windowMs": [
+            13008,
+            38956,
+            23592
+          ],
+          "windowPct": [
+            65.13118365711996,
+            64.92233851076595,
+            58.944633220067956
+          ]
+        },
+        "self": {
+          "ms": 724,
+          "pct": 0.6033333333333334,
+          "windowMs": [
+            132,
+            400,
+            192
+          ],
+          "windowPct": [
+            0.660925295413579,
+            0.6666222251849877,
+            0.47971217269638217
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare",
+        "inclusive": {
+          "ms": 31960,
+          "pct": 26.633333333333333,
+          "windowMs": [
+            5552,
+            16860,
+            9548
+          ],
+          "windowPct": [
+            27.798918485880233,
+            28.09812679154723,
+            23.85568658804717
+          ]
+        },
+        "self": {
+          "ms": 2536,
+          "pct": 2.1133333333333333,
+          "windowMs": [
+            360,
+            1336,
+            840
+          ],
+          "windowPct": [
+            1.8025235329461247,
+            2.2265182321178587,
+            2.098740755546672
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.drawPasses",
+        "inclusive": {
+          "ms": 28064,
+          "pct": 23.386666666666667,
+          "windowMs": [
+            4960,
+            14960,
+            8144
+          ],
+          "windowPct": [
+            24.834768676146606,
+            24.93167122191854,
+            20.347791325204877
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass",
+        "inclusive": {
+          "ms": 22268,
+          "pct": 18.55666666666667,
+          "windowMs": [
+            3908,
+            11904,
+            6456
+          ],
+          "windowPct": [
+            19.56739435209293,
+            19.83867742150523,
+            16.130321806915852
+          ]
+        },
+        "self": {
+          "ms": 1084,
+          "pct": 0.9033333333333333,
+          "windowMs": [
+            192,
+            544,
+            348
+          ],
+          "windowPct": [
+            0.9613458842379331,
+            0.9066062262515833,
+            0.8694783130121927
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.add",
+        "inclusive": {
+          "ms": 14096,
+          "pct": 11.746666666666666,
+          "windowMs": [
+            2464,
+            7604,
+            4028
+          ],
+          "windowPct": [
+            12.337272181053475,
+            12.672488500766615,
+            10.063961623026184
+          ]
+        },
+        "self": {
+          "ms": 548,
+          "pct": 0.45666666666666667,
+          "windowMs": [
+            116,
+            208,
+            224
+          ],
+          "windowPct": [
+            0.5808131383937513,
+            0.3466435570961936,
+            0.5596642014791126
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.networking.client.VSSClientNetworking.onClientTick",
+        "inclusive": {
+          "ms": 12852,
+          "pct": 10.71,
+          "windowMs": [
+            2192,
+            6356,
+            4304
+          ],
+          "windowPct": [
+            10.975365511716403,
+            10.592627158189455,
+            10.753547871277233
+          ]
+        },
+        "self": {
+          "ms": 12,
+          "pct": 0.01,
+          "windowMs": [
+            4,
+            0,
+            8
+          ],
+          "windowPct": [
+            0.02002803925495694,
+            0,
+            0.01998800719568259
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.ClientPredictionState.tick",
+        "inclusive": {
+          "ms": 12632,
+          "pct": 10.526666666666667,
+          "windowMs": [
+            2140,
+            6256,
+            4236
+          ],
+          "windowPct": [
+            10.715001001401962,
+            10.425971601893208,
+            10.583649810113931
+          ]
+        },
+        "self": {
+          "ms": 16,
+          "pct": 0.013333333333333334,
+          "windowMs": [
+            4,
+            8,
+            4
+          ],
+          "windowPct": [
+            0.02002803925495694,
+            0.013332444503699753,
+            0.009994003597841295
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionTileManager.tick",
+        "inclusive": {
+          "ms": 12108,
+          "pct": 10.09,
+          "windowMs": [
+            2008,
+            6016,
+            4084
+          ],
+          "windowPct": [
+            10.054075705988383,
+            10.025998266782215,
+            10.203877673395963
+          ]
+        },
+        "self": {
+          "ms": 28,
+          "pct": 0.023333333333333334,
+          "windowMs": [
+            4,
+            20,
+            4
+          ],
+          "windowPct": [
+            0.02002803925495694,
+            0.03333111125924938,
+            0.009994003597841295
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.stage",
+        "inclusive": {
+          "ms": 9876,
+          "pct": 8.23,
+          "windowMs": [
+            1572,
+            5368,
+            2936
+          ],
+          "windowPct": [
+            7.871019427198077,
+            8.946070261982534,
+            7.335598640815511
+          ]
+        },
+        "self": {
+          "ms": 12,
+          "pct": 0.01,
+          "windowMs": [
+            0,
+            4,
+            8
+          ],
+          "windowPct": [
+            0,
+            0.006666222251849876,
+            0.01998800719568259
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare",
+        "inclusive": {
+          "ms": 8360,
+          "pct": 6.966666666666667,
+          "windowMs": [
+            1504,
+            4444,
+            2412
+          ],
+          "windowPct": [
+            7.53054275986381,
+            7.406172921805213,
+            6.026384169498301
+          ]
+        },
+        "self": {
+          "ms": 4504,
+          "pct": 3.7533333333333334,
+          "windowMs": [
+            784,
+            2408,
+            1312
+          ],
+          "windowPct": [
+            3.9254956939715604,
+            4.013065795613626,
+            3.2780331800919447
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.preparePass",
+        "inclusive": {
+          "ms": 8360,
+          "pct": 6.966666666666667,
+          "windowMs": [
+            1504,
+            4444,
+            2412
+          ],
+          "windowPct": [
+            7.53054275986381,
+            7.406172921805213,
+            6.026384169498301
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionLodSeams.apply",
+        "inclusive": {
+          "ms": 7488,
+          "pct": 6.24,
+          "windowMs": [
+            1424,
+            4284,
+            1780
+          ],
+          "windowPct": [
+            7.129981974764671,
+            7.139524031731218,
+            4.447331601039377
+          ]
+        },
+        "self": {
+          "ms": 64,
+          "pct": 0.05333333333333334,
+          "windowMs": [
+            8,
+            36,
+            20
+          ],
+          "windowPct": [
+            0.04005607850991388,
+            0.05999600026664889,
+            0.04997001798920648
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.upload",
+        "inclusive": {
+          "ms": 7128,
+          "pct": 5.94,
+          "windowMs": [
+            1384,
+            4024,
+            1720
+          ],
+          "windowPct": [
+            6.929701582215102,
+            6.706219585360976,
+            4.297421547071757
+          ]
+        },
+        "self": {
+          "ms": 156,
+          "pct": 0.13,
+          "windowMs": [
+            36,
+            104,
+            16
+          ],
+          "windowPct": [
+            0.18025235329461245,
+            0.1733217785480968,
+            0.03997601439136518
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.resolveCoverage",
+        "inclusive": {
+          "ms": 6244,
+          "pct": 5.203333333333333,
+          "windowMs": [
+            1320,
+            3328,
+            1596
+          ],
+          "windowPct": [
+            6.6092529541357905,
+            5.546296913539098,
+            3.987607435538677
+          ]
+        },
+        "self": {
+          "ms": 120,
+          "pct": 0.1,
+          "windowMs": [
+            44,
+            56,
+            20
+          ],
+          "windowPct": [
+            0.22030843180452633,
+            0.09332711152589827,
+            0.04997001798920648
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail",
+        "inclusive": {
+          "ms": 6240,
+          "pct": 5.2,
+          "windowMs": [
+            1212,
+            3212,
+            1816
+          ],
+          "windowPct": [
+            6.068495894251953,
+            5.352976468235451,
+            4.537277633419948
+          ]
+        },
+        "self": {
+          "ms": 2608,
+          "pct": 2.1733333333333333,
+          "windowMs": [
+            492,
+            1260,
+            856
+          ],
+          "windowPct": [
+            2.4634488283597036,
+            2.099860009332711,
+            2.1387167699380374
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionVisiblePlan.selectStable",
+        "inclusive": {
+          "ms": 5920,
+          "pct": 4.933333333333334,
+          "windowMs": [
+            868,
+            2848,
+            2204
+          ],
+          "windowPct": [
+            4.346084518325656,
+            4.746350243317112,
+            5.5066959824105535
+          ]
+        },
+        "self": {
+          "ms": 148,
+          "pct": 0.12333333333333334,
+          "windowMs": [
+            16,
+            92,
+            40
+          ],
+          "windowPct": [
+            0.08011215701982775,
+            0.15332311179254715,
+            0.09994003597841296
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionLodSeams.stitch",
+        "inclusive": {
+          "ms": 5528,
+          "pct": 4.6066666666666665,
+          "windowMs": [
+            1084,
+            3184,
+            1260
+          ],
+          "windowPct": [
+            5.427598638093331,
+            5.306312912472502,
+            3.148111133320008
+          ]
+        },
+        "self": {
+          "ms": 488,
+          "pct": 0.4066666666666667,
+          "windowMs": [
+            88,
+            280,
+            120
+          ],
+          "windowPct": [
+            0.44061686360905267,
+            0.4666355576294914,
+            0.29982010793523883
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.networking.client.VSSClientNetworking.onRenderLevel",
+        "inclusive": {
+          "ms": 5404,
+          "pct": 4.503333333333333,
+          "windowMs": [
+            600,
+            2740,
+            2064
+          ],
+          "windowPct": [
+            3.004205888243541,
+            4.566362242517165,
+            5.156905856486109
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.onRenderLevel",
+        "inclusive": {
+          "ms": 5396,
+          "pct": 4.496666666666667,
+          "windowMs": [
+            600,
+            2740,
+            2056
+          ],
+          "windowPct": [
+            3.004205888243541,
+            4.566362242517165,
+            5.136917849290426
+          ]
+        },
+        "self": {
+          "ms": 8,
+          "pct": 0.006666666666666667,
+          "windowMs": [
+            4,
+            0,
+            4
+          ],
+          "windowPct": [
+            0.02002803925495694,
+            0,
+            0.009994003597841295
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.renderDeferredWater",
+        "inclusive": {
+          "ms": 5216,
+          "pct": 4.346666666666667,
+          "windowMs": [
+            568,
+            2664,
+            1984
+          ],
+          "windowPct": [
+            2.8439815742038856,
+            4.439704019732018,
+            4.957025784529282
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionTileManager.scheduleWork",
+        "inclusive": {
+          "ms": 4752,
+          "pct": 3.96,
+          "windowMs": [
+            732,
+            2424,
+            1596
+          ],
+          "windowPct": [
+            3.66513118365712,
+            4.039730684621025,
+            3.987607435538677
+          ]
+        },
+        "self": {
+          "ms": 84,
+          "pct": 0.07,
+          "windowMs": [
+            16,
+            40,
+            28
+          ],
+          "windowPct": [
+            0.08011215701982775,
+            0.06666222251849876,
+            0.06995802518488907
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionVisiblePlan.updateStable",
+        "inclusive": {
+          "ms": 4484,
+          "pct": 3.736666666666667,
+          "windowMs": [
+            624,
+            2156,
+            1704
+          ],
+          "windowPct": [
+            3.1243741237732827,
+            3.5930937937470837,
+            4.257445532680392
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderResidency.retain",
+        "inclusive": {
+          "ms": 4372,
+          "pct": 3.6433333333333335,
+          "windowMs": [
+            460,
+            1972,
+            1940
+          ],
+          "windowPct": [
+            2.303224514320048,
+            3.286447570161989,
+            4.847091744953028
+          ]
+        },
+        "self": {
+          "ms": 548,
+          "pct": 0.45666666666666667,
+          "windowMs": [
+            64,
+            260,
+            224
+          ],
+          "windowPct": [
+            0.320448628079311,
+            0.43330444637024196,
+            0.5596642014791126
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionGpuTile.uploadQuadBuffers",
+        "inclusive": {
+          "ms": 4340,
+          "pct": 3.6166666666666667,
+          "windowMs": [
+            800,
+            2176,
+            1364
+          ],
+          "windowPct": [
+            4.005607850991388,
+            3.626424905006333,
+            3.4079552268638817
+          ]
+        },
+        "self": {
+          "ms": 4,
+          "pct": 0.0033333333333333335,
+          "windowMs": [
+            0,
+            0,
+            4
+          ],
+          "windowPct": [
+            0,
+            0,
+            0.009994003597841295
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.drawBatch",
+        "inclusive": {
+          "ms": 4124,
+          "pct": 3.4366666666666665,
+          "windowMs": [
+            440,
+            2056,
+            1628
+          ],
+          "windowPct": [
+            2.2030843180452635,
+            3.4264382374508364,
+            4.067559464321407
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.same",
+        "inclusive": {
+          "ms": 4040,
+          "pct": 3.3666666666666667,
+          "windowMs": [
+            832,
+            2332,
+            876
+          ],
+          "windowPct": [
+            4.165832165031043,
+            3.886407572828478,
+            2.1886867879272436
+          ]
+        },
+        "self": {
+          "ms": 4040,
+          "pct": 3.3666666666666667,
+          "windowMs": [
+            832,
+            2332,
+            876
+          ],
+          "windowPct": [
+            4.165832165031043,
+            3.886407572828478,
+            2.1886867879272436
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates",
+        "inclusive": {
+          "ms": 3880,
+          "pct": 3.2333333333333334,
+          "windowMs": [
+            580,
+            1948,
+            1352
+          ],
+          "windowPct": [
+            2.904065691968756,
+            3.24645023665089,
+            3.377973216070358
+          ]
+        },
+        "self": {
+          "ms": 772,
+          "pct": 0.6433333333333333,
+          "windowMs": [
+            128,
+            412,
+            232
+          ],
+          "windowPct": [
+            0.640897256158622,
+            0.6866208919405373,
+            0.5796522086747952
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwners.version",
+        "inclusive": {
+          "ms": 3308,
+          "pct": 2.756666666666667,
+          "windowMs": [
+            668,
+            1796,
+            844
+          ],
+          "windowPct": [
+            3.344682555577809,
+            2.9931337910805946,
+            2.108734759144513
+          ]
+        },
+        "self": {
+          "ms": 3308,
+          "pct": 2.756666666666667,
+          "windowMs": [
+            668,
+            1796,
+            844
+          ],
+          "windowPct": [
+            3.344682555577809,
+            2.9931337910805946,
+            2.108734759144513
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.sample",
+        "inclusive": {
+          "ms": 3304,
+          "pct": 2.7533333333333334,
+          "windowMs": [
+            540,
+            1388,
+            1376
+          ],
+          "windowPct": [
+            2.7037852994191867,
+            2.313179121391907,
+            3.4379372376574056
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringFeatureTileAtDetail",
+        "inclusive": {
+          "ms": 2844,
+          "pct": 2.37,
+          "windowMs": [
+            604,
+            1520,
+            720
+          ],
+          "windowPct": [
+            3.0242339274984977,
+            2.5331644557029533,
+            1.7989206476114332
+          ]
+        },
+        "self": {
+          "ms": 1288,
+          "pct": 1.0733333333333333,
+          "windowMs": [
+            276,
+            676,
+            336
+          ],
+          "windowPct": [
+            1.3819347085920288,
+            1.126591560562629,
+            0.8394963022186688
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.submitBatch",
+        "inclusive": {
+          "ms": 2804,
+          "pct": 2.3366666666666664,
+          "windowMs": [
+            188,
+            1340,
+            1276
+          ],
+          "windowPct": [
+            0.9413178449829762,
+            2.2331844543697086,
+            3.1880871477113732
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderResidency.pendingUploads",
+        "inclusive": {
+          "ms": 2792,
+          "pct": 2.3266666666666667,
+          "windowMs": [
+            424,
+            1256,
+            1112
+          ],
+          "windowPct": [
+            2.1229721610254355,
+            2.0931937870808612,
+            2.77833300019988
+          ]
+        },
+        "self": {
+          "ms": 4,
+          "pct": 0.0033333333333333335,
+          "windowMs": [
+            0,
+            4,
+            0
+          ],
+          "windowPct": [
+            0,
+            0.006666222251849876,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.drawSingle",
+        "inclusive": {
+          "ms": 2696,
+          "pct": 2.2466666666666666,
+          "windowMs": [
+            340,
+            1548,
+            808
+          ],
+          "windowPct": [
+            1.70238333667134,
+            2.5798280114659025,
+            2.0187887267639417
+          ]
+        },
+        "self": {
+          "ms": 4,
+          "pct": 0.0033333333333333335,
+          "windowMs": [
+            0,
+            0,
+            4
+          ],
+          "windowPct": [
+            0,
+            0,
+            0.009994003597841295
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionTerrainArena.upload",
+        "inclusive": {
+          "ms": 2684,
+          "pct": 2.236666666666667,
+          "windowMs": [
+            452,
+            1460,
+            772
+          ],
+          "windowPct": [
+            2.263168435810134,
+            2.433171121925205,
+            1.92884269438337
+          ]
+        },
+        "self": {
+          "ms": 4,
+          "pct": 0.0033333333333333335,
+          "windowMs": [
+            0,
+            4,
+            0
+          ],
+          "windowPct": [
+            0,
+            0.006666222251849876,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionTileTable.at",
+        "inclusive": {
+          "ms": 2664,
+          "pct": 2.22,
+          "windowMs": [
+            336,
+            1160,
+            1168
+          ],
+          "windowPct": [
+            1.682355297416383,
+            1.9332044530364643,
+            2.918249050569658
+          ]
+        },
+        "self": {
+          "ms": 1708,
+          "pct": 1.4233333333333333,
+          "windowMs": [
+            228,
+            700,
+            780
+          ],
+          "windowPct": [
+            1.1415982375325455,
+            1.1665888940737283,
+            1.9488307015790525
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.flush",
+        "inclusive": {
+          "ms": 2660,
+          "pct": 2.216666666666667,
+          "windowMs": [
+            580,
+            1440,
+            640
+          ],
+          "windowPct": [
+            2.904065691968756,
+            2.3998400106659554,
+            1.5990405756546073
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionLodSeams.edge",
+        "inclusive": {
+          "ms": 2568,
+          "pct": 2.14,
+          "windowMs": [
+            476,
+            1492,
+            600
+          ],
+          "windowPct": [
+            2.383336671339876,
+            2.486500899940004,
+            1.4991005396761943
+          ]
+        },
+        "self": {
+          "ms": 8,
+          "pct": 0.006666666666666667,
+          "windowMs": [
+            0,
+            4,
+            4
+          ],
+          "windowPct": [
+            0,
+            0.006666222251849876,
+            0.009994003597841295
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.drain",
+        "inclusive": {
+          "ms": 2548,
+          "pct": 2.1233333333333335,
+          "windowMs": [
+            544,
+            1384,
+            620
+          ],
+          "windowPct": [
+            2.7238133386741437,
+            2.306512899140057,
+            1.5490705576654007
+          ]
+        },
+        "self": {
+          "ms": 12,
+          "pct": 0.01,
+          "windowMs": [
+            4,
+            4,
+            4
+          ],
+          "windowPct": [
+            0.02002803925495694,
+            0.006666222251849876,
+            0.009994003597841295
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionLodSeams.exteriorEdge",
+        "inclusive": {
+          "ms": 2540,
+          "pct": 2.1166666666666667,
+          "windowMs": [
+            476,
+            1472,
+            592
+          ],
+          "windowPct": [
+            2.383336671339876,
+            2.4531697886807544,
+            1.4791125324805117
+          ]
+        },
+        "self": {
+          "ms": 52,
+          "pct": 0.043333333333333335,
+          "windowMs": [
+            16,
+            8,
+            28
+          ],
+          "windowPct": [
+            0.08011215701982775,
+            0.013332444503699753,
+            0.06995802518488907
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.patches",
+        "inclusive": {
+          "ms": 2536,
+          "pct": 2.1133333333333333,
+          "windowMs": [
+            428,
+            1424,
+            684
+          ],
+          "windowPct": [
+            2.1430002002803925,
+            2.373175121658556,
+            1.7089746152308616
+          ]
+        },
+        "self": {
+          "ms": 24,
+          "pct": 0.02,
+          "windowMs": [
+            0,
+            16,
+            8
+          ],
+          "windowPct": [
+            0,
+            0.026664889007399505,
+            0.01998800719568259
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$SeamBatch.apply",
+        "inclusive": {
+          "ms": 2392,
+          "pct": 1.9933333333333334,
+          "windowMs": [
+            408,
+            1340,
+            644
+          ],
+          "windowPct": [
+            2.042860004005608,
+            2.2331844543697086,
+            1.6090345792524485
+          ]
+        },
+        "self": {
+          "ms": 52,
+          "pct": 0.043333333333333335,
+          "windowMs": [
+            12,
+            20,
+            20
+          ],
+          "windowPct": [
+            0.06008411776487082,
+            0.03333111125924938,
+            0.04997001798920648
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionGpuTile.ensureMesh",
+        "inclusive": {
+          "ms": 2388,
+          "pct": 1.99,
+          "windowMs": [
+            488,
+            1084,
+            816
+          ],
+          "windowPct": [
+            2.4434207891047466,
+            1.8065462302513167,
+            2.038776733959624
+          ]
+        },
+        "self": {
+          "ms": 4,
+          "pct": 0.0033333333333333335,
+          "windowMs": [
+            0,
+            4,
+            0
+          ],
+          "windowPct": [
+            0,
+            0.006666222251849876,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionGpuTile.ensureQuadBuffer",
+        "inclusive": {
+          "ms": 2376,
+          "pct": 1.98,
+          "windowMs": [
+            344,
+            1328,
+            704
+          ],
+          "windowPct": [
+            1.722411375926297,
+            2.213185787614159,
+            1.758944633220068
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.poll",
+        "inclusive": {
+          "ms": 2248,
+          "pct": 1.8733333333333333,
+          "windowMs": [
+            384,
+            840,
+            1024
+          ],
+          "windowPct": [
+            1.9226917684758662,
+            1.3999066728884741,
+            2.5584649210473716
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionTerrainArena$Page.allocate",
+        "inclusive": {
+          "ms": 2236,
+          "pct": 1.8633333333333333,
+          "windowMs": [
+            372,
+            1216,
+            648
+          ],
+          "windowPct": [
+            1.8626076507109954,
+            2.0265315645623625,
+            1.6190285828502897
+          ]
+        },
+        "self": {
+          "ms": 1228,
+          "pct": 1.0233333333333334,
+          "windowMs": [
+            212,
+            644,
+            372
+          ],
+          "windowPct": [
+            1.0614860805127178,
+            1.0732617825478301,
+            0.9294423345992404
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawKey",
+        "inclusive": {
+          "ms": 2212,
+          "pct": 1.8433333333333333,
+          "windowMs": [
+            336,
+            1096,
+            780
+          ],
+          "windowPct": [
+            1.682355297416383,
+            1.8265448970068663,
+            1.9488307015790525
+          ]
+        },
+        "self": {
+          "ms": 740,
+          "pct": 0.6166666666666667,
+          "windowMs": [
+            76,
+            380,
+            284
+          ],
+          "windowPct": [
+            0.38053274584418184,
+            0.6332911139257383,
+            0.7095742554467319
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem",
+        "inclusive": {
+          "ms": 2116,
+          "pct": 1.7633333333333334,
+          "windowMs": [
+            428,
+            1208,
+            480
+          ],
+          "windowPct": [
+            2.1430002002803925,
+            2.0131991200586627,
+            1.1992804317409553
+          ]
+        },
+        "self": {
+          "ms": 2116,
+          "pct": 1.7633333333333334,
+          "windowMs": [
+            428,
+            1208,
+            480
+          ],
+          "windowPct": [
+            2.1430002002803925,
+            2.0131991200586627,
+            1.1992804317409553
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderResidency.pendingFeatureReplacement",
+        "inclusive": {
+          "ms": 2040,
+          "pct": 1.7,
+          "windowMs": [
+            188,
+            944,
+            908
+          ],
+          "windowPct": [
+            0.9413178449829762,
+            1.5732284514365709,
+            2.268638816709974
+          ]
+        },
+        "self": {
+          "ms": 828,
+          "pct": 0.69,
+          "windowMs": [
+            64,
+            384,
+            380
+          ],
+          "windowPct": [
+            0.320448628079311,
+            0.6399573361775882,
+            0.949430341794923
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionGpuTile.ensureSeams",
+        "inclusive": {
+          "ms": 2020,
+          "pct": 1.6833333333333333,
+          "windowMs": [
+            316,
+            1136,
+            568
+          ],
+          "windowPct": [
+            1.5822151011415981,
+            1.893207119525365,
+            1.4191485108934638
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionPackedMesh.terrainRecords",
+        "inclusive": {
+          "ms": 1952,
+          "pct": 1.6266666666666667,
+          "windowMs": [
+            392,
+            1120,
+            440
+          ],
+          "windowPct": [
+            1.9627478469857802,
+            1.8665422305179655,
+            1.0993403957625425
+          ]
+        },
+        "self": {
+          "ms": 152,
+          "pct": 0.12666666666666668,
+          "windowMs": [
+            40,
+            84,
+            28
+          ],
+          "windowPct": [
+            0.2002803925495694,
+            0.1399906672888474,
+            0.06995802518488907
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionPackedMesh.seamRecords",
+        "inclusive": {
+          "ms": 1952,
+          "pct": 1.6266666666666667,
+          "windowMs": [
+            392,
+            1120,
+            440
+          ],
+          "windowPct": [
+            1.9627478469857802,
+            1.8665422305179655,
+            1.0993403957625425
+          ]
+        },
+        "self": {
+          "ms": 0,
+          "pct": 0,
+          "windowMs": [
+            0,
+            0,
+            0
+          ],
+          "windowPct": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "name": "dev.xantha.vss.client.prediction.PredictionRenderer.maintainGpuResidency",
+        "inclusive": {
+          "ms": 1848,
+          "pct": 1.54,
+          "windowMs": [
+            232,
+            892,
+            724
+          ],
+          "windowPct": [
+            1.1616262767875025,
+            1.4865675621625225,
+            1.8089146512092744
+          ]
+        },
+        "self": {
+          "ms": 808,
+          "pct": 0.6733333333333333,
+          "windowMs": [
+            104,
+            392,
+            312
+          ],
+          "windowPct": [
+            0.5207290206288804,
+            0.653289780681288,
+            0.779532280631621
+          ]
+        }
+      }
+    ],
+    "note": "Inclusive call paths overlap. Stack-without-VSS is not module-exclusive self. Only Render thread was sampled."
+  },
+  "environment": {
+    "minecraft": "1.21.1",
+    "neoForge": "21.1.249",
+    "vss": "0.3.5-neoforge-1.21.1",
+    "voxy": "0.2.15-beta",
+    "sodium": "0.8.12-beta.2+mc1.21.1",
+    "iris": "1.8.14-beta.1+mc1.21.1",
+    "shaderPackEnabled": false,
+    "renderPath": "normal",
+    "cpu": "AMD Ryzen 7 7700",
+    "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "java": "Oracle 25.0.1",
+    "jars": {
+      "installedVss": {
+        "fileName": "vss-0.3.5-neoforge-1.21.1.jar",
+        "size": 5928498,
+        "sha256": "a5d6e26f38dd460d53910cb0de4584674f38aa2e7d953a1fb510c332e77c64e9"
+      },
+      "vssRepositoryArtifact": {
+        "fileName": "vss-0.3.5-neoforge-1.21.1.jar",
+        "size": 5928498,
+        "sha256": "a5d6e26f38dd460d53910cb0de4584674f38aa2e7d953a1fb510c332e77c64e9"
+      },
+      "installedVoxy": {
+        "fileName": "voxy-0.2.15-beta.jar",
+        "size": 12626286,
+        "sha256": "802d49edc07c4e4a7af15ffd59337a82af383dfd551b67c278233098737e2f52"
+      },
+      "installedSodium": {
+        "fileName": "[钠] sodium-neoforge-0.8.12-beta.2+mc1.21.1.jar",
+        "size": 1291421,
+        "sha256": "21f46a795137d7049a6736cea1e56837c633da532dd9fcb178363a8df771a4ea"
+      }
+    }
+  },
+  "sourceReference": {
+    "voxyBranch": "263",
+    "voxyCommit": "b0207f6fcc0a55fa6b33f5c916932e8560a71845",
+    "sodiumTag": "mc1.21.1-0.8.12-beta.2",
+    "sodiumCommit": "ec15afd7c85f850552577739eb30858faea1e592",
+    "sodiumTagMatchesInstalledVersionMetadata": true,
+    "voxyShaderVerification": {
+      "jarSha256": "802d49edc07c4e4a7af15ffd59337a82af383dfd551b67c278233098737e2f52",
+      "checks": [
+        {
+          "path": "assets/voxy/shaders/lod/gl46/cmdgen.comp",
+          "sameBytes": false,
+          "sameText": true,
+          "jarSha256": "795000009bbcd8133aa199407ca68440debb0507d86bb067f237c8b1687d5cb0",
+          "sourceSha256": "da341df71b716e599c2e828b0908cdfbfa5c64883ed8837ad5c2916a95eb509e"
+        },
+        {
+          "path": "assets/voxy/shaders/lod/hierarchical/traversal_dev.comp",
+          "sameBytes": false,
+          "sameText": true,
+          "jarSha256": "272fba6e1e623a395342be1f418200d0e896fdab78776205064c79cebdf3c67c",
+          "sourceSha256": "a8b4902d324d37766bd1a01a91a147886ca832a8a170471ffa5330602f0fbe79"
+        },
+        {
+          "path": "assets/voxy/shaders/lod/hierarchical/screenspace.glsl",
+          "sameBytes": false,
+          "sameText": true,
+          "jarSha256": "371676aa891a5a4876f5db1a75905da041cfdd3b88a6caaa795f154d793c8a54",
+          "sourceSha256": "f0c1c91b64e9277916d1af429532a52323452ca60e6269a4374b24f9e927aeca"
+        },
+        {
+          "path": "assets/voxy/shaders/lod/quad_format.glsl",
+          "sameBytes": false,
+          "sameText": true,
+          "jarSha256": "26f4dc6e0bba703ae3424ff2ba3d0dee94199b0df0c24908e44e8c4d18b12a11",
+          "sourceSha256": "8c0df5edc2ca49b78bbf8b35453274694a1a0b1845c77858ee9c2a4d1d7d471f"
+        },
+        {
+          "path": "assets/voxy/shaders/lod/block_model.glsl",
+          "sameBytes": false,
+          "sameText": true,
+          "jarSha256": "3776a82e6f0660951c1dccf7835215027d367945bdeece608b1534441a8012f4",
+          "sourceSha256": "37152f4339854a2fbcfc3b917ddca028f452b9a3c2ff63c53137a1bdf195837e"
+        }
+      ]
+    },
+    "selectedVssSourceParity": [
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java",
+        "sameTextIgnoringLineEndings": true
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionTerrainArena.java",
+        "sameTextIgnoringLineEndings": true
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayGeometry.java",
+        "sameTextIgnoringLineEndings": true
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuEncoding.java",
+        "sameTextIgnoringLineEndings": true
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionCoverageOwners.java",
+        "sameTextIgnoringLineEndings": true
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuResidency.java",
+        "sameTextIgnoringLineEndings": true
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionBlockModel.java",
+        "sameTextIgnoringLineEndings": true
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionPackedMesh.java",
+        "sameTextIgnoringLineEndings": false
+      }
+    ],
+    "packedMeshDifference": "Java-version-compatible clamp expressions; no production synchronization performed in this investigation."
+  },
+  "logWindow": {
+    "sourceFileName": "debug.log",
+    "sourceSha256AtExtraction": "1b87eae679611376fcfc7caf60ec116bb2dd94c844446e40b663a66f017e3738",
+    "firstRenderTime": "21:03:42.290",
+    "lastRenderTime": "21:05:37.754",
+    "renderWindowSeconds": 115.464,
+    "snapshotCount": 24,
+    "cumulativeDeltas": {
+      "meshUploads": 6284,
+      "preparedPlans": 3608,
+      "reusedPlans": 247,
+      "indirect.wholePlanHits": 72,
+      "indirect.planHits": 5689,
+      "indirect.planMisses": 4464,
+      "wallIndex.builds": 4786,
+      "wallIndex.updated": 79678,
+      "gpuResidency.budgetEvictions": 1481,
+      "gpuResidency.restoreRequests": 927
+    },
+    "meshUploadsPerSecond": 54.42388969722165,
+    "snapshotDistributions": {
+      "drawCallsCurrentPass": {
+        "min": 26,
+        "median": 626.0,
+        "max": 1162,
+        "snapshots": 24
+      },
+      "quadsCurrentPass": {
+        "min": 133586,
+        "median": 9982621.0,
+        "max": 38907586,
+        "snapshots": 24
+      },
+      "opaquePageGroups": {
+        "min": 0,
+        "median": 175.0,
+        "max": 225,
+        "snapshots": 24
+      },
+      "opaqueFallbacks": {
+        "min": 5,
+        "median": 450.0,
+        "max": 940,
+        "snapshots": 24
+      },
+      "gpuTiles": {
+        "min": 5347,
+        "median": 8066.0,
+        "max": 9232,
+        "snapshots": 24
+      },
+      "gpuResidency.quads": {
+        "min": 133465364,
+        "median": 152946425.5,
+        "max": 160490448,
+        "snapshots": 24
+      },
+      "gpuResidency.committedGeometryBytes": {
+        "min": 3193391088,
+        "median": 3645169968.0,
+        "max": 3835675408,
+        "snapshots": 24
+      },
+      "gpuResidency.liveBytes": {
+        "min": 3000600880,
+        "median": 3480038176.0,
+        "max": 3666843920,
+        "snapshots": 24
+      },
+      "ownership.suppressedParents": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0,
+        "snapshots": 24
+      },
+      "ownership.partialCoverageParents": {
+        "min": 268,
+        "median": 435.5,
+        "max": 550,
+        "snapshots": 24
+      },
+      "ownership.transitionTiles": {
+        "min": 290,
+        "median": 471.0,
+        "max": 623,
+        "snapshots": 24
+      },
+      "framePace.fps": {
+        "min": 14.4,
+        "median": 24.6,
+        "max": 103.0,
+        "snapshots": 24
+      },
+      "framePace.lastMs": {
+        "min": 8.0,
+        "median": 38.35,
+        "max": 91.8,
+        "snapshots": 24
+      }
+    },
+    "gpuNewSamples": {
+      "OPAQUEGpuMs": {
+        "newSamples": 128,
+        "newSampleMeanMs": 6.162148437500001,
+        "roundingErrorBoundMs": 0.0026328125,
+        "sampleUnit": "opaque stage sample",
+        "startCumulative": {
+          "mean": 11.466,
+          "n": 273
+        },
+        "endCumulative": {
+          "mean": 9.773,
+          "n": 401
+        }
+      },
+      "WATERGpuMs": {
+        "newSamples": 128,
+        "newSampleMeanMs": 1.149890625,
+        "roundingErrorBoundMs": 0.0026328125,
+        "sampleUnit": "water stage sample",
+        "startCumulative": {
+          "mean": 0.091,
+          "n": 273
+        },
+        "endCumulative": {
+          "mean": 0.429,
+          "n": 401
+        }
+      },
+      "DEPTH_COPYGpuMs": {
+        "newSamples": 128,
+        "newSampleMeanMs": 0.2334843749999999,
+        "roundingErrorBoundMs": 0.0026484375,
+        "sampleUnit": "depth copy stage sample",
+        "startCumulative": {
+          "mean": 0.202,
+          "n": 275
+        },
+        "endCumulative": {
+          "mean": 0.212,
+          "n": 403
+        }
+      },
+      "ANTIALIASGpuMs": {
+        "newSamples": 128,
+        "newSampleMeanMs": 0.21079687500000005,
+        "roundingErrorBoundMs": 0.0026328125,
+        "sampleUnit": "antialias stage sample",
+        "startCumulative": {
+          "mean": 0.192,
+          "n": 273
+        },
+        "endCumulative": {
+          "mean": 0.198,
+          "n": 401
+        }
+      },
+      "HZB_REDUCEGpuMs": {
+        "newSamples": 486,
+        "newSampleMeanMs": 0.12226543209876542,
+        "roundingErrorBoundMs": 0.0037530864197530866,
+        "sampleUnit": "individual HZB build interval",
+        "startCumulative": {
+          "mean": 0.101,
+          "n": 1581
+        },
+        "endCumulative": {
+          "mean": 0.106,
+          "n": 2067
+        }
+      },
+      "GPU_FILTERGpuMs": {
+        "newSamples": 486,
+        "newSampleMeanMs": 0.0432530864197531,
+        "roundingErrorBoundMs": 0.0037530864197530866,
+        "sampleUnit": "individual GPU filter interval",
+        "startCumulative": {
+          "mean": 0.039,
+          "n": 1581
+        },
+        "endCumulative": {
+          "mean": 0.04,
+          "n": 2067
+        }
+      },
+      "INDIRECT_SUBMITGpuMs": {
+        "newSamples": 1792,
+        "newSampleMeanMs": 0.05439062499999998,
+        "roundingErrorBoundMs": 0.0027745535714285715,
+        "sampleUnit": "individual batch interval",
+        "startCumulative": {
+          "mean": 0.169,
+          "n": 4076
+        },
+        "endCumulative": {
+          "mean": 0.134,
+          "n": 5868
+        }
+      }
+    },
+    "rows": [
+      {
+        "time": "21:03:42.290",
+        "tiles": 748,
+        "considered": 17314048,
+        "rendered": 16744656,
+        "coverageSkipped": 809648,
+        "authoritativeSkipped": 0,
+        "meshUploads": 8225,
+        "preparedPlans": 3695,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 83,
+        "quadsCurrentPass": 3112672,
+        "opaquePageGroups": 43,
+        "opaqueFallbacks": 40,
+        "coverageResolves": 19,
+        "coverageMs": 4.99,
+        "gpuTiles": 5347,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.064,
+          "COVERAGECpuMs": 0.153,
+          "SEAMSCpuMs": 4.073,
+          "UPLOADCpuMs": 0.142,
+          "OPAQUECpuMs": 4.568,
+          "OPAQUEGpuMs": {
+            "mean": 11.466,
+            "n": 273
+          },
+          "WATERCpuMs": 0.164,
+          "WATERGpuMs": {
+            "mean": 0.091,
+            "n": 273
+          },
+          "DEPTH_COPYCpuMs": 0.031,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.202,
+            "n": 275
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.039,
+          "ANTIALIASGpuMs": {
+            "mean": 0.192,
+            "n": 273
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.101,
+            "n": 1581
+          },
+          "GPU_FILTERCpuMs": 0.052,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1581
+          },
+          "INDIRECT_BUILDCpuMs": 1.961,
+          "INDIRECT_UPLOADCpuMs": 0.039,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.169,
+            "n": 4076
+          },
+          "dropped": 33392
+        },
+        "indirect": {
+          "reusedBatches": 0,
+          "uploadedBatches": 43,
+          "uploadedBytes": 692392,
+          "flushes": 43,
+          "planHits": 15911,
+          "planMisses": 5799,
+          "planReplayBatches": 868154,
+          "planIdentityHits": 13560567,
+          "wholePlanHits": 5342,
+          "planContentChecks": 4352,
+          "filterBarriers": 2,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 2,
+          "sampleAge": 16,
+          "testedCommands": 13016,
+          "hiddenCommands": 1092,
+          "testedQuads": 2823746,
+          "hiddenQuads": 245576,
+          "queuedQuads": [
+            17447,
+            207315,
+            1576454,
+            1311456,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 4330,
+          "suppressedParents": 0,
+          "partialCoverageParents": 268,
+          "transitionTiles": 290
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3000600880,
+          "committedGeometryBytes": 3193391088,
+          "budgetEvictions": 1760,
+          "ownedEvictions": 0,
+          "releasedBytes": 713309168,
+          "coldTiles": 254,
+          "restoreRequests": 739,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 2849661728,
+          "waterPayloadBytes": 5527744,
+          "waterDuplicationSavedBytes": 1530548496,
+          "quads": 133465364,
+          "rectangles": 124297354,
+          "waterRectangles": 234927,
+          "coordinateSavingUpperBoundBytes": 1491568248
+        },
+        "wallIndex": {
+          "builds": 2211,
+          "localReuses": 6822197,
+          "updated": 113656,
+          "parallelMaskBatches": 1554,
+          "parallelMaskSurfaces": 92492,
+          "parallelMaskWallMs": 1528
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[0, 23, 483, 242],spriteQuads=4548839,flatQuads=632997",
+        "surface": {
+          "terrainFull": 5865,
+          "terrainPreview": 393,
+          "visibleCpuMs": 544859,
+          "backgroundCpuMs": 6656,
+          "ordinaryRemaining": 763,
+          "foregroundPending": 5,
+          "deferrals": 2270
+        },
+        "ownershipText": "ownerTiles=4330,suppressedParents=0,partialCoverageParents=268,transitionTiles=290",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 3
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 19.5,
+          "lastMs": 59.0,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:03:47.311",
+        "tiles": 2079,
+        "considered": 17828096,
+        "rendered": 17201344,
+        "coverageSkipped": 915136,
+        "authoritativeSkipped": 0,
+        "meshUploads": 8527,
+        "preparedPlans": 3827,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 451,
+        "quadsCurrentPass": 10624895,
+        "opaquePageGroups": 145,
+        "opaqueFallbacks": 306,
+        "coverageResolves": 67,
+        "coverageMs": 4.93,
+        "gpuTiles": 5583,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.211,
+          "COVERAGECpuMs": 0.154,
+          "SEAMSCpuMs": 4.064,
+          "UPLOADCpuMs": 0.144,
+          "OPAQUECpuMs": 4.592,
+          "OPAQUEGpuMs": {
+            "mean": 11.424,
+            "n": 277
+          },
+          "WATERCpuMs": 0.173,
+          "WATERGpuMs": {
+            "mean": 0.093,
+            "n": 277
+          },
+          "DEPTH_COPYCpuMs": 0.031,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.203,
+            "n": 279
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.039,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 277
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.101,
+            "n": 1599
+          },
+          "GPU_FILTERCpuMs": 0.052,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1599
+          },
+          "INDIRECT_BUILDCpuMs": 1.973,
+          "INDIRECT_UPLOADCpuMs": 0.038,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.169,
+            "n": 4140
+          },
+          "dropped": 33993
+        },
+        "indirect": {
+          "reusedBatches": 72,
+          "uploadedBatches": 16,
+          "uploadedBytes": 132184,
+          "flushes": 145,
+          "planHits": 16168,
+          "planMisses": 6019,
+          "planReplayBatches": 874917,
+          "planIdentityHits": 13635912,
+          "wholePlanHits": 5342,
+          "planContentChecks": 4501,
+          "filterBarriers": 6,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 6,
+          "sampleAge": 28,
+          "testedCommands": 28009,
+          "hiddenCommands": 13257,
+          "testedQuads": 6357133,
+          "hiddenQuads": 3069821,
+          "queuedQuads": [
+            20415,
+            603723,
+            4181176,
+            5819581,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 4457,
+          "suppressedParents": 0,
+          "partialCoverageParents": 295,
+          "transitionTiles": 320
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3072191760,
+          "committedGeometryBytes": 3255289104,
+          "budgetEvictions": 1792,
+          "ownedEvictions": 0,
+          "releasedBytes": 730399088,
+          "coldTiles": 129,
+          "restoreRequests": 893,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 2914567392,
+          "waterPayloadBytes": 5761088,
+          "waterDuplicationSavedBytes": 1562357728,
+          "quads": 136270391,
+          "rectangles": 126927945,
+          "waterRectangles": 244890,
+          "coordinateSavingUpperBoundBytes": 1523135340
+        },
+        "wallIndex": {
+          "builds": 2255,
+          "localReuses": 7236335,
+          "updated": 116459,
+          "parallelMaskBatches": 1600,
+          "parallelMaskSurfaces": 94497,
+          "parallelMaskWallMs": 1564
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[14, 516, 1299, 250],spriteQuads=15912321,flatQuads=3859983",
+        "surface": {
+          "terrainFull": 5977,
+          "terrainPreview": 393,
+          "visibleCpuMs": 568750,
+          "backgroundCpuMs": 7468,
+          "ordinaryRemaining": 378,
+          "foregroundPending": 8,
+          "deferrals": 2355
+        },
+        "ownershipText": "ownerTiles=4457,suppressedParents=0,partialCoverageParents=295,transitionTiles=320",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 4
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 24.2,
+          "lastMs": 62.9,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:03:52.323",
+        "tiles": 2470,
+        "considered": 18734592,
+        "rendered": 18069056,
+        "coverageSkipped": 989760,
+        "authoritativeSkipped": 0,
+        "meshUploads": 8856,
+        "preparedPlans": 3975,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 375,
+        "quadsCurrentPass": 9936667,
+        "opaquePageGroups": 157,
+        "opaqueFallbacks": 218,
+        "coverageResolves": 17,
+        "coverageMs": 3.52,
+        "gpuTiles": 5878,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.354,
+          "COVERAGECpuMs": 0.153,
+          "SEAMSCpuMs": 4.094,
+          "UPLOADCpuMs": 0.15,
+          "OPAQUECpuMs": 4.62,
+          "OPAQUEGpuMs": {
+            "mean": 11.35,
+            "n": 282
+          },
+          "WATERCpuMs": 0.193,
+          "WATERGpuMs": {
+            "mean": 0.117,
+            "n": 282
+          },
+          "DEPTH_COPYCpuMs": 0.031,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.203,
+            "n": 284
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 282
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.101,
+            "n": 1622
+          },
+          "GPU_FILTERCpuMs": 0.053,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1622
+          },
+          "INDIRECT_BUILDCpuMs": 1.99,
+          "INDIRECT_UPLOADCpuMs": 0.034,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.167,
+            "n": 4220
+          },
+          "dropped": 35175
+        },
+        "indirect": {
+          "reusedBatches": 62,
+          "uploadedBatches": 74,
+          "uploadedBytes": 1047752,
+          "flushes": 157,
+          "planHits": 16460,
+          "planMisses": 6303,
+          "planReplayBatches": 883146,
+          "planIdentityHits": 13702629,
+          "wholePlanHits": 5342,
+          "planContentChecks": 4664,
+          "filterBarriers": 7,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 7,
+          "sampleAge": 26,
+          "testedCommands": 32021,
+          "hiddenCommands": 5051,
+          "testedQuads": 7140627,
+          "hiddenQuads": 1204785,
+          "queuedQuads": [
+            4421,
+            615906,
+            4196264,
+            5120076,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 4686,
+          "suppressedParents": 0,
+          "partialCoverageParents": 314,
+          "transitionTiles": 339
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3157923520,
+          "committedGeometryBytes": 3329851312,
+          "budgetEvictions": 1819,
+          "ownedEvictions": 0,
+          "releasedBytes": 745676992,
+          "coldTiles": 98,
+          "restoreRequests": 951,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 2993607648,
+          "waterPayloadBytes": 6256848,
+          "waterDuplicationSavedBytes": 1602176080,
+          "quads": 139699101,
+          "rectangles": 130126471,
+          "waterRectangles": 266748,
+          "coordinateSavingUpperBoundBytes": 1561517652
+        },
+        "wallIndex": {
+          "builds": 2515,
+          "localReuses": 7839849,
+          "updated": 120283,
+          "parallelMaskBatches": 1676,
+          "parallelMaskSurfaces": 97447,
+          "parallelMaskWallMs": 1614
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[128, 691, 1259, 392],spriteQuads=14855620,flatQuads=2831790",
+        "surface": {
+          "terrainFull": 6092,
+          "terrainPreview": 480,
+          "visibleCpuMs": 589906,
+          "backgroundCpuMs": 7515,
+          "ordinaryRemaining": 289,
+          "foregroundPending": 7,
+          "deferrals": 2355
+        },
+        "ownershipText": "ownerTiles=4686,suppressedParents=0,partialCoverageParents=314,transitionTiles=339",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 4
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 28.1,
+          "lastMs": 25.9,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:03:57.338",
+        "tiles": 5434,
+        "considered": 19425280,
+        "rendered": 18719104,
+        "coverageSkipped": 1063552,
+        "authoritativeSkipped": 0,
+        "meshUploads": 9255,
+        "preparedPlans": 4101,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 813,
+        "quadsCurrentPass": 38907586,
+        "opaquePageGroups": 211,
+        "opaqueFallbacks": 602,
+        "coverageResolves": 24,
+        "coverageMs": 0.68,
+        "gpuTiles": 6117,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.545,
+          "COVERAGECpuMs": 0.151,
+          "SEAMSCpuMs": 4.121,
+          "UPLOADCpuMs": 0.148,
+          "OPAQUECpuMs": 4.671,
+          "OPAQUEGpuMs": {
+            "mean": 11.324,
+            "n": 286
+          },
+          "WATERCpuMs": 0.212,
+          "WATERGpuMs": {
+            "mean": 0.13,
+            "n": 286
+          },
+          "DEPTH_COPYCpuMs": 0.031,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.203,
+            "n": 288
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 286
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.101,
+            "n": 1653
+          },
+          "GPU_FILTERCpuMs": 0.053,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.038,
+            "n": 1653
+          },
+          "INDIRECT_BUILDCpuMs": 2.016,
+          "INDIRECT_UPLOADCpuMs": 0.031,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.166,
+            "n": 4284
+          },
+          "dropped": 36809
+        },
+        "indirect": {
+          "reusedBatches": 127,
+          "uploadedBatches": 14,
+          "uploadedBytes": 903148,
+          "flushes": 211,
+          "planHits": 16698,
+          "planMisses": 6533,
+          "planReplayBatches": 891321,
+          "planIdentityHits": 13816172,
+          "wholePlanHits": 5344,
+          "planContentChecks": 4821,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 2,
+          "testedCommands": 134676,
+          "hiddenCommands": 106784,
+          "testedQuads": 26800758,
+          "hiddenQuads": 22023058,
+          "queuedQuads": [
+            4995,
+            1676897,
+            13861394,
+            23364300,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 4894,
+          "suppressedParents": 0,
+          "partialCoverageParents": 328,
+          "transitionTiles": 353
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3195991728,
+          "committedGeometryBytes": 3366829024,
+          "budgetEvictions": 1899,
+          "ownedEvictions": 0,
+          "releasedBytes": 802823504,
+          "coldTiles": 129,
+          "restoreRequests": 995,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3022529696,
+          "waterPayloadBytes": 6326688,
+          "waterDuplicationSavedBytes": 1616906432,
+          "quads": 140981612,
+          "rectangles": 130979441,
+          "waterRectangles": 269519,
+          "coordinateSavingUpperBoundBytes": 1571753292
+        },
+        "wallIndex": {
+          "builds": 2788,
+          "localReuses": 8322119,
+          "updated": 123544,
+          "parallelMaskBatches": 1742,
+          "parallelMaskSurfaces": 100131,
+          "parallelMaskWallMs": 1652
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[968, 2853, 1336, 277],spriteQuads=59483746,flatQuads=13789180",
+        "surface": {
+          "terrainFull": 6238,
+          "terrainPreview": 524,
+          "visibleCpuMs": 612515,
+          "backgroundCpuMs": 7515,
+          "ordinaryRemaining": 91,
+          "foregroundPending": 0,
+          "deferrals": 2367
+        },
+        "ownershipText": "ownerTiles=4894,suppressedParents=0,partialCoverageParents=328,transitionTiles=353",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 0
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 26.8,
+          "lastMs": 37.8,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:02.350",
+        "tiles": 2372,
+        "considered": 19853312,
+        "rendered": 19139712,
+        "coverageSkipped": 1070976,
+        "authoritativeSkipped": 0,
+        "meshUploads": 9494,
+        "preparedPlans": 4216,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 578,
+        "quadsCurrentPass": 12058061,
+        "opaquePageGroups": 167,
+        "opaqueFallbacks": 411,
+        "coverageResolves": 7,
+        "coverageMs": 0.32,
+        "gpuTiles": 6285,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.65,
+          "COVERAGECpuMs": 0.149,
+          "SEAMSCpuMs": 4.122,
+          "UPLOADCpuMs": 0.154,
+          "OPAQUECpuMs": 4.771,
+          "OPAQUEGpuMs": {
+            "mean": 11.341,
+            "n": 290
+          },
+          "WATERCpuMs": 0.226,
+          "WATERGpuMs": {
+            "mean": 0.138,
+            "n": 290
+          },
+          "DEPTH_COPYCpuMs": 0.031,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.203,
+            "n": 292
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 290
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.102,
+            "n": 1685
+          },
+          "GPU_FILTERCpuMs": 0.053,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1685
+          },
+          "INDIRECT_BUILDCpuMs": 2.061,
+          "INDIRECT_UPLOADCpuMs": 0.03,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.164,
+            "n": 4348
+          },
+          "dropped": 38095
+        },
+        "indirect": {
+          "reusedBatches": 136,
+          "uploadedBatches": 4,
+          "uploadedBytes": 48980,
+          "flushes": 167,
+          "planHits": 16924,
+          "planMisses": 6738,
+          "planReplayBatches": 901039,
+          "planIdentityHits": 13952624,
+          "wholePlanHits": 5344,
+          "planContentChecks": 4988,
+          "filterBarriers": 7,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 7,
+          "sampleAge": 27,
+          "testedCommands": 58289,
+          "hiddenCommands": 42754,
+          "testedQuads": 11979995,
+          "hiddenQuads": 8938317,
+          "queuedQuads": [
+            22505,
+            614708,
+            5425858,
+            5994990,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 5000,
+          "suppressedParents": 0,
+          "partialCoverageParents": 331,
+          "transitionTiles": 355
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3273497888,
+          "committedGeometryBytes": 3436834128,
+          "budgetEvictions": 1963,
+          "ownedEvictions": 0,
+          "releasedBytes": 829977120,
+          "coldTiles": 96,
+          "restoreRequests": 1088,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3096603712,
+          "waterPayloadBytes": 6386416,
+          "waterDuplicationSavedBytes": 1657504704,
+          "quads": 144499130,
+          "rectangles": 134145185,
+          "waterRectangles": 271515,
+          "coordinateSavingUpperBoundBytes": 1609742220
+        },
+        "wallIndex": {
+          "builds": 2885,
+          "localReuses": 8720547,
+          "updated": 125730,
+          "parallelMaskBatches": 1780,
+          "parallelMaskSurfaces": 101631,
+          "parallelMaskWallMs": 1675
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[16, 849, 1226, 281],spriteQuads=18293496,flatQuads=4286228",
+        "surface": {
+          "terrainFull": 6388,
+          "terrainPreview": 532,
+          "visibleCpuMs": 634609,
+          "backgroundCpuMs": 10562,
+          "ordinaryRemaining": 323,
+          "foregroundPending": 1,
+          "deferrals": 2385
+        },
+        "ownershipText": "ownerTiles=5000,suppressedParents=0,partialCoverageParents=331,transitionTiles=355",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 2
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 23.6,
+          "lastMs": 32.6,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:07.367",
+        "tiles": 1839,
+        "considered": 20539392,
+        "rendered": 19810944,
+        "coverageSkipped": 1110400,
+        "authoritativeSkipped": 0,
+        "meshUploads": 9877,
+        "preparedPlans": 4381,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 532,
+        "quadsCurrentPass": 7413691,
+        "opaquePageGroups": 129,
+        "opaqueFallbacks": 403,
+        "coverageResolves": 12,
+        "coverageMs": 1.9,
+        "gpuTiles": 6610,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.768,
+          "COVERAGECpuMs": 0.15,
+          "SEAMSCpuMs": 4.155,
+          "UPLOADCpuMs": 0.161,
+          "OPAQUECpuMs": 4.804,
+          "OPAQUEGpuMs": {
+            "mean": 11.257,
+            "n": 296
+          },
+          "WATERCpuMs": 0.256,
+          "WATERGpuMs": {
+            "mean": 0.182,
+            "n": 296
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.203,
+            "n": 298
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.192,
+            "n": 296
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.102,
+            "n": 1718
+          },
+          "GPU_FILTERCpuMs": 0.054,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.038,
+            "n": 1718
+          },
+          "INDIRECT_BUILDCpuMs": 2.084,
+          "INDIRECT_UPLOADCpuMs": 0.027,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.162,
+            "n": 4444
+          },
+          "dropped": 40304
+        },
+        "indirect": {
+          "reusedBatches": 60,
+          "uploadedBatches": 30,
+          "uploadedBytes": 187904,
+          "flushes": 129,
+          "planHits": 17254,
+          "planMisses": 7037,
+          "planReplayBatches": 919216,
+          "planIdentityHits": 14063545,
+          "wholePlanHits": 5350,
+          "planContentChecks": 5142,
+          "filterBarriers": 5,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 5,
+          "sampleAge": 12,
+          "testedCommands": 16240,
+          "hiddenCommands": 1261,
+          "testedQuads": 3592096,
+          "hiddenQuads": 291001,
+          "queuedQuads": [
+            22881,
+            337396,
+            2736024,
+            4317390,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 5250,
+          "suppressedParents": 0,
+          "partialCoverageParents": 336,
+          "transitionTiles": 360
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3358298256,
+          "committedGeometryBytes": 3514277152,
+          "budgetEvictions": 2016,
+          "ownedEvictions": 0,
+          "releasedBytes": 849098016,
+          "coldTiles": 93,
+          "restoreRequests": 1140,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3177426832,
+          "waterPayloadBytes": 6903952,
+          "waterDuplicationSavedBytes": 1699546048,
+          "quads": 148082521,
+          "rectangles": 137556980,
+          "waterRectangles": 294474,
+          "coordinateSavingUpperBoundBytes": 1650683760
+        },
+        "wallIndex": {
+          "builds": 3292,
+          "localReuses": 9475618,
+          "updated": 130992,
+          "parallelMaskBatches": 1859,
+          "parallelMaskSurfaces": 105767,
+          "parallelMaskWallMs": 1742
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[0, 370, 949, 520],spriteQuads=11102737,flatQuads=2147394",
+        "surface": {
+          "terrainFull": 6584,
+          "terrainPreview": 680,
+          "visibleCpuMs": 655140,
+          "backgroundCpuMs": 10578,
+          "ordinaryRemaining": 306,
+          "foregroundPending": 0,
+          "deferrals": 2385
+        },
+        "ownershipText": "ownerTiles=5250,suppressedParents=0,partialCoverageParents=336,transitionTiles=360",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 2
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 42.7,
+          "lastMs": 13.5,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:12.372",
+        "tiles": 2277,
+        "considered": 21211392,
+        "rendered": 20466880,
+        "coverageSkipped": 1176640,
+        "authoritativeSkipped": 0,
+        "meshUploads": 10178,
+        "preparedPlans": 4523,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 634,
+        "quadsCurrentPass": 8602201,
+        "opaquePageGroups": 154,
+        "opaqueFallbacks": 480,
+        "coverageResolves": 75,
+        "coverageMs": 10.15,
+        "gpuTiles": 6829,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.813,
+          "COVERAGECpuMs": 0.151,
+          "SEAMSCpuMs": 4.146,
+          "UPLOADCpuMs": 0.167,
+          "OPAQUECpuMs": 4.822,
+          "OPAQUEGpuMs": {
+            "mean": 11.209,
+            "n": 300
+          },
+          "WATERCpuMs": 0.274,
+          "WATERGpuMs": {
+            "mean": 0.193,
+            "n": 300
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.203,
+            "n": 302
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.192,
+            "n": 300
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.102,
+            "n": 1742
+          },
+          "GPU_FILTERCpuMs": 0.054,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.038,
+            "n": 1742
+          },
+          "INDIRECT_BUILDCpuMs": 2.098,
+          "INDIRECT_UPLOADCpuMs": 0.026,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.161,
+            "n": 4508
+          },
+          "dropped": 42338
+        },
+        "indirect": {
+          "reusedBatches": 4,
+          "uploadedBatches": 78,
+          "uploadedBytes": 454080,
+          "flushes": 154,
+          "planHits": 17532,
+          "planMisses": 7283,
+          "planReplayBatches": 946066,
+          "planIdentityHits": 14166511,
+          "wholePlanHits": 5361,
+          "planContentChecks": 5280,
+          "filterBarriers": 6,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 6,
+          "sampleAge": 4,
+          "testedCommands": 15417,
+          "hiddenCommands": 2024,
+          "testedQuads": 3348577,
+          "hiddenQuads": 473621,
+          "queuedQuads": [
+            23133,
+            416742,
+            2980925,
+            5181401,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 5463,
+          "suppressedParents": 0,
+          "partialCoverageParents": 352,
+          "transitionTiles": 379
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3408950544,
+          "committedGeometryBytes": 3564294016,
+          "budgetEvictions": 2096,
+          "ownedEvictions": 0,
+          "releasedBytes": 876684992,
+          "coldTiles": 131,
+          "restoreRequests": 1180,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3227725952,
+          "waterPayloadBytes": 7114208,
+          "waterDuplicationSavedBytes": 1725604784,
+          "quads": 150352572,
+          "rectangles": 139682816,
+          "waterRectangles": 302402,
+          "coordinateSavingUpperBoundBytes": 1676193792
+        },
+        "wallIndex": {
+          "builds": 3844,
+          "localReuses": 10088825,
+          "updated": 134882,
+          "parallelMaskBatches": 1919,
+          "parallelMaskSurfaces": 108759,
+          "parallelMaskWallMs": 1787
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[2, 598, 1132, 545],spriteQuads=12881533,flatQuads=2625216",
+        "surface": {
+          "terrainFull": 6853,
+          "terrainPreview": 836,
+          "visibleCpuMs": 683015,
+          "backgroundCpuMs": 10718,
+          "ordinaryRemaining": 125,
+          "foregroundPending": 2,
+          "deferrals": 2464
+        },
+        "ownershipText": "ownerTiles=5463,suppressedParents=0,partialCoverageParents=352,transitionTiles=379",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 3
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 23.7,
+          "lastMs": 54.2,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:17.373",
+        "tiles": 2499,
+        "considered": 22148864,
+        "rendered": 21330048,
+        "coverageSkipped": 1287744,
+        "authoritativeSkipped": 0,
+        "meshUploads": 10533,
+        "preparedPlans": 4668,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 766,
+        "quadsCurrentPass": 8433059,
+        "opaquePageGroups": 183,
+        "opaqueFallbacks": 583,
+        "coverageResolves": 10,
+        "coverageMs": 1.26,
+        "gpuTiles": 7112,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 4.972,
+          "COVERAGECpuMs": 0.152,
+          "SEAMSCpuMs": 4.154,
+          "UPLOADCpuMs": 0.169,
+          "OPAQUECpuMs": 4.849,
+          "OPAQUEGpuMs": {
+            "mean": 11.151,
+            "n": 305
+          },
+          "WATERCpuMs": 0.297,
+          "WATERGpuMs": {
+            "mean": 0.223,
+            "n": 305
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.204,
+            "n": 307
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 305
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.102,
+            "n": 1767
+          },
+          "GPU_FILTERCpuMs": 0.055,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1767
+          },
+          "INDIRECT_BUILDCpuMs": 2.116,
+          "INDIRECT_UPLOADCpuMs": 0.024,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.159,
+            "n": 4588
+          },
+          "dropped": 43980
+        },
+        "indirect": {
+          "reusedBatches": 18,
+          "uploadedBatches": 165,
+          "uploadedBytes": 976228,
+          "flushes": 183,
+          "planHits": 17813,
+          "planMisses": 7563,
+          "planReplayBatches": 956796,
+          "planIdentityHits": 14231001,
+          "wholePlanHits": 5364,
+          "planContentChecks": 5450,
+          "filterBarriers": 7,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 7,
+          "sampleAge": 29,
+          "testedCommands": 22906,
+          "hiddenCommands": 8742,
+          "testedQuads": 5113579,
+          "hiddenQuads": 2034429,
+          "queuedQuads": [
+            36435,
+            460493,
+            3139222,
+            4796909,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 5744,
+          "suppressedParents": 0,
+          "partialCoverageParents": 391,
+          "transitionTiles": 421
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3441282768,
+          "committedGeometryBytes": 3590086528,
+          "budgetEvictions": 2168,
+          "ownedEvictions": 0,
+          "releasedBytes": 912707392,
+          "coldTiles": 202,
+          "restoreRequests": 1180,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3251329152,
+          "waterPayloadBytes": 7126320,
+          "waterDuplicationSavedBytes": 1738241776,
+          "quads": 151447540,
+          "rectangles": 140305394,
+          "waterRectangles": 301595,
+          "coordinateSavingUpperBoundBytes": 1683664728
+        },
+        "wallIndex": {
+          "builds": 4155,
+          "localReuses": 10830014,
+          "updated": 138768,
+          "parallelMaskBatches": 1986,
+          "parallelMaskSurfaces": 111585,
+          "parallelMaskWallMs": 1825
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1475.27685546875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[117, 719, 1013, 650],spriteQuads=12899852,flatQuads=2541235",
+        "surface": {
+          "terrainFull": 7130,
+          "terrainPreview": 937,
+          "visibleCpuMs": 707296,
+          "backgroundCpuMs": 10718,
+          "ordinaryRemaining": 195,
+          "foregroundPending": 1,
+          "deferrals": 2516
+        },
+        "ownershipText": "ownerTiles=5744,suppressedParents=0,partialCoverageParents=391,transitionTiles=421",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 1
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 28.5,
+          "lastMs": 38.2,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:22.375",
+        "tiles": 2843,
+        "considered": 22751552,
+        "rendered": 21894528,
+        "coverageSkipped": 1365632,
+        "authoritativeSkipped": 0,
+        "meshUploads": 10937,
+        "preparedPlans": 4790,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 783,
+        "quadsCurrentPass": 9651926,
+        "opaquePageGroups": 207,
+        "opaqueFallbacks": 576,
+        "coverageResolves": 18,
+        "coverageMs": 2.03,
+        "gpuTiles": 7436,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.032,
+          "COVERAGECpuMs": 0.152,
+          "SEAMSCpuMs": 4.089,
+          "UPLOADCpuMs": 0.172,
+          "OPAQUECpuMs": 4.857,
+          "OPAQUEGpuMs": {
+            "mean": 11.108,
+            "n": 309
+          },
+          "WATERCpuMs": 0.318,
+          "WATERGpuMs": {
+            "mean": 0.248,
+            "n": 309
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.206,
+            "n": 311
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 309
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.102,
+            "n": 1793
+          },
+          "GPU_FILTERCpuMs": 0.055,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1793
+          },
+          "INDIRECT_BUILDCpuMs": 2.127,
+          "INDIRECT_UPLOADCpuMs": 0.023,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.157,
+            "n": 4652
+          },
+          "dropped": 46235
+        },
+        "indirect": {
+          "reusedBatches": 132,
+          "uploadedBatches": 69,
+          "uploadedBytes": 619820,
+          "flushes": 207,
+          "planHits": 18057,
+          "planMisses": 7800,
+          "planReplayBatches": 964796,
+          "planIdentityHits": 14274206,
+          "wholePlanHits": 5364,
+          "planContentChecks": 5603,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 1,
+          "testedCommands": 22276,
+          "hiddenCommands": 12615,
+          "testedQuads": 4986390,
+          "hiddenQuads": 2948632,
+          "queuedQuads": [
+            33920,
+            500420,
+            3745752,
+            5371834,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 5960,
+          "suppressedParents": 0,
+          "partialCoverageParents": 413,
+          "transitionTiles": 442
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3473317600,
+          "committedGeometryBytes": 3626198128,
+          "budgetEvictions": 2248,
+          "ownedEvictions": 0,
+          "releasedBytes": 960354624,
+          "coldTiles": 220,
+          "restoreRequests": 1237,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3283591296,
+          "waterPayloadBytes": 7374608,
+          "waterDuplicationSavedBytes": 1754105136,
+          "quads": 152851041,
+          "rectangles": 141578368,
+          "waterRectangles": 311545,
+          "coordinateSavingUpperBoundBytes": 1698940416
+        },
+        "wallIndex": {
+          "builds": 4319,
+          "localReuses": 11451594,
+          "updated": 142300,
+          "parallelMaskBatches": 2044,
+          "parallelMaskSurfaces": 114348,
+          "parallelMaskWallMs": 1862
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1475.0545654296875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[131, 971, 1087, 654],spriteQuads=14773948,flatQuads=2762437",
+        "surface": {
+          "terrainFull": 7167,
+          "terrainPreview": 981,
+          "visibleCpuMs": 716515,
+          "backgroundCpuMs": 10718,
+          "ordinaryRemaining": 176,
+          "foregroundPending": 0,
+          "deferrals": 2555
+        },
+        "ownershipText": "ownerTiles=5960,suppressedParents=0,partialCoverageParents=413,transitionTiles=442",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 1
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 25.3,
+          "lastMs": 27.8,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:27.399",
+        "tiles": 5272,
+        "considered": 23309632,
+        "rendered": 22428080,
+        "coverageSkipped": 1398096,
+        "authoritativeSkipped": 0,
+        "meshUploads": 11175,
+        "preparedPlans": 4898,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 1149,
+        "quadsCurrentPass": 31878423,
+        "opaquePageGroups": 221,
+        "opaqueFallbacks": 928,
+        "coverageResolves": 7,
+        "coverageMs": 1.86,
+        "gpuTiles": 7579,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.148,
+          "COVERAGECpuMs": 0.149,
+          "SEAMSCpuMs": 4.065,
+          "UPLOADCpuMs": 0.175,
+          "OPAQUECpuMs": 4.947,
+          "OPAQUEGpuMs": {
+            "mean": 11.12,
+            "n": 313
+          },
+          "WATERCpuMs": 0.334,
+          "WATERGpuMs": {
+            "mean": 0.253,
+            "n": 313
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.206,
+            "n": 315
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 313
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.103,
+            "n": 1827
+          },
+          "GPU_FILTERCpuMs": 0.055,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1827
+          },
+          "INDIRECT_BUILDCpuMs": 2.169,
+          "INDIRECT_UPLOADCpuMs": 0.022,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.156,
+            "n": 4716
+          },
+          "dropped": 48280
+        },
+        "indirect": {
+          "reusedBatches": 143,
+          "uploadedBatches": 78,
+          "uploadedBytes": 2817240,
+          "flushes": 221,
+          "planHits": 18271,
+          "planMisses": 7989,
+          "planReplayBatches": 980718,
+          "planIdentityHits": 14418445,
+          "wholePlanHits": 5364,
+          "planContentChecks": 5732,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 19,
+          "testedCommands": 97807,
+          "hiddenCommands": 86088,
+          "testedQuads": 17882302,
+          "hiddenQuads": 16207930,
+          "queuedQuads": [
+            31744,
+            1095334,
+            12697643,
+            18053702,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6118,
+          "suppressedParents": 0,
+          "partialCoverageParents": 422,
+          "transitionTiles": 454
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3492746848,
+          "committedGeometryBytes": 3653830816,
+          "budgetEvictions": 2320,
+          "ownedEvictions": 0,
+          "releasedBytes": 1014367280,
+          "coldTiles": 247,
+          "restoreRequests": 1264,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3298807520,
+          "waterPayloadBytes": 7398080,
+          "waterDuplicationSavedBytes": 1762955600,
+          "quads": 153579986,
+          "rectangles": 141612452,
+          "waterRectangles": 311943,
+          "coordinateSavingUpperBoundBytes": 1699349424
+        },
+        "wallIndex": {
+          "builds": 4505,
+          "localReuses": 11998359,
+          "updated": 145643,
+          "parallelMaskBatches": 2092,
+          "parallelMaskSurfaces": 116993,
+          "parallelMaskWallMs": 1898
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[795, 2886, 1286, 305],spriteQuads=52590954,flatQuads=12023106",
+        "surface": {
+          "terrainFull": 7161,
+          "terrainPreview": 1122,
+          "visibleCpuMs": 727062,
+          "backgroundCpuMs": 11453,
+          "ordinaryRemaining": 277,
+          "foregroundPending": 30,
+          "deferrals": 2598
+        },
+        "ownershipText": "ownerTiles=6118,suppressedParents=0,partialCoverageParents=422,transitionTiles=454",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 2
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 20.9,
+          "lastMs": 63.3,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:32.398",
+        "tiles": 5371,
+        "considered": 23703616,
+        "rendered": 22794736,
+        "coverageSkipped": 1456656,
+        "authoritativeSkipped": 0,
+        "meshUploads": 11329,
+        "preparedPlans": 4968,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 1134,
+        "quadsCurrentPass": 31594046,
+        "opaquePageGroups": 225,
+        "opaqueFallbacks": 909,
+        "coverageResolves": 30,
+        "coverageMs": 4.52,
+        "gpuTiles": 7660,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.343,
+          "COVERAGECpuMs": 0.147,
+          "SEAMSCpuMs": 4.227,
+          "UPLOADCpuMs": 0.176,
+          "OPAQUECpuMs": 5.038,
+          "OPAQUEGpuMs": {
+            "mean": 11.145,
+            "n": 315
+          },
+          "WATERCpuMs": 0.345,
+          "WATERGpuMs": {
+            "mean": 0.26,
+            "n": 315
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.208,
+            "n": 317
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.193,
+            "n": 315
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.103,
+            "n": 1843
+          },
+          "GPU_FILTERCpuMs": 0.055,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1843
+          },
+          "INDIRECT_BUILDCpuMs": 2.199,
+          "INDIRECT_UPLOADCpuMs": 0.021,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.155,
+            "n": 4748
+          },
+          "dropped": 49351
+        },
+        "indirect": {
+          "reusedBatches": 119,
+          "uploadedBatches": 103,
+          "uploadedBytes": 3435500,
+          "flushes": 225,
+          "planHits": 18401,
+          "planMisses": 8127,
+          "planReplayBatches": 985058,
+          "planIdentityHits": 14481020,
+          "wholePlanHits": 5365,
+          "planContentChecks": 5815,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 29,
+          "testedCommands": 99185,
+          "hiddenCommands": 85482,
+          "testedQuads": 18093610,
+          "hiddenQuads": 15868431,
+          "queuedQuads": [
+            40006,
+            1003738,
+            13144379,
+            17405923,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6244,
+          "suppressedParents": 0,
+          "partialCoverageParents": 436,
+          "transitionTiles": 475
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3486758752,
+          "committedGeometryBytes": 3653187712,
+          "budgetEvictions": 2392,
+          "ownedEvictions": 0,
+          "releasedBytes": 1060508624,
+          "coldTiles": 258,
+          "restoreRequests": 1264,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3289676928,
+          "waterPayloadBytes": 7397712,
+          "waterDuplicationSavedBytes": 1758668480,
+          "quads": 153158888,
+          "rectangles": 140695421,
+          "waterRectangles": 311673,
+          "coordinateSavingUpperBoundBytes": 1688345052
+        },
+        "wallIndex": {
+          "builds": 4626,
+          "localReuses": 12415078,
+          "updated": 148984,
+          "parallelMaskBatches": 2127,
+          "parallelMaskSurfaces": 119810,
+          "parallelMaskWallMs": 1945
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[719, 3006, 1312, 334],spriteQuads=51672142,flatQuads=11648801",
+        "surface": {
+          "terrainFull": 7121,
+          "terrainPreview": 1206,
+          "visibleCpuMs": 759406,
+          "backgroundCpuMs": 11453,
+          "ordinaryRemaining": 231,
+          "foregroundPending": 4,
+          "deferrals": 2617
+        },
+        "ownershipText": "ownerTiles=6244,suppressedParents=0,partialCoverageParents=436,transitionTiles=475",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 1
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 14.4,
+          "lastMs": 42.8,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:37.414",
+        "tiles": 3428,
+        "considered": 23919680,
+        "rendered": 23032320,
+        "coverageSkipped": 1409344,
+        "authoritativeSkipped": 0,
+        "meshUploads": 11718,
+        "preparedPlans": 5057,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 917,
+        "quadsCurrentPass": 10580834,
+        "opaquePageGroups": 214,
+        "opaqueFallbacks": 703,
+        "coverageResolves": 27,
+        "coverageMs": 2.21,
+        "gpuTiles": 7968,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.408,
+          "COVERAGECpuMs": 0.147,
+          "SEAMSCpuMs": 4.213,
+          "UPLOADCpuMs": 0.176,
+          "OPAQUECpuMs": 5.189,
+          "OPAQUEGpuMs": {
+            "mean": 11.22,
+            "n": 318
+          },
+          "WATERCpuMs": 0.37,
+          "WATERGpuMs": {
+            "mean": 0.283,
+            "n": 318
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.209,
+            "n": 320
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.195,
+            "n": 318
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 1867
+          },
+          "GPU_FILTERCpuMs": 0.056,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1867
+          },
+          "INDIRECT_BUILDCpuMs": 2.273,
+          "INDIRECT_UPLOADCpuMs": 0.02,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.154,
+            "n": 4796
+          },
+          "dropped": 51259
+        },
+        "indirect": {
+          "reusedBatches": 163,
+          "uploadedBatches": 39,
+          "uploadedBytes": 426656,
+          "flushes": 214,
+          "planHits": 18575,
+          "planMisses": 8292,
+          "planReplayBatches": 995675,
+          "planIdentityHits": 14592964,
+          "wholePlanHits": 5365,
+          "planContentChecks": 5912,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 28,
+          "testedCommands": 54395,
+          "hiddenCommands": 38674,
+          "testedQuads": 10697681,
+          "hiddenQuads": 7647590,
+          "queuedQuads": [
+            39897,
+            495953,
+            4424331,
+            5620653,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6389,
+          "suppressedParents": 0,
+          "partialCoverageParents": 435,
+          "transitionTiles": 467
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3495980960,
+          "committedGeometryBytes": 3649787872,
+          "budgetEvictions": 2472,
+          "ownedEvictions": 0,
+          "releasedBytes": 1094835744,
+          "coldTiles": 286,
+          "restoreRequests": 1265,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3294262832,
+          "waterPayloadBytes": 7427120,
+          "waterDuplicationSavedBytes": 1761102528,
+          "quads": 153369463,
+          "rectangles": 140684526,
+          "waterRectangles": 311715,
+          "coordinateSavingUpperBoundBytes": 1688214312
+        },
+        "wallIndex": {
+          "builds": 4760,
+          "localReuses": 12922634,
+          "updated": 153208,
+          "parallelMaskBatches": 2176,
+          "parallelMaskSurfaces": 123534,
+          "parallelMaskWallMs": 2001
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[128, 1248, 1251, 801],spriteQuads=16278623,flatQuads=2996723",
+        "surface": {
+          "terrainFull": 7081,
+          "terrainPreview": 1257,
+          "visibleCpuMs": 792046,
+          "backgroundCpuMs": 11453,
+          "ordinaryRemaining": 62,
+          "foregroundPending": 3,
+          "deferrals": 2635
+        },
+        "ownershipText": "ownerTiles=6389,suppressedParents=0,partialCoverageParents=435,transitionTiles=467",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 1
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 17.7,
+          "lastMs": 35.8,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:42.444",
+        "tiles": 4686,
+        "considered": 24414784,
+        "rendered": 23548304,
+        "coverageSkipped": 1380080,
+        "authoritativeSkipped": 0,
+        "meshUploads": 12032,
+        "preparedPlans": 5170,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 1084,
+        "quadsCurrentPass": 23862038,
+        "opaquePageGroups": 219,
+        "opaqueFallbacks": 865,
+        "coverageResolves": 8,
+        "coverageMs": 0.31,
+        "gpuTiles": 8164,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.517,
+          "COVERAGECpuMs": 0.146,
+          "SEAMSCpuMs": 4.164,
+          "UPLOADCpuMs": 0.174,
+          "OPAQUECpuMs": 5.23,
+          "OPAQUEGpuMs": {
+            "mean": 11.199,
+            "n": 322
+          },
+          "WATERCpuMs": 0.403,
+          "WATERGpuMs": {
+            "mean": 0.324,
+            "n": 322
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.209,
+            "n": 324
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.195,
+            "n": 322
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 1899
+          },
+          "GPU_FILTERCpuMs": 0.056,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.039,
+            "n": 1899
+          },
+          "INDIRECT_BUILDCpuMs": 2.301,
+          "INDIRECT_UPLOADCpuMs": 0.019,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.152,
+            "n": 4860
+          },
+          "dropped": 54295
+        },
+        "indirect": {
+          "reusedBatches": 192,
+          "uploadedBatches": 26,
+          "uploadedBytes": 516496,
+          "flushes": 219,
+          "planHits": 18795,
+          "planMisses": 8510,
+          "planReplayBatches": 1007185,
+          "planIdentityHits": 14644657,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6066,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 21,
+          "testedCommands": 20888,
+          "hiddenCommands": 3024,
+          "testedQuads": 4396338,
+          "hiddenQuads": 678040,
+          "queuedQuads": [
+            35610,
+            884305,
+            11057940,
+            11884183,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6511,
+          "suppressedParents": 0,
+          "partialCoverageParents": 427,
+          "transitionTiles": 460
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3496959264,
+          "committedGeometryBytes": 3657421952,
+          "budgetEvictions": 2552,
+          "ownedEvictions": 0,
+          "releasedBytes": 1126088144,
+          "coldTiles": 315,
+          "restoreRequests": 1271,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3295137536,
+          "waterPayloadBytes": 7355920,
+          "waterDuplicationSavedBytes": 1762115856,
+          "quads": 153485875,
+          "rectangles": 140647003,
+          "waterRectangles": 307754,
+          "coordinateSavingUpperBoundBytes": 1687764036
+        },
+        "wallIndex": {
+          "builds": 4873,
+          "localReuses": 13557179,
+          "updated": 157828,
+          "parallelMaskBatches": 2226,
+          "parallelMaskSurfaces": 127322,
+          "parallelMaskWallMs": 2058
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[257, 2516, 1464, 449],spriteQuads=38584391,flatQuads=9050263",
+        "surface": {
+          "terrainFull": 7075,
+          "terrainPreview": 1250,
+          "visibleCpuMs": 808687,
+          "backgroundCpuMs": 11453,
+          "ordinaryRemaining": 106,
+          "foregroundPending": 1,
+          "deferrals": 2635
+        },
+        "ownershipText": "ownerTiles=6511,suppressedParents=0,partialCoverageParents=427,transitionTiles=460",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 2
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 21.8,
+          "lastMs": 43.9,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:47.449",
+        "tiles": 51,
+        "considered": 24999488,
+        "rendered": 24099072,
+        "coverageSkipped": 1448384,
+        "authoritativeSkipped": 0,
+        "meshUploads": 12374,
+        "preparedPlans": 5291,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 43,
+        "quadsCurrentPass": 133586,
+        "opaquePageGroups": 0,
+        "opaqueFallbacks": 6,
+        "coverageResolves": 0,
+        "coverageMs": 0,
+        "gpuTiles": 8373,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.596,
+          "COVERAGECpuMs": 0.146,
+          "SEAMSCpuMs": 4.097,
+          "UPLOADCpuMs": 0.176,
+          "OPAQUECpuMs": 5.264,
+          "OPAQUEGpuMs": {
+            "mean": 11.182,
+            "n": 326
+          },
+          "WATERCpuMs": 0.417,
+          "WATERGpuMs": {
+            "mean": 0.338,
+            "n": 326
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.209,
+            "n": 328
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.195,
+            "n": 326
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 1920
+          },
+          "GPU_FILTERCpuMs": 0.057,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 1920
+          },
+          "INDIRECT_BUILDCpuMs": 2.32,
+          "INDIRECT_UPLOADCpuMs": 0.018,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.151,
+            "n": 4924
+          },
+          "dropped": 55706
+        },
+        "indirect": {
+          "reusedBatches": 16,
+          "uploadedBatches": 3,
+          "uploadedBytes": 10332,
+          "flushes": 19,
+          "planHits": 19014,
+          "planMisses": 8723,
+          "planReplayBatches": 1011104,
+          "planIdentityHits": 14672352,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6234,
+          "filterBarriers": 1,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 1,
+          "sampleAge": 15,
+          "testedCommands": 38065,
+          "hiddenCommands": 15666,
+          "testedQuads": 8242615,
+          "hiddenQuads": 3482210,
+          "queuedQuads": [
+            32904,
+            171127,
+            0,
+            0,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6662,
+          "suppressedParents": 0,
+          "partialCoverageParents": 442,
+          "transitionTiles": 482
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3503774688,
+          "committedGeometryBytes": 3663727680,
+          "budgetEvictions": 2624,
+          "ownedEvictions": 0,
+          "releasedBytes": 1155538672,
+          "coldTiles": 384,
+          "restoreRequests": 1272,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3298918080,
+          "waterPayloadBytes": 7296704,
+          "waterDuplicationSavedBytes": 1763870752,
+          "quads": 153687717,
+          "rectangles": 140666071,
+          "waterRectangles": 304453,
+          "coordinateSavingUpperBoundBytes": 1687992852
+        },
+        "wallIndex": {
+          "builds": 5200,
+          "localReuses": 14237394,
+          "updated": 162533,
+          "parallelMaskBatches": 2287,
+          "parallelMaskSurfaces": 131319,
+          "parallelMaskWallMs": 2116
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[30, 8, 12, 1],spriteQuads=240007,flatQuads=44174",
+        "surface": {
+          "terrainFull": 7112,
+          "terrainPreview": 1458,
+          "visibleCpuMs": 828875,
+          "backgroundCpuMs": 11515,
+          "ordinaryRemaining": 61,
+          "foregroundPending": 2,
+          "deferrals": 2662
+        },
+        "ownershipText": "ownerTiles=6662,suppressedParents=0,partialCoverageParents=442,transitionTiles=482",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 0
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 25.0,
+          "lastMs": 10.9,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:52.455",
+        "tiles": 103,
+        "considered": 24991296,
+        "rendered": 24091664,
+        "coverageSkipped": 1444016,
+        "authoritativeSkipped": 0,
+        "meshUploads": 12397,
+        "preparedPlans": 5853,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 26,
+        "quadsCurrentPass": 275247,
+        "opaquePageGroups": 21,
+        "opaqueFallbacks": 5,
+        "coverageResolves": 0,
+        "coverageMs": 0,
+        "gpuTiles": 8291,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.473,
+          "COVERAGECpuMs": 0.146,
+          "SEAMSCpuMs": 4.071,
+          "UPLOADCpuMs": 0.176,
+          "OPAQUECpuMs": 4.985,
+          "OPAQUEGpuMs": {
+            "mean": 10.574,
+            "n": 345
+          },
+          "WATERCpuMs": 0.396,
+          "WATERGpuMs": {
+            "mean": 0.32,
+            "n": 345
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.211,
+            "n": 347
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.196,
+            "n": 345
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 1925
+          },
+          "GPU_FILTERCpuMs": 0.057,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 1925
+          },
+          "INDIRECT_BUILDCpuMs": 2.312,
+          "INDIRECT_UPLOADCpuMs": 0.018,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.15,
+            "n": 4972
+          },
+          "dropped": 55721
+        },
+        "indirect": {
+          "reusedBatches": 0,
+          "uploadedBatches": 0,
+          "uploadedBytes": 0,
+          "flushes": 21,
+          "planHits": 19085,
+          "planMisses": 8740,
+          "planReplayBatches": 1012300,
+          "planIdentityHits": 14677446,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6244,
+          "filterBarriers": 1,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 1,
+          "sampleAge": 26,
+          "testedCommands": 2682,
+          "hiddenCommands": 466,
+          "testedQuads": 250051,
+          "hiddenQuads": 84746,
+          "queuedQuads": [
+            67187,
+            208060,
+            0,
+            0,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6660,
+          "suppressedParents": 0,
+          "partialCoverageParents": 441,
+          "transitionTiles": 481
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3443140288,
+          "committedGeometryBytes": 3638060064,
+          "budgetEvictions": 2704,
+          "ownedEvictions": 0,
+          "releasedBytes": 1217591312,
+          "coldTiles": 425,
+          "restoreRequests": 1272,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3242422416,
+          "waterPayloadBytes": 7206464,
+          "waterDuplicationSavedBytes": 1733080176,
+          "quads": 151019379,
+          "rectangles": 137920109,
+          "waterRectangles": 300626,
+          "coordinateSavingUpperBoundBytes": 1655041308
+        },
+        "wallIndex": {
+          "builds": 5273,
+          "localReuses": 14376702,
+          "updated": 163115,
+          "parallelMaskBatches": 2296,
+          "parallelMaskSurfaces": 131729,
+          "parallelMaskWallMs": 2121
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[80, 9, 12, 2],spriteQuads=399417,flatQuads=56512",
+        "surface": {
+          "terrainFull": 7053,
+          "terrainPreview": 1481,
+          "visibleCpuMs": 843343,
+          "backgroundCpuMs": 11671,
+          "ordinaryRemaining": 57,
+          "foregroundPending": 3,
+          "deferrals": 2732
+        },
+        "ownershipText": "ownerTiles=6660,suppressedParents=0,partialCoverageParents=441,transitionTiles=481",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 0
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 72.3,
+          "lastMs": 8.0,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:04:57.483",
+        "tiles": 2091,
+        "considered": 25396800,
+        "rendered": 24476844,
+        "coverageSkipped": 1504020,
+        "authoritativeSkipped": 0,
+        "meshUploads": 12694,
+        "preparedPlans": 6042,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 523,
+        "quadsCurrentPass": 6174125,
+        "opaquePageGroups": 147,
+        "opaqueFallbacks": 376,
+        "coverageResolves": 9,
+        "coverageMs": 0.4,
+        "gpuTiles": 8429,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.564,
+          "COVERAGECpuMs": 0.14,
+          "SEAMSCpuMs": 4.08,
+          "UPLOADCpuMs": 0.174,
+          "OPAQUECpuMs": 4.966,
+          "OPAQUEGpuMs": {
+            "mean": 10.457,
+            "n": 351
+          },
+          "WATERCpuMs": 0.412,
+          "WATERGpuMs": {
+            "mean": 0.347,
+            "n": 351
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.211,
+            "n": 353
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.197,
+            "n": 351
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 1945
+          },
+          "GPU_FILTERCpuMs": 0.057,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 1945
+          },
+          "INDIRECT_BUILDCpuMs": 2.322,
+          "INDIRECT_UPLOADCpuMs": 0.017,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.148,
+            "n": 5068
+          },
+          "dropped": 57355
+        },
+        "indirect": {
+          "reusedBatches": 81,
+          "uploadedBatches": 66,
+          "uploadedBytes": 469620,
+          "flushes": 147,
+          "planHits": 19342,
+          "planMisses": 8908,
+          "planReplayBatches": 1017353,
+          "planIdentityHits": 14710195,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6349,
+          "filterBarriers": 6,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 6,
+          "sampleAge": 5,
+          "testedCommands": 16055,
+          "hiddenCommands": 1631,
+          "testedQuads": 3241550,
+          "hiddenQuads": 378481,
+          "queuedQuads": [
+            56284,
+            1082815,
+            2931220,
+            2103806,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6813,
+          "suppressedParents": 0,
+          "partialCoverageParents": 446,
+          "transitionTiles": 494
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3410931440,
+          "committedGeometryBytes": 3613282544,
+          "budgetEvictions": 2784,
+          "ownedEvictions": 0,
+          "releasedBytes": 1269372640,
+          "coldTiles": 456,
+          "restoreRequests": 1274,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3203191040,
+          "waterPayloadBytes": 7164416,
+          "waterDuplicationSavedBytes": 1712565888,
+          "quads": 149170377,
+          "rectangles": 136004729,
+          "waterRectangles": 298456,
+          "coordinateSavingUpperBoundBytes": 1632056748
+        },
+        "wallIndex": {
+          "builds": 5548,
+          "localReuses": 14903268,
+          "updated": 168381,
+          "parallelMaskBatches": 2340,
+          "parallelMaskSurfaces": 136449,
+          "parallelMaskWallMs": 2204
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.54638671875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[517, 660, 747, 167],spriteQuads=9034941,flatQuads=625365",
+        "surface": {
+          "terrainFull": 7101,
+          "terrainPreview": 1528,
+          "visibleCpuMs": 866078,
+          "backgroundCpuMs": 11812,
+          "ordinaryRemaining": 89,
+          "foregroundPending": 2,
+          "deferrals": 2827
+        },
+        "ownershipText": "ownerTiles=6813,suppressedParents=0,partialCoverageParents=446,transitionTiles=494",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 3
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 22.4,
+          "lastMs": 38.5,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:05:02.530",
+        "tiles": 4195,
+        "considered": 25580096,
+        "rendered": 24636672,
+        "coverageSkipped": 1526976,
+        "authoritativeSkipped": 0,
+        "meshUploads": 12841,
+        "preparedPlans": 6128,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 923,
+        "quadsCurrentPass": 12087250,
+        "opaquePageGroups": 221,
+        "opaqueFallbacks": 702,
+        "coverageResolves": 15,
+        "coverageMs": 5.02,
+        "gpuTiles": 8504,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.664,
+          "COVERAGECpuMs": 0.138,
+          "SEAMSCpuMs": 4.074,
+          "UPLOADCpuMs": 0.178,
+          "OPAQUECpuMs": 4.984,
+          "OPAQUEGpuMs": {
+            "mean": 10.436,
+            "n": 354
+          },
+          "WATERCpuMs": 0.423,
+          "WATERGpuMs": {
+            "mean": 0.356,
+            "n": 354
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.211,
+            "n": 356
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.198,
+            "n": 354
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 1957
+          },
+          "GPU_FILTERCpuMs": 0.057,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 1957
+          },
+          "INDIRECT_BUILDCpuMs": 2.33,
+          "INDIRECT_UPLOADCpuMs": 0.017,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.147,
+            "n": 5116
+          },
+          "dropped": 58220
+        },
+        "indirect": {
+          "reusedBatches": 53,
+          "uploadedBatches": 167,
+          "uploadedBytes": 1471024,
+          "flushes": 221,
+          "planHits": 19511,
+          "planMisses": 9061,
+          "planReplayBatches": 1021071,
+          "planIdentityHits": 14754210,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6460,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 1,
+          "testedCommands": 30754,
+          "hiddenCommands": 5208,
+          "testedQuads": 6615097,
+          "hiddenQuads": 1175121,
+          "queuedQuads": [
+            39788,
+            1129864,
+            5109592,
+            5808006,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6860,
+          "suppressedParents": 0,
+          "partialCoverageParents": 454,
+          "transitionTiles": 502
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3469018208,
+          "committedGeometryBytes": 3640552064,
+          "budgetEvictions": 2849,
+          "ownedEvictions": 0,
+          "releasedBytes": 1286997120,
+          "coldTiles": 428,
+          "restoreRequests": 1360,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3257112784,
+          "waterPayloadBytes": 7188944,
+          "waterDuplicationSavedBytes": 1740679504,
+          "quads": 151725809,
+          "rectangles": 138450282,
+          "waterRectangles": 299546,
+          "coordinateSavingUpperBoundBytes": 1661403384
+        },
+        "wallIndex": {
+          "builds": 5646,
+          "localReuses": 15247864,
+          "updated": 172400,
+          "parallelMaskBatches": 2367,
+          "parallelMaskSurfaces": 140087,
+          "parallelMaskWallMs": 2270
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6588134765625,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[671, 1437, 1308, 779],spriteQuads=18737506,flatQuads=3206181",
+        "surface": {
+          "terrainFull": 7238,
+          "terrainPreview": 1551,
+          "visibleCpuMs": 903531,
+          "backgroundCpuMs": 12296,
+          "ordinaryRemaining": 107,
+          "foregroundPending": 2,
+          "deferrals": 2845
+        },
+        "ownershipText": "ownerTiles=6860,suppressedParents=0,partialCoverageParents=454,transitionTiles=502",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 0
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 17.3,
+          "lastMs": 83.1,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:05:07.574",
+        "tiles": 5236,
+        "considered": 25908800,
+        "rendered": 24936128,
+        "coverageSkipped": 1539264,
+        "authoritativeSkipped": 0,
+        "meshUploads": 13174,
+        "preparedPlans": 6250,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 1162,
+        "quadsCurrentPass": 26345408,
+        "opaquePageGroups": 222,
+        "opaqueFallbacks": 940,
+        "coverageResolves": 12,
+        "coverageMs": 0.41,
+        "gpuTiles": 8640,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.745,
+          "COVERAGECpuMs": 0.137,
+          "SEAMSCpuMs": 4.03,
+          "UPLOADCpuMs": 0.184,
+          "OPAQUECpuMs": 5.049,
+          "OPAQUEGpuMs": {
+            "mean": 10.442,
+            "n": 358
+          },
+          "WATERCpuMs": 0.454,
+          "WATERGpuMs": {
+            "mean": 0.391,
+            "n": 358
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.211,
+            "n": 360
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.197,
+            "n": 358
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 1989
+          },
+          "GPU_FILTERCpuMs": 0.057,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 1989
+          },
+          "INDIRECT_BUILDCpuMs": 2.371,
+          "INDIRECT_UPLOADCpuMs": 0.016,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.146,
+            "n": 5180
+          },
+          "dropped": 61672
+        },
+        "indirect": {
+          "reusedBatches": 146,
+          "uploadedBatches": 75,
+          "uploadedBytes": 1527932,
+          "flushes": 222,
+          "planHits": 19753,
+          "planMisses": 9283,
+          "planReplayBatches": 1060829,
+          "planIdentityHits": 14900950,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6623,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 3,
+          "testedCommands": 69085,
+          "hiddenCommands": 49554,
+          "testedQuads": 13997949,
+          "hiddenQuads": 10444619,
+          "queuedQuads": [
+            46698,
+            1154265,
+            12211336,
+            12933109,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 6965,
+          "suppressedParents": 0,
+          "partialCoverageParents": 457,
+          "transitionTiles": 503
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3495350912,
+          "committedGeometryBytes": 3664166768,
+          "budgetEvictions": 2863,
+          "ownedEvictions": 0,
+          "releasedBytes": 1291067072,
+          "coldTiles": 434,
+          "restoreRequests": 1368,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3285024288,
+          "waterPayloadBytes": 7213824,
+          "waterDuplicationSavedBytes": 1756077392,
+          "quads": 153041810,
+          "rectangles": 139225821,
+          "waterRectangles": 300447,
+          "coordinateSavingUpperBoundBytes": 1670709852
+        },
+        "wallIndex": {
+          "builds": 5716,
+          "localReuses": 15976983,
+          "updated": 176102,
+          "parallelMaskBatches": 2431,
+          "parallelMaskSurfaces": 143089,
+          "parallelMaskWallMs": 2306
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6588134765625,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[799, 2526, 1481, 430],spriteQuads=41916290,flatQuads=9479859",
+        "surface": {
+          "terrainFull": 7175,
+          "terrainPreview": 1559,
+          "visibleCpuMs": 920265,
+          "backgroundCpuMs": 12343,
+          "ordinaryRemaining": 89,
+          "foregroundPending": 7,
+          "deferrals": 2845
+        },
+        "ownershipText": "ownerTiles=6965,suppressedParents=0,partialCoverageParents=457,transitionTiles=503",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 5
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 25.5,
+          "lastMs": 51.6,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:05:12.622",
+        "tiles": 3052,
+        "considered": 26128960,
+        "rendered": 25079616,
+        "coverageSkipped": 1620288,
+        "authoritativeSkipped": 0,
+        "meshUploads": 13294,
+        "preparedPlans": 6322,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 618,
+        "quadsCurrentPass": 10028575,
+        "opaquePageGroups": 198,
+        "opaqueFallbacks": 420,
+        "coverageResolves": 0,
+        "coverageMs": 0,
+        "gpuTiles": 8716,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.816,
+          "COVERAGECpuMs": 0.136,
+          "SEAMSCpuMs": 3.998,
+          "UPLOADCpuMs": 0.189,
+          "OPAQUECpuMs": 5.095,
+          "OPAQUEGpuMs": {
+            "mean": 10.477,
+            "n": 360
+          },
+          "WATERCpuMs": 0.473,
+          "WATERGpuMs": {
+            "mean": 0.402,
+            "n": 360
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.211,
+            "n": 362
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.198,
+            "n": 360
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 2005
+          },
+          "GPU_FILTERCpuMs": 0.057,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 2005
+          },
+          "INDIRECT_BUILDCpuMs": 2.397,
+          "INDIRECT_UPLOADCpuMs": 0.016,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.145,
+            "n": 5212
+          },
+          "dropped": 62826
+        },
+        "indirect": {
+          "reusedBatches": 0,
+          "uploadedBatches": 0,
+          "uploadedBytes": 0,
+          "flushes": 198,
+          "planHits": 19893,
+          "planMisses": 9413,
+          "planReplayBatches": 1069582,
+          "planIdentityHits": 14991123,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6707,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 15,
+          "testedCommands": 68480,
+          "hiddenCommands": 42195,
+          "testedQuads": 14111493,
+          "hiddenQuads": 8942325,
+          "queuedQuads": [
+            33993,
+            1054572,
+            3432509,
+            5507501,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 7018,
+          "suppressedParents": 0,
+          "partialCoverageParents": 483,
+          "transitionTiles": 530
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3533388064,
+          "committedGeometryBytes": 3694355344,
+          "budgetEvictions": 2907,
+          "ownedEvictions": 0,
+          "releasedBytes": 1298042032,
+          "coldTiles": 398,
+          "restoreRequests": 1448,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3315056080,
+          "waterPayloadBytes": 7359328,
+          "waterDuplicationSavedBytes": 1771064464,
+          "quads": 154382508,
+          "rectangles": 140467374,
+          "waterRectangles": 307387,
+          "coordinateSavingUpperBoundBytes": 1685608488
+        },
+        "wallIndex": {
+          "builds": 5818,
+          "localReuses": 16314499,
+          "updated": 181323,
+          "parallelMaskBatches": 2469,
+          "parallelMaskSurfaces": 148141,
+          "parallelMaskWallMs": 2398
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6588134765625,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[487, 693, 1321, 551],spriteQuads=14899658,flatQuads=2422152",
+        "surface": {
+          "terrainFull": 7419,
+          "terrainPreview": 1570,
+          "visibleCpuMs": 953562,
+          "backgroundCpuMs": 13968,
+          "ordinaryRemaining": 84,
+          "foregroundPending": 4,
+          "deferrals": 2845
+        },
+        "ownershipText": "ownerTiles=7018,suppressedParents=0,partialCoverageParents=483,transitionTiles=530",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 0
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 15.6,
+          "lastMs": 91.8,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:05:17.640",
+        "tiles": 3131,
+        "considered": 26494528,
+        "rendered": 25386688,
+        "coverageSkipped": 1760320,
+        "authoritativeSkipped": 0,
+        "meshUploads": 13577,
+        "preparedPlans": 6450,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 753,
+        "quadsCurrentPass": 10365374,
+        "opaquePageGroups": 201,
+        "opaqueFallbacks": 552,
+        "coverageResolves": 20,
+        "coverageMs": 1.74,
+        "gpuTiles": 8959,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.982,
+          "COVERAGECpuMs": 0.133,
+          "SEAMSCpuMs": 3.975,
+          "UPLOADCpuMs": 0.198,
+          "OPAQUECpuMs": 5.122,
+          "OPAQUEGpuMs": {
+            "mean": 10.451,
+            "n": 365
+          },
+          "WATERCpuMs": 0.511,
+          "WATERGpuMs": {
+            "mean": 0.442,
+            "n": 365
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.211,
+            "n": 367
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.197,
+            "n": 365
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 2039
+          },
+          "GPU_FILTERCpuMs": 0.058,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 2039
+          },
+          "INDIRECT_BUILDCpuMs": 2.425,
+          "INDIRECT_UPLOADCpuMs": 0.015,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.144,
+            "n": 5292
+          },
+          "dropped": 65904
+        },
+        "indirect": {
+          "reusedBatches": 99,
+          "uploadedBatches": 100,
+          "uploadedBytes": 1058324,
+          "flushes": 201,
+          "planHits": 20145,
+          "planMisses": 9647,
+          "planReplayBatches": 1076529,
+          "planIdentityHits": 15060919,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6854,
+          "filterBarriers": 8,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 8,
+          "sampleAge": 23,
+          "testedCommands": 3687,
+          "hiddenCommands": 814,
+          "testedQuads": 810872,
+          "hiddenQuads": 173477,
+          "queuedQuads": [
+            18564,
+            1076210,
+            3519682,
+            5750918,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 7111,
+          "suppressedParents": 0,
+          "partialCoverageParents": 518,
+          "transitionTiles": 571
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3595997760,
+          "committedGeometryBytes": 3754155296,
+          "budgetEvictions": 2935,
+          "ownedEvictions": 0,
+          "releasedBytes": 1303635008,
+          "coldTiles": 309,
+          "restoreRequests": 1565,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3375937856,
+          "waterPayloadBytes": 7581680,
+          "waterDuplicationSavedBytes": 1802037824,
+          "quads": 157063399,
+          "rectangles": 143080656,
+          "waterRectangles": 316459,
+          "coordinateSavingUpperBoundBytes": 1716967872
+        },
+        "wallIndex": {
+          "builds": 6081,
+          "localReuses": 16961403,
+          "updated": 184151,
+          "parallelMaskBatches": 2510,
+          "parallelMaskSurfaces": 150101,
+          "parallelMaskWallMs": 2429
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1301.8121337890625,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[497, 713, 1409, 512],spriteQuads=15361862,flatQuads=2287503",
+        "surface": {
+          "terrainFull": 7394,
+          "terrainPreview": 1652,
+          "visibleCpuMs": 979203,
+          "backgroundCpuMs": 14484,
+          "ordinaryRemaining": 31,
+          "foregroundPending": 4,
+          "deferrals": 2891
+        },
+        "ownershipText": "ownerTiles=7111,suppressedParents=0,partialCoverageParents=518,transitionTiles=571",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 3
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 26.4,
+          "lastMs": 53.2,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:05:22.653",
+        "tiles": 138,
+        "considered": 26542912,
+        "rendered": 25420352,
+        "coverageSkipped": 1813312,
+        "authoritativeSkipped": 0,
+        "meshUploads": 13754,
+        "preparedPlans": 6717,
+        "reusedPlans": 4545,
+        "drawCallsCurrentPass": 33,
+        "quadsCurrentPass": 376875,
+        "opaquePageGroups": 24,
+        "opaqueFallbacks": 9,
+        "coverageResolves": 0,
+        "coverageMs": 0,
+        "gpuTiles": 8988,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 6.019,
+          "COVERAGECpuMs": 0.129,
+          "SEAMSCpuMs": 3.948,
+          "UPLOADCpuMs": 0.201,
+          "OPAQUECpuMs": 5.031,
+          "OPAQUEGpuMs": {
+            "mean": 10.239,
+            "n": 374
+          },
+          "WATERCpuMs": 0.509,
+          "WATERGpuMs": {
+            "mean": 0.441,
+            "n": 374
+          },
+          "DEPTH_COPYCpuMs": 0.03,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.211,
+            "n": 376
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.198,
+            "n": 374
+          },
+          "HZB_REDUCECpuMs": 0.02,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 2056
+          },
+          "GPU_FILTERCpuMs": 0.058,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 2056
+          },
+          "INDIRECT_BUILDCpuMs": 2.408,
+          "INDIRECT_UPLOADCpuMs": 0.015,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.141,
+            "n": 5436
+          },
+          "dropped": 66850
+        },
+        "indirect": {
+          "reusedBatches": 0,
+          "uploadedBatches": 0,
+          "uploadedBytes": 0,
+          "flushes": 24,
+          "planHits": 20457,
+          "planMisses": 9764,
+          "planReplayBatches": 1087505,
+          "planIdentityHits": 15115888,
+          "wholePlanHits": 5365,
+          "planContentChecks": 6923,
+          "filterBarriers": 1,
+          "directGpuMs": 14.689792,
+          "culledGpuMs": 13.622784000000001,
+          "hizBuilds": 1,
+          "sampleAge": 20,
+          "testedCommands": 2819,
+          "hiddenCommands": 295,
+          "testedQuads": 298714,
+          "hiddenQuads": 58293,
+          "queuedQuads": [
+            22065,
+            354810,
+            0,
+            0,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 7129,
+          "suppressedParents": 0,
+          "partialCoverageParents": 530,
+          "transitionTiles": 585
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3601432544,
+          "committedGeometryBytes": 3769523296,
+          "budgetEvictions": 3009,
+          "ownedEvictions": 0,
+          "releasedBytes": 1315202656,
+          "coldTiles": 323,
+          "restoreRequests": 1618,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3385163952,
+          "waterPayloadBytes": 7626704,
+          "waterDuplicationSavedBytes": 1807516992,
+          "quads": 157518786,
+          "rectangles": 143271632,
+          "waterRectangles": 318406,
+          "coordinateSavingUpperBoundBytes": 1719259584
+        },
+        "wallIndex": {
+          "builds": 6259,
+          "localReuses": 17237971,
+          "updated": 185386,
+          "parallelMaskBatches": 2529,
+          "parallelMaskSurfaces": 151027,
+          "parallelMaskWallMs": 2441
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[116, 10, 11, 1],spriteQuads=554319,flatQuads=30891",
+        "surface": {
+          "terrainFull": 7383,
+          "terrainPreview": 1672,
+          "visibleCpuMs": 1006156,
+          "backgroundCpuMs": 16015,
+          "ordinaryRemaining": 24,
+          "foregroundPending": 11,
+          "deferrals": 2935
+        },
+        "ownershipText": "ownerTiles=7129,suppressedParents=0,partialCoverageParents=530,transitionTiles=585",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 0
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 70.0,
+          "lastMs": 19.9,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-hiz"
+      },
+      {
+        "time": "21:05:27.679",
+        "tiles": 1083,
+        "considered": 26620224,
+        "rendered": 25479424,
+        "coverageSkipped": 1850688,
+        "authoritativeSkipped": 0,
+        "meshUploads": 13810,
+        "preparedPlans": 7025,
+        "reusedPlans": 4754,
+        "drawCallsCurrentPass": 214,
+        "quadsCurrentPass": 3351611,
+        "opaquePageGroups": 73,
+        "opaqueFallbacks": 141,
+        "coverageResolves": 11,
+        "coverageMs": 1.93,
+        "gpuTiles": 8952,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.874,
+          "COVERAGECpuMs": 0.129,
+          "SEAMSCpuMs": 3.939,
+          "UPLOADCpuMs": 0.202,
+          "OPAQUECpuMs": 4.831,
+          "OPAQUEGpuMs": {
+            "mean": 9.835,
+            "n": 391
+          },
+          "WATERCpuMs": 0.497,
+          "WATERGpuMs": {
+            "mean": 0.429,
+            "n": 391
+          },
+          "DEPTH_COPYCpuMs": 0.029,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.213,
+            "n": 393
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.198,
+            "n": 391
+          },
+          "HZB_REDUCECpuMs": 0.021,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 2066
+          },
+          "GPU_FILTERCpuMs": 0.058,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 2066
+          },
+          "INDIRECT_BUILDCpuMs": 2.357,
+          "INDIRECT_UPLOADCpuMs": 0.015,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.136,
+            "n": 5708
+          },
+          "dropped": 67270
+        },
+        "indirect": {
+          "reusedBatches": 35,
+          "uploadedBatches": 35,
+          "uploadedBytes": 57960,
+          "flushes": 73,
+          "planHits": 20990,
+          "planMisses": 9800,
+          "planReplayBatches": 1101477,
+          "planIdentityHits": 15182058,
+          "wholePlanHits": 5366,
+          "planContentChecks": 6948,
+          "filterBarriers": 0,
+          "directGpuMs": 0.536576,
+          "culledGpuMs": 0.6415359999999999,
+          "hizBuilds": 0,
+          "sampleAge": 87,
+          "testedCommands": 2960,
+          "hiddenCommands": 416,
+          "testedQuads": 302181,
+          "hiddenQuads": 60892,
+          "queuedQuads": [
+            14659,
+            1346068,
+            1976546,
+            14338,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 7146,
+          "suppressedParents": 0,
+          "partialCoverageParents": 539,
+          "transitionTiles": 594
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3604032208,
+          "committedGeometryBytes": 3768682272,
+          "budgetEvictions": 3089,
+          "ownedEvictions": 0,
+          "releasedBytes": 1328343984,
+          "coldTiles": 368,
+          "restoreRequests": 1634,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3383361536,
+          "waterPayloadBytes": 7623392,
+          "waterDuplicationSavedBytes": 1806978336,
+          "quads": 157455518,
+          "rectangles": 143162680,
+          "waterRectangles": 318605,
+          "coordinateSavingUpperBoundBytes": 1717952160
+        },
+        "wallIndex": {
+          "builds": 6445,
+          "localReuses": 17344596,
+          "updated": 185786,
+          "parallelMaskBatches": 2535,
+          "parallelMaskSurfaces": 151262,
+          "parallelMaskWallMs": 2445
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[421, 578, 74, 10],spriteQuads=5308831,flatQuads=154676",
+        "surface": {
+          "terrainFull": 7386,
+          "terrainPreview": 1645,
+          "visibleCpuMs": 1026437,
+          "backgroundCpuMs": 16843,
+          "ordinaryRemaining": 95,
+          "foregroundPending": 7,
+          "deferrals": 3345
+        },
+        "ownershipText": "ownerTiles=7146,suppressedParents=0,partialCoverageParents=539,transitionTiles=594",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 0
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 103.0,
+          "lastMs": 23.2,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-direct"
+      },
+      {
+        "time": "21:05:32.694",
+        "tiles": 1567,
+        "considered": 27218240,
+        "rendered": 26075328,
+        "coverageSkipped": 1914944,
+        "authoritativeSkipped": 0,
+        "meshUploads": 14378,
+        "preparedPlans": 7214,
+        "reusedPlans": 4754,
+        "drawCallsCurrentPass": 345,
+        "quadsCurrentPass": 3830028,
+        "opaquePageGroups": 116,
+        "opaqueFallbacks": 229,
+        "coverageResolves": 22,
+        "coverageMs": 1.52,
+        "gpuTiles": 9211,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.907,
+          "COVERAGECpuMs": 0.128,
+          "SEAMSCpuMs": 3.871,
+          "UPLOADCpuMs": 0.211,
+          "OPAQUECpuMs": 4.797,
+          "OPAQUEGpuMs": {
+            "mean": 9.76,
+            "n": 397
+          },
+          "WATERCpuMs": 0.51,
+          "WATERGpuMs": {
+            "mean": 0.431,
+            "n": 397
+          },
+          "DEPTH_COPYCpuMs": 0.029,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.212,
+            "n": 399
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.198,
+            "n": 397
+          },
+          "HZB_REDUCECpuMs": 0.021,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 2067
+          },
+          "GPU_FILTERCpuMs": 0.058,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 2067
+          },
+          "INDIRECT_BUILDCpuMs": 2.342,
+          "INDIRECT_UPLOADCpuMs": 0.015,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.134,
+            "n": 5804
+          },
+          "dropped": 69626
+        },
+        "indirect": {
+          "reusedBatches": 68,
+          "uploadedBatches": 12,
+          "uploadedBytes": 32916,
+          "flushes": 116,
+          "planHits": 21354,
+          "planMisses": 10148,
+          "planReplayBatches": 1136320,
+          "planIdentityHits": 15306944,
+          "wholePlanHits": 5373,
+          "planContentChecks": 7177,
+          "filterBarriers": 0,
+          "directGpuMs": 0.536576,
+          "culledGpuMs": 0.6415359999999999,
+          "hizBuilds": 0,
+          "sampleAge": 276,
+          "testedCommands": 2960,
+          "hiddenCommands": 416,
+          "testedQuads": 302181,
+          "hiddenQuads": 60892,
+          "queuedQuads": [
+            14659,
+            1301387,
+            2499644,
+            14338,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 7382,
+          "suppressedParents": 0,
+          "partialCoverageParents": 542,
+          "transitionTiles": 617
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3629981968,
+          "committedGeometryBytes": 3799391952,
+          "budgetEvictions": 3169,
+          "ownedEvictions": 0,
+          "releasedBytes": 1342954512,
+          "coldTiles": 430,
+          "restoreRequests": 1635,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3408111040,
+          "waterPayloadBytes": 7669920,
+          "waterDuplicationSavedBytes": 1822374336,
+          "quads": 158706623,
+          "rectangles": 143604796,
+          "waterRectangles": 319883,
+          "coordinateSavingUpperBoundBytes": 1723257552
+        },
+        "wallIndex": {
+          "builds": 6845,
+          "localReuses": 18602717,
+          "updated": 192234,
+          "parallelMaskBatches": 2628,
+          "parallelMaskSurfaces": 156335,
+          "parallelMaskWallMs": 2518
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[774, 717, 68, 8],spriteQuads=6221478,flatQuads=177785",
+        "surface": {
+          "terrainFull": 7424,
+          "terrainPreview": 1824,
+          "visibleCpuMs": 1050843,
+          "backgroundCpuMs": 16843,
+          "ordinaryRemaining": 201,
+          "foregroundPending": 2,
+          "deferrals": 3488
+        },
+        "ownershipText": "ownerTiles=7382,suppressedParents=0,partialCoverageParents=542,transitionTiles=617",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 1
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 41.9,
+          "lastMs": 19.8,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-direct"
+      },
+      {
+        "time": "21:05:37.754",
+        "tiles": 5674,
+        "considered": 27219264,
+        "rendered": 26059712,
+        "coverageSkipped": 1925440,
+        "authoritativeSkipped": 0,
+        "meshUploads": 14509,
+        "preparedPlans": 7303,
+        "reusedPlans": 4792,
+        "drawCallsCurrentPass": 991,
+        "quadsCurrentPass": 38565773,
+        "opaquePageGroups": 222,
+        "opaqueFallbacks": 769,
+        "coverageResolves": 5,
+        "coverageMs": 1.98,
+        "gpuTiles": 9232,
+        "timings": {
+          "sampleEvery": 30,
+          "PREPARECpuMs": 5.907,
+          "COVERAGECpuMs": 0.128,
+          "SEAMSCpuMs": 3.85,
+          "UPLOADCpuMs": 0.213,
+          "OPAQUECpuMs": 4.782,
+          "OPAQUEGpuMs": {
+            "mean": 9.773,
+            "n": 401
+          },
+          "WATERCpuMs": 0.522,
+          "WATERGpuMs": {
+            "mean": 0.429,
+            "n": 401
+          },
+          "DEPTH_COPYCpuMs": 0.029,
+          "DEPTH_COPYGpuMs": {
+            "mean": 0.212,
+            "n": 403
+          },
+          "STATECpuMs": 0.01,
+          "ANTIALIASCpuMs": 0.04,
+          "ANTIALIASGpuMs": {
+            "mean": 0.198,
+            "n": 401
+          },
+          "HZB_REDUCECpuMs": 0.021,
+          "HZB_REDUCEGpuMs": {
+            "mean": 0.106,
+            "n": 2067
+          },
+          "GPU_FILTERCpuMs": 0.058,
+          "GPU_FILTERGpuMs": {
+            "mean": 0.04,
+            "n": 2067
+          },
+          "INDIRECT_BUILDCpuMs": 2.341,
+          "INDIRECT_UPLOADCpuMs": 0.014,
+          "INDIRECT_SUBMITGpuMs": {
+            "mean": 0.134,
+            "n": 5868
+          },
+          "dropped": 71988
+        },
+        "indirect": {
+          "reusedBatches": 22,
+          "uploadedBatches": 6,
+          "uploadedBytes": 32780,
+          "flushes": 222,
+          "planHits": 21600,
+          "planMisses": 10263,
+          "planReplayBatches": 1179412,
+          "planIdentityHits": 15602431,
+          "wholePlanHits": 5414,
+          "planContentChecks": 7248,
+          "filterBarriers": 0,
+          "directGpuMs": 0.536576,
+          "culledGpuMs": 0.6415359999999999,
+          "hizBuilds": 0,
+          "sampleAge": 403,
+          "testedCommands": 2960,
+          "hiddenCommands": 416,
+          "testedQuads": 302181,
+          "hiddenQuads": 60892,
+          "queuedQuads": [
+            4727,
+            1864683,
+            14161862,
+            22534501,
+            0
+          ]
+        },
+        "ownership": {
+          "ownerTiles": 7383,
+          "suppressedParents": 0,
+          "partialCoverageParents": 550,
+          "transitionTiles": 623
+        },
+        "gpuResidency": {
+          "budgetBytes": 1073741824,
+          "targetBytes": 966367642,
+          "liveBytes": 3666843920,
+          "committedGeometryBytes": 3835675408,
+          "budgetEvictions": 3241,
+          "ownedEvictions": 0,
+          "releasedBytes": 1356305264,
+          "coldTiles": 469,
+          "restoreRequests": 1666,
+          "deferredVersionUploads": 0,
+          "opaquePayloadBytes": 3446852112,
+          "waterPayloadBytes": 7751504,
+          "waterDuplicationSavedBytes": 1842233472,
+          "quads": 160490448,
+          "rectangles": 145249388,
+          "waterRectangles": 322917,
+          "coordinateSavingUpperBoundBytes": 1742992656
+        },
+        "wallIndex": {
+          "builds": 6997,
+          "localReuses": 18852692,
+          "updated": 193334,
+          "parallelMaskBatches": 2650,
+          "parallelMaskSurfaces": 157223,
+          "parallelMaskWallMs": 2536
+        },
+        "textures": "enabled=true,tableId=171,useAverage=false,scoping=false,selectionScale=1298.6591796875,table=rows=226,ready=true,broken=false,dirty=false,generation=1,tilesAt1/2/4/8+=[1371, 2821, 1183, 299],spriteQuads=59135808,flatQuads=13882540",
+        "surface": {
+          "terrainFull": 7435,
+          "terrainPreview": 1828,
+          "visibleCpuMs": 1079781,
+          "backgroundCpuMs": 16843,
+          "ordinaryRemaining": 6,
+          "foregroundPending": 10,
+          "deferrals": 3548
+        },
+        "ownershipText": "ownerTiles=7383,suppressedParents=0,partialCoverageParents=550,transitionTiles=623",
+        "arenas": {
+          "opaque": {
+            "pages": 32,
+            "bytes": 2147483648,
+            "budgetBytes": 2147483648,
+            "retired": 4
+          },
+          "water": {
+            "pages": 2,
+            "bytes": 134217728,
+            "budgetBytes": 134217728,
+            "retired": 0
+          }
+        },
+        "framePace": {
+          "fps": 19.9,
+          "lastMs": 52.1,
+          "mode": "diagnostic-only",
+          "windowFramesMax": 90
+        },
+        "occlusionMode": "measuring-direct"
+      }
+    ],
+    "notes": [
+      "Current-pass counters and frame-reset indirect upload counters are snapshots, not cumulative deltas.",
+      "FPS snapshots use a rolling window of up to 90 frames; snapshot median is not the recording average FPS or 1% low.",
+      "quadsCurrentPass is candidate-range count before GPU filter; GPU results may be stale and exclude direct fallbacks.",
+      "Resident quads include source and appended display alternatives; additional display storage is capped at 50% of opaque source.",
+      "Gpu timestamp stages and batch/build/filter intervals have different units and can be nested; do not sum them."
+    ]
+  },
+  "limitations": [
+    "No matched same-scene Voxy-only FPS/GPU/quad benchmark.",
+    "No post-change benchmark: only analysis artifacts were created.",
+    "No complete same-frame category/ownership/Hi-Z/direct geometric census.",
+    "Parent and child presence in draw lists does not establish duplicate visible pixels.",
+    "Sprite material count is not a vegetation count.",
+    "Only selected Voxy shaders were verified against the installed jar, not the entire Java binary.",
+    "Forge source review is not a Forge-client performance recording."
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "date": "2026-10-11",
+  "version": "0.3.5",
+  "sources": [
+    {
+      "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuEncoding.java",
+      "neoforge": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e",
+      "forge": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e"
+    },
+    {
+      "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionTerrainProgram.java",
+      "neoforge": "b4767290a28ca4ed911c33576e108eb660f9d2bbc1908b7a11605a71ba6981d9",
+      "forge": "b4767290a28ca4ed911c33576e108eb660f9d2bbc1908b7a11605a71ba6981d9"
+    },
+    {
+      "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionNormalDepthBridge.java",
+      "neoforge": "6977fe9d9f277a4554a815653585879a9fff54e830d9648f26ddd1f8c8eced14",
+      "forge": "ef822ef8f0e116f0d09220839b6a59e7a7596c3426e7d3eb668b9f207ddbb713"
+    }
+  ],
+  "platforms": {
+    "neoforge": {
+      "cpu": {
+        "tests": 132,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 131,
+        "skippedCases": [
+          "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+        ]
+      },
+      "vegetationGpuOutput": "WARN StatusConsoleListener Advanced terminal features are not available in this environment\nVEGETATION_GPU NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2\nVEGETATION_MICROBENCH draws=16 size=256 quads=384 before32_ms=0.054272 current32_ms=0.062464 vertex20_oldFragment_ms=0.054272 current20_ms=0.062464\nVEGETATION_MICROBENCH draws=16 size=1024 quads=384 before32_ms=0.444416 current32_ms=0.402432 vertex20_oldFragment_ms=0.445440 current20_ms=0.401408\nVEGETATION_VERTEX_MICROBENCH draws=4 quads=262144 beforeBytes=8388672 currentBytes=5242944 before32_ms=0.121856 current32_ms=0.130048 current20_ms=0.157696\n",
+      "microbenchmarks": [
+        {
+          "draws": 16,
+          "size": 256,
+          "quads": 384,
+          "before32_ms": 0.054272,
+          "current32_ms": 0.062464,
+          "vertex20_oldFragment_ms": 0.054272,
+          "current20_ms": 0.062464,
+          "kind": "raster"
+        },
+        {
+          "draws": 16,
+          "size": 1024,
+          "quads": 384,
+          "before32_ms": 0.444416,
+          "current32_ms": 0.402432,
+          "vertex20_oldFragment_ms": 0.44544,
+          "current20_ms": 0.401408,
+          "kind": "raster"
+        },
+        {
+          "draws": 4,
+          "quads": 262144,
+          "beforeBytes": 8388672,
+          "currentBytes": 5242944,
+          "before32_ms": 0.121856,
+          "current32_ms": 0.130048,
+          "current20_ms": 0.157696,
+          "kind": "vertex"
+        }
+      ],
+      "gpu": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 10,
+        "skippedCases": []
+      },
+      "artifact": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\vegetation-render-20261011\\vss-0.3.5-neoforge-1.21.1.jar",
+        "sha256": "1d01e30e125e4e7304c77b856ae6398fac26b3a2d67720dd35723764ec56c807",
+        "bytes": 5902810,
+        "zipIntegrity": true,
+        "versionAndLoaderVerified": true,
+        "nativeFilesMatchPrevious": true,
+        "testClassesExcluded": true,
+        "updatedProductionClassesVerified": [
+          "dev/xantha/vss/client/prediction/PredictionGpuEncoding.class",
+          "dev/xantha/vss/client/prediction/PredictionTerrainProgram.class",
+          "dev/xantha/vss/client/prediction/PredictionNormalDepthBridge.class"
+        ],
+        "compiledClassesIdentical": true,
+        "reobfuscatedOutputIdentical": false
+      },
+      "voxyReference": {
+        "path": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\mods\\voxy-0.2.15-beta.jar",
+        "sha256": "802d49edc07c4e4a7af15ffd59337a82af383dfd551b67c278233098737e2f52"
+      }
+    },
+    "forge": {
+      "cpu": {
+        "tests": 131,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 130,
+        "skippedCases": [
+          "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+        ]
+      },
+      "vegetationGpuOutput": "2026-10-11 01:45:41,075 Test worker WARN Advanced terminal features are not available in this environment\nVEGETATION_GPU NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2\nVEGETATION_MICROBENCH draws=16 size=256 quads=384 before32_ms=0.054272 current32_ms=0.062464 vertex20_oldFragment_ms=0.054272 current20_ms=0.062464\nVEGETATION_MICROBENCH draws=16 size=1024 quads=384 before32_ms=0.444416 current32_ms=0.400384 vertex20_oldFragment_ms=0.444416 current20_ms=0.401408\nVEGETATION_VERTEX_MICROBENCH draws=4 quads=262144 beforeBytes=8388672 currentBytes=5242944 before32_ms=0.121856 current32_ms=0.130048 current20_ms=0.156672\n",
+      "microbenchmarks": [
+        {
+          "draws": 16,
+          "size": 256,
+          "quads": 384,
+          "before32_ms": 0.054272,
+          "current32_ms": 0.062464,
+          "vertex20_oldFragment_ms": 0.054272,
+          "current20_ms": 0.062464,
+          "kind": "raster"
+        },
+        {
+          "draws": 16,
+          "size": 1024,
+          "quads": 384,
+          "before32_ms": 0.444416,
+          "current32_ms": 0.400384,
+          "vertex20_oldFragment_ms": 0.444416,
+          "current20_ms": 0.401408,
+          "kind": "raster"
+        },
+        {
+          "draws": 4,
+          "quads": 262144,
+          "beforeBytes": 8388672,
+          "currentBytes": 5242944,
+          "before32_ms": 0.121856,
+          "current32_ms": 0.130048,
+          "current20_ms": 0.156672,
+          "kind": "vertex"
+        }
+      ],
+      "gpu": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 10,
+        "skippedCases": []
+      },
+      "artifact": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\vegetation-render-20261011\\vss-0.3.5-forge-1.20.1.jar",
+        "sha256": "2f10ab3d22c04e90445458f74fb16dc81a06188a059ddbd69df1b20df827c5c8",
+        "bytes": 6575146,
+        "zipIntegrity": true,
+        "versionAndLoaderVerified": true,
+        "nativeFilesMatchPrevious": true,
+        "testClassesExcluded": true,
+        "updatedProductionClassesVerified": [
+          "dev/xantha/vss/client/prediction/PredictionGpuEncoding.class",
+          "dev/xantha/vss/client/prediction/PredictionTerrainProgram.class",
+          "dev/xantha/vss/client/prediction/PredictionNormalDepthBridge.class"
+        ],
+        "compiledClassesIdentical": false,
+        "reobfuscatedOutputIdentical": true
+      },
+      "voxyReference": {
+        "path": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\DeceasedCraft_Beta\\mods\\voxy-0.2.14-alpha-51ea1a841fff1717b261d2fbd3b3f6dafd470663.jar",
+        "sha256": "f4cdee485ab8031682673068e65ff2fbe325d7214c6cfff430449058e13a63fa"
+      }
+    }
+  },
+  "constraints": {
+    "clientReplaced": false,
+    "clientRestarted": false,
+    "githubPushed": false,
+    "vegetationDensityChanged": false,
+    "cpuOnlyGenerationBudgetPreserved": true
+  },
+  "crossFormat": {
+    "recordBytes": 20,
+    "previousPaletteRecordBytes": 32,
+    "paletteAdditional": true,
+    "gpuOnly": true,
+    "lossless": true,
+    "irregularModelsUseExactFallback": true
+  },
+  "featureShader": {
+    "screenFootprintThreshold": 0.0625,
+    "sameAlphaThreshold": 0.1,
+    "preservesCurrentFrameDepthOwnership": true,
+    "preservesGroundDerivatives": true
+  },
+  "offline": {
+    "quads": 22667547,
+    "beforeBytes": 494105680,
+    "afterBytes": 479940656,
+    "crossRecords": 530848,
+    "changedPasses": 571,
+    "meshes": 3890,
+    "savedBytes": 14165024,
+    "savedPercent": 2.8668004787963577
+  },
+  "microbenchmarkIsGameFPS": false
+}

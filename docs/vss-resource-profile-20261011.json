@@ -1,0 +1,1481 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-10-11",
+  "timezone": "Asia/Hong_Kong",
+  "scope": "Read-only profile/log/source analysis; no production source or game configuration changes",
+  "server_profile": {
+    "source": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\config\\spark\\profile-2026-10-11_17.03.28.sparkprofile",
+    "sha256": "bc3520be7989decbf1871d111b52e0633004ef6729721979c9b54ba34b88eff9",
+    "bytes": 757527,
+    "start_hkt": "2026-10-11T17:01:23.376000+08:00",
+    "end_hkt": "2026-10-11T17:03:23.669000+08:00",
+    "duration_ms": 120293,
+    "sampler": "Java execution, not allocation",
+    "interval_us": 4000,
+    "ticks": 2400,
+    "thread": "Server thread",
+    "samples": 30000.0,
+    "total_sample_weight_ms": 120000.0,
+    "node_count": 5096,
+    "validation": {
+      "roots_ms": 120000.0,
+      "leaf_self_ms": 120000.0
+    },
+    "mod_versions": {
+      "iris": {
+        "name": "iris",
+        "version": "1.8.14-beta.1+mc1.21.1"
+      },
+      "c2me": {
+        "name": "c2me",
+        "version": "0.4.0-alpha.0.112+1.21.1"
+      },
+      "voxy": {
+        "name": "voxy",
+        "version": "0.2.15-beta"
+      },
+      "spark": {
+        "name": "spark",
+        "version": "1.10.124"
+      },
+      "vss": {
+        "name": "vss",
+        "version": "0.3.5-neoforge-1.21.1"
+      },
+      "sodium": {
+        "name": "sodium",
+        "version": "0.8.12-beta.2+mc1.21.1"
+      }
+    }
+  },
+  "client_profile": {
+    "source": "https://spark.lucko.me/KjPbmHFBZC",
+    "sha256": "e25bb4c6be2c72f3b59cdee41de85785b61858a150ecf92a9c4ccaac8c512d04",
+    "bytes": 1151077,
+    "start_hkt": "2026-10-11T17:17:14.210000+08:00",
+    "end_hkt": "2026-10-11T17:19:14.445000+08:00",
+    "duration_ms": 120235,
+    "sampler": "Java execution, not allocation",
+    "interval_us": 4000,
+    "ticks": 2400,
+    "thread": "Render thread",
+    "samples": 30000.0,
+    "total_sample_weight_ms": 120000.0,
+    "node_count": 8916,
+    "validation": {
+      "roots_ms": 120000.0,
+      "leaf_self_ms": 120000.0
+    },
+    "mod_versions": {
+      "iris": {
+        "name": "iris",
+        "version": "1.8.14-beta.1+mc1.21.1"
+      },
+      "c2me": {
+        "name": "c2me",
+        "version": "0.4.0-alpha.0.112+1.21.1"
+      },
+      "voxy": {
+        "name": "voxy",
+        "version": "0.2.15-beta"
+      },
+      "spark": {
+        "name": "spark",
+        "version": "1.10.124"
+      },
+      "vss": {
+        "name": "vss",
+        "version": "0.3.5-neoforge-1.21.1"
+      },
+      "sodium": {
+        "name": "sodium",
+        "version": "0.8.12-beta.2+mc1.21.1"
+      }
+    }
+  },
+  "environment": {
+    "platform": {
+      "type": 1,
+      "name": "NeoForge",
+      "version": "21.1.249",
+      "minecraft_version": "1.21.1",
+      "spark_data_version": 2,
+      "brand": "NeoForge"
+    },
+    "cpu_model": "AMD Ryzen 7 7700 8-Core Processor",
+    "logical_processors": 16,
+    "gpu_model_from_session_startup_log": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "java": "Oracle Java 25.0.1",
+    "vss_instance_jar_sha256_at_analysis_start": "1d01e30e125e4e7304c77b856ae6398fac26b3a2d67720dd35723764ec56c807"
+  },
+  "client_render_samples": {
+    "total_weight_ms": 120000.0,
+    "vss_stack_union_ms": 52140.0,
+    "vss_stack_union_pct": 43.45,
+    "vss_own_java_class_self_ms": 14160.0,
+    "nearest_mod_owner_vss_ms": 52088.0,
+    "disjoint_categories": {
+      "other_vss": {
+        "weight_ms": 7500.0,
+        "pct_of_all_render_samples": 6.25
+      },
+      "client_tick": {
+        "weight_ms": 8644.0,
+        "pct_of_all_render_samples": 7.203333333333334
+      },
+      "iris_draw_including_pass_preparation": {
+        "weight_ms": 22800.0,
+        "pct_of_all_render_samples": 19.0
+      },
+      "scene_prepare": {
+        "weight_ms": 13196.0,
+        "pct_of_all_render_samples": 10.996666666666668
+      }
+    },
+    "vss_lwjgl_self_ms_already_included_in_vss_union": 19736.0,
+    "swap_buffers_native_self_ms": 52632.0,
+    "swap_buffers_native_self_pct": 43.86,
+    "selected_deduplicated_method_weights": [
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionRenderer.submitRanges",
+        "stack_union_ms": 9888.0,
+        "self_ms": 244.0,
+        "pct": 8.24
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare",
+        "stack_union_ms": 4608.0,
+        "self_ms": 2552.0,
+        "pct": 3.84
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionVisiblePlan.selectStable",
+        "stack_union_ms": 3484.0,
+        "self_ms": 48.0,
+        "pct": 2.9033333333333333
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionTileManager.scheduleWork",
+        "stack_union_ms": 2424.0,
+        "self_ms": 12.0,
+        "pct": 2.02
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionLodSeams.apply",
+        "stack_union_ms": 2388.0,
+        "self_ms": 24.0,
+        "pct": 1.99
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionGpuTile.uploadQuadBuffers",
+        "stack_union_ms": 1800.0,
+        "self_ms": 4.0,
+        "pct": 1.5
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionTileManager.refreshViewWork",
+        "stack_union_ms": 1788.0,
+        "self_ms": 60.0,
+        "pct": 1.49
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionRenderer.maintainGpuResidency",
+        "stack_union_ms": 1372.0,
+        "self_ms": 608.0,
+        "pct": 1.1433333333333333
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionSpatialIndex.intersectFrustum",
+        "stack_union_ms": 652.0,
+        "self_ms": 360.0,
+        "pct": 0.5433333333333333
+      },
+      {
+        "method": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverage.filter",
+        "stack_union_ms": 632.0,
+        "self_ms": 0,
+        "pct": 0.5266666666666666
+      }
+    ],
+    "sampling_note": "Weights include native/driver/wait states; not active CPU utilization or GPU milliseconds"
+  },
+  "client_prediction_worker_cpu": {
+    "visible_thread_cpu_ms": 400469,
+    "background_thread_cpu_ms": 30125,
+    "total_thread_cpu_ms": 430594,
+    "equivalent_logical_cpu_time_shares": 3.733517150487289,
+    "logical_processor_count": 16,
+    "machine_cpu_capacity_pct": 23.334482190545554,
+    "visible_classification_cpu_pct": 93.00385049489775,
+    "cpu_time_source": "ThreadMXBean.getCurrentThreadCpuTime, published on task completion",
+    "task_phase_accumulated_elapsed_ms": {
+      "sample": 241188,
+      "surface": 147953,
+      "mesh": 6229,
+      "pack": 9321
+    },
+    "task_phase_elapsed_share_pct": {
+      "sample": 59.598063707866004,
+      "surface": 36.55949848155753,
+      "mesh": 1.53919904322063,
+      "pack": 2.3032387673558348
+    },
+    "phase_time_source": "System.nanoTime, summed across workers; not thread CPU time"
+  },
+  "client_jvm": {
+    "heap_bytes_at_profile_end": {
+      "used": 8695036040,
+      "committed": 11609833472,
+      "init": 1073741824,
+      "max": 11609833472
+    },
+    "non_heap_bytes_at_profile_end": {
+      "used": 363651504,
+      "committed": 415694848,
+      "init": 7667712,
+      "max": -1
+    },
+    "gc_lifetime_cumulative": {
+      "G1 Young Generation": {
+        "total": 673,
+        "avg_time": 9.575037147102526,
+        "avg_frequency": 10150.0
+      },
+      "G1 Concurrent GC": {
+        "total": 446,
+        "avg_time": 1.8497757847533631,
+        "avg_frequency": 15329.0
+      },
+      "G1 Old Generation": {
+        "total": 3,
+        "avg_time": 288.6666666666667,
+        "avg_frequency": 2278986.0
+      }
+    },
+    "jvm_uptime_ms": 6837824,
+    "note": "Heap covers all mods; VSS accounted gauges include reservations and are not exact retained size; GC counts are lifetime totals"
+  },
+  "client_log_evidence": {
+    "source": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\logs\\debug-1.log.gz",
+    "render_window_start": "2026-10-11T17:17:17.114000+08:00",
+    "render_window_end": "2026-10-11T17:19:12.446000+08:00",
+    "render_window_seconds": 115.332,
+    "render_diagnostic_count": 24,
+    "gauges": {
+      "tiles": {
+        "first": 3066,
+        "last": 3259,
+        "min": 60,
+        "max": 3365,
+        "snapshot_median": 2915.0
+      },
+      "drawCallsCurrentPass": {
+        "first": 3061,
+        "last": 3258,
+        "min": 60,
+        "max": 3360,
+        "snapshot_median": 2912.5
+      },
+      "quadsCurrentPass": {
+        "first": 18591368,
+        "last": 23357002,
+        "min": 638290,
+        "max": 28562318,
+        "snapshot_median": 21947612.5
+      },
+      "opaquePageGroups": {
+        "first": 206,
+        "last": 206,
+        "min": 206,
+        "max": 206,
+        "snapshot_median": 206.0
+      },
+      "opaqueFallbacks": {
+        "first": 148,
+        "last": 148,
+        "min": 148,
+        "max": 148,
+        "snapshot_median": 148.0
+      },
+      "gpuTiles": {
+        "first": 4714,
+        "last": 5974,
+        "min": 4714,
+        "max": 6161,
+        "snapshot_median": 5914.0
+      },
+      "gpuResidency.liveBytes": {
+        "first": 2958222336,
+        "last": 3355108208,
+        "min": 2958222336,
+        "max": 3444561360,
+        "snapshot_median": 3383896016.0
+      },
+      "gpuResidency.committedGeometryBytes": {
+        "first": 3360346480,
+        "last": 3585165072,
+        "min": 3360346480,
+        "max": 3641380304,
+        "snapshot_median": 3610037400.0
+      },
+      "gpuResidency.opaquePayloadBytes": {
+        "first": 2844414080,
+        "last": 3227263568,
+        "min": 2844414080,
+        "max": 3300951648,
+        "snapshot_median": 3252891592.0
+      },
+      "gpuResidency.waterPayloadBytes": {
+        "first": 2896256,
+        "last": 3505824,
+        "min": 2896256,
+        "max": 3719184,
+        "snapshot_median": 3590496.0
+      },
+      "gpuResidency.coldTiles": {
+        "first": 566,
+        "last": 277,
+        "min": 144,
+        "max": 566,
+        "snapshot_median": 251.0
+      },
+      "gpuResidency.quads": {
+        "first": 135470152,
+        "last": 153400409,
+        "min": 135470152,
+        "max": 156819070,
+        "snapshot_median": 154591100.5
+      },
+      "gpuResidency.rectangles": {
+        "first": 121924639,
+        "last": 138696041,
+        "min": 121924639,
+        "max": 142315281,
+        "snapshot_median": 139961950.0
+      },
+      "memory.accountedMiB": {
+        "first": 3064,
+        "last": 3659,
+        "min": 3064,
+        "max": 4734,
+        "snapshot_median": 4036.5
+      },
+      "memory.workspaceMiB": {
+        "first": 128,
+        "last": 256,
+        "min": 0,
+        "max": 1280,
+        "snapshot_median": 640.0
+      },
+      "memory.heapFreeMiB": {
+        "first": 1976,
+        "last": 1362,
+        "min": 1185,
+        "max": 2889,
+        "snapshot_median": 2151.5
+      },
+      "surface.framePace.fps": {
+        "first": 27.7,
+        "last": 32.4,
+        "min": 22.3,
+        "max": 41.7,
+        "snapshot_median": 31.35
+      },
+      "surface.cpuBudget.cpu": {
+        "first": 0.087,
+        "last": 0.253,
+        "min": 0.069,
+        "max": 0.589,
+        "snapshot_median": 0.324
+      },
+      "surface.cpuBudget.active": {
+        "first": 0,
+        "last": 2,
+        "min": 0,
+        "max": 8,
+        "snapshot_median": 5.0
+      },
+      "surface.cpuBudget.limit": {
+        "first": 8,
+        "last": 8,
+        "min": 8,
+        "max": 8,
+        "snapshot_median": 8.0
+      },
+      "surface.cpuBudget.detail": {
+        "first": 0,
+        "last": 2,
+        "min": 0,
+        "max": 6,
+        "snapshot_median": 3.0
+      },
+      "surface.cpuCache.coldBytes": {
+        "first": 603341229,
+        "last": 893692165,
+        "min": 174363350,
+        "max": 1475398351,
+        "snapshot_median": 461093903.5
+      },
+      "surface.residency.ready": {
+        "first": 4621,
+        "last": 6046,
+        "min": 4621,
+        "max": 6206,
+        "snapshot_median": 6030.0
+      },
+      "surface.residency.desired": {
+        "first": 1812,
+        "last": 1832,
+        "min": 569,
+        "max": 1837,
+        "snapshot_median": 1821.0
+      }
+    },
+    "counter_deltas": {
+      "meshUploads": {
+        "first": 26115,
+        "last": 29692,
+        "delta": 3577
+      },
+      "preparedPlans": {
+        "first": 33296,
+        "last": 36710,
+        "delta": 3414
+      },
+      "reusedPlans": {
+        "first": 195268,
+        "last": 198682,
+        "delta": 3414
+      },
+      "indirect.planHits": {
+        "first": 370854,
+        "last": 370854,
+        "delta": 0
+      },
+      "indirect.planMisses": {
+        "first": 11382,
+        "last": 11382,
+        "delta": 0
+      },
+      "indirect.wholePlanHits": {
+        "first": 342654,
+        "last": 342654,
+        "delta": 0
+      },
+      "indirect.planContentChecks": {
+        "first": 9121,
+        "last": 9121,
+        "delta": 0
+      },
+      "gpuResidency.budgetEvictions": {
+        "first": 10506,
+        "last": 11591,
+        "delta": 1085
+      },
+      "gpuResidency.ownedEvictions": {
+        "first": 0,
+        "last": 0,
+        "delta": 0
+      },
+      "gpuResidency.restoreRequests": {
+        "first": 8242,
+        "last": 9459,
+        "delta": 1217
+      },
+      "gpuResidency.releasedBytes": {
+        "first": 4152153920,
+        "last": 4634068960,
+        "delta": 481915040
+      },
+      "wallIndex.builds": {
+        "first": 7271,
+        "last": 8062,
+        "delta": 791
+      },
+      "wallIndex.updated": {
+        "first": 333543,
+        "last": 365113,
+        "delta": 31570
+      },
+      "wallIndex.parallelMaskSurfaces": {
+        "first": 269670,
+        "last": 294767,
+        "delta": 25097
+      },
+      "surface.viewScheduling.visibleCpuMs": {
+        "first": 4344984,
+        "last": 4745453,
+        "delta": 400469
+      },
+      "surface.viewScheduling.backgroundCpuMs": {
+        "first": 252046,
+        "last": 282171,
+        "delta": 30125
+      },
+      "surface.cpuBudget.deferrals": {
+        "first": 524289,
+        "last": 529277,
+        "delta": 4988
+      },
+      "surface.cpuCache.evictions": {
+        "first": 9307,
+        "last": 9958,
+        "delta": 651
+      },
+      "surface.cpuCache.releasedBytes": {
+        "first": 3692172239,
+        "last": 3941332672,
+        "delta": 249160433
+      },
+      "surface.metadataCache.freezes": {
+        "first": 4552,
+        "last": 5109,
+        "delta": 557
+      },
+      "surface.metadataCache.restores": {
+        "first": 3452,
+        "last": 3963,
+        "delta": 511
+      },
+      "surface.meshCompression.compressed": {
+        "first": 13573,
+        "last": 15274,
+        "delta": 1701
+      },
+      "surface.meshCompression.savedBytes": {
+        "first": 8204807631,
+        "last": 9007990586,
+        "delta": 803182955
+      },
+      "surface.chunks": {
+        "first": 27904,
+        "last": 31621,
+        "delta": 3717
+      },
+      "surface.stageTotalMs.sample": {
+        "first": 2826365,
+        "last": 3067553,
+        "delta": 241188
+      },
+      "surface.stageTotalMs.surface": {
+        "first": 1329634,
+        "last": 1477587,
+        "delta": 147953
+      },
+      "surface.stageTotalMs.mesh": {
+        "first": 94020,
+        "last": 100249,
+        "delta": 6229
+      },
+      "surface.stageTotalMs.pack": {
+        "first": 148042,
+        "last": 157363,
+        "delta": 9321
+      },
+      "surface.stageDetailMs.disk": {
+        "first": 26324,
+        "last": 29092,
+        "delta": 2768
+      },
+      "surface.stageDetailMs.native": {
+        "first": 1723668,
+        "last": 1887572,
+        "delta": 163904
+      },
+      "surface.stageDetailMs.color": {
+        "first": 83583,
+        "last": 92162,
+        "delta": 8579
+      },
+      "surface.stageDetailMs.exterior": {
+        "first": 1012195,
+        "last": 1080169,
+        "delta": 67974
+      },
+      "surface.stageDetailMs.commit": {
+        "first": 495,
+        "last": 542,
+        "delta": 47
+      },
+      "surface.colorDetail.resolveMs": {
+        "first": 4765,
+        "last": 5272,
+        "delta": 507
+      },
+      "surface.colorDetail.tintMs": {
+        "first": 76374,
+        "last": 84188,
+        "delta": 7814
+      },
+      "surface.buildSources.diskHit": {
+        "first": 13746,
+        "last": 15853,
+        "delta": 2107
+      },
+      "surface.buildSources.diskMiss": {
+        "first": 5472,
+        "last": 5960,
+        "delta": 488
+      },
+      "surface.buildSources.finishedMeshRestores": {
+        "first": 11746,
+        "last": 13521,
+        "delta": 1775
+      },
+      "surface.scheduling.tilesBuilt": {
+        "first": 19064,
+        "last": 21634,
+        "delta": 2570
+      },
+      "surface.scheduling.queuedMs": {
+        "first": 1130405,
+        "last": 1208748,
+        "delta": 78343
+      },
+      "surface.admission.cpuBudget": {
+        "first": 524289,
+        "last": 529277,
+        "delta": 4988
+      },
+      "surface.admission.noDetailSlot": {
+        "first": 1686,
+        "last": 1723,
+        "delta": 37
+      },
+      "surface.disk.hits": {
+        "first": 143147,
+        "last": 156859,
+        "delta": 13712
+      },
+      "surface.disk.misses": {
+        "first": 31654,
+        "last": 35519,
+        "delta": 3865
+      },
+      "surface.disk.writes": {
+        "first": 38782,
+        "last": 43647,
+        "delta": 4865
+      },
+      "surface.disk.errors": {
+        "first": 0,
+        "last": 0,
+        "delta": 0
+      },
+      "surface.disk.meshHits": {
+        "first": 11793,
+        "last": 13572,
+        "delta": 1779
+      },
+      "surface.disk.meshMisses": {
+        "first": 12375,
+        "last": 13961,
+        "delta": 1586
+      },
+      "surface.disk.meshWrites": {
+        "first": 5406,
+        "last": 6066,
+        "delta": 660
+      },
+      "surface.disk.deferredEncodes": {
+        "first": 33376,
+        "last": 37581,
+        "delta": 4205
+      },
+      "surface.disk.deferredEncodeMs": {
+        "first": 60592,
+        "last": 67445,
+        "delta": 6853
+      },
+      "surface.javaPlacement.ms": {
+        "first": 1011381,
+        "last": 1141159,
+        "delta": 129778
+      },
+      "surface.javaPlacement.UNSUPPORTED": {
+        "first": 1250623,
+        "last": 1414310,
+        "delta": 163687
+      },
+      "surface.javaPlacement.TREE_MODEL": {
+        "first": 446478,
+        "last": 505989,
+        "delta": 59511
+      },
+      "surface.stageDetail.featureMs": {
+        "first": 239634,
+        "last": 270912,
+        "delta": 31278
+      },
+      "surface.stageDetail.uploadMs": {
+        "first": 1168,
+        "last": 1271,
+        "delta": 103
+      },
+      "surface.stageDetail.downloadMs": {
+        "first": 3149,
+        "last": 3650,
+        "delta": 501
+      },
+      "surface.biomeCache.loads": {
+        "first": 10628971,
+        "last": 11952050,
+        "delta": 1323079
+      },
+      "surface.biomeCache.evictions": {
+        "first": 10563435,
+        "last": 11886514,
+        "delta": 1323079
+      }
+    },
+    "gpu_interval_timers": {
+      "OPAQUE": {
+        "first_cumulative_mean_ms": 14.991,
+        "last_cumulative_mean_ms": 14.963,
+        "first_count": 6934,
+        "last_count": 7048,
+        "new_samples": 114,
+        "interval_mean_ms_from_rounded_totals": 13.259912280701668,
+        "rounding_error_bound_ms": 0.061324561403508775
+      },
+      "WATER": {
+        "first_cumulative_mean_ms": 0.085,
+        "last_cumulative_mean_ms": 0.085,
+        "first_count": 6933,
+        "last_count": 7047,
+        "new_samples": 114,
+        "interval_mean_ms_from_rounded_totals": 0.08499999999999948,
+        "rounding_error_bound_ms": 0.06131578947368421
+      },
+      "DEPTH_COPY": {
+        "first_cumulative_mean_ms": 0.167,
+        "last_cumulative_mean_ms": 0.165,
+        "first_count": 7623,
+        "last_count": 7851,
+        "new_samples": 228,
+        "interval_mean_ms_from_rounded_totals": 0.09813157894736753,
+        "rounding_error_bound_ms": 0.03393421052631579
+      },
+      "ANTIALIAS": {
+        "first_cumulative_mean_ms": 0.166,
+        "last_cumulative_mean_ms": 0.166,
+        "first_count": 6245,
+        "last_count": 6245,
+        "new_samples": 0,
+        "interval_mean_ms_from_rounded_totals": null,
+        "rounding_error_bound_ms": null
+      },
+      "HZB_REDUCE": {
+        "first_cumulative_mean_ms": 0.086,
+        "last_cumulative_mean_ms": 0.086,
+        "first_count": 35362,
+        "last_count": 35362,
+        "new_samples": 0,
+        "interval_mean_ms_from_rounded_totals": null,
+        "rounding_error_bound_ms": null
+      },
+      "GPU_FILTER": {
+        "first_cumulative_mean_ms": 0.034,
+        "last_cumulative_mean_ms": 0.034,
+        "first_count": 35362,
+        "last_count": 35362,
+        "new_samples": 0,
+        "interval_mean_ms_from_rounded_totals": null,
+        "rounding_error_bound_ms": null
+      },
+      "INDIRECT_SUBMIT": {
+        "first_cumulative_mean_ms": 0.251,
+        "last_cumulative_mean_ms": 0.251,
+        "first_count": 99132,
+        "last_count": 99132,
+        "new_samples": 0,
+        "interval_mean_ms_from_rounded_totals": null,
+        "rounding_error_bound_ms": null
+      }
+    },
+    "requests": {
+      "start": "2026-10-11T17:17:18.943000+08:00",
+      "end": "2026-10-11T17:19:09.599000+08:00",
+      "seconds": 110.656,
+      "deltas": {
+        "total": 68216,
+        "cacheHits": 0,
+        "diskHits": 0,
+        "diskMisses": 68216,
+        "distanceRejected": 0
+      },
+      "columns_per_second": 616.4690572585309,
+      "sampled_batch_count": 2324,
+      "distinct_logged_first_coordinates": 2324
+    }
+  },
+  "server_samples": {
+    "vss_stack_union_ms": 468.0,
+    "vss_stack_union_pct": 0.38999999999999996,
+    "vss_park_sample_ms": 72.0,
+    "vss_nonpark_sample_ms": 396.0,
+    "server_park_self_ms": 109752.0,
+    "last1m_mspt": {
+      "mean": 3.0730229166666665,
+      "max": 9.8085,
+      "min": 2.1139,
+      "median": 2.9938,
+      "percentile95": 4.2381
+    },
+    "within_profile_window_statistics": {
+      "29861823": {
+        "ticks": 468,
+        "cpu_process": 0.5358124653129701,
+        "cpu_system": 0.5932091559754711,
+        "tps": 20.0003352389525,
+        "mspt_median": 2.9938,
+        "mspt_max": 9.8085,
+        "players": 1,
+        "entities": 162,
+        "tile_entities": -1,
+        "chunks": 274,
+        "start_time": 1791709380000,
+        "end_time": 1791709403377,
+        "duration": 23377
+      },
+      "29861822": {
+        "ticks": 1200,
+        "cpu_process": 0.46279337674684207,
+        "cpu_system": 0.5734175227573975,
+        "tps": 20.00000120000007,
+        "mspt_median": 2.8982,
+        "mspt_max": 11.2838,
+        "players": 1,
+        "entities": 164,
+        "tile_entities": -1,
+        "chunks": 274,
+        "start_time": 1791709320000,
+        "end_time": 1791709380000,
+        "duration": 60000
+      },
+      "29861821": {
+        "ticks": 732,
+        "cpu_process": 0.39935313992798094,
+        "cpu_system": 0.5188732307970971,
+        "tps": 20.000297671097005,
+        "mspt_median": 1.6097,
+        "mspt_max": 14.4193,
+        "players": 1,
+        "entities": 98,
+        "tile_entities": -1,
+        "chunks": 274,
+        "start_time": 1791709283376,
+        "end_time": 1791709320000,
+        "duration": 36624
+      }
+    }
+  },
+  "server_period_prediction_worker_cpu": {
+    "visible_thread_cpu_ms": 576687,
+    "background_thread_cpu_ms": 49109,
+    "total_thread_cpu_ms": 625796,
+    "equivalent_logical_cpu_time_shares": 5.567035254556939,
+    "logical_processor_count": 16,
+    "machine_cpu_capacity_pct": 34.79397034098087,
+    "visible_classification_cpu_pct": 92.15255450658042,
+    "cpu_time_source": "ThreadMXBean.getCurrentThreadCpuTime, published on task completion",
+    "task_phase_accumulated_elapsed_ms": {
+      "sample": 478350,
+      "surface": 107636,
+      "mesh": 13710,
+      "pack": 20900
+    },
+    "task_phase_elapsed_share_pct": {
+      "sample": 77.07913038434022,
+      "surface": 17.343972568305308,
+      "mesh": 2.2091666720378473,
+      "pack": 3.3677303753166314
+    },
+    "phase_time_source": "System.nanoTime, summed across workers; not thread CPU time"
+  },
+  "server_period_log_evidence": {
+    "source": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\logs\\debug.log",
+    "render_window_start": "2026-10-11T17:01:27.722000+08:00",
+    "render_window_end": "2026-10-11T17:03:20.133000+08:00",
+    "render_window_seconds": 112.411,
+    "render_diagnostic_count": 23,
+    "gauges": {
+      "tiles": {
+        "first": 2572,
+        "last": 2907,
+        "min": 136,
+        "max": 3028,
+        "snapshot_median": 2725
+      },
+      "drawCallsCurrentPass": {
+        "first": 317,
+        "last": 420,
+        "min": 17,
+        "max": 452,
+        "snapshot_median": 321
+      },
+      "quadsCurrentPass": {
+        "first": 19861621,
+        "last": 18710896,
+        "min": 630225,
+        "max": 24166695,
+        "snapshot_median": 17216467
+      },
+      "opaquePageGroups": {
+        "first": 184,
+        "last": 190,
+        "min": 17,
+        "max": 207,
+        "snapshot_median": 181
+      },
+      "opaqueFallbacks": {
+        "first": 133,
+        "last": 230,
+        "min": 0,
+        "max": 265,
+        "snapshot_median": 128
+      },
+      "gpuTiles": {
+        "first": 5544,
+        "last": 6718,
+        "min": 5544,
+        "max": 6949,
+        "snapshot_median": 6718
+      },
+      "gpuResidency.liveBytes": {
+        "first": 2452734608,
+        "last": 2742511008,
+        "min": 2452734608,
+        "max": 2774946480,
+        "snapshot_median": 2737422032
+      },
+      "gpuResidency.committedGeometryBytes": {
+        "first": 2636668144,
+        "last": 2880385392,
+        "min": 2636668144,
+        "max": 2893535488,
+        "snapshot_median": 2864896912
+      },
+      "gpuResidency.opaquePayloadBytes": {
+        "first": 2337721472,
+        "last": 2606835760,
+        "min": 2337721472,
+        "max": 2647456992,
+        "snapshot_median": 2606835760
+      },
+      "gpuResidency.waterPayloadBytes": {
+        "first": 2977488,
+        "last": 3372944,
+        "min": 2977488,
+        "max": 3528528,
+        "snapshot_median": 3372944
+      },
+      "gpuResidency.coldTiles": {
+        "first": 560,
+        "last": 351,
+        "min": 4,
+        "max": 560,
+        "snapshot_median": 351
+      },
+      "gpuResidency.quads": {
+        "first": 110439374,
+        "last": 123249980,
+        "min": 110439374,
+        "max": 125083023,
+        "snapshot_median": 123249980
+      },
+      "gpuResidency.rectangles": {
+        "first": 102321726,
+        "last": 114003194,
+        "min": 102321726,
+        "max": 116003295,
+        "snapshot_median": 114003194
+      },
+      "memory.accountedMiB": {
+        "first": 3516,
+        "last": 4025,
+        "min": 3004,
+        "max": 4128,
+        "snapshot_median": 3946
+      },
+      "memory.workspaceMiB": {
+        "first": 768,
+        "last": 896,
+        "min": 0,
+        "max": 1024,
+        "snapshot_median": 896
+      },
+      "memory.heapFreeMiB": {
+        "first": 4714,
+        "last": 5213,
+        "min": 4421,
+        "max": 5403,
+        "snapshot_median": 4861
+      },
+      "surface.framePace.fps": {
+        "first": 52.5,
+        "last": 109.4,
+        "min": 21.2,
+        "max": 393.6,
+        "snapshot_median": 39.0
+      },
+      "surface.cpuBudget.cpu": {
+        "first": 0.521,
+        "last": 0.534,
+        "min": 0.374,
+        "max": 0.956,
+        "snapshot_median": 0.592
+      },
+      "surface.cpuBudget.active": {
+        "first": 6,
+        "last": 7,
+        "min": 0,
+        "max": 8,
+        "snapshot_median": 7
+      },
+      "surface.cpuBudget.limit": {
+        "first": 8,
+        "last": 8,
+        "min": 2,
+        "max": 8,
+        "snapshot_median": 8
+      },
+      "surface.cpuBudget.detail": {
+        "first": 6,
+        "last": 4,
+        "min": 0,
+        "max": 6,
+        "snapshot_median": 4
+      },
+      "surface.cpuCache.coldBytes": {
+        "first": 1212507943,
+        "last": 401242587,
+        "min": 140451207,
+        "max": 1889993873,
+        "snapshot_median": 488311989
+      },
+      "surface.residency.ready": {
+        "first": 6108,
+        "last": 7160,
+        "min": 6108,
+        "max": 7160,
+        "snapshot_median": 6911
+      },
+      "surface.residency.desired": {
+        "first": 1832,
+        "last": 1836,
+        "min": 966,
+        "max": 1876,
+        "snapshot_median": 1832
+      }
+    },
+    "counter_deltas": {
+      "meshUploads": {
+        "first": 8562,
+        "last": 12749,
+        "delta": 4187
+      },
+      "preparedPlans": {
+        "first": 6308,
+        "last": 11065,
+        "delta": 4757
+      },
+      "reusedPlans": {
+        "first": 167623,
+        "last": 167905,
+        "delta": 282
+      },
+      "indirect.planHits": {
+        "first": 345168,
+        "last": 354489,
+        "delta": 9321
+      },
+      "indirect.planMisses": {
+        "first": 6327,
+        "last": 10303,
+        "delta": 3976
+      },
+      "indirect.wholePlanHits": {
+        "first": 334163,
+        "last": 335636,
+        "delta": 1473
+      },
+      "indirect.planContentChecks": {
+        "first": 4811,
+        "last": 8201,
+        "delta": 3390
+      },
+      "gpuResidency.budgetEvictions": {
+        "first": 1730,
+        "last": 3210,
+        "delta": 1480
+      },
+      "gpuResidency.ownedEvictions": {
+        "first": 0,
+        "last": 0,
+        "delta": 0
+      },
+      "gpuResidency.restoreRequests": {
+        "first": 959,
+        "last": 2526,
+        "delta": 1567
+      },
+      "gpuResidency.releasedBytes": {
+        "first": 669343216,
+        "last": 1089366768,
+        "delta": 420023552
+      },
+      "wallIndex.builds": {
+        "first": 2432,
+        "last": 3875,
+        "delta": 1443
+      },
+      "wallIndex.updated": {
+        "first": 88407,
+        "last": 128080,
+        "delta": 39673
+      },
+      "wallIndex.parallelMaskSurfaces": {
+        "first": 63521,
+        "last": 93973,
+        "delta": 30452
+      },
+      "surface.viewScheduling.visibleCpuMs": {
+        "first": 1173828,
+        "last": 1750515,
+        "delta": 576687
+      },
+      "surface.viewScheduling.backgroundCpuMs": {
+        "first": 40203,
+        "last": 89312,
+        "delta": 49109
+      },
+      "surface.cpuBudget.deferrals": {
+        "first": 353417,
+        "last": 440185,
+        "delta": 86768
+      },
+      "surface.cpuCache.evictions": {
+        "first": 735,
+        "last": 1343,
+        "delta": 608
+      },
+      "surface.cpuCache.releasedBytes": {
+        "first": 337248616,
+        "last": 509946917,
+        "delta": 172698301
+      },
+      "surface.metadataCache.freezes": {
+        "first": 647,
+        "last": 1094,
+        "delta": 447
+      },
+      "surface.metadataCache.restores": {
+        "first": 409,
+        "last": 811,
+        "delta": 402
+      },
+      "surface.meshCompression.compressed": {
+        "first": 5668,
+        "last": 7120,
+        "delta": 1452
+      },
+      "surface.meshCompression.savedBytes": {
+        "first": 3364242433,
+        "last": 4055015989,
+        "delta": 690773556
+      },
+      "surface.chunks": {
+        "first": 8632,
+        "last": 10408,
+        "delta": 1776
+      },
+      "surface.stageTotalMs.sample": {
+        "first": 651808,
+        "last": 1130158,
+        "delta": 478350
+      },
+      "surface.stageTotalMs.surface": {
+        "first": 327285,
+        "last": 434921,
+        "delta": 107636
+      },
+      "surface.stageTotalMs.mesh": {
+        "first": 27093,
+        "last": 40803,
+        "delta": 13710
+      },
+      "surface.stageTotalMs.pack": {
+        "first": 47209,
+        "last": 68109,
+        "delta": 20900
+      },
+      "surface.stageDetailMs.disk": {
+        "first": 14230,
+        "last": 16795,
+        "delta": 2565
+      },
+      "surface.stageDetailMs.native": {
+        "first": 367614,
+        "last": 620638,
+        "delta": 253024
+      },
+      "surface.stageDetailMs.color": {
+        "first": 19262,
+        "last": 34388,
+        "delta": 15126
+      },
+      "surface.stageDetailMs.exterior": {
+        "first": 261903,
+        "last": 472697,
+        "delta": 210794
+      },
+      "surface.stageDetailMs.commit": {
+        "first": 128,
+        "last": 213,
+        "delta": 85
+      },
+      "surface.colorDetail.resolveMs": {
+        "first": 1341,
+        "last": 2050,
+        "delta": 709
+      },
+      "surface.colorDetail.tintMs": {
+        "first": 17196,
+        "last": 31229,
+        "delta": 14033
+      },
+      "surface.buildSources.diskHit": {
+        "first": 6676,
+        "last": 8063,
+        "delta": 1387
+      },
+      "surface.buildSources.diskMiss": {
+        "first": 1422,
+        "last": 2671,
+        "delta": 1249
+      },
+      "surface.buildSources.finishedMeshRestores": {
+        "first": 5598,
+        "last": 6773,
+        "delta": 1175
+      },
+      "surface.scheduling.tilesBuilt": {
+        "first": 8033,
+        "last": 10658,
+        "delta": 2625
+      },
+      "surface.scheduling.queuedMs": {
+        "first": 447540,
+        "last": 615765,
+        "delta": 168225
+      },
+      "surface.admission.cpuBudget": {
+        "first": 353417,
+        "last": 440185,
+        "delta": 86768
+      },
+      "surface.admission.noDetailSlot": {
+        "first": 223,
+        "last": 545,
+        "delta": 322
+      },
+      "surface.disk.hits": {
+        "first": 36437,
+        "last": 55467,
+        "delta": 19030
+      },
+      "surface.disk.misses": {
+        "first": 10951,
+        "last": 13528,
+        "delta": 2577
+      },
+      "surface.disk.writes": {
+        "first": 11840,
+        "last": 15884,
+        "delta": 4044
+      },
+      "surface.disk.errors": {
+        "first": 0,
+        "last": 0,
+        "delta": 0
+      },
+      "surface.disk.meshHits": {
+        "first": 5601,
+        "last": 6783,
+        "delta": 1182
+      },
+      "surface.disk.meshMisses": {
+        "first": 6086,
+        "last": 8118,
+        "delta": 2032
+      },
+      "surface.disk.meshWrites": {
+        "first": 1787,
+        "last": 2809,
+        "delta": 1022
+      },
+      "surface.disk.deferredEncodes": {
+        "first": 10053,
+        "last": 13075,
+        "delta": 3022
+      },
+      "surface.disk.deferredEncodeMs": {
+        "first": 16677,
+        "last": 23326,
+        "delta": 6649
+      },
+      "surface.javaPlacement.ms": {
+        "first": 269197,
+        "last": 335467,
+        "delta": 66270
+      },
+      "surface.javaPlacement.UNSUPPORTED": {
+        "first": 394871,
+        "last": 474749,
+        "delta": 79878
+      },
+      "surface.javaPlacement.TREE_MODEL": {
+        "first": 138148,
+        "last": 166528,
+        "delta": 28380
+      },
+      "surface.stageDetail.featureMs": {
+        "first": 63777,
+        "last": 77880,
+        "delta": 14103
+      },
+      "surface.stageDetail.uploadMs": {
+        "first": 406,
+        "last": 519,
+        "delta": 113
+      },
+      "surface.stageDetail.downloadMs": {
+        "first": 738,
+        "last": 961,
+        "delta": 223
+      },
+      "surface.biomeCache.loads": {
+        "first": 3459291,
+        "last": 4162047,
+        "delta": 702756
+      },
+      "surface.biomeCache.evictions": {
+        "first": 3393755,
+        "last": 4096511,
+        "delta": 702756
+      }
+    },
+    "gpu_interval_timers": {
+      "OPAQUE": {
+        "first_cumulative_mean_ms": 15.458,
+        "last_cumulative_mean_ms": 15.249,
+        "first_count": 5797,
+        "last_count": 5965,
+        "new_samples": 168,
+        "interval_mean_ms_from_rounded_totals": 8.037255952380985,
+        "rounding_error_bound_ms": 0.03500595238095238
+      },
+      "WATER": {
+        "first_cumulative_mean_ms": 0.08,
+        "last_cumulative_mean_ms": 0.079,
+        "first_count": 5797,
+        "last_count": 5965,
+        "new_samples": 168,
+        "interval_mean_ms_from_rounded_totals": 0.04449404761904775,
+        "rounding_error_bound_ms": 0.03500595238095238
+      },
+      "DEPTH_COPY": {
+        "first_cumulative_mean_ms": 0.179,
+        "last_cumulative_mean_ms": 0.18,
+        "first_count": 5798,
+        "last_count": 5966,
+        "new_samples": 168,
+        "interval_mean_ms_from_rounded_totals": 0.21451190476190482,
+        "rounding_error_bound_ms": 0.035011904761904765
+      },
+      "ANTIALIAS": {
+        "first_cumulative_mean_ms": 0.165,
+        "last_cumulative_mean_ms": 0.165,
+        "first_count": 5797,
+        "last_count": 5965,
+        "new_samples": 168,
+        "interval_mean_ms_from_rounded_totals": 0.16500000000000017,
+        "rounding_error_bound_ms": 0.03500595238095238
+      },
+      "HZB_REDUCE": {
+        "first_cumulative_mean_ms": 0.086,
+        "last_cumulative_mean_ms": 0.086,
+        "first_count": 32461,
+        "last_count": 33288,
+        "new_samples": 827,
+        "interval_mean_ms_from_rounded_totals": 0.08599999999999981,
+        "rounding_error_bound_ms": 0.039751511487303506
+      },
+      "GPU_FILTER": {
+        "first_cumulative_mean_ms": 0.034,
+        "last_cumulative_mean_ms": 0.034,
+        "first_count": 32461,
+        "last_count": 33288,
+        "new_samples": 827,
+        "interval_mean_ms_from_rounded_totals": 0.0340000000000002,
+        "rounding_error_bound_ms": 0.039751511487303506
+      },
+      "INDIRECT_SUBMIT": {
+        "first_cumulative_mean_ms": 0.258,
+        "last_cumulative_mean_ms": 0.255,
+        "first_count": 91976,
+        "last_count": 94652,
+        "new_samples": 2676,
+        "interval_mean_ms_from_rounded_totals": 0.15188789237668204,
+        "rounding_error_bound_ms": 0.03487070254110613
+      }
+    },
+    "requests": {
+      "start": "2026-10-11T17:01:26.833000+08:00",
+      "end": "2026-10-11T17:03:22.542000+08:00",
+      "seconds": 115.709,
+      "deltas": {
+        "total": 73122,
+        "cacheHits": 0,
+        "diskHits": 0,
+        "diskMisses": 73122,
+        "distanceRejected": 0
+      },
+      "columns_per_second": 631.9473852509312,
+      "sampled_batch_count": 2385,
+      "distinct_logged_first_coordinates": 1582
+    }
+  },
+  "source_inspection": {
+    "iris_direct_submission": {
+      "path": "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java",
+      "line": 1606
+    },
+    "normal_mdi_hiz_submission": {
+      "path": "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java",
+      "line": 1432
+    },
+    "worker_thread_cpu_accounting": {
+      "path": "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java",
+      "line": 480
+    }
+  },
+  "findings": [
+    "当前 Iris 预测路径逐瓦片提交；日志中 MDI、预测 Hi-Z 和 GPU 过滤增量为零。",
+    "可见分类占后台构建 CPU 约 93%，主要任务内部的地形采样和装饰仍很重。",
+    "不透明几何是显存载荷大头；1 GiB 预算是软目标，不能强行淘汰近处、接缝和回退覆盖。",
+    "服务端主线程当前负担较小，但未采样其磁盘和网络工作线程。"
+  ],
+  "limits": [
+    "Two profiles are different time windows and scenes, not a controlled A/B.",
+    "Each Spark file samples one thread only; background CPU comes from independent VSS counters.",
+    "No allocation or heap-dump evidence: no VSS allocation rate, exact retained memory, RSS, or leak attribution.",
+    "Geometry accounting is not total physical GPU VRAM usage.",
+    "GPU interval means are reconstructed from rounded cumulative totals; rounding bounds are supplied.",
+    "FPS and draw-call medians are diagnostic snapshot medians, not full-window per-frame averages.",
+    "Stage times and method stack weights overlap; do not add them to parent totals.",
+    "Integrated server direct delivery means column probe counts are not WAN byte rates.",
+    "No VSS request generation in these windows; chunky full-load performance is not measured."
+  ]
+}

@@ -1,0 +1,1751 @@
+{
+  "date": "2026-10-14",
+  "liveClientProfiled": false,
+  "clientLaunched": false,
+  "installedInstanceModified": false,
+  "githubPushed": false,
+  "newJarProduced": false,
+  "decision": "retain experiment and evidence; restore all production changes",
+  "device": "NVIDIA GeForce RTX 4070 Ti SUPER, OpenGL 4.6, NVIDIA 572.70",
+  "measurement": {
+    "isolated": "20 warmups, 41 alternating samples; GPU GL_TIME_ELAPSED",
+    "pipelined": "8 warmup blocks, 21 alternating blocks, 32 frames per block; finish at block boundaries",
+    "viewport": [
+      512,
+      512
+    ],
+    "isGameFps": false
+  },
+  "platforms": [
+    {
+      "platform": "neoforge",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "tests": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "pixelComparisonPairs": 81,
+        "depthComparisonPairs": 81
+      },
+      "productionRestored": true,
+      "productionSha256": {
+        "PredictionIndirectBatch": "51bdeaf8b6fd58554df62f20c42a22c18555521a28c2c7ea5bb2624efe6cc8f8",
+        "PredictionOcclusionCuller": "957ecf5aac4110226b9ffcdf76021f3f8c8baeb2efc343e659e6131aa4745371",
+        "PredictionVisiblePlan": "3de9a5cba56de3db63daea2b9e24845106ac0407f98b070c2261a6c3538562e1",
+        "PredictionRenderer": "861a24e43b1500bf62b30ae6e619908f673f44bd51046d547d00a44f80c01364"
+      },
+      "previousDeliveryVerified": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\loading-benefit-20261014\\vss-0.3.5-neoforge-1.21.1.jar",
+      "previousDeliverySha256": "8bf8d4fb85ca5690526bb65e849166e90f5815b3c042a17cf70750fd6d7bc461",
+      "experimentalSourceSha256": {
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalCandidateIndirectBatch.java": "f5e6b6edae45daeef2c5efa7151e95ab33d789e7c759496443fd3e64b7f16738",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalCandidateOcclusionCuller.java": "3649bc3ecd4db8b389faab5faa16bfa20befdbf2cad927a14900cf6c6762cf87",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalCandidateVisiblePlan.java": "e2da35404919c39ea512fe168041278319c8be1c27c3d7057dc74928431c70ad",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalExperimentBatch.java": "728aab890d6abb14b56e386497c3f5d392c8d76fffb03393a49e927344478269",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalExperimentVisiblePlan.java": "52c451de760c56c2c21d0f6b3fd53ce1b0dca4f2e37cb4d2b75e7287a047a60c",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalGpuCommandSelector.java": "0f15354e66cc2a4c33fe0b35d140ca2992063c1647cf0bc1faf3dca0935b0615",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionGpuTraversalExperimentTest.java": "a85c0f3e03b9d7b8dc609ebc7be9378d6991ae02672a8bdbd97bca3154c72af3",
+        "tools/prediction/gpu-traversal-tests.gradle": "bd2a122584904f58c8c1ff72808339b9e26e902a3bf25628776ac9db13119a86"
+      },
+      "rawResultSha256": {
+        "production-gpu-traversal.csv": "cd54350785364cf26208440d156af53f0ccc006af4f6c315a475fe8dcd247190",
+        "production-gpu-traversal-throughput.csv": "c1372bf08471b619fde528e73947de5c973a9830fa0bdfbc57d7aa8124c98d55"
+      },
+      "cases": [
+        {
+          "tiles": 128,
+          "fixture": "terrain-grid",
+          "sourceQuads": 131072,
+          "scenario": "stationary-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 51700,
+                "p95Ns": 120400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 146432,
+                "p95Ns": 150528,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 47371.875,
+                "p95Ns": 83665.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 127000,
+                "p95Ns": 183600,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 208896,
+                "p95Ns": 212992,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 100746.875,
+                "p95Ns": 124200.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -112.67233986410714
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 129600,
+                "p95Ns": 229700,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 214016,
+                "p95Ns": 219136,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 97353.125,
+                "p95Ns": 120787.5,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -105.50827891021837
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 138200,
+                "p95Ns": 216000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 246784,
+                "p95Ns": 250880,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 110600.0,
+                "p95Ns": 128584.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -133.47186489874002
+            }
+          ]
+        },
+        {
+          "tiles": 128,
+          "fixture": "terrain-grid",
+          "sourceQuads": 131072,
+          "scenario": "turning-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 207300,
+                "p95Ns": 423400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 148480,
+                "p95Ns": 165888,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 64553.125,
+                "p95Ns": 94915.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 22,
+              "medianUploadedBytes": 1848,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 113000,
+                "p95Ns": 167000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 163840,
+                "p95Ns": 172032,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 87350.0,
+                "p95Ns": 119150.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -35.31490535895823
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 111500,
+                "p95Ns": 173600,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 175104,
+                "p95Ns": 186368,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 91415.625,
+                "p95Ns": 108396.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -41.61301253812266
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 120200,
+                "p95Ns": 198000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 201728,
+                "p95Ns": 209920,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 103709.375,
+                "p95Ns": 185475.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -60.65740426973907
+            }
+          ]
+        },
+        {
+          "tiles": 128,
+          "fixture": "terrain-grid",
+          "sourceQuads": 131072,
+          "scenario": "turning-current-frame-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 348900,
+                "p95Ns": 559200,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 175104,
+                "p95Ns": 207872,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 136481.25,
+                "p95Ns": 176078.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 22,
+              "medianUploadedBytes": 5984,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 174400,
+                "p95Ns": 247200,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 215040,
+                "p95Ns": 221184,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 135240.625,
+                "p95Ns": 150521.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.9090076475706366
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 178000,
+                "p95Ns": 267100,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 223232,
+                "p95Ns": 235520,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 135771.875,
+                "p95Ns": 161784.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.519760040298578
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 175200,
+                "p95Ns": 210900,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 247808,
+                "p95Ns": 257024,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 149609.375,
+                "p95Ns": 182484.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -9.618995283234867
+            }
+          ]
+        },
+        {
+          "tiles": 1024,
+          "fixture": "terrain-grid",
+          "sourceQuads": 1048576,
+          "scenario": "stationary-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 33600,
+                "p95Ns": 51700,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 100352,
+                "p95Ns": 103424,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 119025.0,
+                "p95Ns": 154265.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 114200,
+                "p95Ns": 148800,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 152576,
+                "p95Ns": 155648,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 201368.75,
+                "p95Ns": 222484.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -69.1818945599664
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 118000,
+                "p95Ns": 141500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 157696,
+                "p95Ns": 160768,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 204859.375,
+                "p95Ns": 229128.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -72.11457676958621
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 148300,
+                "p95Ns": 214100,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 217088,
+                "p95Ns": 238592,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 262909.375,
+                "p95Ns": 303878.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -120.88584331022894
+            }
+          ]
+        },
+        {
+          "tiles": 1024,
+          "fixture": "terrain-grid",
+          "sourceQuads": 1048576,
+          "scenario": "turning-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 311000,
+                "p95Ns": 562400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 136192,
+                "p95Ns": 155648,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 234946.875,
+                "p95Ns": 275393.75,
+                "samples": 21
+              },
+              "medianEncodedItems": 199,
+              "medianUploadedBytes": 16716,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 109300,
+                "p95Ns": 174700,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 163840,
+                "p95Ns": 183296,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 209178.125,
+                "p95Ns": 229987.5,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 10.967904978519083
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 105400,
+                "p95Ns": 130600,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 166912,
+                "p95Ns": 172032,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 205471.875,
+                "p95Ns": 220628.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 12.545389250229444
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 140900,
+                "p95Ns": 193500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 227328,
+                "p95Ns": 415744,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 269415.625,
+                "p95Ns": 296693.75,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -14.670869744490101
+            }
+          ]
+        },
+        {
+          "tiles": 1024,
+          "fixture": "terrain-grid",
+          "sourceQuads": 1048576,
+          "scenario": "turning-current-frame-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 563200,
+                "p95Ns": 800400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 198656,
+                "p95Ns": 456704,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 354921.875,
+                "p95Ns": 387718.75,
+                "samples": 21
+              },
+              "medianEncodedItems": 199,
+              "medianUploadedBytes": 54128,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 210600,
+                "p95Ns": 331000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 236544,
+                "p95Ns": 411648,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 291412.5,
+                "p95Ns": 324284.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 17.89390270746203
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 210100,
+                "p95Ns": 330900,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 265216,
+                "p95Ns": 474112,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 303028.125,
+                "p95Ns": 316896.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 14.621175434734756
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 262400,
+                "p95Ns": 386500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 310272,
+                "p95Ns": 518144,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 363803.125,
+                "p95Ns": 392818.75,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -2.502311248073963
+            }
+          ]
+        },
+        {
+          "tiles": 1025,
+          "fixture": "mixed-terrain-seams",
+          "sourceQuads": 393920,
+          "scenario": "stationary-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 31200,
+                "p95Ns": 53500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 43008,
+                "p95Ns": 45056,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 46025.0,
+                "p95Ns": 63065.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 65000,
+                "p95Ns": 91800,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 91136,
+                "p95Ns": 96256,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 111778.125,
+                "p95Ns": 136756.25,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -142.86393264530147
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 62300,
+                "p95Ns": 77200,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 88064,
+                "p95Ns": 95232,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 117746.875,
+                "p95Ns": 133646.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -155.83242802824552
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 83800,
+                "p95Ns": 141500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 133120,
+                "p95Ns": 147456,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 171746.875,
+                "p95Ns": 192131.25,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -273.1599674090168
+            }
+          ]
+        },
+        {
+          "tiles": 1025,
+          "fixture": "mixed-terrain-seams",
+          "sourceQuads": 393920,
+          "scenario": "turning-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 194000,
+                "p95Ns": 320000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 70656,
+                "p95Ns": 87040,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 133912.5,
+                "p95Ns": 177956.25,
+                "samples": 21
+              },
+              "medianEncodedItems": 223,
+              "medianUploadedBytes": 18732,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 46900,
+                "p95Ns": 80700,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 92160,
+                "p95Ns": 98304,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 112606.25,
+                "p95Ns": 146134.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 15.910575935778958
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 42800,
+                "p95Ns": 70100,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 94208,
+                "p95Ns": 100352,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 117128.125,
+                "p95Ns": 142587.5,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 12.53383739382059
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 58900,
+                "p95Ns": 102400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 136192,
+                "p95Ns": 149504,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 186559.375,
+                "p95Ns": 208971.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -39.3143843927938
+            }
+          ]
+        },
+        {
+          "tiles": 1025,
+          "fixture": "mixed-terrain-seams",
+          "sourceQuads": 393920,
+          "scenario": "turning-current-frame-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 263700,
+                "p95Ns": 402900,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 138240,
+                "p95Ns": 165888,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 197753.125,
+                "p95Ns": 265515.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 223,
+              "medianUploadedBytes": 36980,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 78600,
+                "p95Ns": 114500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 168960,
+                "p95Ns": 200704,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 204993.75,
+                "p95Ns": 227925.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -3.661446563739501
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 73000,
+                "p95Ns": 128800,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 175104,
+                "p95Ns": 190464,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 211634.375,
+                "p95Ns": 248493.75,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -7.019484521420338
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 98800,
+                "p95Ns": 172300,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 237568,
+                "p95Ns": 266240,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 257206.25,
+                "p95Ns": 297215.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -30.064316303471816
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "tests": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "pixelComparisonPairs": 81,
+        "depthComparisonPairs": 81
+      },
+      "productionRestored": true,
+      "productionSha256": {
+        "PredictionIndirectBatch": "51bdeaf8b6fd58554df62f20c42a22c18555521a28c2c7ea5bb2624efe6cc8f8",
+        "PredictionOcclusionCuller": "957ecf5aac4110226b9ffcdf76021f3f8c8baeb2efc343e659e6131aa4745371",
+        "PredictionVisiblePlan": "e92958dd3799ff1fe758cbaacb48f73a38a8965799598baa4f7d48338b57f5e1",
+        "PredictionRenderer": "b39e155da3f5dfaf8bce59eb4f9e2c3ea9ef0d6bd469c6270644df5be9b41a97"
+      },
+      "previousDeliveryVerified": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\loading-benefit-20261014\\vss-0.3.5-forge-1.20.1.jar",
+      "previousDeliverySha256": "3668f776274cf5c8b572a842f40a0ac5a8f124e73c14fa1dce22d998b48e61d1",
+      "experimentalSourceSha256": {
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalCandidateIndirectBatch.java": "f5e6b6edae45daeef2c5efa7151e95ab33d789e7c759496443fd3e64b7f16738",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalCandidateOcclusionCuller.java": "3649bc3ecd4db8b389faab5faa16bfa20befdbf2cad927a14900cf6c6762cf87",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalCandidateVisiblePlan.java": "e2da35404919c39ea512fe168041278319c8be1c27c3d7057dc74928431c70ad",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalExperimentBatch.java": "728aab890d6abb14b56e386497c3f5d392c8d76fffb03393a49e927344478269",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalExperimentVisiblePlan.java": "52c451de760c56c2c21d0f6b3fd53ce1b0dca4f2e37cb4d2b75e7287a047a60c",
+        "tools/prediction/gpu-traversal-experiments/candidate-src/dev/xantha/vss/client/prediction/TraversalGpuCommandSelector.java": "0f15354e66cc2a4c33fe0b35d140ca2992063c1647cf0bc1faf3dca0935b0615",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionGpuTraversalExperimentTest.java": "a85c0f3e03b9d7b8dc609ebc7be9378d6991ae02672a8bdbd97bca3154c72af3",
+        "tools/prediction/gpu-traversal-tests.gradle": "bd2a122584904f58c8c1ff72808339b9e26e902a3bf25628776ac9db13119a86"
+      },
+      "rawResultSha256": {
+        "production-gpu-traversal.csv": "f98b76f9224dd0d5caa1933071822571d8c664175c5fb048705318bdb5cd5c0a",
+        "production-gpu-traversal-throughput.csv": "30702b1f4633cd3282516a40f32a5a8f3f9d4860830f59bae4e86dbfd5c204a5"
+      },
+      "cases": [
+        {
+          "tiles": 128,
+          "fixture": "terrain-grid",
+          "sourceQuads": 131072,
+          "scenario": "stationary-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 46600,
+                "p95Ns": 132500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 119808,
+                "p95Ns": 121856,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 47156.25,
+                "p95Ns": 125834.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 128400,
+                "p95Ns": 206300,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 173056,
+                "p95Ns": 175104,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 88815.625,
+                "p95Ns": 161778.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -88.34327369118623
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 125100,
+                "p95Ns": 250400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 176128,
+                "p95Ns": 180224,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 98450.0,
+                "p95Ns": 138046.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -108.77402253147781
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 131000,
+                "p95Ns": 226800,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 204800,
+                "p95Ns": 209920,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 101746.875,
+                "p95Ns": 136893.75,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -115.76540755467195
+            }
+          ]
+        },
+        {
+          "tiles": 128,
+          "fixture": "terrain-grid",
+          "sourceQuads": 131072,
+          "scenario": "turning-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 202800,
+                "p95Ns": 303600,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 138240,
+                "p95Ns": 151552,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 65281.25,
+                "p95Ns": 92775.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 22,
+              "medianUploadedBytes": 1848,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 103700,
+                "p95Ns": 206400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 150528,
+                "p95Ns": 156672,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 91584.375,
+                "p95Ns": 116806.25,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -40.2920057443753
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 103900,
+                "p95Ns": 144400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 159744,
+                "p95Ns": 168960,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 87465.625,
+                "p95Ns": 111275.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -33.982766874102445
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 107400,
+                "p95Ns": 183000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 184320,
+                "p95Ns": 196608,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 110440.625,
+                "p95Ns": 139887.5,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -69.17663954044997
+            }
+          ]
+        },
+        {
+          "tiles": 128,
+          "fixture": "terrain-grid",
+          "sourceQuads": 131072,
+          "scenario": "turning-current-frame-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 341000,
+                "p95Ns": 567500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 168960,
+                "p95Ns": 197632,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 134821.875,
+                "p95Ns": 143875.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 22,
+              "medianUploadedBytes": 5984,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 165700,
+                "p95Ns": 212700,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 206848,
+                "p95Ns": 214016,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 125406.25,
+                "p95Ns": 151171.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 6.983751709431429
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 171400,
+                "p95Ns": 240000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 215040,
+                "p95Ns": 223232,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 130350.0,
+                "p95Ns": 152496.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 3.3168764341839907
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 167700,
+                "p95Ns": 234100,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 241664,
+                "p95Ns": 254976,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 142521.875,
+                "p95Ns": 171228.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -5.711239366757059
+            }
+          ]
+        },
+        {
+          "tiles": 1024,
+          "fixture": "terrain-grid",
+          "sourceQuads": 1048576,
+          "scenario": "stationary-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 20400,
+                "p95Ns": 39600,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 100352,
+                "p95Ns": 103424,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 116059.375,
+                "p95Ns": 150684.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 102100,
+                "p95Ns": 144300,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 152576,
+                "p95Ns": 158720,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 201537.5,
+                "p95Ns": 222050.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -73.65034061229436
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 104200,
+                "p95Ns": 131600,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 158720,
+                "p95Ns": 159744,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 209209.375,
+                "p95Ns": 242984.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -80.26064245133149
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 134500,
+                "p95Ns": 194800,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 217088,
+                "p95Ns": 420864,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 270850.0,
+                "p95Ns": 306940.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -133.37192708473572
+            }
+          ]
+        },
+        {
+          "tiles": 1024,
+          "fixture": "terrain-grid",
+          "sourceQuads": 1048576,
+          "scenario": "turning-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 270400,
+                "p95Ns": 428000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 136192,
+                "p95Ns": 154624,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 200090.625,
+                "p95Ns": 234884.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 199,
+              "medianUploadedBytes": 16716,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 107800,
+                "p95Ns": 146900,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 162816,
+                "p95Ns": 184320,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 204012.5,
+                "p95Ns": 216853.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -1.9600493526370943
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 107000,
+                "p95Ns": 134700,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 166912,
+                "p95Ns": 175104,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 213421.875,
+                "p95Ns": 240525.0,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -6.662606006653227
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 145500,
+                "p95Ns": 330200,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 228352,
+                "p95Ns": 480256,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 268387.5,
+                "p95Ns": 306418.75,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -34.13297099751675
+            }
+          ]
+        },
+        {
+          "tiles": 1024,
+          "fixture": "terrain-grid",
+          "sourceQuads": 1048576,
+          "scenario": "turning-current-frame-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 576900,
+                "p95Ns": 806000,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 198656,
+                "p95Ns": 404480,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 319781.25,
+                "p95Ns": 388756.25,
+                "samples": 21
+              },
+              "medianEncodedItems": 199,
+              "medianUploadedBytes": 54128,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 250300,
+                "p95Ns": 383400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 237568,
+                "p95Ns": 851968,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 282109.375,
+                "p95Ns": 303471.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 11.780514023258082
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 226200,
+                "p95Ns": 350300,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 256000,
+                "p95Ns": 293888,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 288825.0,
+                "p95Ns": 306896.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 9.68044561712108
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 300400,
+                "p95Ns": 401300,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 325632,
+                "p95Ns": 487424,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 383734.375,
+                "p95Ns": 399528.125,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -19.99902276947132
+            }
+          ]
+        },
+        {
+          "tiles": 1025,
+          "fixture": "mixed-terrain-seams",
+          "sourceQuads": 393920,
+          "scenario": "stationary-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 12600,
+                "p95Ns": 37100,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 43008,
+                "p95Ns": 45056,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 48828.125,
+                "p95Ns": 70896.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 48000,
+                "p95Ns": 69800,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 90112,
+                "p95Ns": 97280,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 110590.625,
+                "p95Ns": 130012.5,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -126.48959999999998
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 44600,
+                "p95Ns": 90300,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 90112,
+                "p95Ns": 95232,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 111115.625,
+                "p95Ns": 135165.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -127.56479999999999
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 70000,
+                "p95Ns": 131500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 134144,
+                "p95Ns": 147456,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 159643.75,
+                "p95Ns": 177509.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -226.9504
+            }
+          ]
+        },
+        {
+          "tiles": 1025,
+          "fixture": "mixed-terrain-seams",
+          "sourceQuads": 393920,
+          "scenario": "turning-no-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 182400,
+                "p95Ns": 332400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 71680,
+                "p95Ns": 86016,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 126359.375,
+                "p95Ns": 162096.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 223,
+              "medianUploadedBytes": 18732,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 44600,
+                "p95Ns": 68200,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 92160,
+                "p95Ns": 100352,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 111468.75,
+                "p95Ns": 124996.875,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 11.784345245455674
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 39800,
+                "p95Ns": 64600,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 94208,
+                "p95Ns": 99328,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 117153.125,
+                "p95Ns": 140009.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": 7.2857672808210765
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 56000,
+                "p95Ns": 87800,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 138240,
+                "p95Ns": 152576,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 173231.25,
+                "p95Ns": 194959.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -37.09410164461482
+            }
+          ]
+        },
+        {
+          "tiles": 1025,
+          "fixture": "mixed-terrain-seams",
+          "sourceQuads": 393920,
+          "scenario": "turning-current-frame-hiz",
+          "modes": [
+            {
+              "mode": "production-cpu-selection",
+              "cpuSubmissionWall": {
+                "medianNs": 256800,
+                "p95Ns": 392300,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 138240,
+                "p95Ns": 168960,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 198534.375,
+                "p95Ns": 226215.625,
+                "samples": 21
+              },
+              "medianEncodedItems": 223,
+              "medianUploadedBytes": 36980,
+              "pipelinedTimeReductionPercent": 0.0
+            },
+            {
+              "mode": "gpu-flat-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 76200,
+                "p95Ns": 132500,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 167936,
+                "p95Ns": 194560,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 207334.375,
+                "p95Ns": 243987.5,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -4.43248178054807
+            },
+            {
+              "mode": "gpu-coarse-compact",
+              "cpuSubmissionWall": {
+                "medianNs": 70100,
+                "p95Ns": 119900,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 174080,
+                "p95Ns": 183296,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 218125.0,
+                "p95Ns": 244434.375,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -9.867623679778381
+            },
+            {
+              "mode": "gpu-queued-traversal",
+              "cpuSubmissionWall": {
+                "medianNs": 96100,
+                "p95Ns": 170400,
+                "samples": 41
+              },
+              "gpuQueryElapsed": {
+                "medianNs": 239616,
+                "p95Ns": 606208,
+                "samples": 41
+              },
+              "pipelinedWallPerPass": {
+                "medianNs": 269750.0,
+                "p95Ns": 304262.5,
+                "samples": 21
+              },
+              "medianEncodedItems": 0,
+              "medianUploadedBytes": 0,
+              "pipelinedTimeReductionPercent": -35.8706773071414
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

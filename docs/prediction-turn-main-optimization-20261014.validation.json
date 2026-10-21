@@ -1,0 +1,532 @@
+{
+  "date": "2026-10-14",
+  "liveClientProfiled": false,
+  "clientLaunched": false,
+  "installedInstanceModified": false,
+  "githubPushed": false,
+  "platforms": [
+    {
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "version": "0.3.5-neoforge-1.21.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\turn-main-20261014\\vss-0.3.5-neoforge-1.21.1.jar",
+      "jarBytes": 6000223,
+      "jarSha256": "6c3506d921ae0284b1e7f3cef66cf9d98ac486b841dd9e1cfbe94b8fcb51f53a",
+      "javaClassMajor": 65,
+      "cpu": {
+        "tests": 201,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:12"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCpuCachePolicyTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T00:50:13"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDemandLifecycleTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T00:50:13"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:14"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:14"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T00:50:14"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingSettingsTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T00:50:16"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+            "tests": 18,
+            "timestamp": "2026-10-14T00:50:16"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMediumCoverageTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T00:50:17"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryLifecycleTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:17"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMotionPaceTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+            "tests": 6,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementConvergenceTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScreenDetailTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+            "tests": 11,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+            "tests": 12,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionViewRefinementTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVisibilityFeedbackTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVisibleHandoffTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+            "tests": 19,
+            "timestamp": "2026-10-14T00:50:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWorkViewTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:25"
+          }
+        ]
+      },
+      "gpu": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:26"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:34"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:40"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:46"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:52"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:54"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:03"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRenderTargetGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:08"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:23"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainGpuTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:51:30"
+          }
+        ]
+      },
+      "sourcesSha256": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionOpaqueBatches.java": "d0d701f1f8f710c9cf2fbff5f000b63e1404ebf0f030ff9883385e2c61c6158d",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java": "51bdeaf8b6fd58554df62f20c42a22c18555521a28c2c7ea5bb2624efe6cc8f8",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionOcclusionPolicy.java": "87da142a06de015eee81a18e1c2c6ecd05f971ff062606f519d16f4ea4ad8433",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVanillaMask.java": "54689665168757781604c483283af73046199bac150de62d09ff966385c1b368",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSeamPreparation.java": "5f58b729402b696381ce8a9f56fec2033952e9423087783d5d53bdc331413c67",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionDemandPreparation.java": "15bb746eb9ff7dbdf8ddbe58bff0f9b3dd3f3f84a27e42a2ae1cc9126d51d951",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java": "ee1655cdfbc953b889791c914e83d85b3502455ba5aa9625c094cf0693e1d25b",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java": "ae9de12c0c3c4a331f4997512839d6fb8e841277ec8c8826ef86a46fe3e59d23",
+        "src/main/java/dev/xantha/vss/client/prediction/ClientPredictionState.java": "6ca8e81f3fed14e017fba83e84faf4d95a8096a475bc16b77b496e6e5d9a0ff7",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderResidency.java": "173d7a717d4002d8504e5888223805613fc5b607ea44007db70de6ff3cbbf589",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverage.java": "608ee4d27c0965fbb6167b097bb1e5a7e0c97837e40e8feb25af9687d7403d22",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderTimings.java": "9dd61a313408c6db65ec9af15d5294e2eeb770b240844b3ce7f11d04ffdd7581",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMotionPace.java": "3acced0649279bf53fdfa0a699a8ed5f80bbb718f7e5b83a556ff11524040e2c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLodSeams.java": "fbb8404bf8352f6d1ed5350e6a287907f9bdcc9801ad6d3582adff42f147336e",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRealBoundarySeams.java": "194c2d5d32b515efae66f936fafe99124efd0b413e32d1e11656a005b7bbdb6b",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuTile.java": "8d0ef1968528a497e7ea411d05ff7b714a2e08456935857e988b9ea5bfcdaa62",
+        "src/main/java/dev/xantha/vss/mixin/client/LevelRendererPredictionMaskMixin.java": "e12c50825ac755a115d1bf388394666e94ce8fdde623e3b99b8aeeb8af82143b"
+      },
+      "nativeSha256": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      },
+      "maskMixinTargets": {
+        "setSectionDirty": "(IIIZ)V",
+        "allChanged": "()V"
+      }
+    },
+    {
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "version": "0.3.5-forge-1.20.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\turn-main-20261014\\vss-0.3.5-forge-1.20.1.jar",
+      "jarBytes": 6670547,
+      "jarSha256": "c6b8faa086a8ff74990102231fa835d9dc3da9e3a673fabbfb2fd8434266149c",
+      "javaClassMajor": 61,
+      "cpu": {
+        "tests": 199,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:23"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCpuCachePolicyTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T00:50:24"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDemandLifecycleTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T00:50:24"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+            "tests": 13,
+            "timestamp": "2026-10-14T00:50:26"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingSettingsTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T00:50:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+            "tests": 18,
+            "timestamp": "2026-10-14T00:50:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMediumCoverageTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T00:50:29"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryLifecycleTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:30"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMotionPaceTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:32"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T00:50:32"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:32"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+            "tests": 6,
+            "timestamp": "2026-10-14T00:50:32"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementConvergenceTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:32"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:33"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:33"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:33"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScreenDetailTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T00:50:34"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:34"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T00:50:34"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+            "tests": 11,
+            "timestamp": "2026-10-14T00:50:35"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T00:50:35"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:35"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+            "tests": 12,
+            "timestamp": "2026-10-14T00:50:36"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionViewRefinementTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T00:50:36"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVisibilityFeedbackTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:36"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:36"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:50:37"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+            "tests": 20,
+            "timestamp": "2026-10-14T00:50:37"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWorkViewTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T00:50:43"
+          }
+        ]
+      },
+      "gpu": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:44"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:51"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:50:57"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:03"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:09"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:10"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:20"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRenderTargetGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T00:51:39"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainGpuTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T00:51:44"
+          }
+        ]
+      },
+      "sourcesSha256": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionOpaqueBatches.java": "a31a5d4c23e582ccf1a60035e5afddd1c04f779881e977573b907691b714062b",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java": "51bdeaf8b6fd58554df62f20c42a22c18555521a28c2c7ea5bb2624efe6cc8f8",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionOcclusionPolicy.java": "87da142a06de015eee81a18e1c2c6ecd05f971ff062606f519d16f4ea4ad8433",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVanillaMask.java": "3423df31e0704df223021534372eac18de8b1a8596fd14b1dd5a02bfe492d6b9",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSeamPreparation.java": "5f58b729402b696381ce8a9f56fec2033952e9423087783d5d53bdc331413c67",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionDemandPreparation.java": "15bb746eb9ff7dbdf8ddbe58bff0f9b3dd3f3f84a27e42a2ae1cc9126d51d951",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java": "0b5c66006efec295112d6f0b1bdd753e3ea1538f53346c6d674d33dce62e0045",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java": "e75fea9fe1d3bafd1db987ea302a261f4c4c16a2fd338cc49ff313b59ecd02dc",
+        "src/main/java/dev/xantha/vss/client/prediction/ClientPredictionState.java": "89788e6d31d7e9b7c3ad0a00f9f4320cc6f41d6d8deebd78060c45e6fb8667f8",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderResidency.java": "ddb8b50eee1d41716eae717de4e97b263dc8b54934d2a98bed2a2cc33e36c03c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverage.java": "608ee4d27c0965fbb6167b097bb1e5a7e0c97837e40e8feb25af9687d7403d22",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderTimings.java": "b6b4b5f60c8f43c0e9053c19e1b69e8aa18f66ccdf13ef0bf6d92bf4a3a6bc3e",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMotionPace.java": "3acced0649279bf53fdfa0a699a8ed5f80bbb718f7e5b83a556ff11524040e2c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLodSeams.java": "fbb8404bf8352f6d1ed5350e6a287907f9bdcc9801ad6d3582adff42f147336e",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRealBoundarySeams.java": "ff4f904e76149fd75e3a12e6cbefd9224a872bed1ea12c1bb35b3455e1dcd796",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuTile.java": "84be5527d5a5a8beb295cb8d7777c85892133672ab1d882daed8872e3c46b310",
+        "src/main/java/dev/xantha/vss/mixin/client/LevelRendererPredictionMaskMixin.java": "65a12c9dc455d389e75b060bb71f34c3fd3287ad13158d33e04a011a660e2fa1"
+      },
+      "nativeSha256": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      },
+      "maskMixinTargets": {
+        "allChanged": "Lnet/minecraft/client/renderer/LevelRenderer;m_109818_()V",
+        "setSectionDirty(IIIZ)V": "Lnet/minecraft/client/renderer/LevelRenderer;m_109501_(IIIZ)V"
+      }
+    }
+  ]
+}

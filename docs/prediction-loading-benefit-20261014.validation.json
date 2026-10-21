@@ -1,0 +1,1301 @@
+{
+  "date": "2026-10-14",
+  "liveClientProfiled": false,
+  "clientLaunched": false,
+  "installedInstanceModified": false,
+  "githubPushed": false,
+  "platforms": [
+    {
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "version": "0.3.5-neoforge-1.21.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\loading-benefit-20261014\\vss-0.3.5-neoforge-1.21.1.jar",
+      "jarBytes": 6053931,
+      "jarSha256": "8bf8d4fb85ca5690526bb65e849166e90f5815b3c042a17cf70750fd6d7bc461",
+      "javaClassMajor": 65,
+      "cpu": {
+        "tests": 227,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:55"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCpuCachePolicyTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:02:55"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDemandLifecycleTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T03:02:55"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:56"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:56"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T03:02:56"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingBenefitTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:54"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingProgressIntegrationTest",
+            "tests": 6,
+            "timestamp": "2026-10-14T03:02:58"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingSettingsTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T03:02:58"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+            "tests": 18,
+            "timestamp": "2026-10-14T03:02:58"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMainReductionTest",
+            "tests": 9,
+            "timestamp": "2026-10-14T03:02:59"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMediumCoverageTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:02:59"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryLifecycleTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:59"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMotionPaceTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+            "tests": 6,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementConvergenceTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScreenDetailTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+            "tests": 11,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+            "tests": 12,
+            "timestamp": "2026-10-14T03:03:01"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionViewRefinementTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T03:03:02"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVisibilityFeedbackTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:03:02"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVisibleHandoffTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:03:02"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:03:02"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:03:02"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+            "tests": 19,
+            "timestamp": "2026-10-14T03:03:02"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWorkViewTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:03:07"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.VssLodSampleCacheTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:03:07"
+          }
+        ]
+      },
+      "gpu": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:08"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:16"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:22"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMainReductionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:38"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:44"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:46"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:54"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRenderTargetGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:59"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:04:10"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainGpuTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:04:15"
+          }
+        ]
+      },
+      "sourcesSha256": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLoadingPreparation.java": "5cbd16673f2f8b22a8ffd6fdea1d7de94fc6ed966aee7abb39a7d74b91925663",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionUploadSelection.java": "2d9f1dfd6faf2228b9880c9427d13261b4731f36a6549e67c342cb917b5a7845",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileTable.java": "5cf315056fdfd4796c1487cf38aa126223800a8431edf9658dbeb628be53034c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionUploadBudget.java": "009d69b513192dc98e66612feb1fb9a5c941836a4d464cc9707f28f683aa5387",
+        "src/main/java/dev/xantha/vss/client/prediction/VssLodSampleCache.java": "b2432fc86b18109a3d19722a277f2416d906b7974ab8b46eb9487ef80d788a23",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVanillaMask.java": "ed83a3bbe5c73f33b08ce2161bf4e7f5e41262b320278eee279d4f4b5079f5ec",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSeamPreparation.java": "6efc5ce6722dce44b3006a9d5707fa2f573f338fdf49af20ee567e5b758a2ada",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionDemandPreparation.java": "5dac035648990b71096dce382245672455dbe2672c8e2022be5c0724de2755b0",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java": "861a24e43b1500bf62b30ae6e619908f673f44bd51046d547d00a44f80c01364",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java": "18788cc0b8c1ff1b551a604eaf48b5bb237496291d24029cab2e1285af720ebf",
+        "src/main/java/dev/xantha/vss/client/prediction/ClientPredictionState.java": "b4066fe776e5de2925df46107a3486f31628b3a9a7be6f00852cf3e285fe1727",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderResidency.java": "0498c0de65c56b36dae428511b1762f0f0e1804ad2f93b7500d1ca27a5ca1f12",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverage.java": "608ee4d27c0965fbb6167b097bb1e5a7e0c97837e40e8feb25af9687d7403d22",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderTimings.java": "9dd61a313408c6db65ec9af15d5294e2eeb770b240844b3ce7f11d04ffdd7581",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMotionPace.java": "3acced0649279bf53fdfa0a699a8ed5f80bbb718f7e5b83a556ff11524040e2c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLodSeams.java": "fbb8404bf8352f6d1ed5350e6a287907f9bdcc9801ad6d3582adff42f147336e",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRealBoundarySeams.java": "194c2d5d32b515efae66f936fafe99124efd0b413e32d1e11656a005b7bbdb6b",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuTile.java": "8d0ef1968528a497e7ea411d05ff7b714a2e08456935857e988b9ea5bfcdaa62",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionClientPreparation.java": "434bd0205856bc4452165f2dcd10fd86d55a6a1c332f60f8c6e5242a35a5b4f4",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionPlanPreparation.java": "55c177a7ba4d27f818d91c043745caebeae2afebee3aadc3c5c212f5fda3f319",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSchedulePreparation.java": "25412796801e6d43e2ae7502971b912c444f41ea473191d5dfa4f913ed1b2ada",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMaintenanceCursor.java": "e1f640d8ffde733886402101831768fa016166c6339bc05744ad2b941e892704",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuResidency.java": "a4fb63900dd1b236d2543997d232feb3db5cc6b0608ae1658c9fc3bf07edfb1a",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionIdleRefinement.java": "7a51dadf3ce0d5005cc7ee0047b59fb6f2b5487ea581a56c171f916580fdca0b",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionExactCoverageIndex.java": "8c8f7824729dba010b9345e8e063d8665ab983ab4a9adea6d9a846a885bb87c0",
+        "src/main/java/dev/xantha/vss/mixin/client/LevelRendererPredictionMaskMixin.java": "e12c50825ac755a115d1bf388394666e94ce8fdde623e3b99b8aeeb8af82143b",
+        "src/main/java/dev/xantha/vss/mixin/client/ClientChunkCachePredictionMaskMixin.java": "264dcee1703c395e44f445b76bbd60f56df55871ddeea167d2447a3691d86275"
+      },
+      "nativeSha256": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      },
+      "maskMixinTargets": {
+        "setSectionDirty": "(IIIZ)V",
+        "allChanged": "()V"
+      },
+      "chunkCacheMixinTargets": {
+        "drop": "(Lnet/minecraft/world/level/ChunkPos;)V",
+        "replaceWithPacketData": "Mojang"
+      },
+      "benchmarkSourceSha256": {
+        "PredictionLoadingBenefitBenchmark": "605a2a86ae59d46d8559e671a86dd2e5fa1dd5e3c50936c2e5af80917b7d2c37",
+        "LoadingLegacyResidency": "1f6930d07e2e3177ab054e9e378305b7d2b929364c3d8a890ce055c50841e91b",
+        "LoadingLegacyAccounting": "faafc3de4409508d9a58cfaa889f9f7cd2c51aadb58e3e352982ce1bc873ad5b",
+        "PredictionLoadingBenefitTest": "6f7afe61439406a81a5c0d5e429f4b763a11dc592015ec7aa553a983a2693070",
+        "VssLodSampleCacheTest": "f87761bd0b0b0bc3836f78286e7a5207a52d147ef2b9f2b747fb6e6fcc40c140"
+      },
+      "residencyBaselineSha256": "173d7a717d4002d8504e5888223805613fc5b607ea44007db70de6ff3cbbf589"
+    },
+    {
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "version": "0.3.5-forge-1.20.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\loading-benefit-20261014\\vss-0.3.5-forge-1.20.1.jar",
+      "jarBytes": 6724200,
+      "jarSha256": "3668f776274cf5c8b572a842f40a0ac5a8f124e73c14fa1dce22d998b48e61d1",
+      "javaClassMajor": 61,
+      "cpu": {
+        "tests": 225,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:14"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCpuCachePolicyTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:02:15"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDemandLifecycleTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T03:02:15"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:16"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:16"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+            "tests": 13,
+            "timestamp": "2026-10-14T03:02:17"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingBenefitTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:18"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingProgressIntegrationTest",
+            "tests": 6,
+            "timestamp": "2026-10-14T03:02:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLoadingSettingsTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T03:02:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+            "tests": 18,
+            "timestamp": "2026-10-14T03:02:19"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMainReductionTest",
+            "tests": 9,
+            "timestamp": "2026-10-14T03:02:20"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMediumCoverageTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:02:20"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryLifecycleTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:21"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMotionPaceTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:02:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T03:02:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+            "tests": 6,
+            "timestamp": "2026-10-14T03:02:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementConvergenceTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:02:25"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:26"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:02:26"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:26"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionScreenDetailTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:02:27"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:02:27"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+            "tests": 3,
+            "timestamp": "2026-10-14T03:02:27"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+            "tests": 11,
+            "timestamp": "2026-10-14T03:02:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainTest",
+            "tests": 7,
+            "timestamp": "2026-10-14T03:02:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+            "tests": 12,
+            "timestamp": "2026-10-14T03:02:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionViewRefinementTest",
+            "tests": 14,
+            "timestamp": "2026-10-14T03:02:28"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVisibilityFeedbackTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:02:29"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:02:29"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:02:29"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+            "tests": 20,
+            "timestamp": "2026-10-14T03:02:29"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionWorkViewTest",
+            "tests": 5,
+            "timestamp": "2026-10-14T03:02:34"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.VssLodSampleCacheTest",
+            "tests": 4,
+            "timestamp": "2026-10-14T03:02:35"
+          }
+        ]
+      },
+      "gpu": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:02:35"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:02:42"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:02:48"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMainReductionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:02:54"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionMemoryResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:03"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:08"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:10"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusionGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:18"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionRenderTargetGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:23"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyGpuTest",
+            "tests": 1,
+            "timestamp": "2026-10-14T03:03:37"
+          },
+          {
+            "name": "dev.xantha.vss.client.prediction.PredictionTurnMainGpuTest",
+            "tests": 2,
+            "timestamp": "2026-10-14T03:03:42"
+          }
+        ]
+      },
+      "sourcesSha256": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLoadingPreparation.java": "5cbd16673f2f8b22a8ffd6fdea1d7de94fc6ed966aee7abb39a7d74b91925663",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionUploadSelection.java": "2d9f1dfd6faf2228b9880c9427d13261b4731f36a6549e67c342cb917b5a7845",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileTable.java": "5cf315056fdfd4796c1487cf38aa126223800a8431edf9658dbeb628be53034c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionUploadBudget.java": "77d8084ca880aad243aeb74bf625c9cf5e0d673acc92c557eaee438a2b8560d1",
+        "src/main/java/dev/xantha/vss/client/prediction/VssLodSampleCache.java": "b2432fc86b18109a3d19722a277f2416d906b7974ab8b46eb9487ef80d788a23",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVanillaMask.java": "64d900708727e0c484dd07ad163549b22791ef04ec14ebc5df1e39a295eecabf",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSeamPreparation.java": "6efc5ce6722dce44b3006a9d5707fa2f573f338fdf49af20ee567e5b758a2ada",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionDemandPreparation.java": "5dac035648990b71096dce382245672455dbe2672c8e2022be5c0724de2755b0",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java": "b39e155da3f5dfaf8bce59eb4f9e2c3ea9ef0d6bd469c6270644df5be9b41a97",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java": "bde384b4dac3988daef710005ee6bdd5855f2c9eed3de8aec38d369932f7171f",
+        "src/main/java/dev/xantha/vss/client/prediction/ClientPredictionState.java": "7cbd8b0b82ec82564bb44b7cace3a395796e4d10d5ee6dafd5789db676145408",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderResidency.java": "3b5e7866ac65aa04e2a897ff561beba378ef8c6544492f0df276d59da1459181",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverage.java": "608ee4d27c0965fbb6167b097bb1e5a7e0c97837e40e8feb25af9687d7403d22",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderTimings.java": "b6b4b5f60c8f43c0e9053c19e1b69e8aa18f66ccdf13ef0bf6d92bf4a3a6bc3e",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMotionPace.java": "3acced0649279bf53fdfa0a699a8ed5f80bbb718f7e5b83a556ff11524040e2c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLodSeams.java": "fbb8404bf8352f6d1ed5350e6a287907f9bdcc9801ad6d3582adff42f147336e",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRealBoundarySeams.java": "ff4f904e76149fd75e3a12e6cbefd9224a872bed1ea12c1bb35b3455e1dcd796",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuTile.java": "84be5527d5a5a8beb295cb8d7777c85892133672ab1d882daed8872e3c46b310",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionClientPreparation.java": "434bd0205856bc4452165f2dcd10fd86d55a6a1c332f60f8c6e5242a35a5b4f4",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionPlanPreparation.java": "55c177a7ba4d27f818d91c043745caebeae2afebee3aadc3c5c212f5fda3f319",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSchedulePreparation.java": "25412796801e6d43e2ae7502971b912c444f41ea473191d5dfa4f913ed1b2ada",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMaintenanceCursor.java": "e1f640d8ffde733886402101831768fa016166c6339bc05744ad2b941e892704",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuResidency.java": "a4fb63900dd1b236d2543997d232feb3db5cc6b0608ae1658c9fc3bf07edfb1a",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionIdleRefinement.java": "7a51dadf3ce0d5005cc7ee0047b59fb6f2b5487ea581a56c171f916580fdca0b",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionExactCoverageIndex.java": "8c8f7824729dba010b9345e8e063d8665ab983ab4a9adea6d9a846a885bb87c0",
+        "src/main/java/dev/xantha/vss/mixin/client/LevelRendererPredictionMaskMixin.java": "65a12c9dc455d389e75b060bb71f34c3fd3287ad13158d33e04a011a660e2fa1",
+        "src/main/java/dev/xantha/vss/mixin/client/ClientChunkCachePredictionMaskMixin.java": "0fc3e4fb98ab3f042eaeb8860a6a3d13aa05b097a22a1486595d3c4ddd8f045e"
+      },
+      "nativeSha256": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      },
+      "maskMixinTargets": {
+        "allChanged": "Lnet/minecraft/client/renderer/LevelRenderer;m_109818_()V",
+        "setSectionDirty(IIIZ)V": "Lnet/minecraft/client/renderer/LevelRenderer;m_109501_(IIIZ)V"
+      },
+      "chunkCacheMixinTargets": {
+        "drop": "Lnet/minecraft/client/multiplayer/ClientChunkCache;m_104455_(II)V",
+        "replaceWithPacketData": "Lnet/minecraft/client/multiplayer/ClientChunkCache;m_194116_(IILnet/minecraft/network/FriendlyByteBuf;Lnet/minecraft/nbt/CompoundTag;Ljava/util/function/Consumer;)Lnet/minecraft/world/level/chunk/LevelChunk;"
+      },
+      "benchmarkSourceSha256": {
+        "PredictionLoadingBenefitBenchmark": "577ee039b0f20217c76c10b22cc45630e80eb5a35dce45340d920a05ca3a0bb4",
+        "LoadingLegacyResidency": "1f6930d07e2e3177ab054e9e378305b7d2b929364c3d8a890ce055c50841e91b",
+        "LoadingLegacyAccounting": "58567728cb943ad6b0e49c6004df6c094b8ed5e92766ec850c8b0c5c27e05e71",
+        "PredictionLoadingBenefitTest": "8621e139323d7335edae9961325ad505900fb6029ace64b27799a4290d43fb6a",
+        "VssLodSampleCacheTest": "21c904f849497201f7ad2163360d8c25cff7a49def5d3a77531e5d1debcd5e63"
+      },
+      "residencyBaselineSha256": "ddb8b50eee1d41716eae717de4e97b263dc8b54934d2a98bed2a2cc33e36c03c"
+    }
+  ],
+  "benchmarks": {
+    "0.3.5-neoforge-1.21.1": [
+      {
+        "case": "residency-eight-upgrades",
+        "entries": 256,
+        "baseline": {
+          "medianAllocatedBytes": 2927.95,
+          "medianNs": 18304.375,
+          "p95Ns": 23160.625,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 2927.95,
+          "medianNs": 19583.75,
+          "p95Ns": 25984.375,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 160
+      },
+      {
+        "case": "residency-eight-upgrades",
+        "entries": 4096,
+        "baseline": {
+          "medianAllocatedBytes": 18384.25,
+          "medianNs": 168096.25,
+          "p95Ns": 185183.75,
+          "medianCpuNs": 195312.5
+        },
+        "candidate": {
+          "medianAllocatedBytes": 1469.05,
+          "medianNs": 13791.875,
+          "p95Ns": 15950.0,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 160
+      },
+      {
+        "case": "residency-eight-upgrades",
+        "entries": 16384,
+        "baseline": {
+          "medianAllocatedBytes": 69040.25,
+          "medianNs": 811242.5,
+          "p95Ns": 837520.0,
+          "medianCpuNs": 781250.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 1413.05,
+          "medianNs": 71199.375,
+          "p95Ns": 75373.125,
+          "medianCpuNs": 97656.25
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 160
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 32,
+        "baseline": {
+          "medianAllocatedBytes": 825.25,
+          "medianNs": 5184.375,
+          "p95Ns": 8262.5,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 857.25,
+          "medianNs": 5475.0,
+          "p95Ns": 8268.75,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 256,
+        "baseline": {
+          "medianAllocatedBytes": 6249.25,
+          "medianNs": 57993.75,
+          "p95Ns": 63712.5,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 6361.25,
+          "medianNs": 60409.375,
+          "p95Ns": 64418.75,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 4096,
+        "baseline": {
+          "medianAllocatedBytes": 82313.25,
+          "medianNs": 2145218.75,
+          "p95Ns": 2236568.75,
+          "medianCpuNs": 1953125.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 3113.25,
+          "medianNs": 156781.25,
+          "p95Ns": 186390.625,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 16384,
+        "baseline": {
+          "medianAllocatedBytes": 381649.25,
+          "medianNs": 10852509.375,
+          "p95Ns": 11011671.875,
+          "medianCpuNs": 10742187.5
+        },
+        "candidate": {
+          "medianAllocatedBytes": 4073.25,
+          "medianNs": 600771.875,
+          "p95Ns": 639959.375,
+          "medianCpuNs": 488281.25
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "boundary-input-eight-changes",
+        "entries": 256,
+        "baseline": {
+          "medianAllocatedBytes": 25841.25,
+          "medianNs": 47765.625,
+          "p95Ns": 50512.5,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 8345.25,
+          "medianNs": 3368.75,
+          "p95Ns": 4237.5,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "boundary-input-eight-changes",
+        "entries": 4096,
+        "baseline": {
+          "medianAllocatedBytes": 409905.25,
+          "medianNs": 1545596.875,
+          "p95Ns": 1591175.0,
+          "medianCpuNs": 1464843.75
+        },
+        "candidate": {
+          "medianAllocatedBytes": 23481.25,
+          "medianNs": 1893.75,
+          "p95Ns": 3343.75,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "boundary-input-eight-changes",
+        "entries": 16384,
+        "baseline": {
+          "medianAllocatedBytes": 1638737.25,
+          "medianNs": 5497518.75,
+          "p95Ns": 5788500.0,
+          "medianCpuNs": 5371093.75
+        },
+        "candidate": {
+          "medianAllocatedBytes": 91145.25,
+          "medianNs": 4540.625,
+          "p95Ns": 5096.875,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-client-work",
+        "entries": 256,
+        "baseline": {
+          "medianAllocatedBytes": 37425.25,
+          "medianNs": 136259.375,
+          "p95Ns": 175859.375,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 1073.25,
+          "medianNs": 968.75,
+          "p95Ns": 1787.5,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-worker-work",
+        "candidate": {
+          "medianAllocatedBytes": 24857.25,
+          "medianNs": 110803.125,
+          "p95Ns": 182534.375,
+          "medianCpuNs": 0.0
+        },
+        "entries": 256
+      },
+      {
+        "case": "desired-snapshot-reuse",
+        "entries": 256,
+        "baseline": {
+          "medianAllocatedBytes": 13505.25,
+          "medianNs": 43259.375,
+          "p95Ns": 58418.75,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 17.25,
+          "medianNs": 59.375,
+          "p95Ns": 200.0,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "ownership-candidate-client-copy",
+        "entries": 256,
+        "baseline": {
+          "medianAllocatedBytes": 25209.25,
+          "medianNs": 53031.25,
+          "p95Ns": 58050.0,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 25929.25,
+          "medianNs": 48168.75,
+          "p95Ns": 50356.25,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "pending-cleanup-32-admissions",
+        "entries": 24,
+        "baseline": {
+          "medianAllocatedBytes": 10753.25,
+          "medianNs": 35062.5,
+          "p95Ns": 36903.125,
+          "medianCpuNs": 0.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 353.25,
+          "medianNs": 1137.5,
+          "p95Ns": 1359.375,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-client-work",
+        "entries": 4096,
+        "baseline": {
+          "medianAllocatedBytes": 590385.25,
+          "medianNs": 4108940.625,
+          "p95Ns": 4215028.125,
+          "medianCpuNs": 3906250.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 13497.25,
+          "medianNs": 7025.0,
+          "p95Ns": 8225.0,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-worker-work",
+        "candidate": {
+          "medianAllocatedBytes": 393497.25,
+          "medianNs": 3419059.375,
+          "p95Ns": 3571406.25,
+          "medianCpuNs": 3417968.75
+        },
+        "entries": 4096
+      },
+      {
+        "case": "desired-snapshot-reuse",
+        "entries": 4096,
+        "baseline": {
+          "medianAllocatedBytes": 213169.25,
+          "medianNs": 1489418.75,
+          "p95Ns": 1546875.0,
+          "medianCpuNs": 1464843.75
+        },
+        "candidate": {
+          "medianAllocatedBytes": 17.25,
+          "medianNs": 143.75,
+          "p95Ns": 190.625,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "ownership-candidate-client-copy",
+        "entries": 4096,
+        "baseline": {
+          "medianAllocatedBytes": 378473.25,
+          "medianNs": 1675309.375,
+          "p95Ns": 1790481.25,
+          "medianCpuNs": 1953125.0
+        },
+        "candidate": {
+          "medianAllocatedBytes": 25913.25,
+          "medianNs": 50312.5,
+          "p95Ns": 56546.875,
+          "medianCpuNs": 0.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      }
+    ],
+    "0.3.5-forge-1.20.1": [
+      {
+        "case": "residency-eight-upgrades",
+        "entries": 256,
+        "baseline": {
+          "medianNs": 15558.75,
+          "medianAllocatedBytes": 2943.95,
+          "medianCpuNs": 0.0,
+          "p95Ns": 34661.875
+        },
+        "candidate": {
+          "medianNs": 16425.0,
+          "medianAllocatedBytes": 2943.95,
+          "medianCpuNs": 0.0,
+          "p95Ns": 36310.625
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 160
+      },
+      {
+        "case": "residency-eight-upgrades",
+        "entries": 4096,
+        "baseline": {
+          "medianNs": 159316.875,
+          "medianAllocatedBytes": 18400.25,
+          "medianCpuNs": 195312.5,
+          "p95Ns": 173323.125
+        },
+        "candidate": {
+          "medianNs": 14790.625,
+          "medianAllocatedBytes": 1153.05,
+          "medianCpuNs": 0.0,
+          "p95Ns": 17546.25
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 160
+      },
+      {
+        "case": "residency-eight-upgrades",
+        "entries": 16384,
+        "baseline": {
+          "medianNs": 786817.5,
+          "medianAllocatedBytes": 69056.25,
+          "medianCpuNs": 781250.0,
+          "p95Ns": 806488.125
+        },
+        "candidate": {
+          "medianNs": 84623.75,
+          "medianAllocatedBytes": 1121.05,
+          "medianCpuNs": 97656.25,
+          "p95Ns": 90400.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 160
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 32,
+        "baseline": {
+          "medianNs": 4375.0,
+          "medianAllocatedBytes": 825.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 5290.625
+        },
+        "candidate": {
+          "medianNs": 4465.625,
+          "medianAllocatedBytes": 857.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 4743.75
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 256,
+        "baseline": {
+          "medianNs": 52393.75,
+          "medianAllocatedBytes": 6329.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 58990.625
+        },
+        "candidate": {
+          "medianNs": 50309.375,
+          "medianAllocatedBytes": 6361.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 63343.75
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 4096,
+        "baseline": {
+          "medianNs": 1894881.25,
+          "medianAllocatedBytes": 82313.25,
+          "medianCpuNs": 1953125.0,
+          "p95Ns": 1938928.125
+        },
+        "candidate": {
+          "medianNs": 131715.625,
+          "medianAllocatedBytes": 3113.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 137534.375
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "upload-prefix",
+        "entries": 16384,
+        "baseline": {
+          "medianNs": 9641743.75,
+          "medianAllocatedBytes": 381649.25,
+          "medianCpuNs": 9765625.0,
+          "p95Ns": 11417862.5
+        },
+        "candidate": {
+          "medianNs": 540487.5,
+          "medianAllocatedBytes": 4073.25,
+          "medianCpuNs": 488281.25,
+          "p95Ns": 559178.125
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "boundary-input-eight-changes",
+        "entries": 256,
+        "baseline": {
+          "medianNs": 47600.0,
+          "medianAllocatedBytes": 25849.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 54640.625
+        },
+        "candidate": {
+          "medianNs": 1893.75,
+          "medianAllocatedBytes": 7857.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 2550.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "boundary-input-eight-changes",
+        "entries": 4096,
+        "baseline": {
+          "medianNs": 1312971.875,
+          "medianAllocatedBytes": 409913.25,
+          "medianCpuNs": 1464843.75,
+          "p95Ns": 1489553.125
+        },
+        "candidate": {
+          "medianNs": 2112.5,
+          "medianAllocatedBytes": 29857.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 2931.25
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "boundary-input-eight-changes",
+        "entries": 16384,
+        "baseline": {
+          "medianNs": 5240162.5,
+          "medianAllocatedBytes": 1638745.25,
+          "medianCpuNs": 5371093.75,
+          "p95Ns": 5745500.0
+        },
+        "candidate": {
+          "medianNs": 5596.875,
+          "medianAllocatedBytes": 103553.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 6018.75
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-client-work",
+        "entries": 256,
+        "baseline": {
+          "medianNs": 168518.75,
+          "medianAllocatedBytes": 37513.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 260028.125
+        },
+        "candidate": {
+          "medianNs": 1028.125,
+          "medianAllocatedBytes": 1145.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 1865.625
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-worker-work",
+        "entries": 256,
+        "candidate": {
+          "medianNs": 167150.0,
+          "medianAllocatedBytes": 25097.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 205128.125
+        }
+      },
+      {
+        "case": "desired-snapshot-reuse",
+        "entries": 256,
+        "baseline": {
+          "medianNs": 41553.125,
+          "medianAllocatedBytes": 13505.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 43371.875
+        },
+        "candidate": {
+          "medianNs": 28.125,
+          "medianAllocatedBytes": 17.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 56.25
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "ownership-candidate-client-copy",
+        "entries": 256,
+        "baseline": {
+          "medianNs": 52287.5,
+          "medianAllocatedBytes": 25217.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 61537.5
+        },
+        "candidate": {
+          "medianNs": 46825.0,
+          "medianAllocatedBytes": 25937.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 54953.125
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "pending-cleanup-32-admissions",
+        "entries": 24,
+        "baseline": {
+          "medianNs": 43346.875,
+          "medianAllocatedBytes": 10753.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 44865.625
+        },
+        "candidate": {
+          "medianNs": 1365.625,
+          "medianAllocatedBytes": 353.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 1525.0
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-client-work",
+        "entries": 4096,
+        "baseline": {
+          "medianNs": 3518959.375,
+          "medianAllocatedBytes": 590449.25,
+          "medianCpuNs": 3417968.75,
+          "p95Ns": 3595903.125
+        },
+        "candidate": {
+          "medianNs": 7115.625,
+          "medianAllocatedBytes": 13625.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 7621.875
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "loading-accounting-worker-work",
+        "entries": 4096,
+        "candidate": {
+          "medianNs": 3568081.25,
+          "medianAllocatedBytes": 393673.25,
+          "medianCpuNs": 3417968.75,
+          "p95Ns": 3660300.0
+        }
+      },
+      {
+        "case": "desired-snapshot-reuse",
+        "entries": 4096,
+        "baseline": {
+          "medianNs": 1152237.5,
+          "medianAllocatedBytes": 213185.25,
+          "medianCpuNs": 976562.5,
+          "p95Ns": 1177387.5
+        },
+        "candidate": {
+          "medianNs": 87.5,
+          "medianAllocatedBytes": 17.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 137.5
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      },
+      {
+        "case": "ownership-candidate-client-copy",
+        "entries": 4096,
+        "baseline": {
+          "medianNs": 1273815.625,
+          "medianAllocatedBytes": 378497.25,
+          "medianCpuNs": 1464843.75,
+          "p95Ns": 1322081.25
+        },
+        "candidate": {
+          "medianNs": 46734.375,
+          "medianAllocatedBytes": 25937.25,
+          "medianCpuNs": 0.0,
+          "p95Ns": 49431.25
+        },
+        "rounds": 21,
+        "operationsPerMeasurement": 32
+      }
+    ]
+  },
+  "method": {
+    "warmupBatches": 16,
+    "alternatingRounds": 21,
+    "oneOperationBatchRepeats": 32,
+    "residencyFramesPerBatch": 160,
+    "residentUpgradesPerFrame": 8,
+    "finalPlatformsRunSerially": true,
+    "timings": "median wall time per operation; p95 is p95 of batch averages, not single frames",
+    "allocations": "current test thread allocated bytes, not live heap or total process allocations"
+  },
+  "rolledBack": [
+    "incremental residency for sources below 512 tiles",
+    "prefix heap for backlogs at most 512",
+    "preparation time reducing upload admission budget",
+    "initial object-allocating page diff iteration"
+  ],
+  "correctnessFix": "bounded sample cache prefers recomputable predicted columns over authoritative captures"
+}

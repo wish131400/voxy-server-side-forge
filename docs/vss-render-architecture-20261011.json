@@ -1,0 +1,233 @@
+{
+  "date": "2026-10-11",
+  "runtimeFPSMeasured": false,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER / driver 572.70",
+  "rounds": 41,
+  "warmupRounds": 24,
+  "validation": "Production Java submission paths and real OpenGL 4.6; synthetic layouts for A/B, captured canonical meshes for display allocation.",
+  "neoforge": {
+    "stable": {
+      "before": {
+        "cpuMedianMs": 0.1502,
+        "gpuMedianMs": 0.917504,
+        "encodedItemsPerFrame": 0.0,
+        "uploadedBytesMedian": 0
+      },
+      "after": {
+        "cpuMedianMs": 0.1398,
+        "gpuMedianMs": 0.917504,
+        "encodedItemsPerFrame": 0.0,
+        "uploadedBytesMedian": 0
+      },
+      "cpuReductionPercent": 6.924101198402122
+    },
+    "local-change": {
+      "before": {
+        "cpuMedianMs": 0.3838,
+        "gpuMedianMs": 0.920576,
+        "encodedItemsPerFrame": 3072.0,
+        "uploadedBytesMedian": 172032
+      },
+      "after": {
+        "cpuMedianMs": 0.3201,
+        "gpuMedianMs": 0.920576,
+        "encodedItemsPerFrame": 2048.0,
+        "uploadedBytesMedian": 172032
+      },
+      "cpuReductionPercent": 16.59718603439291
+    },
+    "mixed-local-change": {
+      "before": {
+        "cpuMedianMs": 0.4483,
+        "gpuMedianMs": 0.924672,
+        "encodedItemsPerFrame": 3072.0,
+        "uploadedBytesMedian": 21504
+      },
+      "after": {
+        "cpuMedianMs": 0.182,
+        "gpuMedianMs": 0.925696,
+        "encodedItemsPerFrame": 256.0,
+        "uploadedBytesMedian": 21504
+      },
+      "cpuReductionPercent": 59.40218603613652
+    },
+    "overflow": {
+      "before": {
+        "cpuMedianMs": 0.0658,
+        "gpuMedianMs": 0.190464,
+        "drawCalls": 384,
+        "committedBytes": 10242048
+      },
+      "after": {
+        "cpuMedianMs": 0.0233,
+        "gpuMedianMs": 0.11776,
+        "drawCalls": 2,
+        "committedBytes": 16777216
+      },
+      "cpuReductionPercent": 64.58966565349544,
+      "gpuReductionPercent": 38.17204301075269
+    },
+    "tests": {
+      "architecture-regression": {
+        "tests": 119,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "architecture-gpu": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "jar": {
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\render-architecture-20261011\\vss-0.3.5-neoforge-1.21.1.jar",
+      "bytes": 5933388,
+      "sha256": "22db2613e4628b60258f872bfabb7eaa22799f0d0c49957737e6d46ed59502c6",
+      "classMajor": 65,
+      "verifiedNativeResources": [
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+      ]
+    }
+  },
+  "forge": {
+    "stable": {
+      "before": {
+        "cpuMedianMs": 0.1469,
+        "gpuMedianMs": 0.918528,
+        "encodedItemsPerFrame": 0.0,
+        "uploadedBytesMedian": 0
+      },
+      "after": {
+        "cpuMedianMs": 0.1545,
+        "gpuMedianMs": 0.918528,
+        "encodedItemsPerFrame": 0.0,
+        "uploadedBytesMedian": 0
+      },
+      "cpuReductionPercent": -5.17358747447243
+    },
+    "local-change": {
+      "before": {
+        "cpuMedianMs": 0.433,
+        "gpuMedianMs": 0.920576,
+        "encodedItemsPerFrame": 3072.0,
+        "uploadedBytesMedian": 172032
+      },
+      "after": {
+        "cpuMedianMs": 0.2986,
+        "gpuMedianMs": 0.920576,
+        "encodedItemsPerFrame": 2048.0,
+        "uploadedBytesMedian": 172032
+      },
+      "cpuReductionPercent": 31.03926096997691
+    },
+    "mixed-local-change": {
+      "before": {
+        "cpuMedianMs": 0.4472,
+        "gpuMedianMs": 0.924672,
+        "encodedItemsPerFrame": 3072.0,
+        "uploadedBytesMedian": 21504
+      },
+      "after": {
+        "cpuMedianMs": 0.1776,
+        "gpuMedianMs": 0.924672,
+        "encodedItemsPerFrame": 256.0,
+        "uploadedBytesMedian": 21504
+      },
+      "cpuReductionPercent": 60.28622540250447
+    },
+    "overflow": {
+      "before": {
+        "cpuMedianMs": 0.0647,
+        "gpuMedianMs": 0.195584,
+        "drawCalls": 384,
+        "committedBytes": 10242048
+      },
+      "after": {
+        "cpuMedianMs": 0.0286,
+        "gpuMedianMs": 0.118784,
+        "drawCalls": 2,
+        "committedBytes": 16777216
+      },
+      "cpuReductionPercent": 55.795981452859344,
+      "gpuReductionPercent": 39.26701570680628
+    },
+    "tests": {
+      "architecture-regression": {
+        "tests": 117,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "architecture-gpu": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "jar": {
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\render-architecture-20261011\\vss-0.3.5-forge-1.20.1.jar",
+      "bytes": 6605714,
+      "sha256": "33439e8e6d1f2f630fea60dfd2dfb77695630d727b5210b00920ba0afa45acc8",
+      "classMajor": 61,
+      "verifiedNativeResources": [
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+      ]
+    }
+  },
+  "rejectedCoarseFirstDisplay": {
+    "capture": "C:\\Users\\Administrator\\.codex\\tmp\\vss-distance-render-20261010\\geometry",
+    "liveFPSMeasured": false,
+    "depths": [
+      768,
+      1024,
+      2048,
+      4096,
+      8192
+    ],
+    "projection": "1475 pixels per world unit / eye depth; isolated full-ownership scenario; morph stays exact",
+    "source": 21344411,
+    "meshes": 2019,
+    "beforeBytes": 1337534304,
+    "afterBytes": 1287848688,
+    "beforeNs": 12411198800,
+    "afterNs": 12265603200,
+    "oldTiers": [
+      21344411,
+      14653598,
+      10782084,
+      10093604
+    ],
+    "newTiers": [
+      21344411,
+      19129393,
+      12465048,
+      8804086
+    ],
+    "oldSelected": [
+      21344411,
+      21344411,
+      18962827,
+      14592782,
+      12497475
+    ],
+    "newSelected": [
+      21344411,
+      21344411,
+      21344411,
+      16334572,
+      13461465
+    ],
+    "decision": "reverted: screen-error-selected geometry increases at useful intermediate distances despite smaller canonical storage"
+  }
+}

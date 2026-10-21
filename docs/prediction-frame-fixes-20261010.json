@@ -1,0 +1,76 @@
+{
+  "neo": {
+    "tests": {
+      "frame-fixes": {
+        "tests": 203,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 202,
+        "suites": 37,
+        "skippedTests": [
+          "dev.xantha.vss.client.prediction.PredictionSpatialReplayTest.capturedClientMeshesPreserveGeometryAndImproveBounds()"
+        ]
+      },
+      "frame-fixes-gpu": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 7,
+        "suites": 8,
+        "skippedTests": [
+          "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest.installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+        ]
+      }
+    },
+    "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\frame-fixes-20261010\\vss-0.3.5-neoforge-1.21.1.jar",
+    "bytes": 5869014,
+    "sha256": "6C7AD3159E1DE7E2ED6C4DA04200D9A40E98EFDCAB87649C5BF84BC674AEB35A",
+    "changedClassesChecked": 40,
+    "natives": [
+      "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+      "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+      "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+      "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+      "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+    ]
+  },
+  "forge": {
+    "tests": {
+      "frame-fixes": {
+        "tests": 201,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 200,
+        "suites": 36,
+        "skippedTests": [
+          "dev.xantha.vss.client.prediction.PredictionSpatialReplayTest.capturedClientMeshesPreserveGeometryAndImproveBounds()"
+        ]
+      },
+      "frame-fixes-gpu": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 7,
+        "suites": 8,
+        "skippedTests": [
+          "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest.installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+        ]
+      }
+    },
+    "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\frame-fixes-20261010\\vss-0.3.5-forge-1.20.1.jar",
+    "bytes": 6541143,
+    "sha256": "33253787318D7D4971F5AF9A496DFE3115E727FABFF0C51B36625DC4D9101341",
+    "changedClassesChecked": 40,
+    "natives": [
+      "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+      "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+      "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+      "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+      "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+    ]
+  }
+}

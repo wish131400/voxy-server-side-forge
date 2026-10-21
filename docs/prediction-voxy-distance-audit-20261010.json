@@ -1,0 +1,150 @@
+{
+  "recordedAtUtc": "2026-10-10T10:55:14.505291+00:00",
+  "scope": "Installed package and source audit; no new client frame-time recording or production changes",
+  "instance": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249",
+  "vss": {
+    "jar": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\mods\\vss-0.3.5-neoforge-1.21.1.jar",
+    "bytes": 5869014,
+    "sha256": "6C7AD3159E1DE7E2ED6C4DA04200D9A40E98EFDCAB87649C5BF84BC674AEB35A",
+    "matchesLastFrameFixDelivery": true
+  },
+  "voxy": {
+    "jar": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\mods\\voxy-0.2.15-beta.jar",
+    "sha256": "802D49EDC07C4E4A7AF15FFD59337A82AF383DFD551B67C278233098737E2F52",
+    "metadata": [
+      "fabric.mod.json"
+    ],
+    "resources": [
+      {
+        "path": "assets/voxy/shaders/lod/gl46/cmdgen.comp",
+        "sameAsLocalSource": true,
+        "sha256": "795000009bbcd8133aa199407ca68440debb0507d86bb067f237c8b1687d5cb0"
+      },
+      {
+        "path": "assets/voxy/shaders/lod/gl46/quads3.vert",
+        "sameAsLocalSource": false,
+        "sha256": "544669db1d715bd048fdece7783d321a0b30939a72acaee04a4b2f2c10327272"
+      },
+      {
+        "path": "assets/voxy/shaders/lod/gl46/quads.frag",
+        "sameAsLocalSource": false,
+        "sha256": "b43223a6efedc8b301b10c3b489ab76e2ae0a851f6a6b183589ef9952e9761c5"
+      },
+      {
+        "path": "assets/voxy/shaders/lod/quad_format.glsl",
+        "sameAsLocalSource": false,
+        "sha256": "26f4dc6e0bba703ae3424ff2ba3d0dee94199b0df0c24908e44e8c4d18b12a11"
+      },
+      {
+        "path": "assets/voxy/shaders/lod/hierarchical/traversal_dev.comp",
+        "sameAsLocalSource": false,
+        "sha256": "272fba6e1e623a395342be1f418200d0e896fdab78776205064c79cebdf3c67c"
+      },
+      {
+        "path": "assets/voxy/shaders/lod/hierarchical/screenspace.glsl",
+        "sameAsLocalSource": false,
+        "sha256": "371676aa891a5a4876f5db1a75905da041cfdd3b88a6caaa795f154d793c8a54"
+      }
+    ]
+  },
+  "clientConfigFileSnapshot": {
+    "performanceTier": "high",
+    "predictionDistanceBlocks": 2048,
+    "predictionFineDistanceBlocks": 1536,
+    "predictionSurfaceDistanceBlocks": 512,
+    "predictionDetail": "normal",
+    "predictionVegetationDensity": "medium",
+    "predictionTrees": true,
+    "predictionSpyglassLoading": false,
+    "predictionSupersample": false,
+    "predictionAntialiasing": true
+  },
+  "configSnapshotIsRuntimeRead": false,
+  "voxyConfigFileSnapshot": {
+    "enabled": true,
+    "enable_rendering": true,
+    "ingest_enabled": true,
+    "section_render_distance": 16.0,
+    "service_threads": 5,
+    "sub_division_size": 64.0,
+    "sky_fog_distance": 96,
+    "fog_intensity": 1.0,
+    "fog_density": 0.0,
+    "adapt_cloud_distance": true,
+    "cloud_distance": 0,
+    "dont_use_sodium_builder_threads": false,
+    "use_environmental_fog": true
+  },
+  "repoComparison": {
+    "PredictionVegetation.java": {
+      "sameAcrossRepositories": false
+    },
+    "PredictionDisplayGeometry.java": {
+      "sameAcrossRepositories": true
+    },
+    "PredictionScreenDetail.java": {
+      "sameAcrossRepositories": true
+    },
+    "PredictionGpuEncoding.java": {
+      "sameAcrossRepositories": true
+    },
+    "PredictionCoverageOwners.java": {
+      "sameAcrossRepositories": true
+    },
+    "PredictionOcclusionCuller.java": {
+      "sameAcrossRepositories": true
+    },
+    "PredictionMeshletBounds.java": {
+      "sameAcrossRepositories": true
+    },
+    "PredictionSpatialOrder.java": {
+      "sameAcrossRepositories": true
+    }
+  },
+  "verifiedGaps": [
+    {
+      "id": "ordinary-rendering-prefers-finest-resident",
+      "source": "PredictionTileManager.java:1859,1872,1890; PredictionRenderer.java:1690,1926",
+      "installedBytecode": "InstalledVssRenderSnapshot.javap.txt",
+      "implication": "Ordinary ownership is not a full display-error-driven geometry selection policy"
+    },
+    {
+      "id": "canopy-lod-coupled-to-terrain-spacing",
+      "source": "PredictionVegetation.java:288; PredictionVegetationDisplayCache.java:155",
+      "implication": "Fine spacing preserves one-block woody voxels; display merge is restricted to compatible coplanar rectangles"
+    },
+    {
+      "id": "quad-record-size",
+      "voxyBytesPerRecord": 8,
+      "vssCompactBytesPerRecord": 32,
+      "vssFallbackBytesPerRecord": 48,
+      "note": "Shared palettes/models/textures/metadata are additional; no FPS ratio follows"
+    },
+    {
+      "id": "gpu-geometry-command-selection",
+      "voxy": "GPU hierarchy traversal, six-direction command mask, atomic command counts and indirect-count draws",
+      "vss": "CPU scene/ownership and cached plans; GPU meshlet/group Hi-Z zeros hidden command counts"
+    },
+    {
+      "id": "general-purpose-prediction-shader-handoff-work",
+      "source": "PredictionTerrainProgram.java:466,852,867,895,938; PredictionRenderTarget.java",
+      "implication": "Prediction geometry has extra ownership/real-depth/handoff rules in a general shader and independent depth stages",
+      "note": "Branches are conditional; actual instruction traffic and current GPU time are not measured. Voxy also reads shared metadata and performs depth/alpha tests"
+    }
+  ],
+  "existingVssOptimizationsConfirmed": [
+    "Internal woody face culling and exposed vertical run merging",
+    "Coarse vegetation voxels for coarser terrain spacing",
+    "Screen-size-driven generation and view priority",
+    "Three display merge variants selected during rendering when applicable",
+    "Current-frame Hi-Z, meshlet bounds and workgroup coarse bounds",
+    "Static submission replay and compact color/light dictionary",
+    "Direction groups and explicit per-face vertex culling"
+  ],
+  "notEstablished": [
+    "Current forest face-count distribution and display-merge acceptance rate",
+    "Current per-stage CPU/GPU milliseconds attributable to leaves",
+    "FPS or memory improvement achievable by proposed changes"
+  ],
+  "evidenceDirectory": "C:\\Users\\Administrator\\.codex\\tmp\\vss-voxy-distance-audit-20261010"
+}

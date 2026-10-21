@@ -1,0 +1,1053 @@
+{
+  "date": "2026-10-11",
+  "implementation": "Independent Voxy-style scanline rectangle meshing; not complete voxel mip/model pipeline",
+  "runtimeFPSMeasured": false,
+  "replay": {
+    "capture": "C:\\Users\\Administrator\\.codex\\tmp\\vss-distance-render-20261010\\geometry",
+    "epochMs": 1791630438011,
+    "runtimeFPSMeasured": false,
+    "verifiedMaterialLightPlaneSignedArea": true,
+    "verifiedWaterExact": true,
+    "materialApproximationAdapter": "Captured leafClass and vanilla snow; no registry tag snapshot available.",
+    "scope": "Complete resident canonical meshes; draw ownership/visible selection is not replayed.",
+    "summary": {
+      "before": 22619865,
+      "after": 21558585,
+      "leafBefore": 1126761,
+      "leafAfter": 907626,
+      "beforeGpuBytes": 654574640,
+      "afterGpuBytes": 620789344,
+      "beforeNanos": 22337956600,
+      "afterNanos": 20559014400,
+      "meshes": 3890,
+      "improvedMeshes": 522,
+      "oldTiers": [
+        22619865,
+        14664094,
+        13680690,
+        17424802
+      ],
+      "newTiers": [
+        21558585,
+        14867772,
+        10996258,
+        10307778
+      ]
+    },
+    "ordinary": {
+      "before": 22405691,
+      "after": 21344411,
+      "leafBefore": 1126761,
+      "leafAfter": 907626,
+      "beforeGpuBytes": 649511776,
+      "afterGpuBytes": 615726480,
+      "beforeNanos": 22329237700,
+      "afterNanos": 20550343200,
+      "meshes": 2019,
+      "improvedMeshes": 522,
+      "oldTiers": [
+        22405691,
+        14449920,
+        13466516,
+        17210628
+      ],
+      "newTiers": [
+        21344411,
+        14653598,
+        10782084,
+        10093604
+      ]
+    },
+    "noMorph": {
+      "before": 22402531,
+      "after": 21341251,
+      "leafBefore": 1126761,
+      "leafAfter": 907626,
+      "beforeGpuBytes": 649410528,
+      "afterGpuBytes": 615626288,
+      "beforeNanos": 22327104900,
+      "afterNanos": 20548163900,
+      "meshes": 2018,
+      "improvedMeshes": 522,
+      "oldTiers": [
+        22402531,
+        14448418,
+        13463356,
+        17207468
+      ],
+      "newTiers": [
+        21341251,
+        14652149,
+        10780635,
+        10092155
+      ]
+    },
+    "spacingBuckets": {
+      "1": {
+        "before": 6027556,
+        "after": 5228957,
+        "leafBefore": 540026,
+        "leafAfter": 374013,
+        "beforeGpuBytes": 185674176,
+        "afterGpuBytes": 158464896,
+        "beforeNanos": 4389928000,
+        "afterNanos": 5084846800,
+        "meshes": 461,
+        "improvedMeshes": 403,
+        "oldTiers": [
+          6027556,
+          2765650,
+          2820561,
+          5096901
+        ],
+        "newTiers": [
+          5228957,
+          2851057,
+          1917756,
+          1541902
+        ]
+      },
+      "2": {
+        "before": 6475874,
+        "after": 6226855,
+        "leafBefore": 523441,
+        "leafAfter": 471982,
+        "beforeGpuBytes": 192027520,
+        "afterGpuBytes": 185565200,
+        "beforeNanos": 5134144800,
+        "afterNanos": 5053931000,
+        "meshes": 613,
+        "improvedMeshes": 105,
+        "oldTiers": [
+          6475874,
+          2795803,
+          2882168,
+          3504568
+        ],
+        "newTiers": [
+          6226855,
+          2801095,
+          1954962,
+          1834180
+        ]
+      },
+      "4": {
+        "before": 8609935,
+        "after": 8596273,
+        "leafBefore": 58059,
+        "leafAfter": 56396,
+        "beforeGpuBytes": 238689168,
+        "afterGpuBytes": 238543872,
+        "beforeNanos": 10647548800,
+        "afterNanos": 8857657400,
+        "meshes": 834,
+        "improvedMeshes": 14,
+        "oldTiers": [
+          8609935,
+          7605235,
+          6635616,
+          7375316
+        ],
+        "newTiers": [
+          8596273,
+          7709120,
+          5793674,
+          5615845
+        ]
+      },
+      "8": {
+        "before": 785877,
+        "after": 785877,
+        "leafBefore": 5235,
+        "leafAfter": 5235,
+        "beforeGpuBytes": 19842272,
+        "afterGpuBytes": 19860816,
+        "beforeNanos": 1255616700,
+        "afterNanos": 926902100,
+        "meshes": 76,
+        "improvedMeshes": 0,
+        "oldTiers": [
+          785877,
+          776783,
+          713340,
+          743264
+        ],
+        "newTiers": [
+          785877,
+          785877,
+          700274,
+          687698
+        ]
+      },
+      "16": {
+        "before": 249244,
+        "after": 249244,
+        "leafBefore": 0,
+        "leafAfter": 0,
+        "beforeGpuBytes": 6459088,
+        "afterGpuBytes": 6459040,
+        "beforeNanos": 572791600,
+        "afterNanos": 384340300,
+        "meshes": 14,
+        "improvedMeshes": 0,
+        "oldTiers": [
+          249244,
+          249244,
+          207742,
+          233374
+        ],
+        "newTiers": [
+          249244,
+          249244,
+          207684,
+          206245
+        ]
+      },
+      "32": {
+        "before": 228352,
+        "after": 228352,
+        "leafBefore": 0,
+        "leafAfter": 0,
+        "beforeGpuBytes": 6151472,
+        "afterGpuBytes": 6164576,
+        "beforeNanos": 291581700,
+        "afterNanos": 202712800,
+        "meshes": 13,
+        "improvedMeshes": 0,
+        "oldTiers": [
+          228352,
+          228352,
+          178236,
+          228352
+        ],
+        "newTiers": [
+          228352,
+          228352,
+          178881,
+          178881
+        ]
+      },
+      "128": {
+        "before": 25861,
+        "after": 25861,
+        "leafBefore": 0,
+        "leafAfter": 0,
+        "beforeGpuBytes": 589456,
+        "afterGpuBytes": 589456,
+        "beforeNanos": 34370400,
+        "afterNanos": 20744600,
+        "meshes": 1,
+        "improvedMeshes": 0,
+        "oldTiers": [
+          25861,
+          25861,
+          25861,
+          25861
+        ],
+        "newTiers": [
+          25861,
+          25861,
+          25861,
+          25861
+        ]
+      },
+      "512": {
+        "before": 1702,
+        "after": 1702,
+        "leafBefore": 0,
+        "leafAfter": 0,
+        "beforeGpuBytes": 45056,
+        "afterGpuBytes": 45056,
+        "beforeNanos": 1817500,
+        "afterNanos": 16395600,
+        "meshes": 4,
+        "improvedMeshes": 0,
+        "oldTiers": [
+          1702,
+          1702,
+          1702,
+          1702
+        ],
+        "newTiers": [
+          1702,
+          1702,
+          1702,
+          1702
+        ]
+      },
+      "1024": {
+        "before": 1290,
+        "after": 1290,
+        "leafBefore": 0,
+        "leafAfter": 0,
+        "beforeGpuBytes": 33568,
+        "afterGpuBytes": 33568,
+        "beforeNanos": 1438200,
+        "afterNanos": 2812600,
+        "meshes": 3,
+        "improvedMeshes": 0,
+        "oldTiers": [
+          1290,
+          1290,
+          1290,
+          1290
+        ],
+        "newTiers": [
+          1290,
+          1290,
+          1290,
+          1290
+        ]
+      }
+    }
+  },
+  "metrics": {
+    "canonicalOpaqueQuads": {
+      "before": 22405691,
+      "after": 21344411,
+      "saved": 1061280,
+      "reductionPercent": 4.7366537367671455
+    },
+    "leafQuads": {
+      "before": 1126761,
+      "after": 907626,
+      "saved": 219135,
+      "reductionPercent": 19.44822371381331
+    },
+    "gpuEncodedBytes": {
+      "before": 649511776,
+      "after": 615726480,
+      "saved": 33785296,
+      "reductionPercent": 5.2016448736412135
+    }
+  },
+  "displayTierMetrics": [
+    {
+      "tier": 1,
+      "before": 14449920,
+      "after": 14653598,
+      "reductionPercent": -1.4095441358844893
+    },
+    {
+      "tier": 2,
+      "before": 13466516,
+      "after": 10782084,
+      "reductionPercent": 19.934124015446905
+    },
+    {
+      "tier": 3,
+      "before": 17210628,
+      "after": 10093604,
+      "reductionPercent": 41.352494516760224
+    }
+  ],
+  "sharedAlgorithmSha256": {
+    "PredictionScanMesher2D.java": "7818bff2468ca4af42ee315a64d8e2d11e3f36108eafc2048105befe45fcf661",
+    "PredictionScanMerge.java": "6cd1ffd39ee53ffef8c7adf3bc407049842f66c69320363168e225b1c96f308f",
+    "PredictionDisplayGeometry.java": "98e2a133a09cb35901458f88347df76acf47a65fa9da6256346be8908a9c6295",
+    "VssLodGreedyMesher.java": "b9669233db9390aac6667923f235ab7737b275fc054477d50cae9da7b67331e1"
+  },
+  "platforms": {
+    "neoforge": {
+      "date": "2026-10-11",
+      "platform": "neoforge",
+      "minecraft": "1.21.1",
+      "version": "0.3.5",
+      "jar": "vss-0.3.5-neoforge-1.21.1.jar",
+      "jarBytes": 5917520,
+      "sha256": "82519dfff7ee8993ca98893f69ed45d8823218ac6103bc76d35b544db3244ed0",
+      "javaVersion": 21,
+      "forgeReobfuscated": false,
+      "defaultScanMergeEnabled": true,
+      "disableDiagnosticProperty": "vss.disableVoxyScanMerge",
+      "sharedAlgorithmSha256": {
+        "PredictionScanMesher2D.java": "7818bff2468ca4af42ee315a64d8e2d11e3f36108eafc2048105befe45fcf661",
+        "PredictionScanMerge.java": "6cd1ffd39ee53ffef8c7adf3bc407049842f66c69320363168e225b1c96f308f",
+        "PredictionDisplayGeometry.java": "98e2a133a09cb35901458f88347df76acf47a65fa9da6256346be8908a9c6295",
+        "VssLodGreedyMesher.java": "b9669233db9390aac6667923f235ab7737b275fc054477d50cae9da7b67331e1"
+      },
+      "testTotals": {
+        "voxy-scan": {
+          "tests": 145,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 144
+        },
+        "voxy-scan-gpu": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 11
+        }
+      },
+      "report": "../../docs/prediction-voxy-scan-merge-20261011.md",
+      "runtimeFPSMeasured": false,
+      "clientInstanceReplaced": false,
+      "githubPushed": false,
+      "tests": {
+        "voxy-scan": {
+          "total": {
+            "tests": 145,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 1,
+            "passed": 144
+          },
+          "classes": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionAffineMergeTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCrossEncodingTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayErrorTest",
+              "tests": 6,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayGeometryTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 1,
+              "skippedTests": [
+                "realCorpusRoundTripAndEncodingCost()"
+              ]
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+              "tests": 18,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCompressionTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshMemoryTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionOwnershipMemoryTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionPassStorageTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionQuadMergerTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionRectangleEncodingTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMergeTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMesher2DTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionSpatialOrderTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+              "tests": 11,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+              "tests": 11,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVegetationRunsTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVisibleHandoffTest",
+              "tests": 2,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.VssLodModulesTest",
+              "tests": 11,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            }
+          ]
+        },
+        "voxy-scan-gpu": {
+          "total": {
+            "tests": 11,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "passed": 11
+          },
+          "classes": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCompressedUploadGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMergeGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": [],
+              "scanLogs": [
+                "SCAN_GPU renderer=NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2",
+                "SCAN_MICROBENCH synthetic=true rasterDiscard=true draws=4 sourceQuads=65536 mergedQuads=256 sourceBytes=1310736 mergedBytes=5136 before_ms=0.048128 after_ms=0.003072",
+                "SCAN_MICROBENCH synthetic=true rasterDiscard=false draws=4 sourceQuads=65536 mergedQuads=256 sourceBytes=1310736 mergedBytes=5136 before_ms=0.583680 after_ms=0.035840",
+                "SCAN_GPU exact opaque coverage/alpha; RGB tolerance <=2/255; cutout boundary tolerance <=1 pixel and <=0.1% of target, no interior mismatches; XYZ planes, repeated atlas UV, full/mixed/revoked/restored owners and direct/MDI"
+              ],
+              "maxRgbDelta": 1,
+              "maxAlphaBoundaryPixels": 52
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionSegmentedMeshGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVegetationRenderGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVoxyBoundaryGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            }
+          ]
+        }
+      },
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1"
+    },
+    "forge": {
+      "date": "2026-10-11",
+      "platform": "forge",
+      "minecraft": "1.20.1",
+      "version": "0.3.5",
+      "jar": "vss-0.3.5-forge-1.20.1.jar",
+      "jarBytes": 6589830,
+      "sha256": "5915e3c4632f01bb49564991a5ad5835eb2c4c0a82c6d8c4f696ccdc6d76a228",
+      "javaVersion": 17,
+      "forgeReobfuscated": true,
+      "defaultScanMergeEnabled": true,
+      "disableDiagnosticProperty": "vss.disableVoxyScanMerge",
+      "sharedAlgorithmSha256": {
+        "PredictionScanMesher2D.java": "7818bff2468ca4af42ee315a64d8e2d11e3f36108eafc2048105befe45fcf661",
+        "PredictionScanMerge.java": "6cd1ffd39ee53ffef8c7adf3bc407049842f66c69320363168e225b1c96f308f",
+        "PredictionDisplayGeometry.java": "98e2a133a09cb35901458f88347df76acf47a65fa9da6256346be8908a9c6295",
+        "VssLodGreedyMesher.java": "b9669233db9390aac6667923f235ab7737b275fc054477d50cae9da7b67331e1"
+      },
+      "testTotals": {
+        "voxy-scan": {
+          "tests": 144,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 143
+        },
+        "voxy-scan-gpu": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 11
+        }
+      },
+      "report": "../../docs/prediction-voxy-scan-merge-20261011.md",
+      "runtimeFPSMeasured": false,
+      "clientInstanceReplaced": false,
+      "githubPushed": false,
+      "tests": {
+        "voxy-scan": {
+          "total": {
+            "tests": 144,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 1,
+            "passed": 143
+          },
+          "classes": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionAffineMergeTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCrossEncodingTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayErrorTest",
+              "tests": 6,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayGeometryTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 1,
+              "skippedTests": [
+                "realCorpusRoundTripAndEncodingCost()"
+              ]
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+              "tests": 18,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCompressionTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshMemoryTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionOwnershipMemoryTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionPassStorageTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionQuadMergerTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionRectangleEncodingTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMergeTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMesher2DTest",
+              "tests": 3,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionSpatialOrderTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+              "tests": 11,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+              "tests": 12,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVegetationRunsTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.VssLodModulesTest",
+              "tests": 11,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            }
+          ]
+        },
+        "voxy-scan-gpu": {
+          "total": {
+            "tests": 11,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "passed": 11
+          },
+          "classes": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCompressedUploadGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMergeGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": [],
+              "scanLogs": [
+                "SCAN_GPU renderer=NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2",
+                "SCAN_MICROBENCH synthetic=true rasterDiscard=true draws=4 sourceQuads=65536 mergedQuads=256 sourceBytes=1310736 mergedBytes=5136 before_ms=0.048128 after_ms=0.003072",
+                "SCAN_MICROBENCH synthetic=true rasterDiscard=false draws=4 sourceQuads=65536 mergedQuads=256 sourceBytes=1310736 mergedBytes=5136 before_ms=0.582656 after_ms=0.033792",
+                "SCAN_GPU exact opaque coverage/alpha; RGB tolerance <=2/255; cutout boundary tolerance <=1 pixel and <=0.1% of target, no interior mismatches; XYZ planes, repeated atlas UV, full/mixed/revoked/restored owners and direct/MDI"
+              ],
+              "maxRgbDelta": 1,
+              "maxAlphaBoundaryPixels": 52
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionSegmentedMeshGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVegetationRenderGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVoxyBoundaryGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0,
+              "skippedTests": []
+            }
+          ]
+        }
+      },
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside"
+    }
+  },
+  "visualLimits": {
+    "opaqueCoverageAndAlphaExact": true,
+    "maximumMeasuredRgbDifference255": 1,
+    "maximumCutoutBoundaryPixels": 52,
+    "testTargetPixels": 65536,
+    "cutoutInteriorMismatches": 0,
+    "cutoutBoundaryWithinPixels": 1,
+    "pixelExactForCutout": false
+  },
+  "limitations": [
+    "Historical complete resident meshes, not current visible draws",
+    "Material tags approximated from captured leafClass and vanilla snow",
+    "Tier 1 quads increased 1.41% in replay",
+    "Deeper tier gains include representation reuse fix",
+    "Synthetic GPU benchmarks are not runtime FPS gains",
+    "CPU replay timing is not an isolated alternating benchmark"
+  ]
+}

@@ -1,0 +1,386 @@
+{
+  "date": "2026-10-12",
+  "basis_spark": "https://spark.lucko.me/lNvcOAWHJs",
+  "platforms": {
+    "neoforge": {
+      "seam_candidate_ab": [
+        {
+          "file": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tools\\prediction\\render-followup-experiments\\results\\neoforge\\seam-candidates.csv",
+          "sha256": "d67bce7427ed9ef4cae7ed654dc0c988a71b3a9426c181a8cafeba956f758081",
+          "comparisons": [
+            {
+              "samples_per_mode": 121,
+              "query_median_ms": [
+                0.5776,
+                0.4221
+              ],
+              "query_median_reduction_pct": 26.92174515235457,
+              "query_p95_ms": [
+                0.8551,
+                0.7375
+              ],
+              "including_local_update_median_ms": [
+                0.5776,
+                0.4244
+              ],
+              "including_local_update_median_reduction_pct": 26.523545706371188,
+              "including_local_update_p95_ms": [
+                0.8551,
+                0.7392
+              ]
+            }
+          ]
+        },
+        {
+          "file": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tools\\prediction\\render-followup-experiments\\results\\neoforge\\seam-candidates-confirmation.csv",
+          "sha256": "783f5e7ea76dda9a86b3fefc072aa8f41c7071bc4b0c76be901d5c6aeeeb4771",
+          "comparisons": [
+            {
+              "samples_per_mode": 121,
+              "query_median_ms": [
+                0.6666,
+                0.5086
+              ],
+              "query_median_reduction_pct": 23.702370237023697,
+              "query_p95_ms": [
+                1.0317,
+                0.8798
+              ],
+              "including_local_update_median_ms": [
+                0.6666,
+                0.5101
+              ],
+              "including_local_update_median_reduction_pct": 23.47734773477348,
+              "including_local_update_p95_ms": [
+                1.0317,
+                0.8815
+              ]
+            }
+          ]
+        }
+      ],
+      "tests": {
+        "followup-regression": {
+          "tests": 125,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "followup-gpu": {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "followup-cpu-benchmark": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "artifact": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\render-followup-20261012\\vss-0.3.5-neoforge-1.21.1.jar",
+        "sha256": "0bc185c59ff115ac9decce0b7b2494d0bb626653ca59155a855d1beedf5b52fb",
+        "bytes": 5937669,
+        "version": "0.3.5-neoforge-1.21.1",
+        "class_major": 65,
+        "native_sha256": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        }
+      },
+      "source_sha256": {
+        "PredictionRenderer.java": "b91858f7cca927bcd78bc0b2f18d79d742dc89eae2516f2c5337780fe5428919",
+        "PredictionRenderResidency.java": "dd1603f7bab16c2bdbb027485242d9ded7ac68c6776910c63d398b48e3927fce",
+        "PredictionSeamIndex.java": "bd3ce1f61daffb24d33dc83e44bdd44f48f18df0738eed62eb36290dabd00315",
+        "PredictionRefinementOcclusion.java": "8b2254d4797fb4ada7a0eb8037cba9e079fbb790de39cdffe8455e461e3edc9e",
+        "PredictionTerrainProgram.java": "e6a96b7567764f39217d3e45fb56604fef04ac3814ba740de6ab86814cc57990"
+      }
+    },
+    "forge": {
+      "seam_candidate_ab": [
+        {
+          "file": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tools\\prediction\\render-followup-experiments\\results\\forge\\seam-candidates.csv",
+          "sha256": "92ada9df232663e8454b9bae16f6e22f4f8b111372dc73f36b6541963a0c7553",
+          "comparisons": [
+            {
+              "samples_per_mode": 121,
+              "query_median_ms": [
+                0.5931,
+                0.4626
+              ],
+              "query_median_reduction_pct": 22.0030349013657,
+              "query_p95_ms": [
+                1.2594,
+                0.755
+              ],
+              "including_local_update_median_ms": [
+                0.5931,
+                0.4638
+              ],
+              "including_local_update_median_reduction_pct": 21.800708143651992,
+              "including_local_update_p95_ms": [
+                1.2594,
+                0.7573
+              ]
+            }
+          ]
+        },
+        {
+          "file": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tools\\prediction\\render-followup-experiments\\results\\forge\\seam-candidates-confirmation.csv",
+          "sha256": "faad1b46bf2d3c818d3d6b77c04b2e300dd17535c724ead743b0f8b2169b81e7",
+          "comparisons": [
+            {
+              "samples_per_mode": 121,
+              "query_median_ms": [
+                0.6898,
+                0.5054
+              ],
+              "query_median_reduction_pct": 26.73238619889824,
+              "query_p95_ms": [
+                1.2801,
+                0.8264
+              ],
+              "including_local_update_median_ms": [
+                0.6898,
+                0.507
+              ],
+              "including_local_update_median_reduction_pct": 26.500434908669178,
+              "including_local_update_p95_ms": [
+                1.2801,
+                0.8281
+              ]
+            }
+          ]
+        }
+      ],
+      "tests": {
+        "followup-regression": {
+          "tests": 123,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "followup-gpu": {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "followup-cpu-benchmark": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "artifact": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\render-followup-20261012\\vss-0.3.5-forge-1.20.1.jar",
+        "sha256": "03269d70f3e735482f80a6cf13a97c8106accfc6300d41352898a749878960f3",
+        "bytes": 6610008,
+        "version": "0.3.5-forge-1.20.1",
+        "class_major": 61,
+        "native_sha256": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        }
+      },
+      "source_sha256": {
+        "PredictionRenderer.java": "67982bd0149922b0d57bfecd701acb1a6573061363ef552a27da378689101301",
+        "PredictionRenderResidency.java": "2eb724aa441ac84316c705a8ed046b3d93af34d9d069caf3e019c1c8bb3e8642",
+        "PredictionSeamIndex.java": "bd3ce1f61daffb24d33dc83e44bdd44f48f18df0738eed62eb36290dabd00315",
+        "PredictionRefinementOcclusion.java": "8b2254d4797fb4ada7a0eb8037cba9e079fbb790de39cdffe8455e461e3edc9e",
+        "PredictionTerrainProgram.java": "e6a96b7567764f39217d3e45fb56604fef04ac3814ba740de6ab86814cc57990"
+      }
+    }
+  },
+  "rejected": {
+    "mapped-copy": {
+      "file": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tools\\prediction\\render-followup-experiments\\rejected\\mapped-copy\\neoforge-visibility-readback.csv",
+      "sha256": "53de77d23927994a68d54478321ea78a213396f856e8262dade18c0e1222ba43",
+      "comparisons": [
+        {
+          "samples_per_mode": 81,
+          "submit_cpu_median_ms": [
+            0.2592,
+            0.3431
+          ],
+          "submit_cpu_median_reduction_pct": -32.36882716049385,
+          "submit_cpu_p95_ms": [
+            0.6181,
+            0.98
+          ],
+          "poll_cpu_median_ms": [
+            0.4048,
+            0.3464
+          ],
+          "poll_cpu_median_reduction_pct": 14.426877470355738,
+          "poll_cpu_p95_ms": [
+            0.558,
+            0.5117
+          ],
+          "total_cpu_median_ms": [
+            0.699,
+            0.7363
+          ],
+          "total_cpu_median_reduction_pct": -5.336194563662366,
+          "total_cpu_p95_ms": [
+            1.0256,
+            1.314
+          ],
+          "gpu_median_ms": [
+            0.044032,
+            0.103424
+          ],
+          "gpu_median_reduction_pct": -134.88372093023258,
+          "gpu_p95_ms": [
+            0.124928,
+            0.390144
+          ]
+        }
+      ]
+    },
+    "direct-mapped": {
+      "file": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tools\\prediction\\render-followup-experiments\\rejected\\direct-mapped\\neoforge-visibility-readback.csv",
+      "sha256": "667a96ca35ead912e303570a8c0fc5da084fe218a5aea11192520bc92891f862",
+      "comparisons": [
+        {
+          "samples_per_mode": 81,
+          "submit_cpu_median_ms": [
+            0.1996,
+            0.2034
+          ],
+          "submit_cpu_median_reduction_pct": -1.9038076152304573,
+          "submit_cpu_p95_ms": [
+            0.5315,
+            0.5564
+          ],
+          "poll_cpu_median_ms": [
+            0.3142,
+            0.2668
+          ],
+          "poll_cpu_median_reduction_pct": 15.085932527052837,
+          "poll_cpu_p95_ms": [
+            0.4981,
+            0.4379
+          ],
+          "total_cpu_median_ms": [
+            0.5298,
+            0.4891
+          ],
+          "total_cpu_median_reduction_pct": 7.68214420536053,
+          "total_cpu_p95_ms": [
+            1.0101,
+            0.7874
+          ],
+          "gpu_median_ms": [
+            0.044032,
+            0.207872
+          ],
+          "gpu_median_reduction_pct": -372.09302325581393,
+          "gpu_p95_ms": [
+            0.09728,
+            0.384
+          ]
+        }
+      ]
+    },
+    "early-face": {
+      "file": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tools\\prediction\\render-followup-experiments\\rejected\\early-face\\neoforge-early-face.csv",
+      "sha256": "d9e184f3f151afcbf6c59c78aa2769bcba5809e7daf9702be65df4b6ee4feb9b",
+      "comparisons": [
+        {
+          "samples_per_mode": 81,
+          "view": "0",
+          "cpu_median_ms": [
+            0.2091,
+            0.2082
+          ],
+          "cpu_median_reduction_pct": 0.43041606886657924,
+          "cpu_p95_ms": [
+            0.249,
+            0.238
+          ],
+          "gpu_median_ms": [
+            1.984512,
+            1.995776
+          ],
+          "gpu_median_reduction_pct": -0.5675954592363253,
+          "gpu_p95_ms": [
+            2.696192,
+            2.7904
+          ]
+        },
+        {
+          "samples_per_mode": 81,
+          "view": "1",
+          "cpu_median_ms": [
+            0.2103,
+            0.2063
+          ],
+          "cpu_median_reduction_pct": 1.902044698050398,
+          "cpu_p95_ms": [
+            0.2317,
+            0.2273
+          ],
+          "gpu_median_ms": [
+            1.979392,
+            1.974272
+          ],
+          "gpu_median_reduction_pct": 0.2586652871184647,
+          "gpu_p95_ms": [
+            2.692096,
+            2.819072
+          ]
+        },
+        {
+          "samples_per_mode": 81,
+          "view": "2",
+          "cpu_median_ms": [
+            0.2084,
+            0.2081
+          ],
+          "cpu_median_reduction_pct": 0.14395393474088136,
+          "cpu_p95_ms": [
+            0.2498,
+            0.2418
+          ],
+          "gpu_median_ms": [
+            2.00704,
+            1.982464
+          ],
+          "gpu_median_reduction_pct": 1.2244897959183598,
+          "gpu_p95_ms": [
+            2.883584,
+            2.796544
+          ]
+        }
+      ]
+    }
+  },
+  "limits": [
+    "Component timings are not game FPS or frame-time A/B.",
+    "The 6306 seam coordinates are captured; heights are reconstructed as [-64,512].",
+    "Exact visits include warmup; quadtree traversal CPU is included in query timing.",
+    "The GL retirement fixture holds 134144 live bytes in one 64 MiB arena page; this is not a world VRAM saving estimate.",
+    "The Forge shader convention regression reads shader text from the installed NeoForge Voxy JAR; it does not load that mod."
+  ],
+  "retained": [
+    "Local seam patch quadtree with actual subtree bounds",
+    "View-dependent seam GPU protection and cold admission with complete ordinary parent fallback"
+  ],
+  "not_changed": [
+    "GPU readback implementation",
+    "Production vertex shader",
+    "Adaptive HiZ comparison",
+    "Screen-space parent ownership selection",
+    "GPU retirement throttle"
+  ]
+}

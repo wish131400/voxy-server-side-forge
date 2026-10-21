@@ -1,0 +1,1610 @@
+{
+  "date": "2026-10-12",
+  "decision": "retain measured improvements",
+  "spark": {
+    "source": {
+      "url": "https://spark.lucko.me/Oh7GNI04kO",
+      "path": "C:/Users/Administrator/.codex/tmp/vss-zoom-return-20261012/Oh7GNI04kO.sparkprofile",
+      "sha256": "17e122e851beb3edf5b7f361bfffc453b38b9c90a68146199fc4ba1115628424"
+    },
+    "start_hkt": "2026-10-12T16:23:12.709000+08:00",
+    "end_hkt": "2026-10-12T16:25:13.040000+08:00",
+    "interval_us": 4000,
+    "thread": "Render thread",
+    "sample_weight_ms": 120000,
+    "samples": 30000.0,
+    "nodes": 8346,
+    "validation": {
+      "nodes": 8346,
+      "visited": 8346,
+      "refsValid": true,
+      "uniqueParents": true,
+      "minSelf": 0,
+      "totalSelf": [
+        47292,
+        60000,
+        12708
+      ]
+    },
+    "inclusive_groups": {
+      "VSS": {
+        "sample_ms": 84272,
+        "sample_pct": 70.22666666666667
+      },
+      "Voxy": {
+        "sample_ms": 67756,
+        "sample_pct": 56.46333333333333
+      },
+      "Iris": {
+        "sample_ms": 3340,
+        "sample_pct": 2.783333333333333
+      },
+      "Xaero": {
+        "sample_ms": 3020,
+        "sample_pct": 2.5166666666666666
+      },
+      "Sodium": {
+        "sample_ms": 73316,
+        "sample_pct": 61.096666666666664
+      },
+      "drawIris": {
+        "sample_ms": 0,
+        "sample_pct": 0
+      },
+      "drawNormalPass": {
+        "sample_ms": 22484,
+        "sample_pct": 18.736666666666668
+      },
+      "ScenePrepare": {
+        "sample_ms": 17860,
+        "sample_pct": 14.883333333333333
+      },
+      "PreparedPass": {
+        "sample_ms": 9524,
+        "sample_pct": 7.9366666666666665
+      },
+      "submitRanges": {
+        "sample_ms": 1972,
+        "sample_pct": 1.6433333333333333
+      },
+      "swap": {
+        "sample_ms": 25084,
+        "sample_pct": 20.903333333333332
+      },
+      "glFinish": {
+        "sample_ms": 204,
+        "sample_pct": 0.17
+      },
+      "glGetError": {
+        "sample_ms": 4,
+        "sample_pct": 0.0033333333333333335
+      },
+      "VSSgl": {
+        "sample_ms": 23916,
+        "sample_pct": 19.93
+      },
+      "XaeroWorld": {
+        "sample_ms": 1100,
+        "sample_pct": 0.9166666666666666
+      }
+    },
+    "exclusive_categories": {
+      "other_vss": {
+        "sample_ms": 17364,
+        "sample_pct": 14.469999999999999
+      },
+      "vss_voxy_overlap": {
+        "sample_ms": 65848,
+        "sample_pct": 54.87333333333333
+      },
+      "voxy_without_vss": {
+        "sample_ms": 1908,
+        "sample_pct": 1.59
+      },
+      "client_tick": {
+        "sample_ms": 12512,
+        "sample_pct": 10.426666666666666
+      },
+      "draw_passes": {
+        "sample_ms": 28684,
+        "sample_pct": 23.903333333333332
+      },
+      "geometry_upload": {
+        "sample_ms": 2096,
+        "sample_pct": 1.7466666666666666
+      },
+      "refinement_visibility": {
+        "sample_ms": 5756,
+        "sample_pct": 4.796666666666667
+      },
+      "scene_prepare": {
+        "sample_ms": 17860,
+        "sample_pct": 14.883333333333335
+      }
+    },
+    "visibility_poll_self": {
+      "org.lwjgl.opengl.GL32C.nglDeleteSync": 4,
+      "org.lwjgl.opengl.GL32C.glDeleteSync": 0,
+      "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.releaseFence": 0,
+      "org.lwjgl.opengl.GL32C.nglClientWaitSync": 8,
+      "org.lwjgl.opengl.GL32C.glClientWaitSync": 0,
+      "java.util.Collection.removeIf": 40,
+      "java.util.HashMap.resize": 12,
+      "java.util.HashMap.putVal": 0,
+      "java.util.HashMap.put": 0,
+      "java.util.HashMap.computeIfAbsent": 4,
+      "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot.lambda$new$1": 36,
+      "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot$$Lambda/0x000000009925ac00.accept": 0,
+      "java.util.ImmutableCollections$MapN$MapNIterator.next": 4,
+      "java.util.Map.forEach": 20,
+      "java.util.ImmutableCollections$MapN.probe": 140,
+      "java.util.ImmutableCollections$MapN.<init>": 0,
+      "java.util.Map.ofEntries": 8,
+      "java.util.AbstractCollection.toArray": 32,
+      "java.util.Map.copyOf": 0,
+      "it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.insert": 4,
+      "it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.find": 4,
+      "it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.put": 0,
+      "it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get": 16,
+      "dev.xantha.vss.client.prediction.PredictionTileTable.changed": 36,
+      "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot.lambda$new$2": 0,
+      "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot$$Lambda/0x000000009925b000.accept": 0,
+      "java.util.HashMap.forEach": 0,
+      "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot.<init>": 0,
+      "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$History.observe": 68,
+      "org.lwjgl.opengl.GL45C.nglGetNamedBufferSubData": 4080,
+      "org.lwjgl.opengl.GL45C.glGetNamedBufferSubData": 0,
+      "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.poll": 0
+    },
+    "log_window": {
+      "start": "16:23:15.515",
+      "end": "16:25:10.997",
+      "seconds": 115.482,
+      "rows": 24,
+      "deltas": {
+        "meshUploads": 5644,
+        "preparedPlans": 2803,
+        "reusedPlans": 978
+      },
+      "seam_deltas": {
+        "builds": 791,
+        "localReuses": 13163990,
+        "updated": 55020,
+        "parallelMaskBatches": 856,
+        "parallelMaskSurfaces": 35868,
+        "parallelMaskWallMs": 586
+      },
+      "indirect_counter_deltas": {
+        "planHits": 7488,
+        "planMisses": 372442,
+        "planReplayBatches": 1627285,
+        "planIdentityHits": 9390249,
+        "wholePlanHits": 1301,
+        "regionHits": 1627285,
+        "regionRebuilds": 413023,
+        "encodedItems": 3001427,
+        "planContentChecks": 350665,
+        "occlusionRestarts": 2357,
+        "occlusionComparisons": 1
+      },
+      "indirect_snapshot_start_end": {
+        "start": {
+          "buckets": null,
+          "reusedBatches": 401,
+          "uploadedBatches": 0,
+          "uploadedBytes": 0,
+          "flushes": 401,
+          "submissionFrame": 15405,
+          "mdiCandidateQuads": 11498415,
+          "directCandidateQuads": 12322221,
+          "directTiles": 802,
+          "mdiCommands": 78175,
+          "planHits": 15184,
+          "planMisses": 166895,
+          "planReplayBatches": 2232370,
+          "planIdentityHits": 13002056,
+          "wholePlanHits": 5921,
+          "regionHits": 2232370,
+          "regionRebuilds": 189904,
+          "encodedItems": 4136040,
+          "planContentChecks": 144669,
+          "filterBarriers": 8,
+          "directGpuMs": 17.783808,
+          "culledGpuMs": 18.431744000000002,
+          "occlusionRestarts": 3477,
+          "occlusionComparisons": 14,
+          "hizBuilds": 8,
+          "sampleAge": 2,
+          "occlusionFrame": 7803,
+          "sampleFrame": 7801,
+          "sampleSubmissionFrame": 15401,
+          "sampleMdiQuads": 11498415,
+          "sampleDirectQuads": 12322221,
+          "sampleCandidateQuads": 23820636,
+          "sampleAfterHizQuads": 20012304,
+          "testedCommands": 78175,
+          "hiddenCommands": 30733,
+          "testedQuads": 11498415,
+          "hiddenQuads": 3808332,
+          "queuedQuads": [
+            198014,
+            2811717,
+            12583064,
+            8227841,
+            0
+          ]
+        },
+        "end": {
+          "buckets": null,
+          "reusedBatches": 448,
+          "uploadedBatches": 8,
+          "uploadedBytes": 36592,
+          "flushes": 456,
+          "submissionFrame": 22967,
+          "mdiCandidateQuads": 8510156,
+          "directCandidateQuads": 23594013,
+          "directTiles": 1487,
+          "mdiCommands": 67956,
+          "planHits": 22672,
+          "planMisses": 539337,
+          "planReplayBatches": 3859655,
+          "planIdentityHits": 22392305,
+          "wholePlanHits": 7222,
+          "regionHits": 3859655,
+          "regionRebuilds": 602927,
+          "encodedItems": 7137467,
+          "planContentChecks": 495334,
+          "filterBarriers": 8,
+          "directGpuMs": 17.761792,
+          "culledGpuMs": 14.178048,
+          "occlusionRestarts": 5834,
+          "occlusionComparisons": 15,
+          "hizBuilds": 8,
+          "sampleAge": 3,
+          "occlusionFrame": 11584,
+          "sampleFrame": 11581,
+          "sampleSubmissionFrame": 22961,
+          "sampleMdiQuads": 8510058,
+          "sampleDirectQuads": 23571130,
+          "sampleCandidateQuads": 32081188,
+          "sampleAfterHizQuads": 28052148,
+          "testedCommands": 67954,
+          "hiddenCommands": 33858,
+          "testedQuads": 8510058,
+          "hiddenQuads": 4029040,
+          "queuedQuads": [
+            215778,
+            2691983,
+            17042806,
+            12153602,
+            0
+          ]
+        }
+      },
+      "gpu_new_samples": {
+        "OPAQUEGpuMs": {
+          "mean_ms": 12.127793650793654,
+          "samples": 126,
+          "rounding_error_ms": 0.0026746031746031746
+        },
+        "WATERGpuMs": {
+          "mean_ms": 0.7637777777777777,
+          "samples": 126,
+          "rounding_error_ms": 0.0026746031746031746
+        },
+        "DEPTH_COPYGpuMs": {
+          "mean_ms": 0.18912698412698417,
+          "samples": 126,
+          "rounding_error_ms": 0.0026746031746031746
+        },
+        "ANTIALIASGpuMs": {
+          "mean_ms": 0.16077777777777774,
+          "samples": 126,
+          "rounding_error_ms": 0.0026746031746031746
+        },
+        "HZB_REDUCEGpuMs": {
+          "mean_ms": 0.08682414307004468,
+          "samples": 671,
+          "rounding_error_ms": 0.0026758569299552906
+        },
+        "GPU_FILTERGpuMs": {
+          "mean_ms": 0.05652757078986588,
+          "samples": 671,
+          "rounding_error_ms": 0.0026758569299552906
+        },
+        "INDIRECT_SUBMITGpuMs": {
+          "mean_ms": 0.06976934523809522,
+          "samples": 2016,
+          "rounding_error_ms": 0.002438988095238095
+        }
+      },
+      "quads_snapshot_min_med_max": [
+        2880308,
+        25845604.5,
+        33402833
+      ],
+      "fps_snapshot_min_med_max": [
+        21.3,
+        29.65,
+        75.6
+      ],
+      "resident_start_end": {
+        "residentSourceQuads": [
+          "121026427",
+          "163541606"
+        ],
+        "residentDisplayVariantQuads": [
+          "25168561",
+          "35816740"
+        ],
+        "residentSourceTerrain": [
+          "80593051",
+          "105412104"
+        ],
+        "residentSourceFeatures": [
+          "39088795",
+          "56647305"
+        ],
+        "liveBytes": [
+          "3326367840",
+          "4500282144"
+        ],
+        "committedGeometryBytes": [
+          "3561658432",
+          "4689378592"
+        ]
+      },
+      "last_hiz": {
+        "buckets": null,
+        "reusedBatches": 448,
+        "uploadedBatches": 8,
+        "uploadedBytes": 36592,
+        "flushes": 456,
+        "submissionFrame": 22967,
+        "mdiCandidateQuads": 8510156,
+        "directCandidateQuads": 23594013,
+        "directTiles": 1487,
+        "mdiCommands": 67956,
+        "planHits": 22672,
+        "planMisses": 539337,
+        "planReplayBatches": 3859655,
+        "planIdentityHits": 22392305,
+        "wholePlanHits": 7222,
+        "regionHits": 3859655,
+        "regionRebuilds": 602927,
+        "encodedItems": 7137467,
+        "planContentChecks": 495334,
+        "filterBarriers": 8,
+        "directGpuMs": 17.761792,
+        "culledGpuMs": 14.178048,
+        "occlusionRestarts": 5834,
+        "occlusionComparisons": 15,
+        "hizBuilds": 8,
+        "sampleAge": 3,
+        "occlusionFrame": 11584,
+        "sampleFrame": 11581,
+        "sampleSubmissionFrame": 22961,
+        "sampleMdiQuads": 8510058,
+        "sampleDirectQuads": 23571130,
+        "sampleCandidateQuads": 32081188,
+        "sampleAfterHizQuads": 28052148,
+        "testedCommands": 67954,
+        "hiddenCommands": 33858,
+        "testedQuads": 8510058,
+        "hiddenQuads": 4029040,
+        "queuedQuads": [
+          215778,
+          2691983,
+          17042806,
+          12153602,
+          0
+        ]
+      },
+      "last_ownership": {
+        "ownerTiles": 7213,
+        "suppressedParents": 0,
+        "partialCoverageParents": 471,
+        "transitionTiles": 545
+      }
+    },
+    "heap": {
+      "used": 10301000144,
+      "committed": 11609833472,
+      "init": 1073741824,
+      "max": 11609833472
+    },
+    "system": {
+      "cpu": {
+        "threads": 16,
+        "modelName": "AMD Ryzen 7 7700 8-Core Processor",
+        "processUsage": {
+          "last1M": 0.17608526405877403,
+          "last15M": 0.2375195701494849
+        },
+        "systemUsage": {
+          "last1M": 0.24706267023601586,
+          "last15M": 0.3059948329630427
+        }
+      },
+      "java": {
+        "vendor": "Oracle Corporation",
+        "version": "25.0.1",
+        "vendorVersion": "unknown",
+        "vmArgs": "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path=F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\1.21.1-NeoForge_21.1.249-natives -Djna.tmpdir=F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\1.21.1-NeoForge_21.1.249-natives -Dorg.lwjgl.system.SharedLibraryExtractPath=F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\1.21.1-NeoForge_21.1.249-natives -Dio.netty.native.workdir=F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\1.21.1-NeoForge_21.1.249-natives -Dminecraft.launcher.brand=PCL -Dminecraft.launcher.version=410 -Djava.net.preferIPv6Addresses=system -DignoreList=client-extra,1.21.1-NeoForge_21.1.249.jar -DlibraryDirectory=F:\\NovaEngineering-World整合包\\.minecraft\\libraries --module-path=F:\\NovaEngineering-World整合包\\.minecraft\\libraries/cpw/mods/bootstraplauncher/2.0.2/bootstraplauncher-2.0.2.jar;F:\\NovaEngineering-World整合包\\.minecraft\\libraries/cpw/mods/securejarhandler/3.0.8/securejarhandler-3.0.8.jar;F:\\NovaEngineering-World整合包\\.minecraft\\libraries/org/ow2/asm/asm-commons/9.10.1/asm-commons-9.10.1.jar;F:\\NovaEngineering-World整合包\\.minecraft\\libraries/org/ow2/asm/asm-util/9.10.1/asm-util-9.10.1.jar;F:\\NovaEngineering-World整合包\\.minecraft\\libraries/org/ow2/asm/asm-analysis/9.10.1/asm-analysis-9.10.1.jar;F:\\NovaEngineering-World整合包\\.minecraft\\libraries/org/ow2/asm/asm-tree/9.10.1/asm-tree-9.10.1.jar;F:\\NovaEngineering-World整合包\\.minecraft\\libraries/org/ow2/asm/asm/9.10.1/asm-9.10.1.jar;F:\\NovaEngineering-World整合包\\.minecraft\\libraries/net/neoforged/JarJarFileSystems/0.4.1/JarJarFileSystems-0.4.1.jar --add-modules=ALL-MODULE-PATH --add-opens=java.base/java.util.jar=cpw.mods.securejarhandler --add-opens=java.base/java.lang.invoke=cpw.mods.securejarhandler --add-exports=java.base/sun.security.util=cpw.mods.securejarhandler --add-exports=jdk.naming.dns/com.sun.jndi.dns=java.naming -XX:-OmitStackTraceInFastThrow -Djdk.lang.Process.allowAmbiguousCommands=True -Dfml.ignoreInvalidMinecraftCertificates=True -Dfml.ignorePatchDiscrepancies=True -Xmx11059m -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:G1HeapRegionSize=32M -XX:MaxGCPauseMillis=50 -XX:+PerfDisableSharedMem -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40 -Dlog4j2.formatMsgNoLookups=true -Dstdout.encoding=utf-8 -Dstderr.encoding=utf-8"
+      },
+      "gc": {
+        "G1 Young Generation": {
+          "total": 356,
+          "avgTime": 9.435393258426966,
+          "avgFrequency": 1003
+        },
+        "G1 Concurrent GC": {
+          "total": 192,
+          "avgTime": 1.9479166666666667,
+          "avgFrequency": 1876
+        },
+        "G1 Old Generation": {
+          "total": 1,
+          "avgTime": 279,
+          "avgFrequency": 360356
+        }
+      }
+    },
+    "mods": {
+      "iris": "1.8.14-beta.1+mc1.21.1",
+      "voxy": "0.2.15-beta",
+      "spark": "1.10.124",
+      "vss": "0.3.5-neoforge-1.21.1",
+      "sodium": "0.8.12-beta.2+mc1.21.1"
+    }
+  },
+  "method": {
+    "gpu": "RTX 4070 Ti SUPER, NVIDIA 572.70, OpenGL 4.6; actual arena/MDI/shader",
+    "target_pixels": [
+      256,
+      256
+    ],
+    "gpu_warmups": 24,
+    "gpu_rounds": 81,
+    "gpu_repetitions": 64,
+    "cpu_warmups": 8,
+    "cpu_rounds": 31,
+    "order": "paired alternating baseline/current",
+    "cpu_clock": "System.nanoTime; prepare/submit excluding glFinish and query readback",
+    "gpu_clock": "GL_TIME_ELAPSED around prepare/submit; not world FPS"
+  },
+  "results": {
+    "neoforge": {
+      "submission": [
+        {
+          "content": "terrain",
+          "scenario": "normal-expired",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.39936,
+            "p95": 0.402432,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0762,
+            "p95": 0.2224,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "normal-expired",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.036864,
+            "p95": 0.04096,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0805,
+            "p95": 0.2154,
+            "n": 81
+          },
+          "mdi_quads": [
+            52608
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            3
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.847872,
+            "p95": 1.521664,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0961,
+            "p95": 0.4347,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.847872,
+            "p95": 1.854464,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0914,
+            "p95": 0.3353,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.400384,
+            "p95": 0.403456,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.034,
+            "p95": 0.1089,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.038912,
+            "p95": 0.043008,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0365,
+            "p95": 0.1021,
+            "n": 81
+          },
+          "mdi_quads": [
+            52608
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            3
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "active",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.39936,
+            "p95": 0.402432,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0323,
+            "p95": 0.0824,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "active",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.400384,
+            "p95": 0.403456,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0345,
+            "p95": 0.0836,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "normal-expired",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.776192,
+            "p95": 1.28,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0393,
+            "p95": 0.084,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "normal-expired",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.058368,
+            "p95": 0.06144,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0426,
+            "p95": 0.1005,
+            "n": 81
+          },
+          "mdi_quads": [
+            131072
+          ],
+          "mdi_commands": [
+            128
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            2
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 3.576832,
+            "p95": 13.390848,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0643,
+            "p95": 0.0914,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 3.595264,
+            "p95": 12.565504,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0634,
+            "p95": 0.0997,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.785408,
+            "p95": 1.599488,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0332,
+            "p95": 0.0704,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.059392,
+            "p95": 0.06144,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0333,
+            "p95": 0.0753,
+            "n": 81
+          },
+          "mdi_quads": [
+            131072
+          ],
+          "mdi_commands": [
+            128
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            2
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "active",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.777216,
+            "p95": 1.357824,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0355,
+            "p95": 0.07,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "active",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.777216,
+            "p95": 1.389568,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0359,
+            "p95": 0.0698,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        }
+      ],
+      "coverage": [
+        {
+          "content": "coverage",
+          "scenario": "ordinary",
+          "mode": 0,
+          "cpu_ms": {
+            "median": 2.0858,
+            "p95": 2.9768,
+            "n": 31
+          },
+          "rendered_cells": [
+            262144
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "ordinary",
+          "mode": 1,
+          "cpu_ms": {
+            "median": 1.9806,
+            "p95": 3.084,
+            "n": 31
+          },
+          "rendered_cells": [
+            262144
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "unrelated-scope",
+          "mode": 0,
+          "cpu_ms": {
+            "median": 20.9979,
+            "p95": 22.9141,
+            "n": 31
+          },
+          "rendered_cells": [
+            266240
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "unrelated-scope",
+          "mode": 1,
+          "cpu_ms": {
+            "median": 2.009,
+            "p95": 2.4905,
+            "n": 31
+          },
+          "rendered_cells": [
+            266240
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "overlapping-scope",
+          "mode": 0,
+          "cpu_ms": {
+            "median": 20.8712,
+            "p95": 22.2531,
+            "n": 31
+          },
+          "rendered_cells": [
+            266224
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "overlapping-scope",
+          "mode": 1,
+          "cpu_ms": {
+            "median": 2.2632,
+            "p95": 2.8326,
+            "n": 31
+          },
+          "rendered_cells": [
+            266224
+          ]
+        }
+      ]
+    },
+    "forge": {
+      "submission": [
+        {
+          "content": "terrain",
+          "scenario": "normal-expired",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.39936,
+            "p95": 0.78848,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0489,
+            "p95": 0.1207,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "normal-expired",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.036864,
+            "p95": 0.04096,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0521,
+            "p95": 0.1082,
+            "n": 81
+          },
+          "mdi_quads": [
+            52608
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            3
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.8448,
+            "p95": 0.856064,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0456,
+            "p95": 0.0856,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.846848,
+            "p95": 1.739776,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0464,
+            "p95": 0.0884,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.400384,
+            "p95": 0.40448,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0311,
+            "p95": 0.0555,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.038912,
+            "p95": 0.041984,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0325,
+            "p95": 0.0537,
+            "n": 81
+          },
+          "mdi_quads": [
+            52608
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            3
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "active",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.39936,
+            "p95": 0.402432,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0308,
+            "p95": 0.0662,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "terrain",
+          "scenario": "active",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.39936,
+            "p95": 0.820224,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0278,
+            "p95": 0.0602,
+            "n": 81
+          },
+          "mdi_quads": [
+            1048576
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "normal-expired",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.776192,
+            "p95": 1.518592,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0264,
+            "p95": 0.0568,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "normal-expired",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.058368,
+            "p95": 0.06144,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0322,
+            "p95": 0.0686,
+            "n": 81
+          },
+          "mdi_quads": [
+            131072
+          ],
+          "mdi_commands": [
+            128
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            2
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 3.570688,
+            "p95": 9.48224,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.048,
+            "p95": 0.0709,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 3.591168,
+            "p95": 10.289152,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0456,
+            "p95": 0.0662,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.785408,
+            "p95": 1.37216,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0267,
+            "p95": 0.0473,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.059392,
+            "p95": 0.06144,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0303,
+            "p95": 0.0547,
+            "n": 81
+          },
+          "mdi_quads": [
+            131072
+          ],
+          "mdi_commands": [
+            128
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            2
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "active",
+          "mode": 0,
+          "gpu_ms": {
+            "median": 0.777216,
+            "p95": 1.36192,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0316,
+            "p95": 0.0588,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        },
+        {
+          "content": "plants",
+          "scenario": "active",
+          "mode": 1,
+          "gpu_ms": {
+            "median": 0.777216,
+            "p95": 1.391616,
+            "n": 81
+          },
+          "cpu_ms": {
+            "median": 0.0325,
+            "p95": 0.0476,
+            "n": 81
+          },
+          "mdi_quads": [
+            2097152
+          ],
+          "mdi_commands": [
+            64
+          ],
+          "display_tier": [
+            0
+          ],
+          "vegetation_tier": [
+            0
+          ]
+        }
+      ],
+      "coverage": [
+        {
+          "content": "coverage",
+          "scenario": "ordinary",
+          "mode": 0,
+          "cpu_ms": {
+            "median": 1.0066,
+            "p95": 1.6805,
+            "n": 31
+          },
+          "rendered_cells": [
+            262144
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "ordinary",
+          "mode": 1,
+          "cpu_ms": {
+            "median": 1.0145,
+            "p95": 1.7943,
+            "n": 31
+          },
+          "rendered_cells": [
+            262144
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "unrelated-scope",
+          "mode": 0,
+          "cpu_ms": {
+            "median": 20.6176,
+            "p95": 22.5305,
+            "n": 31
+          },
+          "rendered_cells": [
+            266240
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "unrelated-scope",
+          "mode": 1,
+          "cpu_ms": {
+            "median": 1.9537,
+            "p95": 2.5063,
+            "n": 31
+          },
+          "rendered_cells": [
+            266240
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "overlapping-scope",
+          "mode": 0,
+          "cpu_ms": {
+            "median": 20.3644,
+            "p95": 21.6041,
+            "n": 31
+          },
+          "rendered_cells": [
+            266224
+          ]
+        },
+        {
+          "content": "coverage",
+          "scenario": "overlapping-scope",
+          "mode": 1,
+          "cpu_ms": {
+            "median": 2.2488,
+            "p95": 2.8165,
+            "n": 31
+          },
+          "rendered_cells": [
+            266224
+          ]
+        }
+      ]
+    }
+  },
+  "tests": {
+    "neoforge": {
+      "zoom-lod-regression": {
+        "tests": 230,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "archived JUnit XML"
+      },
+      "zoom-lod-cpu": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "archived JUnit XML"
+      },
+      "zoom-lod-gpu": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "archived JUnit XML"
+      },
+      "zoom-lod-production-gpu": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "saved successful Gradle log; later empty filter replaced live XML"
+      }
+    },
+    "forge": {
+      "zoom-lod-regression": {
+        "tests": 229,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "archived JUnit XML"
+      },
+      "zoom-lod-cpu": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "archived JUnit XML"
+      },
+      "zoom-lod-gpu": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "archived JUnit XML"
+      },
+      "zoom-lod-production-gpu": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "evidence": "archived JUnit XML"
+      }
+    }
+  },
+  "jars": {
+    "neoforge": {
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\zoom-return-20261012\\vss-0.3.5-neoforge-1.21.1.jar",
+      "bytes": 5953807,
+      "sha256": "92c6e83f5b5fb4780d71fa9de069c29c3f204c8209f448e36bb1acf784ec9109",
+      "crc": "pass",
+      "vss_class_major_versions": {
+        "65": 883
+      },
+      "experiment_classes_packaged": false,
+      "natives_match_previous_jar": true,
+      "native_sha256": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      }
+    },
+    "forge": {
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\zoom-return-20261012\\vss-0.3.5-forge-1.20.1.jar",
+      "bytes": 6626089,
+      "sha256": "bef8cc2c82680f852e6bd9b138cc52640c627432f719515c7ff26dd8dc2722f1",
+      "crc": "pass",
+      "vss_class_major_versions": {
+        "61": 894
+      },
+      "experiment_classes_packaged": false,
+      "natives_match_previous_jar": true,
+      "native_sha256": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      }
+    }
+  }
+}

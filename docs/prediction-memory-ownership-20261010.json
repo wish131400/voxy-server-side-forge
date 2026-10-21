@@ -1,0 +1,233 @@
+{
+  "date": "2026-10-10",
+  "installedJar": "F:/NovaEngineering-World整合包/.minecraft/versions/1.21.1-NeoForge_21.1.249/mods/vss-0.3.5-neoforge-1.21.1.jar",
+  "installedSha256": "032fe84f91ea10932501a8ce6ff4d7e7a3f56709aed1f72d6ef4b32b4491fd24",
+  "installedMatchesPreviousForestOptimization": true,
+  "sampling": {
+    "durationSeconds": 35,
+    "snapshots": 5,
+    "pausedSnapshots": 0,
+    "noForcedGc": true,
+    "noHeapDumpOrHeapWalk": true,
+    "noGlDiagnosticCalls": true
+  },
+  "memory": {
+    "heap": {
+      "minimumUsedBytes": 9998721880,
+      "maximumUsedBytes": 10804028248,
+      "maximumBytes": 11609833472
+    },
+    "os": {
+      "TotalVisibleMemorySize": 66181052,
+      "FreePhysicalMemory": 32521776,
+      "TotalVirtualMemorySize": 75618236,
+      "FreeVirtualMemory": 24255060
+    },
+    "process": {
+      "Id": 38236,
+      "StartTime": "2026-10-10T21:39:25.865991+08:00",
+      "WorkingSet64": 13829996544,
+      "PrivateMemorySize64": 21062893568
+    },
+    "initialGpuTotalMiB": 16376,
+    "initialGpuUsedMiB": 6536,
+    "initialGpuFreeMiB": 9528,
+    "jvmNativeMemoryTrackingEnabled": false,
+    "directBufferPoolBytes": 52113445,
+    "arrays": {
+      "time": "2026-10-10T13:52:14.266541500Z",
+      "source": "union:/F:/NovaEngineering-World整合包/.minecraft/versions/1.21.1-NeoForge_21.1.249/mods/vss-0.3.5-neoforge-1.21.1.jar%23236!/",
+      "readyTiles": 501,
+      "readyTileRetainedEstimateBytes": 204659058,
+      "uniqueReadyOrGpuPayloads": 2176,
+      "managers": [
+        {
+          "readyTiles": 501
+        }
+      ],
+      "uniqueRawArrayBytes": 22312096,
+      "uniqueOpaqueArrayBytes": 16242256,
+      "uniqueWaterArrayBytes": 197472,
+      "uniqueCompressedBlobBytes": 317475016,
+      "displayCanonicalBytes": 1885995712,
+      "extraUniqueDisplayCanonicalBytes": 1885995712,
+      "extraDisplayCanonicalPayloads": 2176,
+      "displayGeometryPayloads": 2176,
+      "largeDisplayCanonicalArrays": [],
+      "accountingMs": 15.0037,
+      "scope": "Only published prediction payload arrays; excludes other mods, sample objects, running workspaces, native/GPU allocations. Estimates overlap."
+    }
+  },
+  "gc": {
+    "recordingSeconds": 35,
+    "eventsSeconds": 35.007433,
+    "collections": 4,
+    "sumPauseMs": 32.4225,
+    "maximumPauseMs": 10.647,
+    "events": [
+      {
+        "name": "G1New",
+        "cause": "G1 Evacuation Pause",
+        "durationMs": 10.647,
+        "pauseMs": 10.647,
+        "longestPause": "PT0.010647S"
+      },
+      {
+        "name": "G1New",
+        "cause": "G1 Evacuation Pause",
+        "durationMs": 8.1219,
+        "pauseMs": 8.1219,
+        "longestPause": "PT0.0081219S"
+      },
+      {
+        "name": "G1Old",
+        "cause": "G1 Evacuation Pause",
+        "durationMs": 565.5025,
+        "pauseMs": 6.2975,
+        "longestPause": "PT0.0062672S"
+      },
+      {
+        "name": "G1New",
+        "cause": "G1 Evacuation Pause",
+        "durationMs": 7.3561,
+        "pauseMs": 7.3561,
+        "longestPause": "PT0.0073561S"
+      }
+    ],
+    "heapAfterGcBytes": [
+      9904389744,
+      9931613016,
+      10132939608,
+      9953175272
+    ]
+  },
+  "coverage": {
+    "cpuSettledColumns": 392,
+    "edgeColumns": 108,
+    "voxyRadiusBlocks": 8160,
+    "currentWholeOwnedGpuTiles": 0,
+    "lastPlanCpuExcludedOpaqueQuads": 21147,
+    "lastPlanCpuExcludedWaterQuads": 195,
+    "firstSnapshotResidencyState": {
+      "visibleTiles": 274,
+      "protectedTiles": 764,
+      "tiles": 2171,
+      "ownedTiles": 0,
+      "ownedWithoutFallback": 0,
+      "eligibleOwnedTiles": 0,
+      "ownedProtectedTiles": 0
+    },
+    "firstSnapshotGpuResidency": "budgetBytes=1073741824,targetBytes=966367642,liveBytes=943823904,committedGeometryBytes=2147483648,budgetEvictions=2783,ownedEvictions=0,releasedBytes=1205265296,coldTiles=0,restoreRequests=1930,opaquePayloadBytes=891326368,waterPayloadBytes=2242944,waterDuplicationSavedBytes=393763152,quads=39250335,rectangles=36522876,waterRectangles=94370,coordinateSavingUpperBoundBytes=438274512",
+    "firstSnapshotVoxyGeometry": {
+      "sections": 684,
+      "usedBytes": 9219072
+    },
+    "laterWholeTileCensus": {
+      "time": "2026-10-10T14:07:53.204175500Z",
+      "gpuTiles": 3270,
+      "tilesWithFeatures": 2994,
+      "tilesFullyIn3dRadius": 172,
+      "tilesWhollyInsideSettledColumnRectangle": 0,
+      "insideRadiusAndSettledRectangle": 0,
+      "insideRadiusAndSettledRectangleWithFeatures": 0,
+      "tilesWithFallback": 3262,
+      "captureMs": 81.1038
+    },
+    "lastHizSample": {
+      "testedCommands": 97263,
+      "hiddenCommands": 35790,
+      "testedQuads": 12394679,
+      "hiddenQuads": 6923332,
+      "isVoxyReplacementCount": false
+    },
+    "cpuFeatureFacesDroppedSolelyFromColumnIndex": false,
+    "depthCullingFreesCpuData": false,
+    "depthCullingFreesGpuBuffer": false
+  },
+  "fix": {
+    "displayPlanOwnsCanonicalWords": false,
+    "originalAndDisplayCoordinatesRemainInCompressedStorage": true,
+    "currentClientUpdated": false,
+    "measuredAfterFixHeapReductionBytes": null,
+    "oldSnapshotUnnecessaryStrongReferenceBytes": 1885995712
+  },
+  "validation": {
+    "neoforge": {
+      "tests": {
+        "cpu": {
+          "tests": 114,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 1,
+          "passed": 113,
+          "skipCases": [
+            "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+          ]
+        },
+        "gpu": {
+          "tests": 13,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "passed": 13,
+          "skipCases": []
+        }
+      },
+      "artifact": {
+        "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/lib/memory-ownership-20261010/vss-0.3.5-neoforge-1.21.1.jar",
+        "sha256": "1a7c3f03b10795d7fa7e5a4a1e804d48b8e91df7de68370a9c4d552a5a85d74d",
+        "bytes": 5877008,
+        "zipIntegrity": true,
+        "nativeResourcesVerified": 5,
+        "currentCompiledOutputVerified": true,
+        "reobfuscatedOutputVerified": false
+      },
+      "sources": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayGeometry.java": "a5f5cc6fc9507e7a1262ac2f41d68539ea28bf2e9934c75f66d51b9e536cf68c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionPackedMesh.java": "6bb1832620ff565ed62d33b63e65bb10cff5dd71d9a7f0cd84f5ef7acecef987",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionPassStorageTest.java": "c402363a2d0bdc28a1791a4bc85e86a3fde60e56555e6a7bd17dc1df0bd55aee",
+        "tools/prediction/memory-ownership-build.gradle": "d93dd2e72727b8baf667058136aa5cd73e8ef5b323f6b79dee6262573d151c8b"
+      }
+    },
+    "forge": {
+      "tests": {
+        "cpu": {
+          "tests": 111,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 1,
+          "passed": 110,
+          "skipCases": [
+            "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+          ]
+        },
+        "gpu": {
+          "tests": 13,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 1,
+          "passed": 12,
+          "skipCases": [
+            "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest.installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+          ]
+        }
+      },
+      "artifact": {
+        "path": "C:/Users/Administrator/Desktop/voxyserverside/lib/memory-ownership-20261010/vss-0.3.5-forge-1.20.1.jar",
+        "sha256": "19588c0f6c40676fe17d4a0d6e877410005fd42cf41cd2c80dde9bbf6bd2346d",
+        "bytes": 6549182,
+        "zipIntegrity": true,
+        "nativeResourcesVerified": 5,
+        "currentCompiledOutputVerified": false,
+        "reobfuscatedOutputVerified": true
+      },
+      "sources": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayGeometry.java": "a5f5cc6fc9507e7a1262ac2f41d68539ea28bf2e9934c75f66d51b9e536cf68c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionPackedMesh.java": "30f4850ee5fd696d2610d4f0f46722f7b08f622a5ff4108f5203d9005946cdcc",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionPassStorageTest.java": "c402363a2d0bdc28a1791a4bc85e86a3fde60e56555e6a7bd17dc1df0bd55aee",
+        "tools/prediction/memory-ownership-build.gradle": "d93dd2e72727b8baf667058136aa5cd73e8ef5b323f6b79dee6262573d151c8b"
+      }
+    }
+  },
+  "evidenceDirectory": "C:/Users/Administrator/.codex/tmp/vss-memory-ownership-20261010"
+}

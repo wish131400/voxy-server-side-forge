@@ -18,6 +18,8 @@ $env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'
 
 Linux/macOS 对应 `./gradlew verifyModules --no-daemon` 和 `./gradlew jar --no-daemon`。Forge 的 `jar` 会接着执行 `reobfJar`，发行物必须取重混淆完成后的 JAR。默认输出位于 `lib/`。
 
+删除或迁移生产类后，使用 `gradlew cleanCompileJava cleanJar jar --no-daemon` 清理主源码编译输出并重新打包，避免本机旧 `.class` 混入 JAR；同时检查旧类路径已经消失。该命令保留已有测试报告。新增或修改测试后仍须执行对应回归，清理和打包本身不能替代测试。
+
 `verifyModules` 执行生产字节码边界检查和固定范围的 CPU 行为回归，不启动 Minecraft、GPU 或真实存档。普通 `test` 是更广的历史测试集合，有些需要本机模组、原生库或图形环境；不能用跳过数代替成功数。完整 `check` 同时包含普通 `test` 与 `verifyModules`。`planningConsumerTest` 是可单独复现的预测规划调用方 CPU 回归，按类隔离 JVM，并为诊断写入测试提供独立临时目录；它不是完整普通 `test`。
 
 ## 每次变更的流程

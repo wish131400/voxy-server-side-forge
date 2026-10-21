@@ -1,0 +1,326 @@
+{
+  "date": "2026-10-10",
+  "protocol": 51,
+  "profile_format": 4,
+  "implementation": "local verified SERVER_DATA templates with requested server fallback",
+  "atm_fixture": {
+    "jars": 57,
+    "unique_templates": 12508,
+    "manifest_raw_bytes": 1777733,
+    "manifest_deflate_bytes": 654581
+  },
+  "client_launched": false,
+  "github_written": false,
+  "loaders": {
+    "neoforge": {
+      "baseline": "1c9fd92c25db18605ba62d3ecbaf703248953f73",
+      "totals": {
+        "tests": 106,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.xantha.vss.client.prediction.ClientWorldgenRegistriesTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.NbtTreePredictionTemplatesTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionCacheStorageTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionDiskCacheTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionInitializationTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionMeshWriteOrderingTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionSurfaceStructuresTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionTemplateCacheIdentityTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionTemplateFixtureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionTemplateRepositoryTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionVegetationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.common.worldgen.StructureTemplateDigestTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.client.WorldgenProfileAssemblyTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.payloads.StructureTemplatePayloadTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayloadTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.MostructuresSnapshotTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.StructureTemplateServiceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.WorldgenOptionalSnapshotTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.WorldgenProfileDeliveryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.WorldgenTemplateCatalogFixtureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.WorldgenTemplateCatalogTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\templates-20261010\\vss-0.3.5-neoforge-1.21.1-templates-20261010.jar",
+      "bytes": 5781016,
+      "sha256": "eeff58408a4b138d1b8e4940b3189810214a278dee0c0a198f47e03d11970730",
+      "reobfuscated": false
+    },
+    "forge": {
+      "baseline": "a87dffbdd02c0d4b396f672d02fec16209d3b23e",
+      "totals": {
+        "tests": 102,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.xantha.vss.client.prediction.ClientWorldgenRegistriesTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.NbtTreePredictionTemplatesTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionCacheStorageTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionDiskCacheTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionInitializationTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionMeshWriteOrderingTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionSurfaceStructuresTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionTemplateCacheIdentityTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionTemplateRepositoryTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.client.prediction.PredictionVegetationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.common.worldgen.StructureTemplateDigestTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.client.WorldgenProfileAssemblyTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.payloads.StructureTemplatePayloadTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayloadTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.WorldgenOptionalSnapshotTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.WorldgenProfileDeliveryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.xantha.vss.networking.server.session.WorldgenTemplateCatalogTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\templates-20261010\\vss-0.3.5-forge-1.20.1-templates-20261010.jar",
+      "bytes": 6452563,
+      "sha256": "4b8471cf7185a86494a18f6a7ec1a0c8e0c1796a55a59e20d8107e3197822809",
+      "reobfuscated": true
+    }
+  }
+}

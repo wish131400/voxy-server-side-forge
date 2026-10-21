@@ -1,0 +1,941 @@
+{
+  "date": "2026-10-12",
+  "decision": "retain",
+  "behavior": [
+    "rendered projection drives visible refinement",
+    "scoped display uses bounded pixel LOD",
+    "zoom-in selects fine ranges; zoom-out reuses existing coarse ranges",
+    "disabled spyglass loading keeps ordinary generation scale"
+  ],
+  "method": {
+    "gpu": "GL_TIME_ELAPSED around prepare and submission",
+    "target": [
+      256,
+      256
+    ],
+    "warmups": 24,
+    "rounds": 81,
+    "order": "alternating paired A/B",
+    "repetitions": 64,
+    "cpu": "actual PreparedPass plus static replay/submission; excludes glFinish and query readback",
+    "baseline": "exact preceding dirty worktree PreparedPass, test-only ZoomBaselinePass",
+    "projection_degrees": [
+      70,
+      8.75
+    ],
+    "zoom_near_camera": [
+      64,
+      1040,
+      1344
+    ],
+    "zoom_far_camera": [
+      64,
+      7280,
+      9664
+    ],
+    "live_fps_measured": false
+  },
+  "limitations": [
+    "not a live game scene or game FPS A/B",
+    "whole-tile errors and existing variant availability remain",
+    "plant error is an importance proxy, not a bound on the position of every deleted stalk",
+    "water, seams, morph and mixed ownership retain their protections",
+    "other zoom mods require their actual world projection to reach the render event; not all zoom mods tested"
+  ],
+  "repositories": {
+    "neoforge": {
+      "changed_production_files": [
+        "PredictionRenderer.java",
+        "VssLodProjection.java"
+      ],
+      "baseline_hashes": {
+        "PredictionDisplayLod.java": "8dd754e1c94db95dec4808a59e6916295157032d6a99dd910d2d80853934c8e4",
+        "PredictionRenderer.java": "4a262a404fdc8e21e4bc8ec98060cfdc6302802a6fd795671abe90ea50f72ad7",
+        "PredictionTileManager.java": "38f3ee865e9b1c3e2e0b549040be7e268343d5419f5f434eba6817a98fadeb50",
+        "PredictionWorkView.java": "5d10f61adaa9d8f834a2272feb88f47674dea6c4d53b904bd42d6b8d843ad948",
+        "VssLodProjection.java": "298ee3d05a0546b7aee3400d5582b73247fc84244d4e993dc5a0818262a98b38"
+      },
+      "production_hashes": {
+        "PredictionRenderer.java": "cdbc3e35da0e92789be261291415f842d8f29d83f03c020cdf5c5aaa6abe7e14",
+        "VssLodProjection.java": "d8697549496466d6278f94ca13ac4e913ff5ab32a3f37a76298cf1581231e0c2"
+      },
+      "metrics": [
+        {
+          "content": "terrain",
+          "scenario": "normal",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 38912,
+              "p95": 39936
+            },
+            "cpu_ns": {
+              "median": 42800,
+              "p95": 102700
+            },
+            "mdi_quads": {
+              "median": 52608,
+              "p95": 52608
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 3,
+              "p95": 3
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "normal",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 38912,
+              "p95": 39936
+            },
+            "cpu_ns": {
+              "median": 42500,
+              "p95": 72100
+            },
+            "mdi_quads": {
+              "median": 52608,
+              "p95": 52608
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 3,
+              "p95": 3
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 885760,
+              "p95": 1427456
+            },
+            "cpu_ns": {
+              "median": 38600,
+              "p95": 63500
+            },
+            "mdi_quads": {
+              "median": 1048576,
+              "p95": 1048576
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 886784,
+              "p95": 1386496
+            },
+            "cpu_ns": {
+              "median": 39600,
+              "p95": 58300
+            },
+            "mdi_quads": {
+              "median": 1048576,
+              "p95": 1048576
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 398336,
+              "p95": 399360
+            },
+            "cpu_ns": {
+              "median": 27000,
+              "p95": 47600
+            },
+            "mdi_quads": {
+              "median": 1048576,
+              "p95": 1048576
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 37888,
+              "p95": 38912
+            },
+            "cpu_ns": {
+              "median": 26700,
+              "p95": 54300
+            },
+            "mdi_quads": {
+              "median": 52608,
+              "p95": 52608
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 3,
+              "p95": 3
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "normal",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 58368,
+              "p95": 59392
+            },
+            "cpu_ns": {
+              "median": 23300,
+              "p95": 38700
+            },
+            "mdi_quads": {
+              "median": 131072,
+              "p95": 131072
+            },
+            "mdi_commands": {
+              "median": 128,
+              "p95": 128
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 2,
+              "p95": 2
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "normal",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 57344,
+              "p95": 60416
+            },
+            "cpu_ns": {
+              "median": 23400,
+              "p95": 38800
+            },
+            "mdi_quads": {
+              "median": 131072,
+              "p95": 131072
+            },
+            "mdi_commands": {
+              "median": 128,
+              "p95": 128
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 2,
+              "p95": 2
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 3550208,
+              "p95": 4424704
+            },
+            "cpu_ns": {
+              "median": 33500,
+              "p95": 46900
+            },
+            "mdi_quads": {
+              "median": 2097152,
+              "p95": 2097152
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 3563520,
+              "p95": 4452352
+            },
+            "cpu_ns": {
+              "median": 35700,
+              "p95": 58100
+            },
+            "mdi_quads": {
+              "median": 2097152,
+              "p95": 2097152
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 780288,
+              "p95": 1381376
+            },
+            "cpu_ns": {
+              "median": 21300,
+              "p95": 38700
+            },
+            "mdi_quads": {
+              "median": 2097152,
+              "p95": 2097152
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 58368,
+              "p95": 59392
+            },
+            "cpu_ns": {
+              "median": 21800,
+              "p95": 37500
+            },
+            "mdi_quads": {
+              "median": 131072,
+              "p95": 131072
+            },
+            "mdi_commands": {
+              "median": 128,
+              "p95": 128
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 2,
+              "p95": 2
+            }
+          }
+        }
+      ],
+      "tests": {
+        "zoom-lod-regression": {
+          "tests": 228,
+          "failures": 0,
+          "skipped": 0,
+          "errors": 0
+        },
+        "zoom-lod-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "errors": 0
+        },
+        "zoom-lod-production-gpu": {
+          "tests": 10,
+          "failures": 0,
+          "skipped": 0,
+          "errors": 0
+        }
+      },
+      "jar": {
+        "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/lib/zoom-lod-20261012/vss-0.3.5-neoforge-1.21.1.jar",
+        "size": 5953042,
+        "sha256": "ff5093c88ac1f2fb3f05c59bcdc230f4786cb1f834bbb52cb6b0c47f56b6bab1",
+        "zip_integrity": "passed",
+        "native_hashes": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "test_classes": []
+      },
+      "screen_error_checks": {
+        "terrain": {
+          "projected": 1.593359,
+          "limit": 2
+        },
+        "plants_importance_proxy": {
+          "projected": 1.125419,
+          "limit": 1.5
+        }
+      }
+    },
+    "forge": {
+      "changed_production_files": [
+        "PredictionRenderer.java",
+        "VssLodProjection.java"
+      ],
+      "baseline_hashes": {
+        "PredictionDisplayLod.java": "8dd754e1c94db95dec4808a59e6916295157032d6a99dd910d2d80853934c8e4",
+        "PredictionRenderer.java": "58b9e480d9ab5592ceb1b8fafab0a8e0058190bb3f66c669b74a301bd9e54ae0",
+        "PredictionTileManager.java": "dc3c6dacae2862809eaa07e8bb45e1153f6cce476860e3b62b1341dd1bd0475d",
+        "PredictionWorkView.java": "d9e9d92aac8fdb223139c63bd2637cf6a8443ce5f5dc2e392cf13101a1981185",
+        "VssLodProjection.java": "5a4b44dec12260000fcba32a902db4b272c1bb69d7c50cd95a281fc34555f335"
+      },
+      "production_hashes": {
+        "PredictionRenderer.java": "c9c22f00d7efbfdc10db09bb23dcc0ae2c7a3685ec285def6f89195d78ec6fad",
+        "VssLodProjection.java": "0531b5a91fa6afa9ccd8e9793e511c5787765c0942ca6b32f6032ac46a2341b6"
+      },
+      "metrics": [
+        {
+          "content": "terrain",
+          "scenario": "normal",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 38912,
+              "p95": 39936
+            },
+            "cpu_ns": {
+              "median": 35800,
+              "p95": 71500
+            },
+            "mdi_quads": {
+              "median": 52608,
+              "p95": 52608
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 3,
+              "p95": 3
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "normal",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 38912,
+              "p95": 39936
+            },
+            "cpu_ns": {
+              "median": 38100,
+              "p95": 65100
+            },
+            "mdi_quads": {
+              "median": 52608,
+              "p95": 52608
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 3,
+              "p95": 3
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 840704,
+              "p95": 1523712
+            },
+            "cpu_ns": {
+              "median": 33600,
+              "p95": 54400
+            },
+            "mdi_quads": {
+              "median": 1048576,
+              "p95": 1048576
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-near",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 842752,
+              "p95": 1612800
+            },
+            "cpu_ns": {
+              "median": 32500,
+              "p95": 61600
+            },
+            "mdi_quads": {
+              "median": 1048576,
+              "p95": 1048576
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 398336,
+              "p95": 399360
+            },
+            "cpu_ns": {
+              "median": 25700,
+              "p95": 49700
+            },
+            "mdi_quads": {
+              "median": 1048576,
+              "p95": 1048576
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "terrain",
+          "scenario": "zoom-far",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 37888,
+              "p95": 38912
+            },
+            "cpu_ns": {
+              "median": 25700,
+              "p95": 59200
+            },
+            "mdi_quads": {
+              "median": 52608,
+              "p95": 52608
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 3,
+              "p95": 3
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "normal",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 57344,
+              "p95": 59392
+            },
+            "cpu_ns": {
+              "median": 19900,
+              "p95": 34400
+            },
+            "mdi_quads": {
+              "median": 131072,
+              "p95": 131072
+            },
+            "mdi_commands": {
+              "median": 128,
+              "p95": 128
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 2,
+              "p95": 2
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "normal",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 57344,
+              "p95": 60416
+            },
+            "cpu_ns": {
+              "median": 19600,
+              "p95": 31200
+            },
+            "mdi_quads": {
+              "median": 131072,
+              "p95": 131072
+            },
+            "mdi_commands": {
+              "median": 128,
+              "p95": 128
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 2,
+              "p95": 2
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 3545088,
+              "p95": 4428800
+            },
+            "cpu_ns": {
+              "median": 35200,
+              "p95": 50800
+            },
+            "mdi_quads": {
+              "median": 2097152,
+              "p95": 2097152
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-near",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 3560448,
+              "p95": 4616192
+            },
+            "cpu_ns": {
+              "median": 36800,
+              "p95": 62800
+            },
+            "mdi_quads": {
+              "median": 2097152,
+              "p95": 2097152
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": "0",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 780288,
+              "p95": 1466368
+            },
+            "cpu_ns": {
+              "median": 20800,
+              "p95": 32800
+            },
+            "mdi_quads": {
+              "median": 2097152,
+              "p95": 2097152
+            },
+            "mdi_commands": {
+              "median": 64,
+              "p95": 64
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        {
+          "content": "plants",
+          "scenario": "zoom-far",
+          "mode": "1",
+          "samples": 81,
+          "metrics": {
+            "gpu_ns": {
+              "median": 58368,
+              "p95": 59392
+            },
+            "cpu_ns": {
+              "median": 19200,
+              "p95": 36600
+            },
+            "mdi_quads": {
+              "median": 131072,
+              "p95": 131072
+            },
+            "mdi_commands": {
+              "median": 128,
+              "p95": 128
+            },
+            "display_tier": {
+              "median": 0,
+              "p95": 0
+            },
+            "vegetation_tier": {
+              "median": 2,
+              "p95": 2
+            }
+          }
+        }
+      ],
+      "tests": {
+        "zoom-lod-regression": {
+          "tests": 227,
+          "failures": 0,
+          "skipped": 0,
+          "errors": 0
+        },
+        "zoom-lod-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "errors": 0
+        },
+        "zoom-lod-production-gpu": {
+          "tests": 10,
+          "failures": 0,
+          "skipped": 0,
+          "errors": 0
+        }
+      },
+      "jar": {
+        "path": "C:/Users/Administrator/Desktop/voxyserverside/lib/zoom-lod-20261012/vss-0.3.5-forge-1.20.1.jar",
+        "size": 6625348,
+        "sha256": "c00bb23d8c236bab01b5fa52ca09aba391f18c855a5321991684d5ba7a867d1a",
+        "zip_integrity": "passed",
+        "native_hashes": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "test_classes": []
+      },
+      "screen_error_checks": {
+        "terrain": {
+          "projected": 1.593359,
+          "limit": 2
+        },
+        "plants_importance_proxy": {
+          "projected": 1.125419,
+          "limit": 1.5
+        }
+      }
+    }
+  }
+}

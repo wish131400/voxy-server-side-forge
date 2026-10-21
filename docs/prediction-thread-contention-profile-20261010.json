@@ -1,0 +1,4389 @@
+{
+  "date": "2026-10-10",
+  "scope": "live NeoForge 1.21.1 render/CPU contention sampling; documentation only",
+  "pid": 35680,
+  "java": "25.0.1",
+  "sampleDirectory": "C:\\Users\\Administrator\\.codex\\tmp\\vss-thread-contention-20261010-175700",
+  "package": {
+    "sha256": "0f973673bd1e081831279c63e176d5b62e1ff6130fbd50ae518a8dcc48d00dab",
+    "size": 5868079,
+    "matchingJars": [
+      "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\vss-0.3.5-neoforge-1.21.1.jar",
+      "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\chunky-queue-limit-20261010\\vss-0.3.5-neoforge-1.21.1.jar"
+    ],
+    "classes": [
+      {
+        "class": "PredictionRenderer",
+        "sha256": "3e323436971768b314d62c9d27c5379da9e0250b3f97a13d01835f18218ca4d3",
+        "matchingBuildDirs": [
+          "build",
+          "build-turn-optimization-20261010"
+        ]
+      },
+      {
+        "class": "PredictionTileManager",
+        "sha256": "9c9e4e02527d38537a8d42b15b24baf94933625807f2512f74a395da72b6e796",
+        "matchingBuildDirs": [
+          "build",
+          "build-turn-optimization-20261010"
+        ]
+      },
+      {
+        "class": "PredictionWorkView",
+        "sha256": "a619acedf1544e9b187bc57986862dcbed4f26d02cd18fb389d0c3654704196f",
+        "matchingBuildDirs": [
+          "build",
+          "build-screen-detail-20261010",
+          "build-turn-optimization-20261010"
+        ]
+      },
+      {
+        "class": "PredictionVisibilityFeedback",
+        "sha256": "3172c7ea52fd54445f70f79c6c8f870f9bf6991c51eaed866a630b58331c24ad",
+        "matchingBuildDirs": [
+          "build",
+          "build-turn-optimization-20261010"
+        ]
+      },
+      {
+        "class": "PredictionLodPlanner",
+        "sha256": "20dc916c1c263b7029a0c4939a270d959a5e0fbe730bb4a8031fbbc429d61930",
+        "matchingBuildDirs": [
+          "build",
+          "build-turn-optimization-20261010"
+        ]
+      },
+      {
+        "class": "PredictionRefinementOcclusion",
+        "sha256": "82d348b8ecd7b8e32a6e8a5c8ddf141696322b5e6d21aa0e5d421db0594341c4",
+        "matchingBuildDirs": [
+          "build",
+          "build-screen-detail-20261010",
+          "build-turn-optimization-20261010"
+        ]
+      },
+      {
+        "class": "PredictionLoadingProgress",
+        "sha256": "711375805b53b77baab3f5595e1fac8a0545d3ab4fa7335195e4af369ef9b446",
+        "matchingBuildDirs": [
+          "build",
+          "build-screen-detail-20261010",
+          "build-turn-optimization-20261010"
+        ]
+      },
+      {
+        "class": "PredictionIndirectBatch",
+        "sha256": "07e0842ef5d906f519bd8c38067bda1c38233420826719a0a3c0d00975bb7c7d",
+        "matchingBuildDirs": [
+          "build",
+          "build-turn-optimization-20261010"
+        ]
+      }
+    ]
+  },
+  "jfr": {
+    "firstSample": "2026-10-10T09:56:41.706448600Z",
+    "lastSample": "2026-10-10T09:57:56.706627800Z",
+    "settings": {
+      "executionSampleMs": 5,
+      "nativeMethodSampleMs": 5,
+      "monitorEnterThresholdMs": 2,
+      "parkThresholdMs": 2
+    }
+  },
+  "counters": {
+    "active": {
+      "seconds": 50.0518394,
+      "intervals": 25,
+      "fromTo": [
+        [
+          1791626217875,
+          1791626219889
+        ],
+        [
+          1791626219889,
+          1791626221891
+        ],
+        [
+          1791626221891,
+          1791626223893
+        ],
+        [
+          1791626223893,
+          1791626225894
+        ],
+        [
+          1791626225894,
+          1791626227896
+        ],
+        [
+          1791626227896,
+          1791626229898
+        ],
+        [
+          1791626229898,
+          1791626231899
+        ],
+        [
+          1791626231899,
+          1791626233900
+        ],
+        [
+          1791626233900,
+          1791626235902
+        ],
+        [
+          1791626235902,
+          1791626237904
+        ],
+        [
+          1791626245911,
+          1791626247913
+        ],
+        [
+          1791626247913,
+          1791626249914
+        ],
+        [
+          1791626249914,
+          1791626251916
+        ],
+        [
+          1791626251916,
+          1791626253917
+        ],
+        [
+          1791626253917,
+          1791626255918
+        ],
+        [
+          1791626255918,
+          1791626257920
+        ],
+        [
+          1791626257920,
+          1791626259921
+        ],
+        [
+          1791626259921,
+          1791626261922
+        ],
+        [
+          1791626261922,
+          1791626263924
+        ],
+        [
+          1791626263924,
+          1791626265926
+        ],
+        [
+          1791626265926,
+          1791626267927
+        ],
+        [
+          1791626267927,
+          1791626269929
+        ],
+        [
+          1791626269929,
+          1791626271930
+        ],
+        [
+          1791626271930,
+          1791626273932
+        ],
+        [
+          1791626273932,
+          1791626275934
+        ]
+      ],
+      "counters": {
+        "frameStarts": 1983.0,
+        "preparedPlans": 1960.0,
+        "reusedPlans": 24.0,
+        "meshUploads": 681.0,
+        "drawCalls": 284925.0,
+        "indirectCalls": 278243.0,
+        "indirectTiles": 10994358.0,
+        "multiDrawCalls": 4580.0,
+        "quads": 11968957906.0,
+        "visibilityVisits": 15319917.0,
+        "worldVisits": 1745799.0,
+        "orderEdits": 162922.0,
+        "listPublications": 1152.0,
+        "probes": 188.0,
+        "completed": 188.0,
+        "planHits": 2746.0,
+        "planMisses": 3002.0,
+        "planReplayBatches": 101648.0
+      },
+      "actualFps": 39.618923575464045,
+      "twoSecondFpsRange": [
+        28.978299600344286,
+        66.96636614260487
+      ],
+      "gameFpsRange": [
+        24,
+        84
+      ],
+      "processCpuSeconds": 186.421875,
+      "processCpuCores": 3.724575904397232,
+      "threadGroups": {
+        "render": {
+          "cpuSeconds": 44.796875,
+          "allocatedBytes": 4153683880,
+          "cpuCores": 0.895009564823306,
+          "allocationMiBPerSecond": 79.14317799930167
+        },
+        "other": {
+          "cpuSeconds": 13.171875,
+          "allocatedBytes": 438662128,
+          "cpuCores": 0.2631646540446623,
+          "allocationMiBPerSecond": 8.358150470963729
+        },
+        "c2me": {
+          "cpuSeconds": 0.578125,
+          "allocatedBytes": 92421360,
+          "cpuCores": 0.011550524554747933,
+          "allocationMiBPerSecond": 1.7609717919644716
+        },
+        "integrated_server": {
+          "cpuSeconds": 3.6875,
+          "allocatedBytes": 994711704,
+          "cpuCores": 0.07367361607893276,
+          "allocationMiBPerSecond": 18.952969874939225
+        },
+        "other_vss": {
+          "cpuSeconds": 8.609375,
+          "allocatedBytes": 803901328,
+          "cpuCores": 0.17200916296394894,
+          "allocationMiBPerSecond": 15.317320175019914
+        },
+        "prediction_workers": {
+          "cpuSeconds": 103.046875,
+          "allocatedBytes": 7990850024,
+          "cpuCores": 2.0588029577989895,
+          "allocationMiBPerSecond": 152.25551199509096
+        },
+        "profiler": {
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 3910552,
+          "cpuCores": 0.0003121763393175117,
+          "allocationMiBPerSecond": 0.0745106084027572
+        }
+      },
+      "threads": [
+        {
+          "name": "Render thread",
+          "cpuSeconds": 44.796875,
+          "allocatedBytes": 4153683880
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 17.65625,
+          "allocatedBytes": 989527288
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 14.828125,
+          "allocatedBytes": 825961368
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 13.890625,
+          "allocatedBytes": 1201059528
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 13.734375,
+          "allocatedBytes": 1233755848
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 12.515625,
+          "allocatedBytes": 989017648
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 12.3125,
+          "allocatedBytes": 948414608
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 9.875,
+          "allocatedBytes": 786654312
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 8.234375,
+          "allocatedBytes": 1016459424
+        },
+        {
+          "name": "VSS-PresenceCacheWriter",
+          "cpuSeconds": 4.59375,
+          "allocatedBytes": 98795160
+        },
+        {
+          "name": "Server thread",
+          "cpuSeconds": 3.6875,
+          "allocatedBytes": 994711704
+        },
+        {
+          "name": "vss-prediction-disk",
+          "cpuSeconds": 3.59375,
+          "allocatedBytes": 442514376
+        },
+        {
+          "name": "vss-cpu-budget-sampler",
+          "cpuSeconds": 3.296875,
+          "allocatedBytes": 6696
+        },
+        {
+          "name": "CullThread",
+          "cpuSeconds": 2.4375,
+          "allocatedBytes": 7629632
+        },
+        {
+          "name": "vss-finished-mesh-disk",
+          "cpuSeconds": 1.203125,
+          "allocatedBytes": 15136504
+        },
+        {
+          "name": "VSS-DiskWriter-3",
+          "cpuSeconds": 0.609375,
+          "allocatedBytes": 11871816
+        },
+        {
+          "name": "Chunk Render Task Executor #5",
+          "cpuSeconds": 0.40625,
+          "allocatedBytes": 10779312
+        },
+        {
+          "name": "Chunk Render Task Executor #6",
+          "cpuSeconds": 0.40625,
+          "allocatedBytes": 10787800
+        },
+        {
+          "name": "JFR Periodic Tasks",
+          "cpuSeconds": 0.390625,
+          "allocatedBytes": 4800
+        },
+        {
+          "name": "Chunk Render Task Executor #4",
+          "cpuSeconds": 0.375,
+          "allocatedBytes": 9215144
+        },
+        {
+          "name": "Chunk Render Task Executor #1",
+          "cpuSeconds": 0.359375,
+          "allocatedBytes": 10954424
+        },
+        {
+          "name": "Chunk Render Task Executor #8",
+          "cpuSeconds": 0.328125,
+          "allocatedBytes": 11248704
+        },
+        {
+          "name": "Dedicated Voxy Worker #1",
+          "cpuSeconds": 0.3125,
+          "allocatedBytes": 281024
+        },
+        {
+          "name": "Chunk Render Task Executor #2",
+          "cpuSeconds": 0.3125,
+          "allocatedBytes": 9315640
+        },
+        {
+          "name": "Chunk Render Task Executor #7",
+          "cpuSeconds": 0.3125,
+          "allocatedBytes": 9101040
+        },
+        {
+          "name": "Chunk Render Task Executor #0",
+          "cpuSeconds": 0.28125,
+          "allocatedBytes": 9743664
+        },
+        {
+          "name": "Chunk Render Task Executor #3",
+          "cpuSeconds": 0.28125,
+          "allocatedBytes": 9164456
+        },
+        {
+          "name": "Netty Server IO #1",
+          "cpuSeconds": 0.265625,
+          "allocatedBytes": 70387176
+        },
+        {
+          "name": "Chunk Render Task Executor #9",
+          "cpuSeconds": 0.265625,
+          "allocatedBytes": 10019704
+        },
+        {
+          "name": "vss-worldgen-profile",
+          "cpuSeconds": 0.25,
+          "allocatedBytes": 228249920
+        },
+        {
+          "name": "vss-cache-restore-overworld",
+          "cpuSeconds": 0.15625,
+          "allocatedBytes": 61410456
+        },
+        {
+          "name": "c2me-worker-6",
+          "cpuSeconds": 0.109375,
+          "allocatedBytes": 9390688
+        },
+        {
+          "name": "Netty Local Client IO #0",
+          "cpuSeconds": 0.109375,
+          "allocatedBytes": 34593032
+        },
+        {
+          "name": "vss-cache-restore-overworld",
+          "cpuSeconds": 0.109375,
+          "allocatedBytes": 54703408
+        },
+        {
+          "name": "c2me-worker-8",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 10656472
+        },
+        {
+          "name": "Thread-16",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 130480
+        },
+        {
+          "name": "Flywheel Task Executor #2",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 423464
+        },
+        {
+          "name": "Flywheel Task Executor #8",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 394880
+        },
+        {
+          "name": "JFR Recorder Thread",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-DiskReader-10",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 2492168
+        },
+        {
+          "name": "c2me-worker-0",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 9466512
+        },
+        {
+          "name": "c2me-worker-1",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 10439880
+        },
+        {
+          "name": "c2me-worker-7",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 9708264
+        },
+        {
+          "name": "Flywheel Task Executor #1",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 388456
+        },
+        {
+          "name": "Flywheel Task Executor #9",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 551376
+        },
+        {
+          "name": "VSS-DiskReader-11",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 2475280
+        },
+        {
+          "name": "VSS-DiskReader-12",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 2436584
+        },
+        {
+          "name": "c2me-worker-2",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 10930600
+        },
+        {
+          "name": "c2me-worker-3",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 10977296
+        },
+        {
+          "name": "c2me-worker-4",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 10770688
+        },
+        {
+          "name": "Flywheel Task Executor #0",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 546888
+        },
+        {
+          "name": "Flywheel Task Executor #3",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 438136
+        },
+        {
+          "name": "Flywheel Task Executor #5",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 468552
+        },
+        {
+          "name": "Flywheel Task Executor #6",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 428376
+        },
+        {
+          "name": "VSS-DiskReader-9",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 2604584
+        },
+        {
+          "name": "c2me-worker-5",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 8910480
+        },
+        {
+          "name": "c2me-sched",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 1170480
+        },
+        {
+          "name": "C2ME Storage #1",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 1929560
+        },
+        {
+          "name": "Flywheel Task Executor #4",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 388072
+        },
+        {
+          "name": "Flywheel Task Executor #7",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 413216
+        },
+        {
+          "name": "VSS-ColumnProcessor",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 36620904
+        },
+        {
+          "name": "C2ME Storage #2",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 2364496
+        },
+        {
+          "name": "Sound engine",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 141560
+        },
+        {
+          "name": "Async Node Manager",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 250400
+        },
+        {
+          "name": "VSS Seam Mask 1",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 2731504
+        },
+        {
+          "name": "VSS Seam Mask 2",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 2764624
+        },
+        {
+          "name": "Worker-Main-34",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 21160
+        },
+        {
+          "name": "IO-Worker-9",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 129000
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 1556616
+        },
+        {
+          "name": "VSS-thread-profiler-readonly",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 3910552
+        },
+        {
+          "name": "Reference Handler",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Finalizer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Signal Dispatcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Attach Listener",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Common-Cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Notification Thread",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "JNA Cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1608
+        },
+        {
+          "name": "Timer hack thread",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Yggdrasil Key Fetcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Cleaner-0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Cleaner-1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "HttpClient-1-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1632
+        },
+        {
+          "name": "FileSystemWatchService",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "config-file-watcher-0-0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 7968
+        },
+        {
+          "name": "modloading-sync-worker",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "HttpClient-3-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1632
+        },
+        {
+          "name": "Cleaner-2",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "idle-timeout-task",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1120
+        },
+        {
+          "name": "HTTP-Dispatcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 2040
+        },
+        {
+          "name": "HttpClient-4-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1632
+        },
+        {
+          "name": "C2ME Storage #3",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 26352
+        },
+        {
+          "name": "C2ME Storage #4",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #5",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #6",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #7",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #8",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #9",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "RxCachedWorkerPoolEvictor-1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 32
+        },
+        {
+          "name": "ThreadStateHolderCleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 384
+        },
+        {
+          "name": "minecraft_overworld - Light",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 45789760
+        },
+        {
+          "name": "zstdnet-traffic-stats",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 133872
+        },
+        {
+          "name": "Netty Server IO #0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Active world cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 3200
+        },
+        {
+          "name": "Model factory processor",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 58504
+        },
+        {
+          "name": "Telemetry-Sender-#1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-mesh-resource-identity",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-prediction-dispose",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-prediction-compaction",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 6400
+        },
+        {
+          "name": "IO-Worker-8",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 94336
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1642416
+        },
+        {
+          "name": "Download-5",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 369864
+        },
+        {
+          "name": "Worker-Main-31",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 36648
+        },
+        {
+          "name": "Worker-Main-32",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 31912
+        },
+        {
+          "name": "Worker-Main-33",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 28992
+        },
+        {
+          "name": "Worker-Main-35",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 38152
+        },
+        {
+          "name": "Worker-Main-36",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 37208
+        },
+        {
+          "name": "Worker-Main-37",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 52520
+        },
+        {
+          "name": "Worker-Main-38",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 33592
+        },
+        {
+          "name": "Worker-Main-39",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 6048
+        },
+        {
+          "name": "Worker-Main-41",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 12944
+        },
+        {
+          "name": "Worker-Main-40",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 64984
+        },
+        {
+          "name": "Worker-Main-42",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 8976
+        },
+        {
+          "name": "Worker-Main-44",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 39528
+        },
+        {
+          "name": "Worker-Main-43",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 43528
+        },
+        {
+          "name": "Worker-Main-45",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 77104
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1439856
+        },
+        {
+          "name": "JFR Recording Scheduler",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1523712
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS local templates",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 67208
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1873568
+        }
+      ],
+      "timing": {
+        "PREPARE": {
+          "cpuCount": 66,
+          "cpuMs": 6.503263636363637,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "COVERAGE": {
+          "cpuCount": 180,
+          "cpuMs": 0.11403888888888888,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "SEAMS": {
+          "cpuCount": 15,
+          "cpuMs": 1.0850333333333333,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "UPLOAD": {
+          "cpuCount": 18,
+          "cpuMs": 0.33182222222222224,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "OPAQUE": {
+          "cpuCount": 66,
+          "cpuMs": 5.904415151515152,
+          "gpuCount": 66,
+          "gpuMs": 5.326072242424242
+        },
+        "WATER": {
+          "cpuCount": 66,
+          "cpuMs": 0.4641772727272727,
+          "gpuCount": 66,
+          "gpuMs": 0.11530860606060607
+        },
+        "DEPTH_COPY": {
+          "cpuCount": 66,
+          "cpuMs": 0.021333333333333333,
+          "gpuCount": 66,
+          "gpuMs": 0.19767854545454544
+        },
+        "STATE": {
+          "cpuCount": 396,
+          "cpuMs": 0.009907828282828282,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "ANTIALIAS": {
+          "cpuCount": 66,
+          "cpuMs": 0.037875757575757577,
+          "gpuCount": 66,
+          "gpuMs": 0.18202375757575756
+        },
+        "HZB_REDUCE": {
+          "cpuCount": 481,
+          "cpuMs": 0.017188357588357586,
+          "gpuCount": 481,
+          "gpuMs": 0.09287530977130977
+        },
+        "GPU_FILTER": {
+          "cpuCount": 481,
+          "cpuMs": 0.04854532224532225,
+          "gpuCount": 481,
+          "gpuMs": 0.034130494802494804
+        },
+        "INDIRECT_BUILD": {
+          "cpuCount": 122,
+          "cpuMs": 2.2350975409836065,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "INDIRECT_UPLOAD": {
+          "cpuCount": 5425,
+          "cpuMs": 0.008090912442396313,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "INDIRECT_SUBMIT": {
+          "cpuCount": 0,
+          "cpuMs": null,
+          "gpuCount": 976,
+          "gpuMs": 0.1178911475409836
+        }
+      },
+      "managerDeltas": {
+        "viewRefreshes": 508,
+        "viewDeferredAdmissions": 5,
+        "visibleCpuNanos": 94609375000,
+        "backgroundCpuNanos": 7328125000,
+        "samplingNanos": 62880955100,
+        "decorationNanos": 32012852200,
+        "meshingNanos": 2157593300,
+        "packingNanos": 1702300500,
+        "executorCompleted": 324732
+      },
+      "executorActiveRange": [
+        0,
+        4
+      ],
+      "profilerReadMsMax": 13.8085
+    },
+    "early": {
+      "seconds": 20.028836300000002,
+      "intervals": 10,
+      "fromTo": [
+        [
+          1791626217875,
+          1791626219889
+        ],
+        [
+          1791626219889,
+          1791626221891
+        ],
+        [
+          1791626221891,
+          1791626223893
+        ],
+        [
+          1791626223893,
+          1791626225894
+        ],
+        [
+          1791626225894,
+          1791626227896
+        ],
+        [
+          1791626227896,
+          1791626229898
+        ],
+        [
+          1791626229898,
+          1791626231899
+        ],
+        [
+          1791626231899,
+          1791626233900
+        ],
+        [
+          1791626233900,
+          1791626235902
+        ],
+        [
+          1791626235902,
+          1791626237904
+        ]
+      ],
+      "counters": {
+        "frameStarts": 839.0,
+        "preparedPlans": 839.0,
+        "reusedPlans": 0.0,
+        "meshUploads": 213.0,
+        "drawCalls": 109818.0,
+        "indirectCalls": 103136.0,
+        "indirectTiles": 4232736.0,
+        "multiDrawCalls": 4580.0,
+        "quads": 4556498154.0,
+        "visibilityVisits": 6395651.0,
+        "worldVisits": 623416.0,
+        "orderEdits": 69979.0,
+        "listPublications": 555.0,
+        "probes": 75.0,
+        "completed": 75.0,
+        "planHits": 1054.0,
+        "planMisses": 1248.0,
+        "planReplayBatches": 23805.0
+      },
+      "actualFps": 41.88960294213398,
+      "twoSecondFpsRange": [
+        30.477117779970797,
+        66.96636614260487
+      ],
+      "gameFpsRange": [
+        24,
+        84
+      ],
+      "processCpuSeconds": 41.921875,
+      "processCpuCores": 2.093075921739896,
+      "threadGroups": {
+        "render": {
+          "cpuSeconds": 17.96875,
+          "allocatedBytes": 1769663128,
+          "cpuCores": 0.8971439843462098,
+          "allocationMiBPerSecond": 84.26262258006203
+        },
+        "other": {
+          "cpuSeconds": 6.265625,
+          "allocatedBytes": 182971208,
+          "cpuCores": 0.31283020671550443,
+          "allocationMiBPerSecond": 8.712185725509462
+        },
+        "c2me": {
+          "cpuSeconds": 0.140625,
+          "allocatedBytes": 46598480,
+          "cpuCores": 0.007021126834013815,
+          "allocationMiBPerSecond": 2.2187895938602438
+        },
+        "integrated_server": {
+          "cpuSeconds": 1.4375,
+          "allocatedBytes": 413415776,
+          "cpuCores": 0.07177151874769679,
+          "allocationMiBPerSecond": 19.684818511815354
+        },
+        "other_vss": {
+          "cpuSeconds": 2.21875,
+          "allocatedBytes": 221301568,
+          "cpuCores": 0.11077777893666242,
+          "allocationMiBPerSecond": 10.537288258830655
+        },
+        "prediction_workers": {
+          "cpuSeconds": 9.5625,
+          "allocatedBytes": 1959705432,
+          "cpuCores": 0.47743662471293946,
+          "allocationMiBPerSecond": 93.31149899209146
+        },
+        "profiler": {
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1566384,
+          "cpuCores": 0.0,
+          "allocationMiBPerSecond": 0.07458347394999117
+        }
+      },
+      "threads": [
+        {
+          "name": "Render thread",
+          "cpuSeconds": 17.96875,
+          "allocatedBytes": 1769663128
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 2.640625,
+          "allocatedBytes": 511742280
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 2.125,
+          "allocatedBytes": 410150728
+        },
+        {
+          "name": "VSS-PresenceCacheWriter",
+          "cpuSeconds": 1.71875,
+          "allocatedBytes": 39518048
+        },
+        {
+          "name": "CullThread",
+          "cpuSeconds": 1.671875,
+          "allocatedBytes": 3233856
+        },
+        {
+          "name": "Server thread",
+          "cpuSeconds": 1.4375,
+          "allocatedBytes": 413415776
+        },
+        {
+          "name": "vss-cpu-budget-sampler",
+          "cpuSeconds": 1.296875,
+          "allocatedBytes": 2736
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 1.296875,
+          "allocatedBytes": 212296632
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 1.046875,
+          "allocatedBytes": 193345408
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 0.71875,
+          "allocatedBytes": 222015688
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 0.703125,
+          "allocatedBytes": 209819664
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 0.65625,
+          "allocatedBytes": 148603720
+        },
+        {
+          "name": "vss-prediction-disk",
+          "cpuSeconds": 0.453125,
+          "allocatedBytes": 70402976
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 0.375,
+          "allocatedBytes": 51731312
+        },
+        {
+          "name": "vss-finished-mesh-disk",
+          "cpuSeconds": 0.265625,
+          "allocatedBytes": 3737952
+        },
+        {
+          "name": "Chunk Render Task Executor #4",
+          "cpuSeconds": 0.25,
+          "allocatedBytes": 3929096
+        },
+        {
+          "name": "Chunk Render Task Executor #6",
+          "cpuSeconds": 0.25,
+          "allocatedBytes": 4502728
+        },
+        {
+          "name": "Chunk Render Task Executor #1",
+          "cpuSeconds": 0.203125,
+          "allocatedBytes": 3582928
+        },
+        {
+          "name": "Chunk Render Task Executor #2",
+          "cpuSeconds": 0.203125,
+          "allocatedBytes": 4791200
+        },
+        {
+          "name": "VSS-DiskWriter-3",
+          "cpuSeconds": 0.203125,
+          "allocatedBytes": 3714840
+        },
+        {
+          "name": "Chunk Render Task Executor #5",
+          "cpuSeconds": 0.1875,
+          "allocatedBytes": 4088016
+        },
+        {
+          "name": "Chunk Render Task Executor #7",
+          "cpuSeconds": 0.1875,
+          "allocatedBytes": 3954000
+        },
+        {
+          "name": "Dedicated Voxy Worker #1",
+          "cpuSeconds": 0.171875,
+          "allocatedBytes": 112616
+        },
+        {
+          "name": "Chunk Render Task Executor #3",
+          "cpuSeconds": 0.15625,
+          "allocatedBytes": 3058696
+        },
+        {
+          "name": "Chunk Render Task Executor #8",
+          "cpuSeconds": 0.15625,
+          "allocatedBytes": 4826304
+        },
+        {
+          "name": "JFR Periodic Tasks",
+          "cpuSeconds": 0.15625,
+          "allocatedBytes": 1920
+        },
+        {
+          "name": "Chunk Render Task Executor #0",
+          "cpuSeconds": 0.140625,
+          "allocatedBytes": 3236624
+        },
+        {
+          "name": "Chunk Render Task Executor #9",
+          "cpuSeconds": 0.140625,
+          "allocatedBytes": 3119736
+        },
+        {
+          "name": "vss-worldgen-profile",
+          "cpuSeconds": 0.109375,
+          "allocatedBytes": 97066096
+        },
+        {
+          "name": "Thread-16",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 105928
+        },
+        {
+          "name": "c2me-worker-6",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 4932232
+        },
+        {
+          "name": "Netty Server IO #1",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 29785320
+        },
+        {
+          "name": "vss-cache-restore-overworld",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 18270632
+        },
+        {
+          "name": "vss-cache-restore-overworld",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 31818616
+        },
+        {
+          "name": "Netty Local Client IO #0",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 15119600
+        },
+        {
+          "name": "Flywheel Task Executor #2",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 182160
+        },
+        {
+          "name": "Flywheel Task Executor #5",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 217232
+        },
+        {
+          "name": "JFR Recorder Thread",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-DiskReader-10",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 1007120
+        },
+        {
+          "name": "c2me-worker-0",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 4208520
+        },
+        {
+          "name": "c2me-worker-3",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 5743920
+        },
+        {
+          "name": "c2me-worker-5",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 4788304
+        },
+        {
+          "name": "c2me-worker-7",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 4647256
+        },
+        {
+          "name": "c2me-sched",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 535888
+        },
+        {
+          "name": "Sound engine",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 49520
+        },
+        {
+          "name": "Async Node Manager",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 100128
+        },
+        {
+          "name": "Flywheel Task Executor #0",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 219032
+        },
+        {
+          "name": "Flywheel Task Executor #3",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 170824
+        },
+        {
+          "name": "Flywheel Task Executor #6",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 177152
+        },
+        {
+          "name": "Flywheel Task Executor #8",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 196736
+        },
+        {
+          "name": "VSS-ColumnProcessor",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 14284640
+        },
+        {
+          "name": "VSS-DiskReader-11",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 977072
+        },
+        {
+          "name": "VSS-DiskReader-12",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 994416
+        },
+        {
+          "name": "Worker-Main-34",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 18808
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 461600
+        },
+        {
+          "name": "Reference Handler",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Finalizer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Signal Dispatcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Attach Listener",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Common-Cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Notification Thread",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "c2me-worker-1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 5434424
+        },
+        {
+          "name": "c2me-worker-2",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 5742576
+        },
+        {
+          "name": "c2me-worker-4",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 5283176
+        },
+        {
+          "name": "c2me-worker-8",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 5282184
+        },
+        {
+          "name": "JNA Cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Timer hack thread",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Yggdrasil Key Fetcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Cleaner-0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Cleaner-1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "HttpClient-1-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 672
+        },
+        {
+          "name": "FileSystemWatchService",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "config-file-watcher-0-0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 3200
+        },
+        {
+          "name": "modloading-sync-worker",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "HttpClient-3-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 672
+        },
+        {
+          "name": "Cleaner-2",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "idle-timeout-task",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 448
+        },
+        {
+          "name": "HTTP-Dispatcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 840
+        },
+        {
+          "name": "HttpClient-4-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 672
+        },
+        {
+          "name": "C2ME Storage #1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 990552
+        },
+        {
+          "name": "C2ME Storage #2",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1281232
+        },
+        {
+          "name": "C2ME Storage #3",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1536
+        },
+        {
+          "name": "C2ME Storage #4",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #5",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #6",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #7",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #8",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #9",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "RxCachedWorkerPoolEvictor-1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 32
+        },
+        {
+          "name": "ThreadStateHolderCleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 192
+        },
+        {
+          "name": "minecraft_overworld - Light",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 25180008
+        },
+        {
+          "name": "zstdnet-traffic-stats",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 8664
+        },
+        {
+          "name": "Netty Server IO #0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Active world cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1280
+        },
+        {
+          "name": "Model factory processor",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Flywheel Task Executor #1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 164416
+        },
+        {
+          "name": "Flywheel Task Executor #4",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 180384
+        },
+        {
+          "name": "Flywheel Task Executor #7",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 192504
+        },
+        {
+          "name": "Flywheel Task Executor #9",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 249992
+        },
+        {
+          "name": "Telemetry-Sender-#1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-mesh-resource-identity",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-prediction-dispose",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-prediction-compaction",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 2560
+        },
+        {
+          "name": "VSS Seam Mask 1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 805792
+        },
+        {
+          "name": "VSS Seam Mask 2",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 807328
+        },
+        {
+          "name": "IO-Worker-8",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 28960
+        },
+        {
+          "name": "VSS-DiskReader-9",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1100832
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 607528
+        },
+        {
+          "name": "Download-5",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 369864
+        },
+        {
+          "name": "Worker-Main-31",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 36272
+        },
+        {
+          "name": "Worker-Main-32",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 30672
+        },
+        {
+          "name": "Worker-Main-33",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 19880
+        },
+        {
+          "name": "Worker-Main-35",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 20800
+        },
+        {
+          "name": "Worker-Main-36",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 11936
+        },
+        {
+          "name": "Worker-Main-37",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 22024
+        },
+        {
+          "name": "Worker-Main-38",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 15744
+        },
+        {
+          "name": "Worker-Main-39",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 4680
+        },
+        {
+          "name": "Worker-Main-41",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 10448
+        },
+        {
+          "name": "Worker-Main-40",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 36624
+        },
+        {
+          "name": "Worker-Main-42",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 3632
+        },
+        {
+          "name": "Worker-Main-44",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 13680
+        },
+        {
+          "name": "Worker-Main-43",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 23312
+        },
+        {
+          "name": "Worker-Main-45",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 42856
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 482368
+        },
+        {
+          "name": "IO-Worker-9",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "JFR Recording Scheduler",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 480784
+        },
+        {
+          "name": "VSS-thread-profiler-readonly",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1566384
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        }
+      ],
+      "timing": {
+        "PREPARE": {
+          "cpuCount": 28,
+          "cpuMs": 5.648432142857143,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "COVERAGE": {
+          "cpuCount": 19,
+          "cpuMs": 0.21067368421052632,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "SEAMS": {
+          "cpuCount": 4,
+          "cpuMs": 1.043325,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "UPLOAD": {
+          "cpuCount": 1,
+          "cpuMs": 1.0055,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "OPAQUE": {
+          "cpuCount": 28,
+          "cpuMs": 5.874446428571428,
+          "gpuCount": 28,
+          "gpuMs": 5.777737142857143
+        },
+        "WATER": {
+          "cpuCount": 28,
+          "cpuMs": 0.42743571428571425,
+          "gpuCount": 28,
+          "gpuMs": 0.1266102857142857
+        },
+        "DEPTH_COPY": {
+          "cpuCount": 28,
+          "cpuMs": 0.020335714285714287,
+          "gpuCount": 28,
+          "gpuMs": 0.20194742857142858
+        },
+        "STATE": {
+          "cpuCount": 168,
+          "cpuMs": 0.009553571428571429,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "ANTIALIAS": {
+          "cpuCount": 28,
+          "cpuMs": 0.037032142857142854,
+          "gpuCount": 28,
+          "gpuMs": 0.17879771428571428
+        },
+        "HZB_REDUCE": {
+          "cpuCount": 184,
+          "cpuMs": 0.016331521739130436,
+          "gpuCount": 184,
+          "gpuMs": 0.09124173913043479
+        },
+        "GPU_FILTER": {
+          "cpuCount": 184,
+          "cpuMs": 0.04994619565217391,
+          "gpuCount": 184,
+          "gpuMs": 0.030208
+        },
+        "INDIRECT_BUILD": {
+          "cpuCount": 46,
+          "cpuMs": 2.7938782608695654,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "INDIRECT_UPLOAD": {
+          "cpuCount": 2445,
+          "cpuMs": 0.00917959100204499,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "INDIRECT_SUBMIT": {
+          "cpuCount": 0,
+          "cpuMs": null,
+          "gpuCount": 368,
+          "gpuMs": 0.1371241739130435
+        }
+      },
+      "managerDeltas": {
+        "viewRefreshes": 249,
+        "viewDeferredAdmissions": 1,
+        "visibleCpuNanos": 7812500000,
+        "backgroundCpuNanos": 359375000,
+        "samplingNanos": 6612616900,
+        "decorationNanos": 300859800,
+        "meshingNanos": 564861200,
+        "packingNanos": 529495000,
+        "executorCompleted": 160782
+      },
+      "executorActiveRange": [
+        0,
+        2
+      ],
+      "profilerReadMsMax": 13.8085
+    },
+    "late": {
+      "seconds": 30.0230031,
+      "intervals": 15,
+      "fromTo": [
+        [
+          1791626245911,
+          1791626247913
+        ],
+        [
+          1791626247913,
+          1791626249914
+        ],
+        [
+          1791626249914,
+          1791626251916
+        ],
+        [
+          1791626251916,
+          1791626253917
+        ],
+        [
+          1791626253917,
+          1791626255918
+        ],
+        [
+          1791626255918,
+          1791626257920
+        ],
+        [
+          1791626257920,
+          1791626259921
+        ],
+        [
+          1791626259921,
+          1791626261922
+        ],
+        [
+          1791626261922,
+          1791626263924
+        ],
+        [
+          1791626263924,
+          1791626265926
+        ],
+        [
+          1791626265926,
+          1791626267927
+        ],
+        [
+          1791626267927,
+          1791626269929
+        ],
+        [
+          1791626269929,
+          1791626271930
+        ],
+        [
+          1791626271930,
+          1791626273932
+        ],
+        [
+          1791626273932,
+          1791626275934
+        ]
+      ],
+      "counters": {
+        "frameStarts": 1144.0,
+        "preparedPlans": 1121.0,
+        "reusedPlans": 24.0,
+        "meshUploads": 468.0,
+        "drawCalls": 175107.0,
+        "indirectCalls": 175107.0,
+        "indirectTiles": 6761622.0,
+        "multiDrawCalls": 0.0,
+        "quads": 7412459752.0,
+        "visibilityVisits": 8924266.0,
+        "worldVisits": 1122383.0,
+        "orderEdits": 92943.0,
+        "listPublications": 597.0,
+        "probes": 113.0,
+        "completed": 113.0,
+        "planHits": 1692.0,
+        "planMisses": 1754.0,
+        "planReplayBatches": 77843.0
+      },
+      "actualFps": 38.10411624012389,
+      "twoSecondFpsRange": [
+        28.978299600344286,
+        47.46420249847565
+      ],
+      "gameFpsRange": [
+        28,
+        49
+      ],
+      "processCpuSeconds": 144.5,
+      "processCpuCores": 4.812976220889775,
+      "threadGroups": {
+        "render": {
+          "cpuSeconds": 26.828125,
+          "allocatedBytes": 2384020752,
+          "cpuCores": 0.8935856586578442,
+          "allocationMiBPerSecond": 75.72791280702742
+        },
+        "other": {
+          "cpuSeconds": 6.90625,
+          "allocatedBytes": 255690920,
+          "cpuCores": 0.23003195173370247,
+          "allocationMiBPerSecond": 8.121967763520804
+        },
+        "c2me": {
+          "cpuSeconds": 0.4375,
+          "allocatedBytes": 45822880,
+          "cpuCores": 0.014572159838334094,
+          "allocationMiBPerSecond": 1.45555405014649
+        },
+        "integrated_server": {
+          "cpuSeconds": 2.25,
+          "allocatedBytes": 581295928,
+          "cpuCores": 0.07494253631143248,
+          "allocationMiBPerSecond": 18.46474168219157
+        },
+        "other_vss": {
+          "cpuSeconds": 6.390625,
+          "allocatedBytes": 582599760,
+          "cpuCores": 0.21285762049566587,
+          "allocationMiBPerSecond": 18.506157628729863
+        },
+        "prediction_workers": {
+          "cpuSeconds": 93.484375,
+          "allocatedBytes": 6031144592,
+          "cpuCores": 3.1137582968840314,
+          "allocationMiBPerSecond": 191.57802691373175
+        },
+        "profiler": {
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 2344168,
+          "cpuCores": 0.0005204342799405034,
+          "allocationMiBPerSecond": 0.07446199860471008
+        }
+      },
+      "threads": [
+        {
+          "name": "Render thread",
+          "cpuSeconds": 26.828125,
+          "allocatedBytes": 2384020752
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 16.953125,
+          "allocatedBytes": 779707624
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 14.453125,
+          "allocatedBytes": 774230056
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 11.859375,
+          "allocatedBytes": 840413928
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 11.609375,
+          "allocatedBytes": 823605120
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 11.59375,
+          "allocatedBytes": 726398920
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 11.25,
+          "allocatedBytes": 689317248
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 8.578125,
+          "allocatedBytes": 574357680
+        },
+        {
+          "name": "vss-prediction-overworld",
+          "cpuSeconds": 7.1875,
+          "allocatedBytes": 823114016
+        },
+        {
+          "name": "vss-prediction-disk",
+          "cpuSeconds": 3.140625,
+          "allocatedBytes": 372111400
+        },
+        {
+          "name": "VSS-PresenceCacheWriter",
+          "cpuSeconds": 2.875,
+          "allocatedBytes": 59277112
+        },
+        {
+          "name": "Server thread",
+          "cpuSeconds": 2.25,
+          "allocatedBytes": 581295928
+        },
+        {
+          "name": "vss-cpu-budget-sampler",
+          "cpuSeconds": 2.0,
+          "allocatedBytes": 3960
+        },
+        {
+          "name": "vss-finished-mesh-disk",
+          "cpuSeconds": 0.9375,
+          "allocatedBytes": 11398552
+        },
+        {
+          "name": "CullThread",
+          "cpuSeconds": 0.765625,
+          "allocatedBytes": 4395776
+        },
+        {
+          "name": "VSS-DiskWriter-3",
+          "cpuSeconds": 0.40625,
+          "allocatedBytes": 8156976
+        },
+        {
+          "name": "JFR Periodic Tasks",
+          "cpuSeconds": 0.234375,
+          "allocatedBytes": 2880
+        },
+        {
+          "name": "Chunk Render Task Executor #5",
+          "cpuSeconds": 0.21875,
+          "allocatedBytes": 6691296
+        },
+        {
+          "name": "Netty Server IO #1",
+          "cpuSeconds": 0.203125,
+          "allocatedBytes": 40601856
+        },
+        {
+          "name": "Chunk Render Task Executor #8",
+          "cpuSeconds": 0.171875,
+          "allocatedBytes": 6422400
+        },
+        {
+          "name": "Chunk Render Task Executor #1",
+          "cpuSeconds": 0.15625,
+          "allocatedBytes": 7371496
+        },
+        {
+          "name": "Chunk Render Task Executor #6",
+          "cpuSeconds": 0.15625,
+          "allocatedBytes": 6285072
+        },
+        {
+          "name": "Dedicated Voxy Worker #1",
+          "cpuSeconds": 0.140625,
+          "allocatedBytes": 168408
+        },
+        {
+          "name": "Chunk Render Task Executor #0",
+          "cpuSeconds": 0.140625,
+          "allocatedBytes": 6507040
+        },
+        {
+          "name": "vss-worldgen-profile",
+          "cpuSeconds": 0.140625,
+          "allocatedBytes": 131183824
+        },
+        {
+          "name": "Chunk Render Task Executor #3",
+          "cpuSeconds": 0.125,
+          "allocatedBytes": 6105760
+        },
+        {
+          "name": "Chunk Render Task Executor #4",
+          "cpuSeconds": 0.125,
+          "allocatedBytes": 5286048
+        },
+        {
+          "name": "Chunk Render Task Executor #7",
+          "cpuSeconds": 0.125,
+          "allocatedBytes": 5147040
+        },
+        {
+          "name": "Chunk Render Task Executor #9",
+          "cpuSeconds": 0.125,
+          "allocatedBytes": 6899968
+        },
+        {
+          "name": "Chunk Render Task Executor #2",
+          "cpuSeconds": 0.109375,
+          "allocatedBytes": 4524440
+        },
+        {
+          "name": "vss-cache-restore-overworld",
+          "cpuSeconds": 0.109375,
+          "allocatedBytes": 29591840
+        },
+        {
+          "name": "c2me-worker-8",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 5374288
+        },
+        {
+          "name": "Netty Local Client IO #0",
+          "cpuSeconds": 0.078125,
+          "allocatedBytes": 19473432
+        },
+        {
+          "name": "c2me-worker-1",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 5005456
+        },
+        {
+          "name": "Flywheel Task Executor #1",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 224040
+        },
+        {
+          "name": "Flywheel Task Executor #8",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 198144
+        },
+        {
+          "name": "Flywheel Task Executor #9",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 301384
+        },
+        {
+          "name": "vss-cache-restore-overworld",
+          "cpuSeconds": 0.0625,
+          "allocatedBytes": 36432776
+        },
+        {
+          "name": "c2me-worker-0",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 5257992
+        },
+        {
+          "name": "c2me-worker-2",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 5188024
+        },
+        {
+          "name": "c2me-worker-4",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 5487512
+        },
+        {
+          "name": "c2me-worker-6",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 4458456
+        },
+        {
+          "name": "c2me-worker-7",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 5061008
+        },
+        {
+          "name": "Flywheel Task Executor #2",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 241304
+        },
+        {
+          "name": "JFR Recorder Thread",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-DiskReader-9",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 1503752
+        },
+        {
+          "name": "VSS-DiskReader-10",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 1485048
+        },
+        {
+          "name": "VSS-DiskReader-11",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 1498208
+        },
+        {
+          "name": "VSS-DiskReader-12",
+          "cpuSeconds": 0.046875,
+          "allocatedBytes": 1442168
+        },
+        {
+          "name": "c2me-worker-3",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 5233376
+        },
+        {
+          "name": "C2ME Storage #1",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 939008
+        },
+        {
+          "name": "Flywheel Task Executor #0",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 327856
+        },
+        {
+          "name": "Flywheel Task Executor #3",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 267312
+        },
+        {
+          "name": "Flywheel Task Executor #4",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 207688
+        },
+        {
+          "name": "Flywheel Task Executor #6",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 251224
+        },
+        {
+          "name": "Flywheel Task Executor #7",
+          "cpuSeconds": 0.03125,
+          "allocatedBytes": 220712
+        },
+        {
+          "name": "c2me-worker-5",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 4122176
+        },
+        {
+          "name": "c2me-sched",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 634592
+        },
+        {
+          "name": "C2ME Storage #2",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 1083264
+        },
+        {
+          "name": "Flywheel Task Executor #5",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 251320
+        },
+        {
+          "name": "VSS-ColumnProcessor",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 22336264
+        },
+        {
+          "name": "VSS Seam Mask 1",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 1925712
+        },
+        {
+          "name": "VSS Seam Mask 2",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 1957296
+        },
+        {
+          "name": "IO-Worker-9",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 129000
+        },
+        {
+          "name": "VSS-thread-profiler-readonly",
+          "cpuSeconds": 0.015625,
+          "allocatedBytes": 2344168
+        },
+        {
+          "name": "Reference Handler",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Finalizer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Signal Dispatcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Attach Listener",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Common-Cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Notification Thread",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "JNA Cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1608
+        },
+        {
+          "name": "Timer hack thread",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Yggdrasil Key Fetcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Cleaner-0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Cleaner-1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "HttpClient-1-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 960
+        },
+        {
+          "name": "FileSystemWatchService",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "config-file-watcher-0-0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 4768
+        },
+        {
+          "name": "modloading-sync-worker",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Thread-16",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 24552
+        },
+        {
+          "name": "HttpClient-3-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 960
+        },
+        {
+          "name": "Cleaner-2",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "idle-timeout-task",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 672
+        },
+        {
+          "name": "HTTP-Dispatcher",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1200
+        },
+        {
+          "name": "HttpClient-4-SelectorManager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 960
+        },
+        {
+          "name": "C2ME Storage #3",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 24816
+        },
+        {
+          "name": "C2ME Storage #4",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #5",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #6",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #7",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #8",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "C2ME Storage #9",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "RxCachedWorkerPoolEvictor-1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "ThreadStateHolderCleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 192
+        },
+        {
+          "name": "minecraft_overworld - Light",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 20609752
+        },
+        {
+          "name": "zstdnet-traffic-stats",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 125208
+        },
+        {
+          "name": "Netty Server IO #0",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Active world cleaner",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1920
+        },
+        {
+          "name": "Sound engine",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 92040
+        },
+        {
+          "name": "Model factory processor",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 58504
+        },
+        {
+          "name": "Async Node Manager",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 150272
+        },
+        {
+          "name": "Telemetry-Sender-#1",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-mesh-resource-identity",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-prediction-dispose",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "vss-prediction-compaction",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 3840
+        },
+        {
+          "name": "IO-Worker-8",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 65376
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1034888
+        },
+        {
+          "name": "Download-5",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "Worker-Main-31",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 376
+        },
+        {
+          "name": "Worker-Main-32",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1240
+        },
+        {
+          "name": "Worker-Main-33",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 9112
+        },
+        {
+          "name": "Worker-Main-34",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 2352
+        },
+        {
+          "name": "Worker-Main-35",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 17352
+        },
+        {
+          "name": "Worker-Main-36",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 25272
+        },
+        {
+          "name": "Worker-Main-37",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 30496
+        },
+        {
+          "name": "Worker-Main-38",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 17848
+        },
+        {
+          "name": "Worker-Main-39",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1368
+        },
+        {
+          "name": "Worker-Main-41",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 2496
+        },
+        {
+          "name": "Worker-Main-40",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 28360
+        },
+        {
+          "name": "Worker-Main-42",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 5344
+        },
+        {
+          "name": "Worker-Main-44",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 25848
+        },
+        {
+          "name": "Worker-Main-43",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 20216
+        },
+        {
+          "name": "Worker-Main-45",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 34248
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 957488
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1095016
+        },
+        {
+          "name": "JFR Recording Scheduler",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS-LOD-Packer",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1042928
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 0
+        },
+        {
+          "name": "VSS local templates",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 67208
+        },
+        {
+          "name": "vss-mesh-restore",
+          "cpuSeconds": 0.0,
+          "allocatedBytes": 1873568
+        }
+      ],
+      "timing": {
+        "PREPARE": {
+          "cpuCount": 38,
+          "cpuMs": 7.13313947368421,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "COVERAGE": {
+          "cpuCount": 161,
+          "cpuMs": 0.10263478260869564,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "SEAMS": {
+          "cpuCount": 11,
+          "cpuMs": 1.1002,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "UPLOAD": {
+          "cpuCount": 17,
+          "cpuMs": 0.29219411764705877,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "OPAQUE": {
+          "cpuCount": 38,
+          "cpuMs": 5.926497368421052,
+          "gpuCount": 38,
+          "gpuMs": 4.993266526315789
+        },
+        "WATER": {
+          "cpuCount": 38,
+          "cpuMs": 0.49125,
+          "gpuCount": 38,
+          "gpuMs": 0.10698105263157895
+        },
+        "DEPTH_COPY": {
+          "cpuCount": 38,
+          "cpuMs": 0.02206842105263158,
+          "gpuCount": 38,
+          "gpuMs": 0.19453305263157897
+        },
+        "STATE": {
+          "cpuCount": 228,
+          "cpuMs": 0.010168859649122806,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "ANTIALIAS": {
+          "cpuCount": 38,
+          "cpuMs": 0.038497368421052634,
+          "gpuCount": 38,
+          "gpuMs": 0.18440084210526314
+        },
+        "HZB_REDUCE": {
+          "cpuCount": 297,
+          "cpuMs": 0.01771919191919192,
+          "gpuCount": 297,
+          "gpuMs": 0.09388735353535355
+        },
+        "GPU_FILTER": {
+          "cpuCount": 297,
+          "cpuMs": 0.04767744107744108,
+          "gpuCount": 297,
+          "gpuMs": 0.03656059259259259
+        },
+        "INDIRECT_BUILD": {
+          "cpuCount": 76,
+          "cpuMs": 1.8968881578947367,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "INDIRECT_UPLOAD": {
+          "cpuCount": 2980,
+          "cpuMs": 0.007197684563758389,
+          "gpuCount": 0,
+          "gpuMs": null
+        },
+        "INDIRECT_SUBMIT": {
+          "cpuCount": 0,
+          "cpuMs": null,
+          "gpuCount": 608,
+          "gpuMs": 0.1062501052631579
+        }
+      },
+      "managerDeltas": {
+        "viewRefreshes": 259,
+        "viewDeferredAdmissions": 4,
+        "visibleCpuNanos": 86796875000,
+        "backgroundCpuNanos": 6968750000,
+        "samplingNanos": 56268338200,
+        "decorationNanos": 31711992400,
+        "meshingNanos": 1592732100,
+        "packingNanos": 1172805500,
+        "executorCompleted": 163950
+      },
+      "executorActiveRange": [
+        1,
+        4
+      ],
+      "profilerReadMsMax": 1.2017
+    }
+  },
+  "threadFindings": {
+    "active": {
+      "renderExecutionSamples": 6372,
+      "renderNativeSamples": 214,
+      "renderMonitorMs": 0.0,
+      "renderParkMs": 0.0,
+      "gcCount": 22,
+      "gcMs": 169.45759999999999,
+      "maxGcMs": 17.3125,
+      "renderSelf": {
+        "jdk.ExecutionSample | java.util.HashMap.getNode:579": 393,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter:185": 322,
+        "jdk.ExecutionSample | net.minecraft.client.renderer.culling.Frustum.cubeInFrustum:85": 306,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDrawRanges.<init>:15": 257,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:956": 216,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem:249": 179,
+        "jdk.ExecutionSample | java.lang.invoke.LambdaForm$MH.0x00000000932eb800.guard:-1": 172,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:583": 162,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail:61": 143,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter:214": 120,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates:799": 118,
+        "jdk.ExecutionSample | java.lang.StrictMath.hypot:2202": 113,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked:579": 110,
+        "jdk.ExecutionSample | java.util.WeakHashMap.matchesKey:299": 100,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionSubmissionCoverage.filter:128": 98,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass:1436": 97,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.<init>:551": 93,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare:153": 86,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:586": 85,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get:372": 84,
+        "jdk.NativeMethodSample | org.lwjgl.system.JNI.invokePV:-1": 83,
+        "jdk.ExecutionSample | java.util.HashMap.putVal:645": 79,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get:331": 78,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.hashCode:3437": 77,
+        "jdk.ExecutionSample | java.util.HashMap.computeIfAbsent:1210": 70,
+        "jdk.ExecutionSample | java.util.Arrays.hashCode:4479": 70,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionWorkView.intersects:106": 68,
+        "jdk.ExecutionSample | java.util.Objects.equals:62": 64,
+        "jdk.ExecutionSample | java.util.HashMap$HashIterator.nextNode:1610": 64,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMorph.startSeconds:20": 61,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.objects.ObjectOpenHashSet.add:368": 60,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch.add:199": 58,
+        "jdk.ExecutionSample | java.util.IdentityHashMap.get:349": 55,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderGeometry$Entry.visible:23": 53,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates:798": 52,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare:155": 52,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOpaqueBatches.prepare:68": 45,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.same:715": 43,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionExactCoverageMask$Snapshot.interior:38": 39,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionFeatureHandoff.any:26": 35,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTile.baseBlockX:3477": 33,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepareAquatic:193": 32,
+        "jdk.ExecutionSample | java.util.WeakHashMap.getTable:362": 30,
+        "jdk.NativeMethodSample | org.lwjgl.system.JNI.invokeV:-1": 30,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap$Traverser.advance:3399": 29,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionSpatialIndex.intersectFrustum:124": 29,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawKey:786": 28,
+        "jdk.ExecutionSample | java.util.IdentityHashMap.resize:497": 28,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:588": 27,
+        "jdk.ExecutionSample | java.util.ImmutableCollections$MapN.probe:1583": 27,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:958": 26,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare:934": 26,
+        "jdk.ExecutionSample | java.util.TreeMap.successor:2523": 26,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.coordinate:192": 25,
+        "jdk.ExecutionSample | java.util.HashMap.computeIfAbsent:1215": 25
+      },
+      "renderMethods": {
+        "java.lang.invoke.Invokers$Holder.invokeExact_MT": 6586,
+        "net.minecraft.client.main.Main.main": 6586,
+        "java.lang.invoke.LambdaForm$MH.0x00000000935a9000.invoke": 6586,
+        "net.minecraft.client.Minecraft.run": 6586,
+        "jdk.internal.reflect.DirectMethodHandleAccessor.invokeImpl": 6586,
+        "net.minecraft.client.Minecraft.runTick": 6586,
+        "java.lang.invoke.LambdaForm$DMH.0x000000009306c400.invokeStatic": 6586,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.runTarget": 6585,
+        "cpw.mods.modlauncher.LaunchServiceHandler.launch": 6585,
+        "net.neoforged.fml.loading.targets.CommonClientLaunchHandler.runService": 6585,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.clientService": 6585,
+        "cpw.mods.modlauncher.LaunchServiceHandlerDecorator.launch": 6585,
+        "jdk.internal.reflect.DirectMethodHandleAccessor.invoke": 6585,
+        "java.lang.reflect.Method.invoke": 6585,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler$$Lambda.0x00000000937b2000.run": 6585,
+        "cpw.mods.modlauncher.Launcher.run": 6585,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.lambda$launchService$4": 6585,
+        "cpw.mods.modlauncher.Launcher.main": 6555,
+        "cpw.mods.modlauncher.BootstrapLaunchConsumer.accept": 6553,
+        "cpw.mods.bootstraplauncher.BootstrapLauncher.run": 6547,
+        "cpw.mods.bootstraplauncher.BootstrapLauncher.main": 6529,
+        "net.minecraft.client.renderer.GameRenderer.render": 5468,
+        "net.minecraft.client.renderer.GameRenderer.renderLevel": 5385,
+        "net.minecraft.client.renderer.LevelRenderer.renderLevel": 5371,
+        "net.minecraft.client.renderer.LevelRenderer.renderSectionLayer": 5218,
+        "net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer.drawChunkLayer": 5070,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.render": 5070,
+        "net.caffeinemc.mods.sodium.client.render.chunk.RenderSectionManager.renderLayer": 5070,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.handler$bdg000$voxy$injectRender": 5063,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.doRender": 5063,
+        "me.cortex.voxy.client.core.VoxyRenderSystem.renderOpaque": 5062,
+        "me.cortex.voxy.client.core.AbstractRenderPipeline.runPipeline": 5044,
+        "me.cortex.voxy.client.core.NormalRenderPipeline.handler$cmd000$vss$predictionBeforeWater": 4979,
+        "dev.xantha.vss.client.prediction.PredictionNormalTranslucencyBridge.beforeTranslucent": 4979,
+        "me.cortex.voxy.client.core.NormalRenderPipeline.postOpaquePreTranslucent": 4979,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStage": 4979,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderBeforeVoxyWater": 4979,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked": 4975,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare": 2238,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawPasses": 1936,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.preparePass": 1344,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare": 1344,
+        "net.neoforged.bus.EventBus.post": 1062,
+        "java.lang.invoke.LambdaForm$MH.0x00000000935a9400.invokeExact_MT": 990,
+        "net.minecraft.client.Minecraft.tick": 927,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass": 873,
+        "net.neoforged.neoforge.client.ClientHooks.fireClientTickPost": 831,
+        "net.neoforged.bus.EventListenerFactory$onClientTick.0x00000000949a9000.invoke": 829,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onClientTick": 829,
+        "java.lang.invoke.LambdaForm$MH.0x0000000095df9400.invoke": 829,
+        "java.util.HashMap.getNode": 819,
+        "dev.xantha.vss.client.prediction.ClientPredictionState.tick": 810,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.tick": 799,
+        "dev.xantha.vss.client.prediction.PredictionSubmissionCoverage.filter": 711,
+        "java.util.HashMap.get": 688,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.selectStable": 665,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.add": 607,
+        "dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter": 450,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates": 388,
+        "net.minecraft.client.renderer.culling.Frustum.isVisible": 330,
+        "net.minecraft.client.renderer.culling.Frustum.cubeInFrustum": 330,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.updateStable": 325,
+        "java.lang.invoke.Invokers$Holder.linkToTargetMethod": 283,
+        "java.util.concurrent.ConcurrentHashMap.get": 277,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.drawRanges": 259,
+        "dev.xantha.vss.client.prediction.PredictionDrawRanges.<init>": 257,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.scheduleWork": 246,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932eb800.guard": 239,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932ebc00.invoke": 237,
+        "java.lang.invoke.DelegatingMethodHandle$Holder.delegate": 237,
+        "dev.xantha.vss.client.prediction.PredictionSpatialIndex.intersectFrustum": 234,
+        "dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.equals": 221,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshViewWork": 196,
+        "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail": 192,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.recordPlanItem": 189,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.<init>": 185,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem": 182,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.resolveCoverage": 158,
+        "java.util.HashMap.computeIfAbsent": 157,
+        "java.util.HashMap.put": 155,
+        "net.neoforged.neoforge.client.ClientHooks.dispatchRenderStage": 154,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepareAquatic": 153,
+        "net.caffeinemc.mods.sodium.neoforge.level.NeoForgeLevelRenderHooks.runChunkLayerEvents": 148,
+        "net.neoforged.bus.EventListenerFactory$onRenderLevel.0x00000000949a8800.invoke": 146,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.onRenderLevel": 146,
+        "java.lang.invoke.LambdaForm$MH.0x0000000096191800.invoke": 146,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onRenderLevel": 146,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderDeferredWater": 145,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawKey": 142,
+        "java.util.HashMap.putVal": 141,
+        "java.lang.invoke.DirectMethodHandle$Holder.invokeStatic": 136,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.maintainGpuResidency": 135,
+        "java.util.concurrent.ConcurrentHashMap.containsKey": 133,
+        "java.util.WeakHashMap.get": 133,
+        "java.util.concurrent.ConcurrentHashMap$KeySetView.contains": 126,
+        "dev.xantha.vss.client.prediction.PredictionGpuResidency.used": 124,
+        "java.util.HashMap.containsKey": 122,
+        "java.util.AbstractCollection.addAll": 115,
+        "java.lang.Math.hypot": 114,
+        "dev.xantha.vss.client.prediction.PredictionAquaticLod.distance": 114,
+        "java.lang.StrictMath.hypot": 114,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.pruneReady": 105,
+        "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.sample": 103,
+        "com.mojang.blaze3d.systems.RenderSystem.flipFrame": 100,
+        "java.util.WeakHashMap.matchesKey": 100,
+        "com.mojang.blaze3d.platform.Window.updateDisplay": 100,
+        "dev.xantha.vss.client.prediction.PredictionLodPlanner.plan": 98,
+        "java.util.Objects.equals": 97,
+        "it.unimi.dsi.fastutil.objects.ObjectOpenHashSet.add": 96,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932eb000.invoke": 95,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.key": 92,
+        "java.util.HashSet.add": 92,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.apply": 92,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.removeStale": 90,
+        "java.util.Comparator$$Lambda.0x0000000093323800.compare": 90,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.occludedWork": 90,
+        "java.util.Comparator.lambda$thenComparing$36697e65$1": 89,
+        "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot.hidden": 89,
+        "it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get": 87,
+        "it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get": 84,
+        "org.lwjgl.glfw.GLFW.glfwSwapBuffers": 83,
+        "java.util.stream.AbstractPipeline.evaluate": 83,
+        "org.lwjgl.system.JNI.invokePV": 83,
+        "java.util.stream.AbstractPipeline.wrapAndCopyInto": 83,
+        "java.util.stream.AbstractPipeline.copyInto": 81,
+        "net.minecraft.client.gui.Gui.render$mixinextras$wrapped$97": 80,
+        "java.util.HashMap.hash": 80,
+        "net.minecraft.client.gui.Gui.render": 80,
+        "net.minecraft.client.gui.Gui.mixinextras$bridge$render$mixinextras$wrapped$97$98": 80,
+        "net.minecraft.client.gui.Gui$$Lambda.0x0000000096113c00.call": 80,
+        "net.neoforged.neoforge.client.gui.GuiLayerManager.render": 80,
+        "net.minecraft.client.gui.Gui.wrapMethod$zgl000$iris$handleHudHidingScreens": 80,
+        "dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.hashCode": 77,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.stage": 73,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.recomputeRenderOwners": 73,
+        "dev.xantha.vss.client.prediction.PredictionOpaqueBatches.prepare": 73,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.stitch": 73,
+        "java.util.Arrays.hashCode": 71,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.upload": 71,
+        "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringFeatureTileAtDetail": 70,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.intersects": 68,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.band": 68,
+        "net.neoforged.neoforge.client.gui.GuiLayerManager.renderInner": 68,
+        "dev.xantha.vss.client.prediction.PredictionTileTable.at": 64,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.retain": 64,
+        "java.util.HashMap$HashIterator.nextNode": 64,
+        "java.util.HashMap.remove": 64,
+        "java.util.HashMap.removeNode": 63,
+        "java.util.TimSort.sort": 63,
+        "java.util.Arrays.sort": 63,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene$$Lambda.0x00000000962b0c00.accept": 61,
+        "dev.xantha.vss.client.prediction.PredictionGpuTile.morphStartSeconds": 61,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.pendingUploads": 61,
+        "dev.xantha.vss.client.prediction.PredictionMorph.startSeconds": 61,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshLoadingProgress": 60,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.classifyView": 57,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.<init>": 56,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshOccludedPriorities": 56,
+        "java.util.IdentityHashMap.get": 56,
+        "java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual": 56,
+        "java.lang.invoke.LambdaForm$MH.0x000000009306c000.invokeExact_MT": 56,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.terrainRecords": 56,
+        "dev.xantha.vss.client.prediction.PredictionRenderGeometry$Entry.visible": 53,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.ranges": 53,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.enqueue": 52,
+        "dev.xantha.vss.client.prediction.PredictionVoxyBoundaryBridge.bind": 51,
+        "xaero.hud.render.HudRenderer.render": 51,
+        "xaero.common.events.ModClientEventsNeoForge$$Lambda.0x000000009528ec00.render": 51,
+        "xaero.common.events.ModClientEvents.handleRenderModOverlay": 51,
+        "java.util.ArrayList.removeIf": 50,
+        "dev.xantha.vss.client.prediction.PredictionDisplayGeometry.build": 50,
+        "java.util.Comparator.lambda$comparingInt$7b0bb60$1": 50,
+        "java.util.concurrent.ConcurrentHashMap.forEach": 50,
+        "java.util.Comparator$$Lambda.0x000000009303e800.compare": 50,
+        "xaero.hud.render.HudRenderer.renderModule": 50,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.voxyBoundaryCoverage": 50,
+        "java.util.ImmutableCollections$MapN.probe": 50,
+        "xaero.hud.minimap.module.MinimapRenderer.render": 49,
+        "java.util.ArrayList.sort": 49,
+        "dev.xantha.vss.client.prediction.PredictionTileTable.get": 49
+      },
+      "workerSelf": {
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.surfacePoints:-1": 601,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.displayPoints:-1": 522,
+        "jdk.ExecutionSample | com.ishland.c2me.opts.dfc.common.gen.jvm.SplineSupport.findRangeForLocation:42": 370,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.exteriorFootprints:-1": 175,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.placedFeature:-1": 96,
+        "jdk.ExecutionSample | com.ishland.c2me.opts.dfc.common.gen.jvm.InvocationShim.invokeDensityFunctionNoiseSample:48": 88,
+        "jdk.ExecutionSample | net.minecraft.world.level.levelgen.DensityFunction$NoiseHolder.getValue:53": 77,
+        "jdk.ExecutionSample | jdk.internal.foreign.abi.DowncallStub.0x00000000957a4800.invoke:-1": 66,
+        "jdk.ExecutionSample | java.util.Arrays.copyOf:3537": 61,
+        "jdk.ExecutionSample | java.io.DataOutputStream.writeInt:217": 58,
+        "jdk.ExecutionSample | com.ishland.c2me.opts.dfc.common.gen.jvm.SubCompiledDensityFunction.compute:81": 56,
+        "jdk.ExecutionSample | java.io.BufferedOutputStream.flushBuffer:123": 52,
+        "jdk.ExecutionSample | net.minecraft.world.level.biome.Climate$RTree$SubTree.search:133": 51,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.previewPoints:-1": 51,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.tints:-1": 48,
+        "jdk.ExecutionSample | net.minecraft.core.Vec3i.equals:49": 45,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:956": 35,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.decorationPoints:-1": 31,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.coordinate:192": 30,
+        "jdk.ExecutionSample | net.minecraft.world.level.levelgen.synth.NormalNoise.getValue:566": 30,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionPackedMesh.packQuad:572": 25,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.join:163": 22,
+        "jdk.ExecutionSample | java.util.ImmutableCollections$MapN.probe:1583": 21,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap.getAndMoveToLast:534": 20,
+        "jdk.ExecutionSample | java.util.Comparator.lambda$comparingInt$7b0bb60$1:494": 19,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMeshBuilder$VertexAccumulator.vertex:1337": 18,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionPackedMesh.group:688": 18,
+        "jdk.ExecutionSample | jdk.internal.foreign.AbstractMemorySegmentImpl.equals:534": 16,
+        "jdk.ExecutionSample | DfcCompiled_18_multiNoiseSampler_continents.method_12_AddNode:-1": 16,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.build:44": 16,
+        "jdk.ExecutionSample | java.util.Comparator.lambda$thenComparing$36697e65$1:220": 14,
+        "jdk.ExecutionSample | java.security.MessageDigest$Delegate.engineUpdate:662": 14,
+        "jdk.ExecutionSample | jdk.internal.foreign.abi.SharedUtils.checkSymbol:372": 14,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager.markCoverageDirty:1558": 13,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionPackedMesh.validateCoordinates:653": 13
+      },
+      "serverSelf": {
+        "jdk.ExecutionSample | net.minecraft.world.level.chunk.PalettedContainer.get:158": 52,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap.getOrDefault:411": 13,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap.get:373": 12,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap.get:327": 10,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get:331": 10,
+        "jdk.ExecutionSample | java.util.Arrays.binarySearch:2322": 9,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get:372": 8,
+        "jdk.ExecutionSample | net.minecraft.server.level.ServerChunkCache.getChunk$mixinextras$wrapped$81:153": 8,
+        "jdk.ExecutionSample | com.google.common.collect.Iterators$1.hasNext:140": 6,
+        "jdk.ExecutionSample | net.minecraft.world.level.Level.getChunk:202": 6,
+        "jdk.ExecutionSample | net.minecraft.server.level.ChunkHolder.broadcastChanges:188": 5,
+        "jdk.ExecutionSample | net.minecraft.world.entity.Mob.getItemBySlot:933": 5,
+        "jdk.ExecutionSample | net.minecraft.server.level.ServerEntity.sendChanges:139": 5,
+        "jdk.ExecutionSample | net.minecraft.world.entity.ai.goal.GoalSelector.tickRunningGoals:114": 4,
+        "jdk.ExecutionSample | net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.randomTick:736": 4,
+        "jdk.ExecutionSample | net.minecraft.server.level.ChunkTracker.getComputedLevel:49": 4,
+        "jdk.ExecutionSample | net.minecraft.world.ticks.LevelChunkTicks.peek:53": 4,
+        "jdk.ExecutionSample | net.minecraft.world.level.chunk.PalettedContainer.lambda$pack$11:241": 4,
+        "jdk.ExecutionSample | net.minecraft.world.level.NaturalSpawner.spawnCategoryForChunk:125": 4,
+        "jdk.ExecutionSample | net.minecraft.server.level.ServerLevel.tick:346": 4,
+        "jdk.ExecutionSample | net.minecraft.world.entity.EntitySelector.lambda$static$4:21": 4,
+        "jdk.ExecutionSample | net.minecraft.world.level.chunk.PalettedContainer$Strategy$1.getConfiguration:353": 4,
+        "jdk.ExecutionSample | java.util.Arrays$ArrayList.get:4225": 4,
+        "jdk.ExecutionSample | net.minecraft.world.level.LevelAccessor.dayTime:34": 3,
+        "jdk.ExecutionSample | net.minecraft.server.MinecraftServer.runServer:682": 3
+      },
+      "cpuLoad": [
+        {
+          "jvmUser": 0.08833704,
+          "machineTotal": 0.25544447,
+          "epochMs": 1791626218135,
+          "jvmSystem": 0.009707367
+        },
+        {
+          "jvmUser": 0.1047878,
+          "machineTotal": 0.21118097,
+          "epochMs": 1791626219142,
+          "jvmSystem": 0.038810294
+        },
+        {
+          "jvmUser": 0.099015154,
+          "machineTotal": 0.14380912,
+          "epochMs": 1791626220148,
+          "jvmSystem": 0.030092841
+        },
+        {
+          "jvmUser": 0.18938817,
+          "machineTotal": 0.2226382,
+          "epochMs": 1791626221153,
+          "jvmSystem": 0.009712214
+        },
+        {
+          "jvmUser": 0.13641769,
+          "machineTotal": 0.18752876,
+          "epochMs": 1791626222191,
+          "jvmSystem": 0.01128974
+        },
+        {
+          "jvmUser": 0.08930788,
+          "machineTotal": 0.11424796,
+          "epochMs": 1791626223197,
+          "jvmSystem": 0.010678116
+        },
+        {
+          "jvmUser": 0.19220619,
+          "machineTotal": 0.24670674,
+          "epochMs": 1791626224203,
+          "jvmSystem": 0.01747329
+        },
+        {
+          "jvmUser": 0.14755197,
+          "machineTotal": 0.30432582,
+          "epochMs": 1791626225210,
+          "jvmSystem": 0.013590313
+        },
+        {
+          "jvmUser": 0.15143533,
+          "machineTotal": 0.29975075,
+          "epochMs": 1791626226215,
+          "jvmSystem": 0.011648872
+        },
+        {
+          "jvmUser": 0.13292523,
+          "machineTotal": 0.2480508,
+          "epochMs": 1791626227221,
+          "jvmSystem": 0.0067918
+        },
+        {
+          "jvmUser": 0.096198656,
+          "machineTotal": 0.19097345,
+          "epochMs": 1791626228227,
+          "jvmSystem": 0.007773629
+        },
+        {
+          "jvmUser": 0.120742075,
+          "machineTotal": 0.16432056,
+          "epochMs": 1791626229242,
+          "jvmSystem": 0.00579562
+        },
+        {
+          "jvmUser": 0.08596837,
+          "machineTotal": 0.14229329,
+          "epochMs": 1791626230249,
+          "jvmSystem": 0.011591241
+        },
+        {
+          "jvmUser": 0.0767264,
+          "machineTotal": 0.12255203,
+          "epochMs": 1791626231254,
+          "jvmSystem": 0.005827321
+        },
+        {
+          "jvmUser": 0.07530121,
+          "machineTotal": 0.111873195,
+          "epochMs": 1791626232292,
+          "jvmSystem": 0.011295181
+        },
+        {
+          "jvmUser": 0.10289834,
+          "machineTotal": 0.23856351,
+          "epochMs": 1791626233297,
+          "jvmSystem": 0.043683257
+        },
+        {
+          "jvmUser": 0.123344734,
+          "machineTotal": 0.27838206,
+          "epochMs": 1791626234303,
+          "jvmSystem": 0.007769747
+        },
+        {
+          "jvmUser": 0.107859194,
+          "machineTotal": 0.19719969,
+          "epochMs": 1791626235309,
+          "jvmSystem": 0.008745341
+        },
+        {
+          "jvmUser": 0.15337674,
+          "machineTotal": 0.25993088,
+          "epochMs": 1791626236314,
+          "jvmSystem": 0.005824433
+        },
+        {
+          "jvmUser": 0.057188395,
+          "machineTotal": 0.08712512,
+          "epochMs": 1791626237326,
+          "jvmSystem": 0.005815769
+        },
+        {
+          "jvmUser": 0.24160397,
+          "machineTotal": 0.36273482,
+          "epochMs": 1791626246428,
+          "jvmSystem": 0.033824556
+        },
+        {
+          "jvmUser": 0.31635746,
+          "machineTotal": 0.4152266,
+          "epochMs": 1791626247435,
+          "jvmSystem": 0.05401225
+        },
+        {
+          "jvmUser": 0.2951046,
+          "machineTotal": 0.3544593,
+          "epochMs": 1791626248441,
+          "jvmSystem": 0.014561081
+        },
+        {
+          "jvmUser": 0.28165397,
+          "machineTotal": 0.3324389,
+          "epochMs": 1791626249446,
+          "jvmSystem": 0.01651075
+        },
+        {
+          "jvmUser": 0.26902854,
+          "machineTotal": 0.2981565,
+          "epochMs": 1791626250452,
+          "jvmSystem": 0.010683443
+        },
+        {
+          "jvmUser": 0.3902368,
+          "machineTotal": 0.49496505,
+          "epochMs": 1791626251458,
+          "jvmSystem": 0.010678121
+        },
+        {
+          "jvmUser": 0.25585467,
+          "machineTotal": 0.5267141,
+          "epochMs": 1791626252500,
+          "jvmSystem": 0.017806735
+        },
+        {
+          "jvmUser": 0.24474794,
+          "machineTotal": 0.38521686,
+          "epochMs": 1791626253505,
+          "jvmSystem": 0.017481996
+        },
+        {
+          "jvmUser": 0.28179416,
+          "machineTotal": 0.34442675,
+          "epochMs": 1791626254511,
+          "jvmSystem": 0.013603856
+        },
+        {
+          "jvmUser": 0.2938421,
+          "machineTotal": 0.3725559,
+          "epochMs": 1791626255517,
+          "jvmSystem": 0.020365294
+        },
+        {
+          "jvmUser": 0.2824848,
+          "machineTotal": 0.3143187,
+          "epochMs": 1791626256523,
+          "jvmSystem": 0.0077659055
+        },
+        {
+          "jvmUser": 0.2723713,
+          "machineTotal": 0.32279998,
+          "epochMs": 1791626257531,
+          "jvmSystem": 0.01647798
+        },
+        {
+          "jvmUser": 0.27277747,
+          "machineTotal": 0.34798762,
+          "epochMs": 1791626258537,
+          "jvmSystem": 0.042712487
+        },
+        {
+          "jvmUser": 0.29869014,
+          "machineTotal": 0.35672113,
+          "epochMs": 1791626259544,
+          "jvmSystem": 0.041700248
+        },
+        {
+          "jvmUser": 0.29010692,
+          "machineTotal": 0.35477874,
+          "epochMs": 1791626260550,
+          "jvmSystem": 0.016494375
+        },
+        {
+          "jvmUser": 0.30869445,
+          "machineTotal": 0.46194458,
+          "epochMs": 1791626261556,
+          "jvmSystem": 0.011648848
+        },
+        {
+          "jvmUser": 0.41665402,
+          "machineTotal": 0.5730461,
+          "epochMs": 1791626262599,
+          "jvmSystem": 0.010299313
+        },
+        {
+          "jvmUser": 0.26061046,
+          "machineTotal": 0.3595523,
+          "epochMs": 1791626263613,
+          "jvmSystem": 0.021313867
+        },
+        {
+          "jvmUser": 0.2566857,
+          "machineTotal": 0.34701782,
+          "epochMs": 1791626264619,
+          "jvmSystem": 0.020264661
+        },
+        {
+          "jvmUser": 0.21550387,
+          "machineTotal": 0.299127,
+          "epochMs": 1791626265625,
+          "jvmSystem": 0.015531811
+        },
+        {
+          "jvmUser": 0.24668954,
+          "machineTotal": 0.3198073,
+          "epochMs": 1791626266630,
+          "jvmSystem": 0.011654624
+        },
+        {
+          "jvmUser": 0.22013904,
+          "machineTotal": 0.26333702,
+          "epochMs": 1791626267638,
+          "jvmSystem": 0.012607082
+        },
+        {
+          "jvmUser": 0.26015764,
+          "machineTotal": 0.32305947,
+          "epochMs": 1791626268644,
+          "jvmSystem": 0.038829498
+        },
+        {
+          "jvmUser": 0.23794897,
+          "machineTotal": 0.3560813,
+          "epochMs": 1791626269649,
+          "jvmSystem": 0.04176247
+        },
+        {
+          "jvmUser": 0.2417138,
+          "machineTotal": 0.3884342,
+          "epochMs": 1791626270655,
+          "jvmSystem": 0.013590334
+        },
+        {
+          "jvmUser": 0.26404056,
+          "machineTotal": 0.3727965,
+          "epochMs": 1791626271666,
+          "jvmSystem": 0.009707374
+        },
+        {
+          "jvmUser": 0.27477464,
+          "machineTotal": 0.38033077,
+          "epochMs": 1791626272714,
+          "jvmSystem": 0.02413561
+        },
+        {
+          "jvmUser": 0.417417,
+          "machineTotal": 0.4631815,
+          "epochMs": 1791626273719,
+          "jvmSystem": 0.012619584
+        },
+        {
+          "jvmUser": 0.22035794,
+          "machineTotal": 0.25738537,
+          "epochMs": 1791626274725,
+          "jvmSystem": 0.015531837
+        },
+        {
+          "jvmUser": 0.28553855,
+          "machineTotal": 0.2958648,
+          "epochMs": 1791626275731,
+          "jvmSystem": 0.009712195
+        }
+      ]
+    },
+    "early": {
+      "renderExecutionSamples": 2538,
+      "renderNativeSamples": 95,
+      "renderMonitorMs": 0.0,
+      "renderParkMs": 0.0,
+      "gcCount": 8,
+      "gcMs": 57.6551,
+      "maxGcMs": 16.9957,
+      "renderSelf": {
+        "jdk.ExecutionSample | java.util.HashMap.getNode:579": 155,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter:185": 148,
+        "jdk.ExecutionSample | net.minecraft.client.renderer.culling.Frustum.cubeInFrustum:85": 120,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDrawRanges.<init>:15": 112,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem:249": 86,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:956": 84,
+        "jdk.ExecutionSample | java.lang.invoke.LambdaForm$MH.0x00000000932eb800.guard:-1": 69,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail:61": 55,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter:214": 51,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:583": 50,
+        "jdk.ExecutionSample | java.lang.StrictMath.hypot:2202": 49,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates:799": 48,
+        "jdk.ExecutionSample | java.util.WeakHashMap.matchesKey:299": 45,
+        "jdk.ExecutionSample | java.util.HashMap.putVal:645": 40,
+        "jdk.NativeMethodSample | org.lwjgl.system.JNI.invokePV:-1": 40,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionSubmissionCoverage.filter:128": 40,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.<init>:551": 40,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass:1436": 37,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.hashCode:3437": 36,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked:579": 36,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:586": 35,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get:372": 34,
+        "jdk.ExecutionSample | java.util.Arrays.hashCode:4479": 34,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get:331": 31,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionWorkView.intersects:106": 29,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare:153": 29,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderGeometry$Entry.visible:23": 28,
+        "jdk.ExecutionSample | java.util.HashMap$HashIterator.nextNode:1610": 26,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare:155": 25,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.objects.ObjectOpenHashSet.add:368": 23,
+        "jdk.ExecutionSample | java.util.Objects.equals:62": 22,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionExactCoverageMask$Snapshot.interior:38": 22,
+        "jdk.ExecutionSample | java.util.HashMap.computeIfAbsent:1210": 21,
+        "jdk.ExecutionSample | java.util.IdentityHashMap.get:349": 20,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates:798": 19,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.same:715": 18,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOpaqueBatches.prepare:68": 16,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch.add:199": 16,
+        "jdk.ExecutionSample | java.util.IdentityHashMap.resize:497": 14,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMorph.startSeconds:20": 14,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTile.baseBlockX:3477": 14,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap$Traverser.advance:3399": 13,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.objects.ObjectOpenHashSet.contains:483": 12,
+        "jdk.ExecutionSample | java.util.WeakHashMap.getTable:362": 12,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepareAquatic:193": 12,
+        "jdk.NativeMethodSample | org.lwjgl.system.JNI.invokeV:-1": 11,
+        "jdk.ExecutionSample | java.util.HashMap.computeIfAbsent:1215": 11,
+        "jdk.ExecutionSample | java.util.ImmutableCollections$AbstractImmutableMap.getOrDefault:1336": 11,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionFeatureHandoff.any:26": 10,
+        "jdk.ExecutionSample | java.util.ImmutableCollections$MapN.probe:1583": 10,
+        "jdk.NativeMethodSample | org.lwjgl.opengl.GL15C.nglBufferData:-1": 10,
+        "jdk.ExecutionSample | java.util.HashMap.resize:721": 10,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:958": 9,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:588": 9,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawKey:786": 9
+      },
+      "renderMethods": {
+        "java.lang.invoke.Invokers$Holder.invokeExact_MT": 2633,
+        "java.lang.invoke.LambdaForm$DMH.0x000000009306c400.invokeStatic": 2633,
+        "net.minecraft.client.main.Main.main": 2633,
+        "java.lang.invoke.LambdaForm$MH.0x00000000935a9000.invoke": 2633,
+        "net.minecraft.client.Minecraft.run": 2633,
+        "jdk.internal.reflect.DirectMethodHandleAccessor.invokeImpl": 2633,
+        "net.minecraft.client.Minecraft.runTick": 2633,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.runTarget": 2632,
+        "java.lang.reflect.Method.invoke": 2632,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler$$Lambda.0x00000000937b2000.run": 2632,
+        "cpw.mods.modlauncher.LaunchServiceHandler.launch": 2632,
+        "net.neoforged.fml.loading.targets.CommonClientLaunchHandler.runService": 2632,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.clientService": 2632,
+        "cpw.mods.modlauncher.LaunchServiceHandlerDecorator.launch": 2632,
+        "jdk.internal.reflect.DirectMethodHandleAccessor.invoke": 2632,
+        "cpw.mods.modlauncher.Launcher.run": 2632,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.lambda$launchService$4": 2632,
+        "cpw.mods.bootstraplauncher.BootstrapLauncher.run": 2618,
+        "cpw.mods.modlauncher.BootstrapLaunchConsumer.accept": 2618,
+        "cpw.mods.modlauncher.Launcher.main": 2618,
+        "cpw.mods.bootstraplauncher.BootstrapLauncher.main": 2610,
+        "net.minecraft.client.renderer.GameRenderer.render": 2172,
+        "net.minecraft.client.renderer.GameRenderer.renderLevel": 2143,
+        "net.minecraft.client.renderer.LevelRenderer.renderLevel": 2141,
+        "net.minecraft.client.renderer.LevelRenderer.renderSectionLayer": 2072,
+        "net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer.drawChunkLayer": 2016,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.render": 2016,
+        "net.caffeinemc.mods.sodium.client.render.chunk.RenderSectionManager.renderLayer": 2016,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.handler$bdg000$voxy$injectRender": 2011,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.doRender": 2011,
+        "me.cortex.voxy.client.core.VoxyRenderSystem.renderOpaque": 2011,
+        "me.cortex.voxy.client.core.AbstractRenderPipeline.runPipeline": 2000,
+        "me.cortex.voxy.client.core.NormalRenderPipeline.handler$cmd000$vss$predictionBeforeWater": 1970,
+        "dev.xantha.vss.client.prediction.PredictionNormalTranslucencyBridge.beforeTranslucent": 1970,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderBeforeVoxyWater": 1970,
+        "me.cortex.voxy.client.core.NormalRenderPipeline.postOpaquePreTranslucent": 1970,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStage": 1970,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked": 1968,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare": 852,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawPasses": 804,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.preparePass": 583,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare": 583,
+        "net.neoforged.bus.EventBus.post": 428,
+        "java.lang.invoke.LambdaForm$MH.0x00000000935a9400.invokeExact_MT": 405,
+        "net.minecraft.client.Minecraft.tick": 380,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass": 348,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onClientTick": 344,
+        "net.neoforged.neoforge.client.ClientHooks.fireClientTickPost": 344,
+        "java.lang.invoke.LambdaForm$MH.0x0000000095df9400.invoke": 344,
+        "net.neoforged.bus.EventListenerFactory$onClientTick.0x00000000949a9000.invoke": 344,
+        "dev.xantha.vss.client.prediction.ClientPredictionState.tick": 334,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.tick": 328,
+        "dev.xantha.vss.client.prediction.PredictionSubmissionCoverage.filter": 318,
+        "java.util.HashMap.getNode": 316,
+        "java.util.HashMap.get": 266,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.selectStable": 261,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.add": 245,
+        "dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter": 202,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates": 145,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.updateStable": 129,
+        "net.minecraft.client.renderer.culling.Frustum.isVisible": 126,
+        "net.minecraft.client.renderer.culling.Frustum.cubeInFrustum": 126,
+        "java.lang.invoke.Invokers$Holder.linkToTargetMethod": 114,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.drawRanges": 113,
+        "dev.xantha.vss.client.prediction.PredictionDrawRanges.<init>": 112,
+        "java.util.concurrent.ConcurrentHashMap.get": 108,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.scheduleWork": 102,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshViewWork": 96,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932eb800.guard": 93,
+        "java.lang.invoke.DelegatingMethodHandle$Holder.delegate": 92,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932ebc00.invoke": 92,
+        "dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.equals": 88,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem": 87,
+        "dev.xantha.vss.client.prediction.PredictionSpatialIndex.intersectFrustum": 86,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.recordPlanItem": 82,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.<init>": 80,
+        "java.util.HashMap.put": 74,
+        "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail": 70,
+        "java.util.HashMap.putVal": 69,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepareAquatic": 64,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.maintainGpuResidency": 59,
+        "java.util.WeakHashMap.get": 58,
+        "net.neoforged.bus.EventListenerFactory$onRenderLevel.0x00000000949a8800.invoke": 56,
+        "net.caffeinemc.mods.sodium.neoforge.level.NeoForgeLevelRenderHooks.runChunkLayerEvents": 56,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.onRenderLevel": 56,
+        "net.neoforged.neoforge.client.ClientHooks.dispatchRenderStage": 56,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderDeferredWater": 56,
+        "java.util.HashMap.computeIfAbsent": 56,
+        "java.lang.invoke.DirectMethodHandle$Holder.invokeStatic": 56,
+        "java.lang.invoke.LambdaForm$MH.0x0000000096191800.invoke": 56,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onRenderLevel": 56,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.resolveCoverage": 53,
+        "com.mojang.blaze3d.systems.RenderSystem.flipFrame": 51,
+        "com.mojang.blaze3d.platform.Window.updateDisplay": 51,
+        "java.lang.Math.hypot": 50,
+        "java.util.concurrent.ConcurrentHashMap.containsKey": 50,
+        "dev.xantha.vss.client.prediction.PredictionAquaticLod.distance": 50,
+        "java.lang.StrictMath.hypot": 50,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawKey": 49,
+        "java.util.concurrent.ConcurrentHashMap$KeySetView.contains": 48,
+        "dev.xantha.vss.client.prediction.PredictionGpuResidency.used": 47,
+        "java.util.HashMap.containsKey": 47,
+        "java.util.AbstractCollection.addAll": 46,
+        "java.util.WeakHashMap.matchesKey": 45,
+        "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.sample": 43,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.pruneReady": 43,
+        "it.unimi.dsi.fastutil.objects.ObjectOpenHashSet.add": 42,
+        "org.lwjgl.system.JNI.invokePV": 40,
+        "org.lwjgl.glfw.GLFW.glfwSwapBuffers": 40,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.key": 40,
+        "java.util.Objects.equals": 38,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932eb000.invoke": 37,
+        "java.util.HashSet.add": 36,
+        "dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.hashCode": 36,
+        "it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get": 36,
+        "java.util.HashMap.hash": 35,
+        "java.util.Arrays.hashCode": 34,
+        "it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get": 34,
+        "dev.xantha.vss.client.prediction.PredictionLodPlanner.plan": 34,
+        "java.util.Comparator.lambda$thenComparing$36697e65$1": 33,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.removeStale": 33,
+        "java.util.Comparator$$Lambda.0x0000000093323800.compare": 33,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.classifyView": 33,
+        "dev.xantha.vss.client.prediction.PredictionOpaqueBatches.prepare": 31,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.stage": 31,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.upload": 31,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.intersects": 29,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshLoadingProgress": 29,
+        "net.minecraft.client.gui.Gui.render$mixinextras$wrapped$97": 29,
+        "net.minecraft.client.gui.Gui.mixinextras$bridge$render$mixinextras$wrapped$97$98": 29,
+        "net.minecraft.client.gui.Gui$$Lambda.0x0000000096113c00.call": 29,
+        "net.neoforged.neoforge.client.gui.GuiLayerManager.render": 29,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.band": 29,
+        "net.minecraft.client.gui.Gui.wrapMethod$zgl000$iris$handleHudHidingScreens": 29,
+        "net.minecraft.client.gui.Gui.render": 29,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.occludedWork": 29,
+        "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot.hidden": 28,
+        "dev.xantha.vss.client.prediction.PredictionRenderGeometry$Entry.visible": 28,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.apply": 28,
+        "dev.xantha.vss.client.prediction.PredictionTileTable.at": 26,
+        "net.neoforged.neoforge.client.gui.GuiLayerManager.renderInner": 26,
+        "java.util.HashMap$HashIterator.nextNode": 26,
+        "java.util.stream.AbstractPipeline.evaluate": 25,
+        "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringFeatureTileAtDetail": 25,
+        "java.util.stream.AbstractPipeline.wrapAndCopyInto": 25,
+        "java.util.TimSort.sort": 25,
+        "java.util.Arrays.sort": 25,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene$$Lambda.0x00000000962b0c00.accept": 24,
+        "java.util.stream.AbstractPipeline.copyInto": 24,
+        "java.util.concurrent.ConcurrentHashMap.forEach": 24,
+        "java.util.ArrayList.sortRange": 23,
+        "dev.xantha.vss.client.prediction.PredictionVoxyBoundaryBridge.bind": 23,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.recomputeRenderOwners": 23,
+        "java.util.HashMap.remove": 23,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.voxyBoundaryCoverage": 23,
+        "java.util.HashMap.removeNode": 23,
+        "java.util.HashSet.contains": 23,
+        "java.util.ArrayList.sort": 23,
+        "dev.xantha.vss.client.prediction.PredictionTileTable.get": 22,
+        "dev.xantha.vss.client.prediction.PredictionOwnershipRuns.staticCoverage": 22,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.enqueue": 22,
+        "dev.xantha.vss.client.prediction.PredictionExactCoverageMask$Snapshot.interior": 22,
+        "java.util.IdentityHashMap.get": 21,
+        "java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual": 20,
+        "java.lang.invoke.LambdaForm$MH.0x000000009306c000.invokeExact_MT": 20,
+        "java.util.ImmutableCollections$MapN.probe": 20,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.foreground": 20,
+        "java.util.ImmutableCollections$AbstractImmutableMap.getOrDefault": 19,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932e9000.invoke": 19,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.ranges": 19,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.stitch": 19,
+        "java.lang.invoke.LambdaForm$MH.0x0000000093180400.invoke": 19,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.retain": 19,
+        "java.util.Objects.hashCode": 19,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$DrawKey.hashCode": 19,
+        "java.util.TimSort.binarySort": 18,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.same": 18,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.sortWater": 18,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.retireCovered": 18,
+        "java.util.Comparator.lambda$comparingInt$7b0bb60$1": 18
+      },
+      "workerSelf": {
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.exteriorFootprints:-1": 75,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.displayPoints:-1": 43,
+        "jdk.ExecutionSample | java.io.BufferedOutputStream.flushBuffer:123": 17,
+        "jdk.ExecutionSample | java.io.DataOutputStream.writeInt:217": 15,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.coordinate:192": 12,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.join:163": 12,
+        "jdk.ExecutionSample | java.util.Arrays.copyOf:3537": 12,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.surfacePoints:-1": 11,
+        "jdk.ExecutionSample | java.util.Comparator.lambda$comparingInt$7b0bb60$1:494": 8,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap.getAndMoveToLast:534": 8,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:956": 7,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.previewPoints:-1": 7,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.join:164": 6,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionQuadMesh$$Lambda.0x0000000096291400.applyAsInt:-1": 5,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionPackedMesh.packQuad:572": 5,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionSpatialOrder.arrange:68": 5,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager.lambda$enqueue$75:2323": 5,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMeshletBounds.<init>:14": 4,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMeshBuilder$VertexAccumulator.vertex:1337": 4,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionQuadMesh.normalX:525": 4,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.build:44": 4,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager.targetCellAxis:2105": 3,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap.moveIndexToLast:460": 3,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap$TreeNode.findTreeNode:2766": 3,
+        "jdk.ExecutionSample | java.util.concurrent.PriorityBlockingQueue.dequeue:328": 3,
+        "jdk.ExecutionSample | java.util.Comparator.lambda$thenComparing$36697e65$1:220": 3,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager.lambda$enqueue$75:2287": 3,
+        "jdk.ExecutionSample | net.minecraft.world.level.material.FluidState.isEmpty:46": 3,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionPackedMesh.group:688": 3,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMeshBuilder.cornerColor:636": 3,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.eligible:124": 3,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager.requiredCoverage:425": 3,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.build:53": 3,
+        "jdk.ExecutionSample | java.lang.ThreadLocal$ThreadLocalMap.getEntry:491": 2,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionQuadMerger.mergeLast:14": 2
+      },
+      "serverSelf": {
+        "jdk.ExecutionSample | net.minecraft.world.level.chunk.PalettedContainer.get:158": 22,
+        "jdk.ExecutionSample | java.util.Arrays.binarySearch:2322": 6,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap.get:373": 6,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap.getOrDefault:411": 5,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get:372": 5,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get:331": 5,
+        "jdk.ExecutionSample | net.minecraft.server.level.ServerChunkCache.getChunk$mixinextras$wrapped$81:153": 4,
+        "jdk.ExecutionSample | net.minecraft.world.entity.ai.goal.GoalSelector.tickRunningGoals:114": 3,
+        "jdk.ExecutionSample | net.minecraft.world.entity.Mob.getItemBySlot:933": 3,
+        "jdk.ExecutionSample | com.google.common.collect.Iterators$1.hasNext:140": 3,
+        "jdk.ExecutionSample | net.minecraft.world.level.Level.getChunk:202": 3,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap.get:327": 3,
+        "jdk.ExecutionSample | net.minecraft.world.ticks.LevelChunkTicks.peek:53": 3,
+        "jdk.ExecutionSample | java.util.Arrays$ArrayList.get:4225": 3,
+        "jdk.ExecutionSample | net.minecraft.network.syncher.SynchedEntityData.packDirty:87": 2,
+        "jdk.ExecutionSample | net.minecraft.world.level.Level.handler$cbj000$c2me_opts_scheduling$onPostTickEntity:4346": 2,
+        "jdk.ExecutionSample | net.minecraft.world.level.NaturalSpawner.spawnCategoryForChunk:125": 2,
+        "jdk.ExecutionSample | net.minecraft.server.MinecraftServer.runServer:682": 2,
+        "jdk.ExecutionSample | java.util.ImmutableCollections$SetN.probe:1263": 2,
+        "jdk.ExecutionSample | net.minecraft.server.level.ChunkMap$TrackedEntity.updatePlayer:1299": 2,
+        "jdk.ExecutionSample | java.util.stream.Sink$ChainedReference.cancellationRequested:266": 2,
+        "jdk.ExecutionSample | net.minecraft.world.entity.EntitySelector.lambda$static$4:21": 2,
+        "jdk.ExecutionSample | net.minecraft.server.MinecraftServer.runServer:710": 2,
+        "jdk.ExecutionSample | java.util.ImmutableCollections$Set12.contains:1036": 2,
+        "jdk.ExecutionSample | java.util.HashMap$HashIterator.<init>:1594": 2
+      },
+      "cpuLoad": [
+        {
+          "jvmUser": 0.08833704,
+          "machineTotal": 0.25544447,
+          "epochMs": 1791626218135,
+          "jvmSystem": 0.009707367
+        },
+        {
+          "jvmUser": 0.1047878,
+          "machineTotal": 0.21118097,
+          "epochMs": 1791626219142,
+          "jvmSystem": 0.038810294
+        },
+        {
+          "jvmUser": 0.099015154,
+          "machineTotal": 0.14380912,
+          "epochMs": 1791626220148,
+          "jvmSystem": 0.030092841
+        },
+        {
+          "jvmUser": 0.18938817,
+          "machineTotal": 0.2226382,
+          "epochMs": 1791626221153,
+          "jvmSystem": 0.009712214
+        },
+        {
+          "jvmUser": 0.13641769,
+          "machineTotal": 0.18752876,
+          "epochMs": 1791626222191,
+          "jvmSystem": 0.01128974
+        },
+        {
+          "jvmUser": 0.08930788,
+          "machineTotal": 0.11424796,
+          "epochMs": 1791626223197,
+          "jvmSystem": 0.010678116
+        },
+        {
+          "jvmUser": 0.19220619,
+          "machineTotal": 0.24670674,
+          "epochMs": 1791626224203,
+          "jvmSystem": 0.01747329
+        },
+        {
+          "jvmUser": 0.14755197,
+          "machineTotal": 0.30432582,
+          "epochMs": 1791626225210,
+          "jvmSystem": 0.013590313
+        },
+        {
+          "jvmUser": 0.15143533,
+          "machineTotal": 0.29975075,
+          "epochMs": 1791626226215,
+          "jvmSystem": 0.011648872
+        },
+        {
+          "jvmUser": 0.13292523,
+          "machineTotal": 0.2480508,
+          "epochMs": 1791626227221,
+          "jvmSystem": 0.0067918
+        },
+        {
+          "jvmUser": 0.096198656,
+          "machineTotal": 0.19097345,
+          "epochMs": 1791626228227,
+          "jvmSystem": 0.007773629
+        },
+        {
+          "jvmUser": 0.120742075,
+          "machineTotal": 0.16432056,
+          "epochMs": 1791626229242,
+          "jvmSystem": 0.00579562
+        },
+        {
+          "jvmUser": 0.08596837,
+          "machineTotal": 0.14229329,
+          "epochMs": 1791626230249,
+          "jvmSystem": 0.011591241
+        },
+        {
+          "jvmUser": 0.0767264,
+          "machineTotal": 0.12255203,
+          "epochMs": 1791626231254,
+          "jvmSystem": 0.005827321
+        },
+        {
+          "jvmUser": 0.07530121,
+          "machineTotal": 0.111873195,
+          "epochMs": 1791626232292,
+          "jvmSystem": 0.011295181
+        },
+        {
+          "jvmUser": 0.10289834,
+          "machineTotal": 0.23856351,
+          "epochMs": 1791626233297,
+          "jvmSystem": 0.043683257
+        },
+        {
+          "jvmUser": 0.123344734,
+          "machineTotal": 0.27838206,
+          "epochMs": 1791626234303,
+          "jvmSystem": 0.007769747
+        },
+        {
+          "jvmUser": 0.107859194,
+          "machineTotal": 0.19719969,
+          "epochMs": 1791626235309,
+          "jvmSystem": 0.008745341
+        },
+        {
+          "jvmUser": 0.15337674,
+          "machineTotal": 0.25993088,
+          "epochMs": 1791626236314,
+          "jvmSystem": 0.005824433
+        },
+        {
+          "jvmUser": 0.057188395,
+          "machineTotal": 0.08712512,
+          "epochMs": 1791626237326,
+          "jvmSystem": 0.005815769
+        }
+      ]
+    },
+    "late": {
+      "renderExecutionSamples": 3834,
+      "renderNativeSamples": 119,
+      "renderMonitorMs": 0.0,
+      "renderParkMs": 0.0,
+      "gcCount": 14,
+      "gcMs": 111.8025,
+      "maxGcMs": 17.3125,
+      "renderSelf": {
+        "jdk.ExecutionSample | java.util.HashMap.getNode:579": 238,
+        "jdk.ExecutionSample | net.minecraft.client.renderer.culling.Frustum.cubeInFrustum:85": 186,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter:185": 174,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDrawRanges.<init>:15": 145,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:956": 132,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:583": 112,
+        "jdk.ExecutionSample | java.lang.invoke.LambdaForm$MH.0x00000000932eb800.guard:-1": 103,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem:249": 93,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail:61": 88,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked:579": 74,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates:799": 70,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter:214": 69,
+        "jdk.ExecutionSample | java.lang.StrictMath.hypot:2202": 64,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass:1436": 60,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionSubmissionCoverage.filter:128": 58,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare:153": 57,
+        "jdk.ExecutionSample | java.util.WeakHashMap.matchesKey:299": 55,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.<init>:551": 53,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get:372": 50,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:586": 50,
+        "jdk.ExecutionSample | java.util.HashMap.computeIfAbsent:1210": 49,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMorph.startSeconds:20": 47,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get:331": 47,
+        "jdk.NativeMethodSample | org.lwjgl.system.JNI.invokePV:-1": 43,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch.add:199": 42,
+        "jdk.ExecutionSample | java.util.Objects.equals:62": 42,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.hashCode:3437": 41,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionWorkView.intersects:106": 39,
+        "jdk.ExecutionSample | java.util.HashMap.putVal:645": 39,
+        "jdk.ExecutionSample | java.util.HashMap$HashIterator.nextNode:1610": 38,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.objects.ObjectOpenHashSet.add:368": 37,
+        "jdk.ExecutionSample | java.util.Arrays.hashCode:4479": 36,
+        "jdk.ExecutionSample | java.util.IdentityHashMap.get:349": 35,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates:798": 33,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionOpaqueBatches.prepare:68": 29,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare:155": 27,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionFeatureHandoff.any:26": 25,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.same:715": 25,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderGeometry$Entry.visible:23": 25,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionSpatialIndex.intersectFrustum:124": 21,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepareAquatic:193": 20,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionGpuTile.arenaSlice:81": 20,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare:934": 19,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawKey:786": 19,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail:64": 19,
+        "jdk.NativeMethodSample | org.lwjgl.system.JNI.invokeV:-1": 19,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTile.baseBlockX:3477": 19,
+        "jdk.ExecutionSample | java.util.WeakHashMap.getTable:362": 18,
+        "jdk.ExecutionSample | org.joml.FrustumIntersection.testAab:436": 18,
+        "jdk.ExecutionSample | java.util.TreeMap.successor:2523": 18,
+        "jdk.ExecutionSample | net.minecraft.world.level.chunk.PalettedContainer.get:158": 18,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:588": 18,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.coordinate:192": 17,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:958": 17,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionExactCoverageMask$Snapshot.interior:38": 17
+      },
+      "renderMethods": {
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.runTarget": 3953,
+        "java.lang.invoke.Invokers$Holder.invokeExact_MT": 3953,
+        "cpw.mods.modlauncher.LaunchServiceHandler.launch": 3953,
+        "net.minecraft.client.main.Main.main": 3953,
+        "net.neoforged.fml.loading.targets.CommonClientLaunchHandler.runService": 3953,
+        "java.lang.invoke.LambdaForm$MH.0x00000000935a9000.invoke": 3953,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.clientService": 3953,
+        "net.minecraft.client.Minecraft.run": 3953,
+        "cpw.mods.modlauncher.LaunchServiceHandlerDecorator.launch": 3953,
+        "jdk.internal.reflect.DirectMethodHandleAccessor.invoke": 3953,
+        "jdk.internal.reflect.DirectMethodHandleAccessor.invokeImpl": 3953,
+        "net.minecraft.client.Minecraft.runTick": 3953,
+        "java.lang.reflect.Method.invoke": 3953,
+        "java.lang.invoke.LambdaForm$DMH.0x000000009306c400.invokeStatic": 3953,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler$$Lambda.0x00000000937b2000.run": 3953,
+        "cpw.mods.modlauncher.Launcher.run": 3953,
+        "net.neoforged.fml.loading.targets.CommonLaunchHandler.lambda$launchService$4": 3953,
+        "cpw.mods.modlauncher.Launcher.main": 3937,
+        "cpw.mods.modlauncher.BootstrapLaunchConsumer.accept": 3935,
+        "cpw.mods.bootstraplauncher.BootstrapLauncher.run": 3929,
+        "cpw.mods.bootstraplauncher.BootstrapLauncher.main": 3919,
+        "net.minecraft.client.renderer.GameRenderer.render": 3296,
+        "net.minecraft.client.renderer.GameRenderer.renderLevel": 3242,
+        "net.minecraft.client.renderer.LevelRenderer.renderLevel": 3230,
+        "net.minecraft.client.renderer.LevelRenderer.renderSectionLayer": 3146,
+        "net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer.drawChunkLayer": 3054,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.render": 3054,
+        "net.caffeinemc.mods.sodium.client.render.chunk.RenderSectionManager.renderLayer": 3054,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.handler$bdg000$voxy$injectRender": 3052,
+        "net.caffeinemc.mods.sodium.client.render.chunk.DefaultChunkRenderer.doRender": 3052,
+        "me.cortex.voxy.client.core.VoxyRenderSystem.renderOpaque": 3051,
+        "me.cortex.voxy.client.core.AbstractRenderPipeline.runPipeline": 3044,
+        "me.cortex.voxy.client.core.NormalRenderPipeline.handler$cmd000$vss$predictionBeforeWater": 3009,
+        "dev.xantha.vss.client.prediction.PredictionNormalTranslucencyBridge.beforeTranslucent": 3009,
+        "me.cortex.voxy.client.core.NormalRenderPipeline.postOpaquePreTranslucent": 3009,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStage": 3009,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderBeforeVoxyWater": 3009,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderStageUnpacked": 3007,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.prepare": 1386,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawPasses": 1132,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.preparePass": 761,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepare": 761,
+        "net.neoforged.bus.EventBus.post": 634,
+        "java.lang.invoke.LambdaForm$MH.0x00000000935a9400.invokeExact_MT": 585,
+        "net.minecraft.client.Minecraft.tick": 547,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.drawNormalPass": 525,
+        "java.util.HashMap.getNode": 503,
+        "net.neoforged.neoforge.client.ClientHooks.fireClientTickPost": 487,
+        "net.neoforged.bus.EventListenerFactory$onClientTick.0x00000000949a9000.invoke": 485,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onClientTick": 485,
+        "java.lang.invoke.LambdaForm$MH.0x0000000095df9400.invoke": 485,
+        "dev.xantha.vss.client.prediction.ClientPredictionState.tick": 476,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.tick": 471,
+        "java.util.HashMap.get": 422,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.selectStable": 404,
+        "dev.xantha.vss.client.prediction.PredictionSubmissionCoverage.filter": 393,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.add": 362,
+        "dev.xantha.vss.client.prediction.PredictionOwnershipRuns.filter": 248,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawCandidates": 243,
+        "net.minecraft.client.renderer.culling.Frustum.isVisible": 204,
+        "net.minecraft.client.renderer.culling.Frustum.cubeInFrustum": 204,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.updateStable": 196,
+        "java.util.concurrent.ConcurrentHashMap.get": 169,
+        "java.lang.invoke.Invokers$Holder.linkToTargetMethod": 169,
+        "dev.xantha.vss.client.prediction.PredictionSpatialIndex.intersectFrustum": 148,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932eb800.guard": 146,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.drawRanges": 146,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932ebc00.invoke": 145,
+        "java.lang.invoke.DelegatingMethodHandle$Holder.delegate": 145,
+        "dev.xantha.vss.client.prediction.PredictionDrawRanges.<init>": 145,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.scheduleWork": 144,
+        "dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.equals": 133,
+        "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringTileAtDetail": 122,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.recordPlanItem": 107,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.resolveCoverage": 105,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.<init>": 105,
+        "java.util.HashMap.computeIfAbsent": 101,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshViewWork": 100,
+        "net.neoforged.neoforge.client.ClientHooks.dispatchRenderStage": 98,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.encodeItem": 95,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.drawKey": 93,
+        "net.caffeinemc.mods.sodium.neoforge.level.NeoForgeLevelRenderHooks.runChunkLayerEvents": 92,
+        "net.neoforged.bus.EventListenerFactory$onRenderLevel.0x00000000949a8800.invoke": 90,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.onRenderLevel": 90,
+        "java.lang.invoke.LambdaForm$MH.0x0000000096191800.invoke": 90,
+        "dev.xantha.vss.networking.client.VSSClientNetworking.onRenderLevel": 90,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.prepareAquatic": 89,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.renderDeferredWater": 89,
+        "java.util.concurrent.ConcurrentHashMap.containsKey": 83,
+        "java.util.HashMap.put": 81,
+        "java.lang.invoke.DirectMethodHandle$Holder.invokeStatic": 80,
+        "java.util.concurrent.ConcurrentHashMap$KeySetView.contains": 78,
+        "dev.xantha.vss.client.prediction.PredictionGpuResidency.used": 77,
+        "dev.xantha.vss.client.prediction.PredictionRenderer.maintainGpuResidency": 76,
+        "java.util.WeakHashMap.get": 75,
+        "java.util.HashMap.containsKey": 75,
+        "java.util.HashMap.putVal": 72,
+        "java.util.AbstractCollection.addAll": 69,
+        "java.lang.Math.hypot": 64,
+        "dev.xantha.vss.client.prediction.PredictionLodPlanner.plan": 64,
+        "dev.xantha.vss.client.prediction.PredictionAquaticLod.distance": 64,
+        "java.lang.StrictMath.hypot": 64,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.apply": 64,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.pruneReady": 62,
+        "dev.xantha.vss.client.prediction.PredictionVisibilityFeedback$Snapshot.hidden": 61,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.occludedWork": 61,
+        "dev.xantha.vss.client.prediction.PredictionRefinementOcclusion.sample": 60,
+        "java.util.Objects.equals": 59,
+        "java.util.stream.AbstractPipeline.evaluate": 58,
+        "java.lang.invoke.LambdaForm$MH.0x00000000932eb000.invoke": 58,
+        "java.util.stream.AbstractPipeline.wrapAndCopyInto": 58,
+        "dev.xantha.vss.client.prediction.PredictionVisiblePlan.removeStale": 57,
+        "java.util.Comparator$$Lambda.0x0000000093323800.compare": 57,
+        "java.util.stream.AbstractPipeline.copyInto": 57,
+        "java.util.Comparator.lambda$thenComparing$36697e65$1": 56,
+        "java.util.HashSet.add": 56,
+        "java.util.WeakHashMap.matchesKey": 55,
+        "it.unimi.dsi.fastutil.objects.ObjectOpenHashSet.add": 54,
+        "dev.xantha.vss.client.prediction.PredictionLodSeams.stitch": 54,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.key": 52,
+        "net.minecraft.client.gui.Gui.render$mixinextras$wrapped$97": 51,
+        "net.minecraft.client.gui.Gui.render": 51,
+        "net.minecraft.client.gui.Gui.mixinextras$bridge$render$mixinextras$wrapped$97$98": 51,
+        "net.minecraft.client.gui.Gui$$Lambda.0x0000000096113c00.call": 51,
+        "net.neoforged.neoforge.client.gui.GuiLayerManager.render": 51,
+        "net.minecraft.client.gui.Gui.wrapMethod$zgl000$iris$handleHudHidingScreens": 51,
+        "it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get": 51,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.recomputeRenderOwners": 50,
+        "it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get": 50,
+        "com.mojang.blaze3d.systems.RenderSystem.flipFrame": 49,
+        "com.mojang.blaze3d.platform.Window.updateDisplay": 49,
+        "dev.xantha.vss.client.prediction.PredictionGpuTile.morphStartSeconds": 47,
+        "dev.xantha.vss.client.prediction.PredictionMorph.startSeconds": 47,
+        "java.util.HashMap.hash": 45,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.pendingUploads": 45,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.retain": 45,
+        "dev.xantha.vss.client.prediction.PredictionCoverageOwners.coveringFeatureTileAtDetail": 45,
+        "org.lwjgl.glfw.GLFW.glfwSwapBuffers": 43,
+        "org.lwjgl.system.JNI.invokePV": 43,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch.stage": 42,
+        "dev.xantha.vss.client.prediction.PredictionOpaqueBatches.prepare": 42,
+        "net.neoforged.neoforge.client.gui.GuiLayerManager.renderInner": 42,
+        "dev.xantha.vss.client.prediction.PredictionTileManager$PredictionTileKey.hashCode": 41,
+        "java.util.HashMap.remove": 41,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.<init>": 40,
+        "java.util.HashMap.removeNode": 40,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$BatchSlot.upload": 40,
+        "dev.xantha.vss.client.prediction.PredictionPackedMesh.terrainRecords": 40,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshOccludedPriorities": 39,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.intersects": 39,
+        "dev.xantha.vss.client.prediction.PredictionWorkView.band": 39,
+        "java.util.ArrayList.removeIf": 38,
+        "dev.xantha.vss.client.prediction.PredictionTileTable.at": 38,
+        "java.util.HashMap$HashIterator.nextNode": 38,
+        "java.util.TimSort.sort": 38,
+        "java.util.Arrays.sort": 38,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.contains": 37,
+        "java.util.Arrays.hashCode": 37,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene$$Lambda.0x00000000962b0c00.accept": 37,
+        "xaero.hud.render.HudRenderer.render": 37,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency.lambda$pendingUploads$2": 37,
+        "xaero.common.events.ModClientEventsNeoForge$$Lambda.0x000000009528ec00.render": 37,
+        "dev.xantha.vss.client.prediction.PredictionRenderResidency$$Lambda.0x00000000962af800.test": 37,
+        "xaero.common.events.ModClientEvents.handleRenderModOverlay": 37,
+        "java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual": 36,
+        "java.lang.invoke.LambdaForm$MH.0x000000009306c000.invokeExact_MT": 36,
+        "xaero.hud.render.HudRenderer.renderModule": 36,
+        "dev.xantha.vss.client.prediction.PredictionDisplayGeometry.build": 35,
+        "xaero.hud.minimap.module.MinimapRenderer.render": 35,
+        "xaero.common.minimap.MinimapProcessor.onRender": 35,
+        "java.util.IdentityHashMap.get": 35,
+        "xaero.common.minimap.render.MinimapRenderer.renderMinimap": 35,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$Scene.fullyCoveredByChildren": 34,
+        "dev.xantha.vss.client.prediction.PredictionRenderer$PreparedPass.ranges": 34,
+        "java.util.Comparator.lambda$comparingInt$7b0bb60$1": 32,
+        "java.util.Comparator$$Lambda.0x000000009303e800.compare": 32,
+        "dev.xantha.vss.client.prediction.PredictionTileManager.refreshLoadingProgress": 31,
+        "java.util.stream.AbstractPipeline.copyIntoWithCancel": 31,
+        "dev.xantha.vss.client.prediction.PredictionIndirectBatch$PlanItem.matches": 31,
+        "dev.xantha.vss.client.prediction.PredictionGpuTile.uploadQuadBuffers": 31
+      },
+      "workerSelf": {
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.surfacePoints:-1": 590,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.displayPoints:-1": 479,
+        "jdk.ExecutionSample | com.ishland.c2me.opts.dfc.common.gen.jvm.SplineSupport.findRangeForLocation:42": 369,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.exteriorFootprints:-1": 100,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.placedFeature:-1": 96,
+        "jdk.ExecutionSample | com.ishland.c2me.opts.dfc.common.gen.jvm.InvocationShim.invokeDensityFunctionNoiseSample:48": 88,
+        "jdk.ExecutionSample | net.minecraft.world.level.levelgen.DensityFunction$NoiseHolder.getValue:53": 77,
+        "jdk.ExecutionSample | jdk.internal.foreign.abi.DowncallStub.0x00000000957a4800.invoke:-1": 65,
+        "jdk.ExecutionSample | com.ishland.c2me.opts.dfc.common.gen.jvm.SubCompiledDensityFunction.compute:81": 56,
+        "jdk.ExecutionSample | net.minecraft.world.level.biome.Climate$RTree$SubTree.search:133": 50,
+        "jdk.ExecutionSample | java.util.Arrays.copyOf:3537": 49,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.tints:-1": 46,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.previewPoints:-1": 44,
+        "jdk.ExecutionSample | net.minecraft.core.Vec3i.equals:49": 43,
+        "jdk.ExecutionSample | java.io.DataOutputStream.writeInt:217": 43,
+        "jdk.ExecutionSample | java.io.BufferedOutputStream.flushBuffer:123": 35,
+        "jdk.NativeMethodSample | dev.xantha.vss.client.prediction.RustWorldgenBackend.decorationPoints:-1": 31,
+        "jdk.ExecutionSample | net.minecraft.world.level.levelgen.synth.NormalNoise.getValue:566": 30,
+        "jdk.ExecutionSample | java.util.concurrent.ConcurrentHashMap.get:956": 28,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionPackedMesh.packQuad:572": 20,
+        "jdk.ExecutionSample | java.util.ImmutableCollections$MapN.probe:1583": 19,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.coordinate:192": 18,
+        "jdk.ExecutionSample | DfcCompiled_18_multiNoiseSampler_continents.method_12_AddNode:-1": 16,
+        "jdk.ExecutionSample | jdk.internal.foreign.AbstractMemorySegmentImpl.equals:534": 15,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionPackedMesh.group:688": 15,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionMeshBuilder$VertexAccumulator.vertex:1337": 14,
+        "jdk.ExecutionSample | jdk.internal.foreign.abi.SharedUtils.checkSymbol:372": 14,
+        "jdk.ExecutionSample | java.security.MessageDigest$Delegate.engineUpdate:662": 12,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionDisplayGeometry.build:44": 12,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap.getAndMoveToLast:534": 12,
+        "jdk.ExecutionSample | DfcCompiled_20_multiNoiseSampler_depth.method_30_GenericShiftedNoiseNode:-1": 11,
+        "jdk.ExecutionSample | java.util.Comparator.lambda$thenComparing$36697e65$1:220": 11,
+        "jdk.ExecutionSample | dev.xantha.vss.client.prediction.PredictionTileManager.markCoverageDirty:1558": 11,
+        "jdk.ExecutionSample | java.util.concurrent.atomic.LongAdder.add:93": 11,
+        "jdk.ExecutionSample | java.util.Comparator.lambda$comparingInt$7b0bb60$1:494": 11
+      },
+      "serverSelf": {
+        "jdk.ExecutionSample | net.minecraft.world.level.chunk.PalettedContainer.get:158": 30,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap.getOrDefault:411": 8,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap.get:327": 7,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap.get:373": 6,
+        "jdk.ExecutionSample | net.minecraft.server.level.ServerEntity.sendChanges:139": 5,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap.get:331": 5,
+        "jdk.ExecutionSample | net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.randomTick:736": 4,
+        "jdk.ExecutionSample | net.minecraft.server.level.ServerLevel.tick:346": 4,
+        "jdk.ExecutionSample | net.minecraft.server.level.ServerChunkCache.getChunk$mixinextras$wrapped$81:153": 4,
+        "jdk.ExecutionSample | net.minecraft.server.level.ChunkHolder.broadcastChanges:188": 4,
+        "jdk.ExecutionSample | java.util.Arrays.binarySearch:2322": 3,
+        "jdk.ExecutionSample | com.google.common.collect.Iterators$1.hasNext:140": 3,
+        "jdk.ExecutionSample | net.minecraft.world.level.Level.getChunk:202": 3,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap.get:372": 3,
+        "jdk.ExecutionSample | net.minecraft.world.level.chunk.PalettedContainer.lambda$pack$11:241": 3,
+        "jdk.ExecutionSample | it.unimi.dsi.fastutil.longs.LongAVLTreeSet$Entry.next:811": 2,
+        "jdk.ExecutionSample | net.minecraft.world.entity.Mob.serverAiStep:774": 2,
+        "jdk.ExecutionSample | net.minecraft.world.level.lighting.LevelLightEngine.getRawBrightness:163": 2,
+        "jdk.ExecutionSample | net.minecraft.world.entity.Mob.getItemBySlot:933": 2,
+        "jdk.ExecutionSample | net.minecraft.world.level.gameevent.GameEventDispatcher.post:44": 2,
+        "jdk.ExecutionSample | net.minecraft.world.level.Level.getGameRules:983": 2,
+        "jdk.ExecutionSample | net.minecraft.world.level.LevelAccessor.dayTime:34": 2,
+        "jdk.ExecutionSample | net.minecraft.network.syncher.SynchedEntityData.getItem:51": 2,
+        "jdk.ExecutionSample | net.minecraft.world.level.NaturalSpawner.spawnCategoryForChunk:125": 2,
+        "jdk.ExecutionSample | java.util.HashMap.getNode:579": 2
+      },
+      "cpuLoad": [
+        {
+          "jvmUser": 0.24160397,
+          "machineTotal": 0.36273482,
+          "epochMs": 1791626246428,
+          "jvmSystem": 0.033824556
+        },
+        {
+          "jvmUser": 0.31635746,
+          "machineTotal": 0.4152266,
+          "epochMs": 1791626247435,
+          "jvmSystem": 0.05401225
+        },
+        {
+          "jvmUser": 0.2951046,
+          "machineTotal": 0.3544593,
+          "epochMs": 1791626248441,
+          "jvmSystem": 0.014561081
+        },
+        {
+          "jvmUser": 0.28165397,
+          "machineTotal": 0.3324389,
+          "epochMs": 1791626249446,
+          "jvmSystem": 0.01651075
+        },
+        {
+          "jvmUser": 0.26902854,
+          "machineTotal": 0.2981565,
+          "epochMs": 1791626250452,
+          "jvmSystem": 0.010683443
+        },
+        {
+          "jvmUser": 0.3902368,
+          "machineTotal": 0.49496505,
+          "epochMs": 1791626251458,
+          "jvmSystem": 0.010678121
+        },
+        {
+          "jvmUser": 0.25585467,
+          "machineTotal": 0.5267141,
+          "epochMs": 1791626252500,
+          "jvmSystem": 0.017806735
+        },
+        {
+          "jvmUser": 0.24474794,
+          "machineTotal": 0.38521686,
+          "epochMs": 1791626253505,
+          "jvmSystem": 0.017481996
+        },
+        {
+          "jvmUser": 0.28179416,
+          "machineTotal": 0.34442675,
+          "epochMs": 1791626254511,
+          "jvmSystem": 0.013603856
+        },
+        {
+          "jvmUser": 0.2938421,
+          "machineTotal": 0.3725559,
+          "epochMs": 1791626255517,
+          "jvmSystem": 0.020365294
+        },
+        {
+          "jvmUser": 0.2824848,
+          "machineTotal": 0.3143187,
+          "epochMs": 1791626256523,
+          "jvmSystem": 0.0077659055
+        },
+        {
+          "jvmUser": 0.2723713,
+          "machineTotal": 0.32279998,
+          "epochMs": 1791626257531,
+          "jvmSystem": 0.01647798
+        },
+        {
+          "jvmUser": 0.27277747,
+          "machineTotal": 0.34798762,
+          "epochMs": 1791626258537,
+          "jvmSystem": 0.042712487
+        },
+        {
+          "jvmUser": 0.29869014,
+          "machineTotal": 0.35672113,
+          "epochMs": 1791626259544,
+          "jvmSystem": 0.041700248
+        },
+        {
+          "jvmUser": 0.29010692,
+          "machineTotal": 0.35477874,
+          "epochMs": 1791626260550,
+          "jvmSystem": 0.016494375
+        },
+        {
+          "jvmUser": 0.30869445,
+          "machineTotal": 0.46194458,
+          "epochMs": 1791626261556,
+          "jvmSystem": 0.011648848
+        },
+        {
+          "jvmUser": 0.41665402,
+          "machineTotal": 0.5730461,
+          "epochMs": 1791626262599,
+          "jvmSystem": 0.010299313
+        },
+        {
+          "jvmUser": 0.26061046,
+          "machineTotal": 0.3595523,
+          "epochMs": 1791626263613,
+          "jvmSystem": 0.021313867
+        },
+        {
+          "jvmUser": 0.2566857,
+          "machineTotal": 0.34701782,
+          "epochMs": 1791626264619,
+          "jvmSystem": 0.020264661
+        },
+        {
+          "jvmUser": 0.21550387,
+          "machineTotal": 0.299127,
+          "epochMs": 1791626265625,
+          "jvmSystem": 0.015531811
+        },
+        {
+          "jvmUser": 0.24668954,
+          "machineTotal": 0.3198073,
+          "epochMs": 1791626266630,
+          "jvmSystem": 0.011654624
+        },
+        {
+          "jvmUser": 0.22013904,
+          "machineTotal": 0.26333702,
+          "epochMs": 1791626267638,
+          "jvmSystem": 0.012607082
+        },
+        {
+          "jvmUser": 0.26015764,
+          "machineTotal": 0.32305947,
+          "epochMs": 1791626268644,
+          "jvmSystem": 0.038829498
+        },
+        {
+          "jvmUser": 0.23794897,
+          "machineTotal": 0.3560813,
+          "epochMs": 1791626269649,
+          "jvmSystem": 0.04176247
+        },
+        {
+          "jvmUser": 0.2417138,
+          "machineTotal": 0.3884342,
+          "epochMs": 1791626270655,
+          "jvmSystem": 0.013590334
+        },
+        {
+          "jvmUser": 0.26404056,
+          "machineTotal": 0.3727965,
+          "epochMs": 1791626271666,
+          "jvmSystem": 0.009707374
+        },
+        {
+          "jvmUser": 0.27477464,
+          "machineTotal": 0.38033077,
+          "epochMs": 1791626272714,
+          "jvmSystem": 0.02413561
+        },
+        {
+          "jvmUser": 0.417417,
+          "machineTotal": 0.4631815,
+          "epochMs": 1791626273719,
+          "jvmSystem": 0.012619584
+        },
+        {
+          "jvmUser": 0.22035794,
+          "machineTotal": 0.25738537,
+          "epochMs": 1791626274725,
+          "jvmSystem": 0.015531837
+        },
+        {
+          "jvmUser": 0.28553855,
+          "machineTotal": 0.2958648,
+          "epochMs": 1791626275731,
+          "jvmSystem": 0.009712195
+        }
+      ]
+    }
+  },
+  "pausedAdmissionProbe": {
+    "seconds": 28.0184334,
+    "allPaused": true,
+    "from": 1791626586296,
+    "to": 1791626614315,
+    "builtTiles": 16,
+    "executorCompleted": 46060,
+    "admissionDeltas": {
+      "ADMIT_NOT_DESIRED": 0,
+      "ADMIT_RELEASED": 0,
+      "ADMIT_MEDIUM": 0,
+      "ADMIT_TERRAIN_NEEDED": 0,
+      "ADMIT_SURFACE_READY": 0,
+      "ADMIT_NO_PREVIOUS": 0,
+      "ADMIT_NO_RESERVATION": 0,
+      "ADMIT_NO_DETAIL_SLOT": 0,
+      "ADMIT_NO_SURFACE_SLOT": 0,
+      "ADMIT_CPU_BUDGET": 65244
+    },
+    "repair": "Removed ADMIT_REASONS array-length sentinel from malformed diagnostic JSON; actual ADMIT_* readings preserved. cpuBudgetFields unavailable."
+  },
+  "productionSourceChanged": false,
+  "clientJarReplaced": false,
+  "githubChanged": false
+}

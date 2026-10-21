@@ -1,0 +1,1692 @@
+{
+  "date": "2026-10-14",
+  "version": "0.3.5",
+  "liveClientProfiled": false,
+  "clientLaunched": false,
+  "installedInstanceModified": false,
+  "githubPushed": false,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER / OpenGL 4.6 / 572.70",
+  "retained": "Height-aware water/model protection fallback only after the existing display representation policy rejects all tiers.",
+  "rolledBack": [
+    "Terrain-only append with shared feature ranges",
+    "Replacing already useful variants with height-aware variants",
+    "Finer fallback lattice"
+  ],
+  "productionSourceSha256": "6e16466d8e4437d75aa0d400f8b87244b6359fa1c82351daa3873afd0de28524",
+  "corpus": {
+    "origin": "Historical October 10 immutable geometry capture, not the October 14 coastal screenshot",
+    "meshes": 2019,
+    "sourceOpaqueQuads": 21344411,
+    "beforeVariantMeshes": 1262,
+    "afterVariantMeshes": 1937,
+    "beforeExtraQuads": 6473205,
+    "afterExtraQuads": 8881352,
+    "incrementalCanonicalBytes": 115591056,
+    "selectionRegressions": 0,
+    "existingRepresentationsPreserved": true,
+    "projectionPixels": 900,
+    "pixelError": 2,
+    "fullDistance": 512,
+    "selections": [
+      {
+        "distance": 512,
+        "before": 21344411,
+        "after": 21344411,
+        "reductionPercent": 0.0
+      },
+      {
+        "distance": 768,
+        "before": 20980039,
+        "after": 20980039,
+        "reductionPercent": 0.0
+      },
+      {
+        "distance": 1024,
+        "before": 18613803,
+        "after": 18601074,
+        "reductionPercent": 0.06838473577914196
+      },
+      {
+        "distance": 1536,
+        "before": 18518493,
+        "after": 18505764,
+        "reductionPercent": 0.06873669471916533
+      },
+      {
+        "distance": 2048,
+        "before": 14248112,
+        "after": 14117009,
+        "reductionPercent": 0.9201429635028135
+      },
+      {
+        "distance": 3072,
+        "before": 14223686,
+        "after": 14092583,
+        "reductionPercent": 0.9217231032799796
+      },
+      {
+        "distance": 4096,
+        "before": 12148428,
+        "after": 10321568,
+        "reductionPercent": 15.037830409004359
+      },
+      {
+        "distance": 6144,
+        "before": 12148428,
+        "after": 10321568,
+        "reductionPercent": 15.037830409004359
+      },
+      {
+        "distance": 8192,
+        "before": 10116374,
+        "after": 7511461,
+        "reductionPercent": 25.749473081956044
+      }
+    ],
+    "limitation": "All meshes evaluated at each common distance; these are candidate counts, not an actual world view or FPS. Material classification comes from retained capture metadata and a minimal replay adapter."
+  },
+  "platforms": [
+    {
+      "platform": "neoforge-1.21.1",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "tests": {
+        "loading-benefit": {
+          "tests": 282,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "far-terrain-cpu": {
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "loading-benefit-gpu": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "far-terrain-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "worker": {
+        "rounds": 25,
+        "warmupRounds": 8,
+        "interleaved": true,
+        "meshes": [
+          {
+            "mesh": 13,
+            "before": {
+              "medianBuildNs": 14652900,
+              "medianAllocatedBytes": 6175008,
+              "extraQuads": 11234
+            },
+            "after": {
+              "medianBuildNs": 14581800,
+              "medianAllocatedBytes": 6175008,
+              "extraQuads": 11234
+            }
+          },
+          {
+            "mesh": 1074,
+            "before": {
+              "medianBuildNs": 23898600,
+              "medianAllocatedBytes": 12363728,
+              "extraQuads": 22301
+            },
+            "after": {
+              "medianBuildNs": 23763100,
+              "medianAllocatedBytes": 12363728,
+              "extraQuads": 22301
+            }
+          },
+          {
+            "mesh": 2241,
+            "before": {
+              "medianBuildNs": 11784100,
+              "medianAllocatedBytes": 5754424,
+              "extraQuads": 8849
+            },
+            "after": {
+              "medianBuildNs": 11754800,
+              "medianAllocatedBytes": 5754464,
+              "extraQuads": 8849
+            }
+          },
+          {
+            "mesh": 2280,
+            "before": {
+              "medianBuildNs": 11122700,
+              "medianAllocatedBytes": 4943632,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 31099500,
+              "medianAllocatedBytes": 9070936,
+              "extraQuads": 6166
+            }
+          },
+          {
+            "mesh": 2808,
+            "before": {
+              "medianBuildNs": 9667000,
+              "medianAllocatedBytes": 4882296,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 21063600,
+              "medianAllocatedBytes": 8288120,
+              "extraQuads": 5067
+            }
+          },
+          {
+            "mesh": 3687,
+            "before": {
+              "medianBuildNs": 10870900,
+              "medianAllocatedBytes": 6944184,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 21964300,
+              "medianAllocatedBytes": 11071824,
+              "extraQuads": 7501
+            }
+          },
+          {
+            "mesh": 3844,
+            "before": {
+              "medianBuildNs": 10762300,
+              "medianAllocatedBytes": 7074552,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 21584100,
+              "medianAllocatedBytes": 11122704,
+              "extraQuads": 7201
+            }
+          },
+          {
+            "mesh": 3780,
+            "before": {
+              "medianBuildNs": 10306400,
+              "medianAllocatedBytes": 6407352,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 20265900,
+              "medianAllocatedBytes": 10094272,
+              "extraQuads": 6874
+            }
+          },
+          {
+            "mesh": 3342,
+            "before": {
+              "medianBuildNs": 9968300,
+              "medianAllocatedBytes": 6344856,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 20034000,
+              "medianAllocatedBytes": 9916672,
+              "extraQuads": 6311
+            }
+          },
+          {
+            "mesh": 3609,
+            "before": {
+              "medianBuildNs": 7813900,
+              "medianAllocatedBytes": 3734968,
+              "extraQuads": 4758
+            },
+            "after": {
+              "medianBuildNs": 7755700,
+              "medianAllocatedBytes": 3734968,
+              "extraQuads": 4758
+            }
+          },
+          {
+            "mesh": 3154,
+            "before": {
+              "medianBuildNs": 9633700,
+              "medianAllocatedBytes": 6093888,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 19017900,
+              "medianAllocatedBytes": 9418440,
+              "extraQuads": 6017
+            }
+          }
+        ]
+      },
+      "gpu": {
+        "rounds": 81,
+        "warmupRounds": 24,
+        "repetitionsPerMesh": 64,
+        "projectionPixels": 900,
+        "pixelError": 2,
+        "views": {
+          "near": {
+            "sumBeforeGpuMedianNs": 9357312,
+            "sumAfterGpuMedianNs": 9384960,
+            "gpuReductionPercent": -0.29546946815495734,
+            "submittedBeforeQuads": 13988928,
+            "submittedAfterQuads": 13988928,
+            "storedBeforeBytes": 5891024,
+            "storedAfterBytes": 7024096,
+            "meshes": [
+              {
+                "mesh": 13,
+                "before": {
+                  "gpuMedianNs": 1116160,
+                  "cpuMedianNs": 48800,
+                  "submittedQuads": 1842304,
+                  "commands": 64,
+                  "storedBytes": 845232
+                },
+                "after": {
+                  "gpuMedianNs": 1125376,
+                  "cpuMedianNs": 45100,
+                  "submittedQuads": 1842304,
+                  "commands": 64,
+                  "storedBytes": 845232
+                }
+              },
+              {
+                "mesh": 1074,
+                "before": {
+                  "gpuMedianNs": 2359296,
+                  "cpuMedianNs": 25400,
+                  "submittedQuads": 3755072,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                },
+                "after": {
+                  "gpuMedianNs": 2365440,
+                  "cpuMedianNs": 28000,
+                  "submittedQuads": 3755072,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                }
+              },
+              {
+                "mesh": 2241,
+                "before": {
+                  "gpuMedianNs": 943104,
+                  "cpuMedianNs": 19500,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                },
+                "after": {
+                  "gpuMedianNs": 949248,
+                  "cpuMedianNs": 19500,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                }
+              },
+              {
+                "mesh": 2280,
+                "before": {
+                  "gpuMedianNs": 663552,
+                  "cpuMedianNs": 19300,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 321440
+                },
+                "after": {
+                  "gpuMedianNs": 665600,
+                  "cpuMedianNs": 18500,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 497840
+                }
+              },
+              {
+                "mesh": 2808,
+                "before": {
+                  "gpuMedianNs": 590848,
+                  "cpuMedianNs": 19100,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 286576
+                },
+                "after": {
+                  "gpuMedianNs": 590848,
+                  "cpuMedianNs": 18400,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 431616
+                }
+              },
+              {
+                "mesh": 3687,
+                "before": {
+                  "gpuMedianNs": 676864,
+                  "cpuMedianNs": 19900,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 361552
+                },
+                "after": {
+                  "gpuMedianNs": 677888,
+                  "cpuMedianNs": 19000,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 538384
+                }
+              },
+              {
+                "mesh": 3844,
+                "before": {
+                  "gpuMedianNs": 635904,
+                  "cpuMedianNs": 18200,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 351088
+                },
+                "after": {
+                  "gpuMedianNs": 635904,
+                  "cpuMedianNs": 17400,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 521744
+                }
+              },
+              {
+                "mesh": 3780,
+                "before": {
+                  "gpuMedianNs": 622592,
+                  "cpuMedianNs": 18400,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 342000
+                },
+                "after": {
+                  "gpuMedianNs": 624640,
+                  "cpuMedianNs": 18800,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 509664
+                }
+              },
+              {
+                "mesh": 3342,
+                "before": {
+                  "gpuMedianNs": 613376,
+                  "cpuMedianNs": 25800,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 319344
+                },
+                "after": {
+                  "gpuMedianNs": 612352,
+                  "cpuMedianNs": 25200,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 468880
+                }
+              },
+              {
+                "mesh": 3609,
+                "before": {
+                  "gpuMedianNs": 532480,
+                  "cpuMedianNs": 27000,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                },
+                "after": {
+                  "gpuMedianNs": 532480,
+                  "cpuMedianNs": 25900,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                }
+              },
+              {
+                "mesh": 3154,
+                "before": {
+                  "gpuMedianNs": 603136,
+                  "cpuMedianNs": 22800,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 312576
+                },
+                "after": {
+                  "gpuMedianNs": 605184,
+                  "cpuMedianNs": 22000,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 459520
+                }
+              }
+            ]
+          },
+          "4096": {
+            "sumBeforeGpuMedianNs": 7063552,
+            "sumAfterGpuMedianNs": 6414336,
+            "gpuReductionPercent": 9.191069875326182,
+            "submittedBeforeQuads": 10537792,
+            "submittedAfterQuads": 9671104,
+            "storedBeforeBytes": 5891024,
+            "storedAfterBytes": 7024096,
+            "meshes": [
+              {
+                "mesh": 13,
+                "before": {
+                  "gpuMedianNs": 435200,
+                  "cpuMedianNs": 29500,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                },
+                "after": {
+                  "gpuMedianNs": 436224,
+                  "cpuMedianNs": 28900,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                }
+              },
+              {
+                "mesh": 1074,
+                "before": {
+                  "gpuMedianNs": 750592,
+                  "cpuMedianNs": 19600,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                },
+                "after": {
+                  "gpuMedianNs": 750592,
+                  "cpuMedianNs": 20600,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                }
+              },
+              {
+                "mesh": 2241,
+                "before": {
+                  "gpuMedianNs": 942080,
+                  "cpuMedianNs": 20100,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                },
+                "after": {
+                  "gpuMedianNs": 948224,
+                  "cpuMedianNs": 19900,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                }
+              },
+              {
+                "mesh": 2280,
+                "before": {
+                  "gpuMedianNs": 663552,
+                  "cpuMedianNs": 19500,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 321440
+                },
+                "after": {
+                  "gpuMedianNs": 666624,
+                  "cpuMedianNs": 19000,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 497840
+                }
+              },
+              {
+                "mesh": 2808,
+                "before": {
+                  "gpuMedianNs": 590848,
+                  "cpuMedianNs": 17300,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 286576
+                },
+                "after": {
+                  "gpuMedianNs": 589824,
+                  "cpuMedianNs": 17600,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 431616
+                }
+              },
+              {
+                "mesh": 3687,
+                "before": {
+                  "gpuMedianNs": 675840,
+                  "cpuMedianNs": 18000,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 361552
+                },
+                "after": {
+                  "gpuMedianNs": 675840,
+                  "cpuMedianNs": 18300,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 538384
+                }
+              },
+              {
+                "mesh": 3844,
+                "before": {
+                  "gpuMedianNs": 634880,
+                  "cpuMedianNs": 18300,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 351088
+                },
+                "after": {
+                  "gpuMedianNs": 634880,
+                  "cpuMedianNs": 18100,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 521744
+                }
+              },
+              {
+                "mesh": 3780,
+                "before": {
+                  "gpuMedianNs": 621568,
+                  "cpuMedianNs": 20100,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 342000
+                },
+                "after": {
+                  "gpuMedianNs": 621568,
+                  "cpuMedianNs": 20400,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 509664
+                }
+              },
+              {
+                "mesh": 3342,
+                "before": {
+                  "gpuMedianNs": 612352,
+                  "cpuMedianNs": 25200,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 319344
+                },
+                "after": {
+                  "gpuMedianNs": 279552,
+                  "cpuMedianNs": 23800,
+                  "submittedQuads": 403904,
+                  "commands": 64,
+                  "storedBytes": 468880
+                }
+              },
+              {
+                "mesh": 3609,
+                "before": {
+                  "gpuMedianNs": 532480,
+                  "cpuMedianNs": 22700,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                },
+                "after": {
+                  "gpuMedianNs": 532480,
+                  "cpuMedianNs": 20500,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                }
+              },
+              {
+                "mesh": 3154,
+                "before": {
+                  "gpuMedianNs": 604160,
+                  "cpuMedianNs": 20200,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 312576
+                },
+                "after": {
+                  "gpuMedianNs": 278528,
+                  "cpuMedianNs": 18300,
+                  "submittedQuads": 385088,
+                  "commands": 64,
+                  "storedBytes": 459520
+                }
+              }
+            ]
+          },
+          "8192": {
+            "sumBeforeGpuMedianNs": 6320128,
+            "sumAfterGpuMedianNs": 3671040,
+            "gpuReductionPercent": 41.9151004536617,
+            "submittedBeforeQuads": 9330176,
+            "submittedAfterQuads": 5745984,
+            "storedBeforeBytes": 5891024,
+            "storedAfterBytes": 7024096,
+            "meshes": [
+              {
+                "mesh": 13,
+                "before": {
+                  "gpuMedianNs": 434176,
+                  "cpuMedianNs": 19300,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                },
+                "after": {
+                  "gpuMedianNs": 435200,
+                  "cpuMedianNs": 19100,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                }
+              },
+              {
+                "mesh": 1074,
+                "before": {
+                  "gpuMedianNs": 749568,
+                  "cpuMedianNs": 19100,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                },
+                "after": {
+                  "gpuMedianNs": 751616,
+                  "cpuMedianNs": 18200,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                }
+              },
+              {
+                "mesh": 2241,
+                "before": {
+                  "gpuMedianNs": 198656,
+                  "cpuMedianNs": 18200,
+                  "submittedQuads": 346432,
+                  "commands": 64,
+                  "storedBytes": 722016
+                },
+                "after": {
+                  "gpuMedianNs": 197632,
+                  "cpuMedianNs": 17900,
+                  "submittedQuads": 346432,
+                  "commands": 64,
+                  "storedBytes": 722016
+                }
+              },
+              {
+                "mesh": 2280,
+                "before": {
+                  "gpuMedianNs": 664576,
+                  "cpuMedianNs": 17900,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 321440
+                },
+                "after": {
+                  "gpuMedianNs": 191488,
+                  "cpuMedianNs": 18000,
+                  "submittedQuads": 228864,
+                  "commands": 64,
+                  "storedBytes": 497840
+                }
+              },
+              {
+                "mesh": 2808,
+                "before": {
+                  "gpuMedianNs": 591872,
+                  "cpuMedianNs": 18100,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 286576
+                },
+                "after": {
+                  "gpuMedianNs": 167936,
+                  "cpuMedianNs": 19800,
+                  "submittedQuads": 192512,
+                  "commands": 64,
+                  "storedBytes": 431616
+                }
+              },
+              {
+                "mesh": 3687,
+                "before": {
+                  "gpuMedianNs": 675840,
+                  "cpuMedianNs": 17700,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 361552
+                },
+                "after": {
+                  "gpuMedianNs": 293888,
+                  "cpuMedianNs": 17900,
+                  "submittedQuads": 480064,
+                  "commands": 64,
+                  "storedBytes": 538384
+                }
+              },
+              {
+                "mesh": 3844,
+                "before": {
+                  "gpuMedianNs": 633856,
+                  "cpuMedianNs": 17200,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 351088
+                },
+                "after": {
+                  "gpuMedianNs": 275456,
+                  "cpuMedianNs": 17900,
+                  "submittedQuads": 460864,
+                  "commands": 64,
+                  "storedBytes": 521744
+                }
+              },
+              {
+                "mesh": 3780,
+                "before": {
+                  "gpuMedianNs": 623616,
+                  "cpuMedianNs": 24900,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 342000
+                },
+                "after": {
+                  "gpuMedianNs": 267264,
+                  "cpuMedianNs": 23600,
+                  "submittedQuads": 439936,
+                  "commands": 64,
+                  "storedBytes": 509664
+                }
+              },
+              {
+                "mesh": 3342,
+                "before": {
+                  "gpuMedianNs": 612352,
+                  "cpuMedianNs": 20300,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 319344
+                },
+                "after": {
+                  "gpuMedianNs": 279552,
+                  "cpuMedianNs": 20200,
+                  "submittedQuads": 403904,
+                  "commands": 64,
+                  "storedBytes": 468880
+                }
+              },
+              {
+                "mesh": 3609,
+                "before": {
+                  "gpuMedianNs": 531456,
+                  "cpuMedianNs": 24600,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                },
+                "after": {
+                  "gpuMedianNs": 532480,
+                  "cpuMedianNs": 23400,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                }
+              },
+              {
+                "mesh": 3154,
+                "before": {
+                  "gpuMedianNs": 604160,
+                  "cpuMedianNs": 19300,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 312576
+                },
+                "after": {
+                  "gpuMedianNs": 278528,
+                  "cpuMedianNs": 17700,
+                  "submittedQuads": 385088,
+                  "commands": 64,
+                  "storedBytes": 459520
+                }
+              }
+            ]
+          }
+        },
+        "limitation": "Sum of independent component medians with a replacement atlas and a fixed diagnostic camera, not frame time or game FPS."
+      },
+      "jar": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\far-terrain-20261014\\vss-0.3.5-neoforge-1.21.1.jar",
+        "bytes": 6067549,
+        "sha256": "1a58a67d16e5b83cb23eb9ff13a39e987e5da80dc07224f5bbe0597e90956edb",
+        "javaClassMajor": 65,
+        "nativesUnchanged": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "experimentalClassesExcluded": true,
+        "changedClassesAgainstPreviousDelivery": [
+          "dev/xantha/vss/client/prediction/PredictionDisplayGeometry.class"
+        ]
+      }
+    },
+    {
+      "platform": "forge-1.20.1",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "tests": {
+        "loading-benefit": {
+          "tests": 280,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "far-terrain-cpu": {
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "loading-benefit-gpu": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "far-terrain-gpu": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "worker": {
+        "rounds": 25,
+        "warmupRounds": 8,
+        "interleaved": true,
+        "meshes": [
+          {
+            "mesh": 13,
+            "before": {
+              "medianBuildNs": 14114000,
+              "medianAllocatedBytes": 6174768,
+              "extraQuads": 11234
+            },
+            "after": {
+              "medianBuildNs": 15378500,
+              "medianAllocatedBytes": 6174768,
+              "extraQuads": 11234
+            }
+          },
+          {
+            "mesh": 1074,
+            "before": {
+              "medianBuildNs": 24764400,
+              "medianAllocatedBytes": 12363488,
+              "extraQuads": 22301
+            },
+            "after": {
+              "medianBuildNs": 27512800,
+              "medianAllocatedBytes": 12363488,
+              "extraQuads": 22301
+            }
+          },
+          {
+            "mesh": 2241,
+            "before": {
+              "medianBuildNs": 11767900,
+              "medianAllocatedBytes": 5756616,
+              "extraQuads": 8849
+            },
+            "after": {
+              "medianBuildNs": 13047400,
+              "medianAllocatedBytes": 5756616,
+              "extraQuads": 8849
+            }
+          },
+          {
+            "mesh": 2280,
+            "before": {
+              "medianBuildNs": 10918600,
+              "medianAllocatedBytes": 4943928,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 30018200,
+              "medianAllocatedBytes": 9073544,
+              "extraQuads": 6166
+            }
+          },
+          {
+            "mesh": 2808,
+            "before": {
+              "medianBuildNs": 9711400,
+              "medianAllocatedBytes": 4882592,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 20026100,
+              "medianAllocatedBytes": 8290648,
+              "extraQuads": 5067
+            }
+          },
+          {
+            "mesh": 3687,
+            "before": {
+              "medianBuildNs": 11041900,
+              "medianAllocatedBytes": 6944480,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 23760100,
+              "medianAllocatedBytes": 11073424,
+              "extraQuads": 7501
+            }
+          },
+          {
+            "mesh": 3844,
+            "before": {
+              "medianBuildNs": 11191000,
+              "medianAllocatedBytes": 7074848,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 23455200,
+              "medianAllocatedBytes": 11124304,
+              "extraQuads": 7201
+            }
+          },
+          {
+            "mesh": 3780,
+            "before": {
+              "medianBuildNs": 10395100,
+              "medianAllocatedBytes": 6407648,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 21967800,
+              "medianAllocatedBytes": 10095872,
+              "extraQuads": 6874
+            }
+          },
+          {
+            "mesh": 3342,
+            "before": {
+              "medianBuildNs": 10416600,
+              "medianAllocatedBytes": 6345152,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 21398300,
+              "medianAllocatedBytes": 9918272,
+              "extraQuads": 6311
+            }
+          },
+          {
+            "mesh": 3609,
+            "before": {
+              "medianBuildNs": 7636800,
+              "medianAllocatedBytes": 3736272,
+              "extraQuads": 4758
+            },
+            "after": {
+              "medianBuildNs": 8242500,
+              "medianAllocatedBytes": 3736272,
+              "extraQuads": 4758
+            }
+          },
+          {
+            "mesh": 3154,
+            "before": {
+              "medianBuildNs": 9911700,
+              "medianAllocatedBytes": 6094184,
+              "extraQuads": 0
+            },
+            "after": {
+              "medianBuildNs": 20579200,
+              "medianAllocatedBytes": 9420040,
+              "extraQuads": 6017
+            }
+          }
+        ]
+      },
+      "gpu": {
+        "rounds": 81,
+        "warmupRounds": 24,
+        "repetitionsPerMesh": 64,
+        "projectionPixels": 900,
+        "pixelError": 2,
+        "views": {
+          "near": {
+            "sumBeforeGpuMedianNs": 9349120,
+            "sumAfterGpuMedianNs": 9376768,
+            "gpuReductionPercent": -0.29572836801752467,
+            "submittedBeforeQuads": 13988928,
+            "submittedAfterQuads": 13988928,
+            "storedBeforeBytes": 5891024,
+            "storedAfterBytes": 7024096,
+            "meshes": [
+              {
+                "mesh": 13,
+                "before": {
+                  "gpuMedianNs": 1119232,
+                  "cpuMedianNs": 44900,
+                  "submittedQuads": 1842304,
+                  "commands": 64,
+                  "storedBytes": 845232
+                },
+                "after": {
+                  "gpuMedianNs": 1128448,
+                  "cpuMedianNs": 44200,
+                  "submittedQuads": 1842304,
+                  "commands": 64,
+                  "storedBytes": 845232
+                }
+              },
+              {
+                "mesh": 1074,
+                "before": {
+                  "gpuMedianNs": 2358272,
+                  "cpuMedianNs": 34600,
+                  "submittedQuads": 3755072,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                },
+                "after": {
+                  "gpuMedianNs": 2362368,
+                  "cpuMedianNs": 34100,
+                  "submittedQuads": 3755072,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                }
+              },
+              {
+                "mesh": 2241,
+                "before": {
+                  "gpuMedianNs": 940032,
+                  "cpuMedianNs": 25500,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                },
+                "after": {
+                  "gpuMedianNs": 945152,
+                  "cpuMedianNs": 24700,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                }
+              },
+              {
+                "mesh": 2280,
+                "before": {
+                  "gpuMedianNs": 663552,
+                  "cpuMedianNs": 25100,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 321440
+                },
+                "after": {
+                  "gpuMedianNs": 666624,
+                  "cpuMedianNs": 23400,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 497840
+                }
+              },
+              {
+                "mesh": 2808,
+                "before": {
+                  "gpuMedianNs": 590848,
+                  "cpuMedianNs": 23200,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 286576
+                },
+                "after": {
+                  "gpuMedianNs": 591872,
+                  "cpuMedianNs": 24000,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 431616
+                }
+              },
+              {
+                "mesh": 3687,
+                "before": {
+                  "gpuMedianNs": 675840,
+                  "cpuMedianNs": 25800,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 361552
+                },
+                "after": {
+                  "gpuMedianNs": 674816,
+                  "cpuMedianNs": 27100,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 538384
+                }
+              },
+              {
+                "mesh": 3844,
+                "before": {
+                  "gpuMedianNs": 634880,
+                  "cpuMedianNs": 21800,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 351088
+                },
+                "after": {
+                  "gpuMedianNs": 634880,
+                  "cpuMedianNs": 23900,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 521744
+                }
+              },
+              {
+                "mesh": 3780,
+                "before": {
+                  "gpuMedianNs": 621568,
+                  "cpuMedianNs": 25300,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 342000
+                },
+                "after": {
+                  "gpuMedianNs": 623616,
+                  "cpuMedianNs": 26800,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 509664
+                }
+              },
+              {
+                "mesh": 3342,
+                "before": {
+                  "gpuMedianNs": 612352,
+                  "cpuMedianNs": 18100,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 319344
+                },
+                "after": {
+                  "gpuMedianNs": 612352,
+                  "cpuMedianNs": 18700,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 468880
+                }
+              },
+              {
+                "mesh": 3609,
+                "before": {
+                  "gpuMedianNs": 529408,
+                  "cpuMedianNs": 14700,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                },
+                "after": {
+                  "gpuMedianNs": 532480,
+                  "cpuMedianNs": 14600,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                }
+              },
+              {
+                "mesh": 3154,
+                "before": {
+                  "gpuMedianNs": 603136,
+                  "cpuMedianNs": 14400,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 312576
+                },
+                "after": {
+                  "gpuMedianNs": 604160,
+                  "cpuMedianNs": 14800,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 459520
+                }
+              }
+            ]
+          },
+          "4096": {
+            "sumBeforeGpuMedianNs": 7056384,
+            "sumAfterGpuMedianNs": 6406144,
+            "gpuReductionPercent": 9.214918008997243,
+            "submittedBeforeQuads": 10537792,
+            "submittedAfterQuads": 9671104,
+            "storedBeforeBytes": 5891024,
+            "storedAfterBytes": 7024096,
+            "meshes": [
+              {
+                "mesh": 13,
+                "before": {
+                  "gpuMedianNs": 434176,
+                  "cpuMedianNs": 31100,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                },
+                "after": {
+                  "gpuMedianNs": 435200,
+                  "cpuMedianNs": 29700,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                }
+              },
+              {
+                "mesh": 1074,
+                "before": {
+                  "gpuMedianNs": 748544,
+                  "cpuMedianNs": 26500,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                },
+                "after": {
+                  "gpuMedianNs": 751616,
+                  "cpuMedianNs": 26600,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                }
+              },
+              {
+                "mesh": 2241,
+                "before": {
+                  "gpuMedianNs": 940032,
+                  "cpuMedianNs": 22600,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                },
+                "after": {
+                  "gpuMedianNs": 945152,
+                  "cpuMedianNs": 25100,
+                  "submittedQuads": 1554048,
+                  "commands": 64,
+                  "storedBytes": 722016
+                }
+              },
+              {
+                "mesh": 2280,
+                "before": {
+                  "gpuMedianNs": 664576,
+                  "cpuMedianNs": 25400,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 321440
+                },
+                "after": {
+                  "gpuMedianNs": 663552,
+                  "cpuMedianNs": 24600,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 497840
+                }
+              },
+              {
+                "mesh": 2808,
+                "before": {
+                  "gpuMedianNs": 590848,
+                  "cpuMedianNs": 25500,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 286576
+                },
+                "after": {
+                  "gpuMedianNs": 590848,
+                  "cpuMedianNs": 25400,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 431616
+                }
+              },
+              {
+                "mesh": 3687,
+                "before": {
+                  "gpuMedianNs": 675840,
+                  "cpuMedianNs": 21200,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 361552
+                },
+                "after": {
+                  "gpuMedianNs": 675840,
+                  "cpuMedianNs": 20800,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 538384
+                }
+              },
+              {
+                "mesh": 3844,
+                "before": {
+                  "gpuMedianNs": 633856,
+                  "cpuMedianNs": 21600,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 351088
+                },
+                "after": {
+                  "gpuMedianNs": 633856,
+                  "cpuMedianNs": 22600,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 521744
+                }
+              },
+              {
+                "mesh": 3780,
+                "before": {
+                  "gpuMedianNs": 622592,
+                  "cpuMedianNs": 24000,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 342000
+                },
+                "after": {
+                  "gpuMedianNs": 621568,
+                  "cpuMedianNs": 23800,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 509664
+                }
+              },
+              {
+                "mesh": 3342,
+                "before": {
+                  "gpuMedianNs": 611328,
+                  "cpuMedianNs": 18000,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 319344
+                },
+                "after": {
+                  "gpuMedianNs": 278528,
+                  "cpuMedianNs": 17900,
+                  "submittedQuads": 403904,
+                  "commands": 64,
+                  "storedBytes": 468880
+                }
+              },
+              {
+                "mesh": 3609,
+                "before": {
+                  "gpuMedianNs": 531456,
+                  "cpuMedianNs": 14900,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                },
+                "after": {
+                  "gpuMedianNs": 531456,
+                  "cpuMedianNs": 15300,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                }
+              },
+              {
+                "mesh": 3154,
+                "before": {
+                  "gpuMedianNs": 603136,
+                  "cpuMedianNs": 14100,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 312576
+                },
+                "after": {
+                  "gpuMedianNs": 278528,
+                  "cpuMedianNs": 14000,
+                  "submittedQuads": 385088,
+                  "commands": 64,
+                  "storedBytes": 459520
+                }
+              }
+            ]
+          },
+          "8192": {
+            "sumBeforeGpuMedianNs": 6317056,
+            "sumAfterGpuMedianNs": 3667968,
+            "gpuReductionPercent": 41.935483870967744,
+            "submittedBeforeQuads": 9330176,
+            "submittedAfterQuads": 5745984,
+            "storedBeforeBytes": 5891024,
+            "storedAfterBytes": 7024096,
+            "meshes": [
+              {
+                "mesh": 13,
+                "before": {
+                  "gpuMedianNs": 434176,
+                  "cpuMedianNs": 25000,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                },
+                "after": {
+                  "gpuMedianNs": 435200,
+                  "cpuMedianNs": 25400,
+                  "submittedQuads": 718976,
+                  "commands": 64,
+                  "storedBytes": 845232
+                }
+              },
+              {
+                "mesh": 1074,
+                "before": {
+                  "gpuMedianNs": 749568,
+                  "cpuMedianNs": 24900,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                },
+                "after": {
+                  "gpuMedianNs": 750592,
+                  "cpuMedianNs": 24400,
+                  "submittedQuads": 1427264,
+                  "commands": 64,
+                  "storedBytes": 1673792
+                }
+              },
+              {
+                "mesh": 2241,
+                "before": {
+                  "gpuMedianNs": 198656,
+                  "cpuMedianNs": 24800,
+                  "submittedQuads": 346432,
+                  "commands": 64,
+                  "storedBytes": 722016
+                },
+                "after": {
+                  "gpuMedianNs": 197632,
+                  "cpuMedianNs": 24800,
+                  "submittedQuads": 346432,
+                  "commands": 64,
+                  "storedBytes": 722016
+                }
+              },
+              {
+                "mesh": 2280,
+                "before": {
+                  "gpuMedianNs": 664576,
+                  "cpuMedianNs": 21500,
+                  "submittedQuads": 924352,
+                  "commands": 64,
+                  "storedBytes": 321440
+                },
+                "after": {
+                  "gpuMedianNs": 191488,
+                  "cpuMedianNs": 20700,
+                  "submittedQuads": 228864,
+                  "commands": 64,
+                  "storedBytes": 497840
+                }
+              },
+              {
+                "mesh": 2808,
+                "before": {
+                  "gpuMedianNs": 590848,
+                  "cpuMedianNs": 21900,
+                  "submittedQuads": 790336,
+                  "commands": 64,
+                  "storedBytes": 286576
+                },
+                "after": {
+                  "gpuMedianNs": 167936,
+                  "cpuMedianNs": 21500,
+                  "submittedQuads": 192512,
+                  "commands": 64,
+                  "storedBytes": 431616
+                }
+              },
+              {
+                "mesh": 3687,
+                "before": {
+                  "gpuMedianNs": 675840,
+                  "cpuMedianNs": 22100,
+                  "submittedQuads": 970432,
+                  "commands": 64,
+                  "storedBytes": 361552
+                },
+                "after": {
+                  "gpuMedianNs": 293888,
+                  "cpuMedianNs": 23400,
+                  "submittedQuads": 480064,
+                  "commands": 64,
+                  "storedBytes": 538384
+                }
+              },
+              {
+                "mesh": 3844,
+                "before": {
+                  "gpuMedianNs": 633856,
+                  "cpuMedianNs": 21300,
+                  "submittedQuads": 938048,
+                  "commands": 64,
+                  "storedBytes": 351088
+                },
+                "after": {
+                  "gpuMedianNs": 275456,
+                  "cpuMedianNs": 21100,
+                  "submittedQuads": 460864,
+                  "commands": 64,
+                  "storedBytes": 521744
+                }
+              },
+              {
+                "mesh": 3780,
+                "before": {
+                  "gpuMedianNs": 623616,
+                  "cpuMedianNs": 17600,
+                  "submittedQuads": 896576,
+                  "commands": 64,
+                  "storedBytes": 342000
+                },
+                "after": {
+                  "gpuMedianNs": 267264,
+                  "cpuMedianNs": 17400,
+                  "submittedQuads": 439936,
+                  "commands": 64,
+                  "storedBytes": 509664
+                }
+              },
+              {
+                "mesh": 3342,
+                "before": {
+                  "gpuMedianNs": 612352,
+                  "cpuMedianNs": 14700,
+                  "submittedQuads": 846144,
+                  "commands": 64,
+                  "storedBytes": 319344
+                },
+                "after": {
+                  "gpuMedianNs": 279552,
+                  "cpuMedianNs": 14900,
+                  "submittedQuads": 403904,
+                  "commands": 64,
+                  "storedBytes": 468880
+                }
+              },
+              {
+                "mesh": 3609,
+                "before": {
+                  "gpuMedianNs": 529408,
+                  "cpuMedianNs": 15200,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                },
+                "after": {
+                  "gpuMedianNs": 530432,
+                  "cpuMedianNs": 15400,
+                  "submittedQuads": 662080,
+                  "commands": 64,
+                  "storedBytes": 355408
+                }
+              },
+              {
+                "mesh": 3154,
+                "before": {
+                  "gpuMedianNs": 604160,
+                  "cpuMedianNs": 13800,
+                  "submittedQuads": 809536,
+                  "commands": 64,
+                  "storedBytes": 312576
+                },
+                "after": {
+                  "gpuMedianNs": 278528,
+                  "cpuMedianNs": 13700,
+                  "submittedQuads": 385088,
+                  "commands": 64,
+                  "storedBytes": 459520
+                }
+              }
+            ]
+          }
+        },
+        "limitation": "Sum of independent component medians with a replacement atlas and a fixed diagnostic camera, not frame time or game FPS."
+      },
+      "jar": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\far-terrain-20261014\\vss-0.3.5-forge-1.20.1.jar",
+        "bytes": 6737833,
+        "sha256": "30b85a33fcaf199942057e0ea31dec6e265c7fde3af819a9721c9f396014dac8",
+        "javaClassMajor": 61,
+        "nativesUnchanged": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "experimentalClassesExcluded": true,
+        "changedClassesAgainstPreviousDelivery": [
+          "dev/xantha/vss/client/prediction/PredictionDisplayGeometry.class"
+        ]
+      }
+    }
+  ]
+}

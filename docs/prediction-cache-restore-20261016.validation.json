@@ -1,0 +1,376 @@
+{
+  "date": "2026-10-16",
+  "scope": "Finished-mesh cache restore: merged canonical sources and static display/vegetation plans",
+  "liveClientReplaced": false,
+  "githubPushed": false,
+  "repositories": [
+    {
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "artifact": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\cache-restore-20261016\\vss-0.3.5-neoforge-1.21.1.jar",
+      "bytes": 6172201,
+      "sha256": "20a15ef4483ec3dd28c5ff64b3c1b94ffb668eb86969c7f3f9404620fe9bed0f",
+      "classVersion": 65,
+      "classCount": 955,
+      "snapshot": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\.gradle\\cache-restore-snapshot-20261016",
+      "sourceManifestSha256": "d94c35d40879d04d61088347dd25de7ef78115a74b1462e38c6fa75ad793f576",
+      "tests": {
+        "cache-restore": {
+          "totals": {
+            "tests": 92,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "suites": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCityMeshCacheTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayGeometryTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionGroundCoverTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCacheBenchmarkTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshDerivedCacheTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshMemoryTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionPassStorageTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+              "tests": 2,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMergeTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+              "tests": 12,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+              "tests": 21,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          ]
+        },
+        "cache-restore-gpu": {
+          "totals": {
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "suites": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionGroundCoverGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVegetationLodGpuTest",
+              "tests": 2,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          ]
+        }
+      },
+      "benchmark": [
+        "CACHE_RESTORE_BENCH features=0 iterations=48 legacyMs=3.000 preparedMs=0.721 legacyKiB=815.2 preparedKiB=434.0 legacyBytes=278391 preparedBytes=281838",
+        "CACHE_RESTORE_BENCH features=8192 iterations=48 legacyMs=22.710 preparedMs=0.855 legacyKiB=4560.4 preparedKiB=872.1 legacyBytes=671607 preparedBytes=696273"
+      ],
+      "coreSources": {
+        "PredictionMeshDerivedCache.java": {
+          "sha256": "b42594eb9faff7b428c656cf6cb0c6c231396ad288a01207d39c87c248a5de78",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionMeshCodec.java": {
+          "sha256": "e6533b57a058dd4692fbe003066f0f04eecbd0a5c5a664e59e999500732dfe38",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionPackedMesh.java": {
+          "sha256": "98918b484a87cd867ed9399a3d2b334b7e73f0e046b0605158c6b59806b107f3",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionVegetationRanges.java": {
+          "sha256": "64e77f69a290b776d4ba45c3798da7a89ca187bf538d338a21cb3f75cc0eb84b",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionTerrainDisplayRanges.java": {
+          "sha256": "96f7a9f6850bf621cc1522811ec50ca768a505d2270f660aa3cd423c88470235",
+          "workingTreeMatchesSnapshot": true
+        }
+      }
+    },
+    {
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "artifact": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\cache-restore-20261016\\vss-0.3.5-forge-1.20.1.jar",
+      "bytes": 6842586,
+      "sha256": "dfce6079d8acd5a60afc7f68e7cd325a0e38ae7d9e75ddff7b787e7cfc145b16",
+      "classVersion": 61,
+      "classCount": 965,
+      "snapshot": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\.gradle\\cache-restore-snapshot-20261016",
+      "sourceManifestSha256": "3f7cbae53937979de8ab2f5d8a53d93cd7e3aeb468f60db11821f6a139d04390",
+      "tests": {
+        "cache-restore": {
+          "totals": {
+            "tests": 93,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "suites": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCityMeshCacheTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayGeometryTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionGroundCoverTest",
+              "tests": 4,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCacheBenchmarkTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshDerivedCacheTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionMeshMemoryTest",
+              "tests": 7,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionPassStorageTest",
+              "tests": 5,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+              "tests": 2,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionScanMergeTest",
+              "tests": 8,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+              "tests": 12,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+              "tests": 22,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          ]
+        },
+        "cache-restore-gpu": {
+          "totals": {
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "suites": [
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionGroundCoverGpuTest",
+              "tests": 1,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            {
+              "class": "dev.xantha.vss.client.prediction.PredictionVegetationLodGpuTest",
+              "tests": 2,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          ]
+        }
+      },
+      "benchmark": [
+        "CACHE_RESTORE_BENCH features=0 iterations=48 legacyMs=3.243 preparedMs=1.007 legacyKiB=815.5 preparedKiB=433.5 legacyBytes=278391 preparedBytes=281838",
+        "CACHE_RESTORE_BENCH features=8192 iterations=48 legacyMs=7.119 preparedMs=0.886 legacyKiB=4565.2 preparedKiB=871.4 legacyBytes=671607 preparedBytes=696273"
+      ],
+      "coreSources": {
+        "PredictionMeshDerivedCache.java": {
+          "sha256": "b42594eb9faff7b428c656cf6cb0c6c231396ad288a01207d39c87c248a5de78",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionMeshCodec.java": {
+          "sha256": "fe831f3f640c1a0d82d418739e42f06d374c270bfa2d74264672994ab232dc52",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionPackedMesh.java": {
+          "sha256": "eba366265ec2536dd3a3ecf53e4d3865d266b09fcdac49f89318daed456693a7",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionVegetationRanges.java": {
+          "sha256": "64e77f69a290b776d4ba45c3798da7a89ca187bf538d338a21cb3f75cc0eb84b",
+          "workingTreeMatchesSnapshot": true
+        },
+        "PredictionTerrainDisplayRanges.java": {
+          "sha256": "96f7a9f6850bf621cc1522811ec50ca768a505d2270f660aa3cd423c88470235",
+          "workingTreeMatchesSnapshot": true
+        }
+      }
+    }
+  ]
+}

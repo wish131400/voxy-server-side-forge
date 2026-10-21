@@ -1,0 +1,289 @@
+{
+  "date": "2026-10-12",
+  "implementedSteps": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "deferredSteps": [
+    5,
+    6
+  ],
+  "liveFPSMeasured": false,
+  "terrainErrorPixels": {
+    "low": 3,
+    "normal": 2,
+    "high": 1.5,
+    "extreme": 1
+  },
+  "terrainEnterFraction": 0.8,
+  "corpusReplay": {
+    "capture": "C:\\Users\\Administrator\\.codex\\tmp\\vss-distance-render-20261010\\geometry",
+    "liveFPSMeasured": false,
+    "depths": [
+      512,
+      768,
+      1024,
+      1536,
+      2048,
+      3072,
+      4096,
+      6144,
+      8192
+    ],
+    "projection": "1475 pixels per world unit / eye depth, fullDistance=512, aquaticDistance=738; all meshes placed at each hypothetical eye depth, complete ownership; morph stays exact. Historical capture camera is unavailable.",
+    "source": 21344411,
+    "meshes": 2019,
+    "modes": [
+      "baseline 1.5 px",
+      "independent plants, unchanged 1.5 px terrain",
+      "independent plants, normal 2 px terrain"
+    ],
+    "materialLimits": "Captured registry tags and shared-row mappings are unavailable; only known vanilla plant sprite names and captured leafClass are classified. New tagged modded vegetation benefits are not estimated.",
+    "beforeBytes": 1337534304,
+    "afterBytes": 1337534304,
+    "oldTiers": [
+      21344411,
+      14653598,
+      10782084,
+      10093604
+    ],
+    "newTiers": [
+      21344411,
+      14683754,
+      10899446,
+      10232042
+    ],
+    "oldSelected": [
+      21344411,
+      21344411,
+      20980039,
+      20884729,
+      18518493,
+      18494067,
+      14223686,
+      14223686,
+      12150139
+    ],
+    "newFixedSelected": [
+      21344411,
+      21344411,
+      20980039,
+      20884729,
+      18518493,
+      18494067,
+      14223686,
+      14223686,
+      12150139
+    ],
+    "newSelected": [
+      21344411,
+      21344411,
+      20980039,
+      18518493,
+      18518493,
+      14223686,
+      14223686,
+      12150139,
+      12150139
+    ],
+    "limits": "Hypothetical distance sweep on captured meshes, no live FPS. All tested meshes preserve baseline error and do not increase candidate count at normal 2px. Registry tags unavailable in capture."
+  },
+  "platforms": {
+    "neoforge": {
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\vegetation-lod-20261012\\vss-0.3.5-neoforge-1.21.1.jar",
+      "bytes": 5947883,
+      "sha256": "96ef109e7083819668b6a76bce174f6853b40136ca3085f974fb469322d132d5",
+      "classMajor": 65,
+      "tests": {
+        "regression": {
+          "tests": 197,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "gpu": {
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "gpuFixture": {
+        "vegetation-lod": {
+          "vertex": {
+            "baseline": {
+              "gpu_ns": 361472,
+              "cpu_ns": 53700,
+              "mdi_quads": 2097152,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 93184,
+              "cpu_ns": 49900,
+              "mdi_quads": 524288,
+              "mdi_commands": 128
+            },
+            "gpuChangePercent": -74.22096317280453
+          },
+          "raster": {
+            "baseline": {
+              "gpu_ns": 4947968,
+              "cpu_ns": 42100,
+              "mdi_quads": 2097152,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 1319936,
+              "cpu_ns": 38300,
+              "mdi_quads": 524288,
+              "mdi_commands": 128
+            },
+            "gpuChangePercent": -73.32367549668875
+          }
+        },
+        "terrain-lod": {
+          "vertex": {
+            "baseline": {
+              "gpu_ns": 192512,
+              "cpu_ns": 26200,
+              "mdi_quads": 1048576,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 18432,
+              "cpu_ns": 26400,
+              "mdi_quads": 68608,
+              "mdi_commands": 64
+            },
+            "gpuChangePercent": -90.42553191489363
+          },
+          "raster": {
+            "baseline": {
+              "gpu_ns": 1274880,
+              "cpu_ns": 29900,
+              "mdi_quads": 1048576,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 150528,
+              "cpu_ns": 29600,
+              "mdi_quads": 68608,
+              "mdi_commands": 64
+            },
+            "gpuChangePercent": -88.19277108433735
+          }
+        }
+      },
+      "artifactChecks": {
+        "zip": true,
+        "testClassesExcluded": true,
+        "allProductionClassVersions": true,
+        "nativeResourceHashesMatch": true,
+        "nativeFiles": 5
+      }
+    },
+    "forge": {
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\vegetation-lod-20261012\\vss-0.3.5-forge-1.20.1.jar",
+      "bytes": 6620128,
+      "sha256": "4d39bc863f944fbfba161ddbe812aa7bdf9b237f4595a53b3d7bc39716f97bc6",
+      "classMajor": 61,
+      "tests": {
+        "regression": {
+          "tests": 196,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "gpu": {
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "gpuFixture": {
+        "vegetation-lod": {
+          "vertex": {
+            "baseline": {
+              "gpu_ns": 361472,
+              "cpu_ns": 53400,
+              "mdi_quads": 2097152,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 93184,
+              "cpu_ns": 51300,
+              "mdi_quads": 524288,
+              "mdi_commands": 128
+            },
+            "gpuChangePercent": -74.22096317280453
+          },
+          "raster": {
+            "baseline": {
+              "gpu_ns": 4965376,
+              "cpu_ns": 41300,
+              "mdi_quads": 2097152,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 1320960,
+              "cpu_ns": 40800,
+              "mdi_quads": 524288,
+              "mdi_commands": 128
+            },
+            "gpuChangePercent": -73.3965766137348
+          }
+        },
+        "terrain-lod": {
+          "vertex": {
+            "baseline": {
+              "gpu_ns": 192512,
+              "cpu_ns": 28700,
+              "mdi_quads": 1048576,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 17408,
+              "cpu_ns": 28700,
+              "mdi_quads": 68608,
+              "mdi_commands": 64
+            },
+            "gpuChangePercent": -90.95744680851064
+          },
+          "raster": {
+            "baseline": {
+              "gpu_ns": 1276928,
+              "cpu_ns": 32600,
+              "mdi_quads": 1048576,
+              "mdi_commands": 64
+            },
+            "selected": {
+              "gpu_ns": 150528,
+              "cpu_ns": 32700,
+              "mdi_quads": 68608,
+              "mdi_commands": 64
+            },
+            "gpuChangePercent": -88.21170809943865
+          }
+        }
+      },
+      "artifactChecks": {
+        "zip": true,
+        "testClassesExcluded": true,
+        "allProductionClassVersions": true,
+        "nativeResourceHashesMatch": true,
+        "nativeFiles": 5,
+        "reobfOutputMatches": true
+      }
+    }
+  },
+  "rejectedExperiment": "coupled plant/terrain error and appended plant copies: +2.11%/+4.03% candidates at 2048/4096; reverted from production",
+  "operations": {
+    "githubCommit": false,
+    "githubPush": false,
+    "minecraftStarted": false,
+    "clientJarReplaced": false
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "capture": "C:\\Users\\Administrator\\.codex\\tmp\\vss-distance-render-20261010\\geometry",
+  "manifest_sha256": "9a4d4bf4164f265c24ec4cfbfcb6c60f79a4da3aa49ce501ebf9d888ae0c4153",
+  "captured_epoch_ms": 1791630438011,
+  "meshes": 2019,
+  "source": {
+    "quads": 22405691,
+    "axis_up": 7889513,
+    "axis_down": 971700,
+    "other_axis": 13013630,
+    "conservative_unknown_or_double_sided": 530848,
+    "model_uv": 0,
+    "cutout": 531365,
+    "feature": 5632858,
+    "preview": 0,
+    "slope_y_axis": 0,
+    "leaf_material": 1126761,
+    "known_vanilla_aquatic_material": 328806,
+    "known_vanilla_land_plant_material": 163092
+  },
+  "captured_opaque_selection": {
+    "quads": 15501420,
+    "axis_up": 7849183,
+    "axis_down": 959500,
+    "other_axis": 6560415,
+    "conservative_unknown_or_double_sided": 132322,
+    "model_uv": 0,
+    "cutout": 132615,
+    "feature": 3535920,
+    "preview": 0,
+    "slope_y_axis": 0,
+    "leaf_material": 758658,
+    "known_vanilla_aquatic_material": 35228,
+    "known_vanilla_land_plant_material": 58144
+  },
+  "hypothetical_segmented_commands": {
+    "single_direction": 81725,
+    "quads_single_direction": 11835620,
+    "all": 100995,
+    "unknown_or_double_sided": 1476,
+    "quads_unknown_or_double_sided": 253559,
+    "mixed_known_directions": 17794,
+    "quads_mixed_known_directions": 3412241
+  },
+  "top_selected_materials": [
+    {
+      "sprite": 24,
+      "name": "minecraft:block/stone",
+      "quads": 4109409
+    },
+    {
+      "sprite": 30,
+      "name": "minecraft:block/snow",
+      "quads": 3900029
+    },
+    {
+      "sprite": 22,
+      "name": "minecraft:block/grass_block_top",
+      "quads": 1697639
+    },
+    {
+      "sprite": 45,
+      "name": "minecraft:block/gravel",
+      "quads": 1374315
+    },
+    {
+      "sprite": 25,
+      "name": "minecraft:block/sand",
+      "quads": 1241838
+    },
+    {
+      "sprite": 23,
+      "name": "minecraft:block/dirt",
+      "quads": 730904
+    },
+    {
+      "sprite": 51,
+      "name": "minecraft:block/grass_block_side",
+      "quads": 722721
+    },
+    {
+      "sprite": 40,
+      "name": "minecraft:block/spruce_leaves",
+      "quads": 476402
+    },
+    {
+      "sprite": 56,
+      "name": "minecraft:block/packed_ice",
+      "quads": 263056
+    },
+    {
+      "sprite": 31,
+      "name": "minecraft:block/oak_leaves",
+      "quads": 209071
+    },
+    {
+      "sprite": 53,
+      "name": "minecraft:block/deepslate",
+      "quads": 105873
+    },
+    {
+      "sprite": 46,
+      "name": "minecraft:block/terracotta",
+      "quads": 76608
+    },
+    {
+      "sprite": 41,
+      "name": "minecraft:block/birch_leaves",
+      "quads": 62552
+    },
+    {
+      "sprite": 62,
+      "name": "minecraft:block/powder_snow",
+      "quads": 50868
+    },
+    {
+      "sprite": 49,
+      "name": "minecraft:block/podzol_top",
+      "quads": 48784
+    },
+    {
+      "sprite": 1,
+      "name": "minecraft:block/short_grass",
+      "quads": 48078
+    }
+  ],
+  "water_order_replay": {
+    "items": 1028,
+    "assumed_origin_xz": [
+      3968.0,
+      1040.0
+    ],
+    "synthetic_paths": true,
+    "camera_missing_in_capture": true,
+    "cpu_timing_measured": false,
+    "paths": {
+      "vertical_only": {
+        "frames": 600,
+        "current_sort_and_revision_events": 600,
+        "actual_order_changes": 0,
+        "exact_validation_full_sorts": 0,
+        "camera_y_changes": true,
+        "identical_order_every_frame": true
+      },
+      "horizontal_72_blocks": {
+        "frames": 600,
+        "current_sort_and_revision_events": 600,
+        "actual_order_changes": 591,
+        "exact_validation_full_sorts": 591,
+        "camera_y_changes": false,
+        "identical_order_every_frame": true
+      },
+      "turning_64_block_radius": {
+        "frames": 600,
+        "current_sort_and_revision_events": 600,
+        "actual_order_changes": 598,
+        "exact_validation_full_sorts": 598,
+        "camera_y_changes": false,
+        "identical_order_every_frame": true
+      }
+    }
+  },
+  "limits": [
+    "Historical pre-20261012 meshes and draw ranges; not current client or current display LOD.",
+    "No camera, no measured FPS/GPU times; quad directions are potential selectivity, not cull savings.",
+    "Material classes may overlap other flags; feature/cutout/model counts are not mutually exclusive.",
+    "Registry tags and shared material users are unavailable; vanilla material names do not classify every modded plant.",
+    "Command census assumes segmentation; does not reproduce adaptive direct mode, command caps or page grouping."
+  ]
+}

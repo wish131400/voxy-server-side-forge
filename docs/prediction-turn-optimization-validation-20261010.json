@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-10",
+  "scope": "turn/movement CPU hotspots; no live FPS comparison after replacement",
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER / OpenGL 4.6",
+  "results": [
+    {
+      "platform": "neoforge-1.21.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\turn-optimization-20261010\\vss-0.3.5-neoforge-1.21.1.jar",
+      "size_bytes": 5866204,
+      "sha256": "05F035B906AB5EFEB2C56A6948867864EC3C2BA3181EA8C1A1C6A05D8F05D99D",
+      "class_major_version": 65,
+      "zip_crc_valid": true,
+      "tests": {
+        "turn-optimization": {
+          "tests": 182,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 181,
+          "suites": 35,
+          "skipped_cases": [
+            "dev.xantha.vss.client.prediction.PredictionSpatialReplayTest.capturedClientMeshesPreserveGeometryAndImproveBounds()"
+          ]
+        },
+        "turn-optimization-gpu": {
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 6,
+          "suites": 7,
+          "skipped_cases": [
+            "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest.installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+          ]
+        }
+      },
+      "production_sources": {
+        "PredictionIndirectBatch": "AC6A838207994441467EB0C74A9492E52B96ACD3059F9DC57C10CCD348E3769A",
+        "PredictionPackedMesh": "459C3FD1876246A7A3ABD4ABA97881B3F5DCA05AC9D75F18149F585483A23786",
+        "PredictionRenderer": "89A181FF9CFBB01DFC99D1A3EE095840E1494AEFB3C50F26603E8D0291DE349C",
+        "PredictionVisiblePlan": "3DE9A5CBA56DE3DB63DAEA2B9E24845106AC0407F98B070C2261A6C3538562E1",
+        "PredictionTileManager": "32949039407E34DF232A657F48A8B443B537FCDF912FC9BD4272E1B4F72070F9",
+        "PredictionTileTable": "0DFEEF7E6AFC553BF80ED223B49FED81A4B80C1E808E9730BED9DC234DBA61A0",
+        "PredictionSubmissionCoverage": "EB6E630F6A3FA88E9EB3085CFE9DC151B45F4538449970BF47994975D33513B1",
+        "PredictionOwnershipRuns": "75213C6D12E01BD4FFE24EF242CB8C228B9C85A0E51D3B72AD130F24B8119FF7",
+        "PredictionVisibilityFeedback": "82B5F63FCB24D29ABDD8B077AEBDAFBAF7CFEEA26E46164CF592291E73773C22",
+        "PredictionLodPlanner": "3835B1534A6867EEF25ED6F5AE72785419C8FBF57F5BC9B8FA6339B46D655499",
+        "PredictionSpatialIndex": "61A0F5055421D9C7D94BD4EC77BC13DEF60767E9E43E9B71AEA055756F74ECE3"
+      }
+    },
+    {
+      "platform": "forge-1.20.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\turn-optimization-20261010\\vss-0.3.5-forge-1.20.1.jar",
+      "size_bytes": 6538413,
+      "sha256": "C6721F11460876E40886C344BB65597D986EC8AF4C9C5AEAC600BE9AB638FA5A",
+      "class_major_version": 61,
+      "zip_crc_valid": true,
+      "tests": {
+        "turn-optimization": {
+          "tests": 180,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 179,
+          "suites": 34,
+          "skipped_cases": [
+            "dev.xantha.vss.client.prediction.PredictionSpatialReplayTest.capturedClientMeshesPreserveGeometryAndImproveBounds()"
+          ]
+        },
+        "turn-optimization-gpu": {
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 6,
+          "suites": 7,
+          "skipped_cases": [
+            "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest.installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+          ]
+        }
+      },
+      "production_sources": {
+        "PredictionIndirectBatch": "7800AB05075A89430CACA841CA91C55A7C4166F4D2D09E3279B5339356506927",
+        "PredictionPackedMesh": "5362CE3D6D5CAD36C8F99A1F69F7B844D0C8BE3174CD97D8108B70544AAE141E",
+        "PredictionRenderer": "62334299D82313B709FEBB4AFACB2615643244A42E97441D45F017FAE2055E6E",
+        "PredictionVisiblePlan": "E92958DD3799FF1FE758CBAACB48F73A38A8965799598BAA4F7D48338B57F5E1",
+        "PredictionTileManager": "00328C45595FFB0CB4DCBC8B2DF67858C85E2294E3F119F9A832C418248D5D28",
+        "PredictionTileTable": "C22B50A49EFAE17067131EFF45B14C4E904B61FC37472E3FBC21B7252EF91C91",
+        "PredictionSubmissionCoverage": "FC832E140AABA4BB2D2D6DF4FC131E09B7E15A7C12C93DD61D9CBBEC1C8A7F09",
+        "PredictionOwnershipRuns": "7684DD3F2578B5BF043A75E50B3B2A72CDEAC523F357883309E402D944AFAEF0",
+        "PredictionVisibilityFeedback": "427BB893FD5D66E7024F920D21C76A07EE2A75A452A2996D3E9C1FCF779058ED",
+        "PredictionLodPlanner": "3C8FE19A591C86B2CAF68BD3F934A5791D30871EC99D9F3E12D9FA6CECFD9B5D",
+        "PredictionSpatialIndex": "0A5E0AC684682B489A9024EEF08F20EFE5785907E7E9676BEE2D920BAACAD6D6"
+      }
+    }
+  ],
+  "client_replaced": false,
+  "minecraft_launched": false,
+  "github_pushed": false
+}

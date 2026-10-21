@@ -1,0 +1,1045 @@
+{
+  "date": "2026-10-12",
+  "runtimeFPSMeasured": false,
+  "workload": "Controlled Java worker turn/zoom during the first sample; fake column sampler, 3 warmups and 11 measured rounds.",
+  "retained": "Running optional refinement checks current demand at bounded stage checkpoints; preserves resident tile and retryability. Atomic surface goal publication. Opt-in contextual scalar measurements.",
+  "unchangedDisplayGeometrySha256": "14a66b826a5a33a5b612d5d1e787ecbe78fa7c4dd0b7b063faed95ae18f9b6f7",
+  "unchangedScanMergeSha256": "247c9109781fd014c7e21e77796b6c878e3cfe3c65a01122ba3f4ea2f1f5da77",
+  "platforms": {
+    "neoforge": {
+      "sourceSha256": {
+        "PredictionTileManager": "2488813c89c972794400dc407f34386acf5657ca34dbcd493468ca502ab1e669",
+        "PredictionRenderer": "a80045d9ddb13205a2a1b6b223a3a6f25d65b149a57ac2d49a70542e4eb4c90f",
+        "ClientPredictionState": "a87174ee04042f8ef6efb3f60e56e2b67e536a21d8200faea924ca0e8c9dd6d1",
+        "PredictionFramePace": "46707f88997d668365a33e0953ed87ef7a7f5b3528257fe6d46524e30b829d2a",
+        "PredictionRenderTimings": "a059bc57f090275f0471f0ea5bf61cb735767a8aad77d14991de4f96c1468236",
+        "PredictionGpuResidency": "900ba6d98b0666adc7d4ca69e0cdc88b83072d566abcab9ab26b1aeadbcaffd4",
+        "PredictionDemandProfile": "5d7ee31a3fe61fee1ad9eb4cb0e6cf628bdc185c91c97eb04fd9f0e69239fcf8"
+      },
+      "tests": {
+        "detail-demand-cpu": {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "detail-demand-profile": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "detail-demand-regression": {
+          "tests": 271,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "detail-demand-production-gpu": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "worker": {
+        "baseline": {
+          "turn": {
+            "samples": 3267,
+            "worker_cpu_ns": 15625000,
+            "worker_tail_allocated_bytes": 5566072,
+            "completed_axis": 64,
+            "rows": [
+              {
+                "change": "turn",
+                "round": "0",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566072",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "1",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566072",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "2",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566072",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "3",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566072",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "4",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566072",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "5",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566216",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "6",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566224",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "7",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "8",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "9",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "10",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              }
+            ]
+          },
+          "zoom-out": {
+            "samples": 3267,
+            "worker_cpu_ns": 0,
+            "worker_tail_allocated_bytes": 5566024,
+            "completed_axis": 64,
+            "rows": [
+              {
+                "change": "zoom-out",
+                "round": "0",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "1",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "2",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "3",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566352",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "4",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "5",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566344",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "6",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566024",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "7",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566000",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "8",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566000",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "9",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566000",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "10",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5565936",
+                "completed_axis": "64"
+              }
+            ]
+          }
+        },
+        "current": {
+          "turn": {
+            "samples": 66,
+            "worker_cpu_ns": 0,
+            "worker_tail_allocated_bytes": 13448,
+            "completed_axis": 32,
+            "rows": [
+              {
+                "change": "turn",
+                "round": "0",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "1",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "2",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "3",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "4",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13512",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "5",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "6",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "7",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "8",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13480",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "9",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "10",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              }
+            ]
+          },
+          "zoom-out": {
+            "samples": 66,
+            "worker_cpu_ns": 0,
+            "worker_tail_allocated_bytes": 13448,
+            "completed_axis": 32,
+            "rows": [
+              {
+                "change": "zoom-out",
+                "round": "0",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "1",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "2",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "3",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13480",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "4",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "5",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "13512",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "6",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "7",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "8",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "9",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "10",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13448",
+                "completed_axis": "32"
+              }
+            ]
+          }
+        }
+      },
+      "build": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\detail-demand-20261012\\vss-0.3.5-neoforge-1.21.1.jar",
+        "size": 5963201,
+        "sha256": "9e3893335a41d880603d432169e1bd0e65810b43ed17c686b4db2a2ae413659f",
+        "classMajor": 65,
+        "nativeUnchanged": true,
+        "nativeSha256": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "zipVerified": true,
+        "experimentalClassesAbsent": true,
+        "reobfuscated": false
+      }
+    },
+    "forge": {
+      "sourceSha256": {
+        "PredictionTileManager": "b4d3fa2e00fbc07c6cf55087cb79d916341d7659add9c0ab8e645fbb1dabf974",
+        "PredictionRenderer": "96c77263b05d5c8430d127636a6ebb3369ddb34d9f9b4eff9447ea09145cc5af",
+        "ClientPredictionState": "5e07ad11ce20c1f1ad685bd14d9582e553bfd59ec1b322b9ba1624090288e6d4",
+        "PredictionFramePace": "46707f88997d668365a33e0953ed87ef7a7f5b3528257fe6d46524e30b829d2a",
+        "PredictionRenderTimings": "a059bc57f090275f0471f0ea5bf61cb735767a8aad77d14991de4f96c1468236",
+        "PredictionGpuResidency": "900ba6d98b0666adc7d4ca69e0cdc88b83072d566abcab9ab26b1aeadbcaffd4",
+        "PredictionDemandProfile": "5d7ee31a3fe61fee1ad9eb4cb0e6cf628bdc185c91c97eb04fd9f0e69239fcf8"
+      },
+      "tests": {
+        "detail-demand-cpu": {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "detail-demand-profile": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "detail-demand-regression": {
+          "tests": 270,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "detail-demand-production-gpu": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "worker": {
+        "baseline": {
+          "turn": {
+            "samples": 3267,
+            "worker_cpu_ns": 0,
+            "worker_tail_allocated_bytes": 5566216,
+            "completed_axis": 64,
+            "rows": [
+              {
+                "change": "turn",
+                "round": "0",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566216",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "1",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566280",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "2",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566216",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "3",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566216",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "4",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566360",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "5",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566368",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "6",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566168",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "7",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566168",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "8",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566168",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "9",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566168",
+                "completed_axis": "64"
+              },
+              {
+                "change": "turn",
+                "round": "10",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566168",
+                "completed_axis": "64"
+              }
+            ]
+          },
+          "zoom-out": {
+            "samples": 3267,
+            "worker_cpu_ns": 0,
+            "worker_tail_allocated_bytes": 5566128,
+            "completed_axis": 64,
+            "rows": [
+              {
+                "change": "zoom-out",
+                "round": "0",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566168",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "1",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566128",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "2",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566400",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "3",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566184",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "4",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566448",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "5",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566128",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "6",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566104",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "7",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566104",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "8",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566104",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "9",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "5566104",
+                "completed_axis": "64"
+              },
+              {
+                "change": "zoom-out",
+                "round": "10",
+                "mode": "baseline",
+                "samples": "3267",
+                "worker_cpu_ns": "15625000",
+                "worker_tail_allocated_bytes": "5566104",
+                "completed_axis": "64"
+              }
+            ]
+          }
+        },
+        "current": {
+          "turn": {
+            "samples": 66,
+            "worker_cpu_ns": 0,
+            "worker_tail_allocated_bytes": 13408,
+            "completed_axis": 32,
+            "rows": [
+              {
+                "change": "turn",
+                "round": "0",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13472",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "1",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "2",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "3",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "4",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "5",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "6",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "7",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "8",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "9",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "turn",
+                "round": "10",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              }
+            ]
+          },
+          "zoom-out": {
+            "samples": 66,
+            "worker_cpu_ns": 0,
+            "worker_tail_allocated_bytes": 13408,
+            "completed_axis": 32,
+            "rows": [
+              {
+                "change": "zoom-out",
+                "round": "0",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "1",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "2",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "3",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "4",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "5",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "6",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "7",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "8",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "9",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              },
+              {
+                "change": "zoom-out",
+                "round": "10",
+                "mode": "demand",
+                "samples": "66",
+                "worker_cpu_ns": "0",
+                "worker_tail_allocated_bytes": "13408",
+                "completed_axis": "32"
+              }
+            ]
+          }
+        }
+      },
+      "build": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\detail-demand-20261012\\vss-0.3.5-forge-1.20.1.jar",
+        "size": 6635525,
+        "sha256": "347de77a4407db59476668677f227339cfffb6ec3b72670496b33ecdba3bcc91",
+        "classMajor": 61,
+        "nativeUnchanged": true,
+        "nativeSha256": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "zipVerified": true,
+        "experimentalClassesAbsent": true,
+        "reobfuscated": true
+      }
+    }
+  },
+  "rejectedCoarseFirst": {
+    "summary": {
+      "source": 21344411,
+      "oldExtra": 6473205,
+      "newExtra": 5438088,
+      "oldGpuBytes": 615726480,
+      "newGpuBytes": 598886848,
+      "oldNs": 13211714500,
+      "newNs": 13049271300,
+      "oldAlloc": 8004398432,
+      "newAlloc": 6506983496,
+      "regressions": 569115,
+      "oldTiers": [
+        21344411,
+        14683754,
+        10899446,
+        10232042
+      ],
+      "newTiers": [
+        21344411,
+        19129393,
+        12481818,
+        8942524
+      ],
+      "oldDepths": [
+        21344411,
+        21344411,
+        21344411,
+        18978175,
+        18978175,
+        14707794,
+        14707794,
+        12632536,
+        10600482
+      ],
+      "newDepths": [
+        21344411,
+        21344411,
+        21344411,
+        21344411,
+        21344411,
+        16343552,
+        16343552,
+        13568287,
+        10435055
+      ]
+    },
+    "reason": "Far tier improved but mid-distance ranges grew; not retained. Production DisplayGeometry and ScanMerge match baseline hashes.",
+    "output": "C:\\Users\\Administrator\\.codex\\tmp\\vss-detail-demand-20261012\\coarse-first\\results.json"
+  },
+  "pythonAnalyzerTests": 4,
+  "limits": [
+    "Samples/allocations are component counts, not live FPS or simultaneous memory savings.",
+    "Windows ThreadMXBean CPU times are too coarse for these small jobs; no CPU-time percent claimed.",
+    "GPU suite verifies existing selection and protection paths, not a new geometry gain.",
+    "Cancellation happens at safe Java/grid checkpoints; an executing native batch is not forcibly interrupted.",
+    "CPU fine cache, source ownership and seam version remain independent from current display choice.",
+    "Ordinary reversible parent switching and same-source coarse-column/canopy reconstruction remain a larger separate design."
+  ]
+}

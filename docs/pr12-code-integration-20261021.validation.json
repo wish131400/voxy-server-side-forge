@@ -1,0 +1,189 @@
+{
+  "date": "2026-10-21",
+  "pullRequest": {
+    "url": "https://github.com/wish131400/voxy-server-side-neoforge/pull/12",
+    "state": "MERGED",
+    "upstreamHead": "36b2087906dc43b9452e3e487082dbeac8b7c192",
+    "mergeCommit": "1dc2880cfef7e0bf854f649a576f370a9331e528",
+    "mergedAt": "2026-10-20T23:58:58Z",
+    "forgePortCommit": "41fd9e2"
+  },
+  "platforms": [
+    {
+      "repository": "voxyserverside-neoforge-1.21.1",
+      "platform": "0.3.5-neoforge-1.21.1",
+      "productionCommit": "8858885f1a80a13f879f2c46c2f84a63e55c5cbd",
+      "jar": {
+        "path": "lib/vss-0.3.5-neoforge-1.21.1.jar",
+        "savedCopy": "lib/pr12-organized-20261021/vss-0.3.5-neoforge-1.21.1.jar",
+        "bytes": 6229770,
+        "sha256": "a71cf26c2f0bab18f9685f835ff4c7cbdf81bd0fa58ebe3d930875970863a0e4",
+        "protocol": 53,
+        "buildId": "pr12-organized-20261021-p53",
+        "implementationTimestamp": "2026-10-21T08:23:37+0800",
+        "classMajors": [
+          65
+        ],
+        "nativeResources": [
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+        ],
+        "requiredClassesPresent": true,
+        "obsoleteClassesAbsent": true,
+        "testClassesAbsent": true,
+        "bothFluidQueueNamesPresent": true,
+        "strictIngestPluginPresent": true
+      },
+      "suites": {
+        "architectureTest": {
+          "classes": 1,
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "columnFilterTest": {
+          "classes": 13,
+          "tests": 64,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "moduleRegressionTest": {
+          "classes": 51,
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "planningConsumerTest": {
+          "classes": 7,
+          "tests": 32,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffTest": {
+          "classes": 15,
+          "tests": 120,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "ingest-retained": {
+          "classes": 10,
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffGpuTest": {
+          "classes": 10,
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "repository": "voxyserverside",
+      "platform": "0.3.5-forge-1.20.1",
+      "productionCommit": "f408f7a91280617773655146eb3548930c91db2c",
+      "jar": {
+        "path": "lib/vss-0.3.5-forge-1.20.1.jar",
+        "savedCopy": "lib/pr12-organized-20261021/vss-0.3.5-forge-1.20.1.jar",
+        "bytes": 6903078,
+        "sha256": "859c03c8cf21cc41c618ef12a015cda5081c78a36016a7b84b2b9ce9c9c986c2",
+        "protocol": 53,
+        "buildId": "pr12-organized-20261021-p53",
+        "implementationTimestamp": "2026-10-21T08:26:58+0800",
+        "classMajors": [
+          61
+        ],
+        "nativeResources": [
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+        ],
+        "requiredClassesPresent": true,
+        "obsoleteClassesAbsent": true,
+        "testClassesAbsent": true,
+        "bothFluidQueueNamesPresent": true,
+        "strictIngestPluginPresent": true
+      },
+      "suites": {
+        "architectureTest": {
+          "classes": 1,
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "columnFilterTest": {
+          "classes": 13,
+          "tests": 66,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "moduleRegressionTest": {
+          "classes": 51,
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "planningConsumerTest": {
+          "classes": 7,
+          "tests": 32,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffTest": {
+          "classes": 15,
+          "tests": 119,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "ingest-retained": {
+          "classes": 10,
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffGpuTest": {
+          "classes": 10,
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    }
+  ],
+  "voxyInputs": [
+    {
+      "name": "voxy超远视野-0.4.11-1.21.1-neoforge-alpha.jar",
+      "sha256": "13555a2ee7d03bc00c5a90bdb7b4097ea1bff34cc3df5fa8b7f3c005739c9235"
+    },
+    {
+      "name": "voxy-0.2.11-alpha.jar",
+      "sha256": "7a533166757c78ba935e609889539a45fada36938b014858ffa002058092fd65"
+    }
+  ],
+  "exactReportedVoxy0414BinaryTested": false,
+  "isolatedEffectFogAndRasterFixturesCompiledOnBothLoaders": true,
+  "clientWorldSmokeTest": false,
+  "liveFpsMeasured": false,
+  "historicalExperimentsAllRerun": false,
+  "testCountNote": "Suites overlap; do not sum them as independent test cases."
+}

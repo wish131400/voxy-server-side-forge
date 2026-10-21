@@ -1,0 +1,620 @@
+{
+  "task": "Unified terrain capabilities and LOD source integration",
+  "date": "2026-10-10",
+  "protocolVersion": 52,
+  "worldgenFormatVersion": 5,
+  "scope": {
+    "liveGameTest": false,
+    "installedToGame": false,
+    "githubCommitOrPush": false,
+    "parallelRendererChangesIncluded": false
+  },
+  "regression": {
+    "neoforge": {
+      "totals": {
+        "tests": 145,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 4
+      },
+      "skips": [
+        "dev.xantha.vss.client.prediction.DensityFunctionSnapshotTest.installedTectonicDefaultConfigFunctionsRoundTrip()",
+        "dev.xantha.vss.client.prediction.DensityFunctionSnapshotTest.installedLithostitchedAppliedGraphRoundTrips()",
+        "dev.xantha.vss.client.prediction.WorldgenRegistryDependenciesTest.runtimeTemplateListsRoundTripWithoutAnyCodecLookup()",
+        "dev.xantha.vss.client.prediction.WorldgenRegistryDependenciesTest.installedFastNoiseRegistryRoundTripsAndUsesServerSeed()"
+      ]
+    },
+    "forge": {
+      "totals": {
+        "tests": 144,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5
+      },
+      "skips": [
+        "dev.xantha.vss.client.prediction.C2meDensityMemoCompatTest.compiledCacheRestrictionDoesNotPreventPredictionDensityInitialization()",
+        "dev.xantha.vss.client.prediction.DensityFunctionSnapshotTest.installedTectonicDefaultConfigFunctionsRoundTrip()",
+        "dev.xantha.vss.client.prediction.DensityFunctionSnapshotTest.installedLithostitchedAppliedGraphRoundTrips()",
+        "dev.xantha.vss.client.prediction.WorldgenRegistryDependenciesTest.runtimeTemplateListsRoundTripWithoutAnyCodecLookup()",
+        "dev.xantha.vss.client.prediction.WorldgenRegistryDependenciesTest.installedFastNoiseRegistryRoundTripsAndUsesServerSeed()"
+      ]
+    }
+  },
+  "packagedRuntimeTests": {
+    "neoforge": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "forge": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "terrainAb": {
+    "neoforge": {
+      "verifiedPointsPerExecutor": 32768,
+      "measuredPointsPerExecutor": 16384,
+      "warmupRounds": 16,
+      "measuredRounds": 16,
+      "pointsPerRound": 1024,
+      "seed": 42,
+      "spacing": 16,
+      "outputsEqual": true,
+      "Ms": {
+        "baselineMedian": 26.19905,
+        "currentMedian": 26.31485,
+        "baselineSum": 419.76099999999997,
+        "currentSum": 421.5446,
+        "pairedRatioMedian": 1.0083047833205847,
+        "allPairsIdentical": false
+      },
+      "CpuMs": {
+        "baselineMedian": 31.25,
+        "currentMedian": 31.25,
+        "baselineSum": 437.5,
+        "currentSum": 390.625,
+        "pairedRatioMedian": 1.0,
+        "allPairsIdentical": false
+      },
+      "Bytes": {
+        "baselineMedian": 1948136.0,
+        "currentMedian": 1948136.0,
+        "baselineSum": 34528440.0,
+        "currentSum": 34528440.0,
+        "pairedRatioMedian": 1.0,
+        "allPairsIdentical": true
+      }
+    },
+    "forge": {
+      "verifiedPointsPerExecutor": 32768,
+      "measuredPointsPerExecutor": 16384,
+      "warmupRounds": 16,
+      "measuredRounds": 16,
+      "pointsPerRound": 1024,
+      "seed": 42,
+      "spacing": 16,
+      "outputsEqual": true,
+      "Ms": {
+        "baselineMedian": 25.923650000000002,
+        "currentMedian": 26.3624,
+        "baselineSum": 413.7823,
+        "currentSum": 417.7854,
+        "pairedRatioMedian": 1.011310311119124,
+        "allPairsIdentical": false
+      },
+      "CpuMs": {
+        "baselineMedian": 31.25,
+        "currentMedian": 31.25,
+        "baselineSum": 406.25,
+        "currentSum": 406.25,
+        "pairedRatioMedian": 1.0,
+        "allPairsIdentical": false
+      },
+      "Bytes": {
+        "baselineMedian": 1997288.0,
+        "currentMedian": 1997288.0,
+        "baselineSum": 35360184.0,
+        "currentSum": 35341112.0,
+        "pairedRatioMedian": 1.0,
+        "allPairsIdentical": false
+      }
+    }
+  },
+  "c2meFixtures": [
+    {
+      "project": "c2me-neoforge",
+      "minecraft": "1.21.1",
+      "version": "0.4.0-alpha.0.122+1.21.1",
+      "url": "https://cdn.modrinth.com/data/COlSi5iR/versions/yxOYFgnK/c2me-neoforge-mc1.21.1-0.4.0-alpha.0.122.jar",
+      "sha256": "672bd9a7dc3fae20817f3563e140d82be90845ef50ce26f57698082d4b2918c0",
+      "path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-terrain-capabilities-20261010\\fixtures\\c2me-neoforge-mc1.21.1-0.4.0-alpha.0.122.jar",
+      "components": [
+        "C:\\Users\\Administrator\\.codex\\tmp\\vss-terrain-capabilities-20261010\\fixtures\\c2me-neoforge-opts-dfc-mc1.21.1-0.4.0-alpha.0.122.jar"
+      ]
+    },
+    {
+      "project": "c2mef",
+      "minecraft": "1.20.1",
+      "version": "0.2.0+alpha.12",
+      "url": "https://cdn.modrinth.com/data/yE4MbG65/versions/h9trYS7V/c2meF-0.2.0%2Balpha.12-all.jar",
+      "sha256": "b09a9fd943f49ccaf553c236dd9871901f4c00daf20674528d67c6bbbecb16f0",
+      "path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-terrain-capabilities-20261010\\fixtures\\c2meF-0.2.0+alpha.12-all.jar",
+      "components": []
+    }
+  ],
+  "packages": {
+    "neoforge": {
+      "jar": "C:\\Users\\Administrator\\.codex\\tmp\\vss-terrain-capabilities-20261010\\neoforge\\lib\\vss-0.3.5-neoforge-1.21.1.jar",
+      "sha256": "b3fb38dc193712551b0ec26173d816c7aecc4d9ca9a339929c2915f989d3878c",
+      "bytes": 5861956,
+      "newClassCount": 25,
+      "classMajor": [
+        65
+      ],
+      "testClassesIncluded": [],
+      "nativeFiles": [
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+      ],
+      "ownedBuildMismatch": [],
+      "protocolVersion": 52,
+      "worldgenFormatVersion": 5,
+      "deliveryPath": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\terrain-capabilities-20261010\\vss-0.3.5-neoforge-1.21.1-terrain-capabilities.jar"
+    },
+    "forge": {
+      "jar": "C:\\Users\\Administrator\\.codex\\tmp\\vss-terrain-capabilities-20261010\\forge\\lib\\vss-0.3.5-forge-1.20.1.jar",
+      "sha256": "e7c09293449832bc1103d92ee6566d8a0c38a0b3a3f9384e40390ea5edb89246",
+      "bytes": 6534129,
+      "newClassCount": 25,
+      "classMajor": [
+        61
+      ],
+      "testClassesIncluded": [],
+      "nativeFiles": [
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+      ],
+      "ownedBuildMismatch": [],
+      "protocolVersion": 52,
+      "worldgenFormatVersion": 5,
+      "deliveryPath": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\terrain-capabilities-20261010\\vss-0.3.5-forge-1.20.1-terrain-capabilities.jar"
+    }
+  },
+  "sourceSnapshotAudit": {
+    "neoforge": {
+      "unrelatedChangedSinceStart": [
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionProductionBatchGpuTest.java",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverageTest.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLodPlanner.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionOwnershipRuns.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionPackedMesh.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSpatialIndex.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverage.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileTable.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVisibilityFeedback.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVisiblePlan.java"
+      ],
+      "missingSinceStart": [],
+      "ownedBuildMismatch": []
+    },
+    "forge": {
+      "unrelatedChangedSinceStart": [
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionProductionBatchGpuTest.java",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverageTest.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionLodPlanner.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionOwnershipRuns.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionPackedMesh.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSpatialIndex.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionSubmissionCoverage.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileTable.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVisibilityFeedback.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVisiblePlan.java"
+      ],
+      "missingSinceStart": [],
+      "ownedBuildMismatch": []
+    }
+  },
+  "whitespace": {
+    "neoforge": {
+      "trackedDiffWhitespacePassed": true,
+      "ownedFilesTrailingWhitespace": []
+    },
+    "forge": {
+      "trackedDiffWhitespacePassed": true,
+      "ownedFilesTrailingWhitespace": []
+    }
+  },
+  "benchRawRows": {
+    "neoforge": [
+      {
+        "round": "16",
+        "points": "1024",
+        "baselineMs": "24.4373",
+        "currentMs": "23.7605",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1894744",
+        "currentBytes": "1894744"
+      },
+      {
+        "round": "17",
+        "points": "1024",
+        "baselineMs": "23.7942",
+        "currentMs": "24.6806",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1927984",
+        "currentBytes": "1927984"
+      },
+      {
+        "round": "18",
+        "points": "1024",
+        "baselineMs": "27.1203",
+        "currentMs": "28.2458",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "2014176",
+        "currentBytes": "2014176"
+      },
+      {
+        "round": "19",
+        "points": "1024",
+        "baselineMs": "26.305",
+        "currentMs": "26.5506",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "2824808",
+        "currentBytes": "2824808"
+      },
+      {
+        "round": "20",
+        "points": "1024",
+        "baselineMs": "28.2426",
+        "currentMs": "26.3275",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1917048",
+        "currentBytes": "1917048"
+      },
+      {
+        "round": "21",
+        "points": "1024",
+        "baselineMs": "26.9975",
+        "currentMs": "26.6297",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1863864",
+        "currentBytes": "1863864"
+      },
+      {
+        "round": "22",
+        "points": "1024",
+        "baselineMs": "27.7806",
+        "currentMs": "27.8468",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2009816",
+        "currentBytes": "2009816"
+      },
+      {
+        "round": "23",
+        "points": "1024",
+        "baselineMs": "26.0931",
+        "currentMs": "26.5534",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "2830696",
+        "currentBytes": "2830696"
+      },
+      {
+        "round": "24",
+        "points": "1024",
+        "baselineMs": "25.808",
+        "currentMs": "25.9957",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1897208",
+        "currentBytes": "1897208"
+      },
+      {
+        "round": "25",
+        "points": "1024",
+        "baselineMs": "25.6471",
+        "currentMs": "26.1782",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1906336",
+        "currentBytes": "1906336"
+      },
+      {
+        "round": "26",
+        "points": "1024",
+        "baselineMs": "23.9506",
+        "currentMs": "23.2321",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1939440",
+        "currentBytes": "1939440"
+      },
+      {
+        "round": "27",
+        "points": "1024",
+        "baselineMs": "28.6758",
+        "currentMs": "29.5766",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2852624",
+        "currentBytes": "2852624"
+      },
+      {
+        "round": "28",
+        "points": "1024",
+        "baselineMs": "27.9382",
+        "currentMs": "27.237",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1956832",
+        "currentBytes": "1956832"
+      },
+      {
+        "round": "29",
+        "points": "1024",
+        "baselineMs": "25.2745",
+        "currentMs": "26.2958",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1910152",
+        "currentBytes": "1910152"
+      },
+      {
+        "round": "30",
+        "points": "1024",
+        "baselineMs": "26.3826",
+        "currentMs": "26.3022",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1990416",
+        "currentBytes": "1990416"
+      },
+      {
+        "round": "31",
+        "points": "1024",
+        "baselineMs": "25.3136",
+        "currentMs": "26.1321",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "2792296",
+        "currentBytes": "2792296"
+      }
+    ],
+    "forge": [
+      {
+        "round": "16",
+        "points": "1024",
+        "baselineMs": "24.167",
+        "currentMs": "23.6593",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1943896",
+        "currentBytes": "1943896"
+      },
+      {
+        "round": "17",
+        "points": "1024",
+        "baselineMs": "24.251",
+        "currentMs": "24.6918",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1977136",
+        "currentBytes": "1977136"
+      },
+      {
+        "round": "18",
+        "points": "1024",
+        "baselineMs": "27.9092",
+        "currentMs": "27.0255",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2063328",
+        "currentBytes": "2063328"
+      },
+      {
+        "round": "19",
+        "points": "1024",
+        "baselineMs": "26.2318",
+        "currentMs": "26.5231",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2880520",
+        "currentBytes": "2880520"
+      },
+      {
+        "round": "20",
+        "points": "1024",
+        "baselineMs": "25.4092",
+        "currentMs": "25.4844",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1966200",
+        "currentBytes": "1966200"
+      },
+      {
+        "round": "21",
+        "points": "1024",
+        "baselineMs": "27.7622",
+        "currentMs": "27.2292",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1913016",
+        "currentBytes": "1913016"
+      },
+      {
+        "round": "22",
+        "points": "1024",
+        "baselineMs": "26.9771",
+        "currentMs": "26.6027",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2058968",
+        "currentBytes": "2058968"
+      },
+      {
+        "round": "23",
+        "points": "1024",
+        "baselineMs": "25.088",
+        "currentMs": "26.2017",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2886408",
+        "currentBytes": "2886408"
+      },
+      {
+        "round": "24",
+        "points": "1024",
+        "baselineMs": "25.8428",
+        "currentMs": "26.1404",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1946360",
+        "currentBytes": "1946360"
+      },
+      {
+        "round": "25",
+        "points": "1024",
+        "baselineMs": "26.5826",
+        "currentMs": "26.945",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "1955488",
+        "currentBytes": "1955488"
+      },
+      {
+        "round": "26",
+        "points": "1024",
+        "baselineMs": "22.5353",
+        "currentMs": "23.1658",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1988592",
+        "currentBytes": "1988592"
+      },
+      {
+        "round": "27",
+        "points": "1024",
+        "baselineMs": "27.5638",
+        "currentMs": "28.4938",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "2927408",
+        "currentBytes": "2908336"
+      },
+      {
+        "round": "28",
+        "points": "1024",
+        "baselineMs": "26.0045",
+        "currentMs": "27.102",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2005984",
+        "currentBytes": "2005984"
+      },
+      {
+        "round": "29",
+        "points": "1024",
+        "baselineMs": "25.7862",
+        "currentMs": "25.9776",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "15.625",
+        "baselineBytes": "1959304",
+        "currentBytes": "1959304"
+      },
+      {
+        "round": "30",
+        "points": "1024",
+        "baselineMs": "26.4586",
+        "currentMs": "27.0511",
+        "baselineCpuMs": "31.25",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2039568",
+        "currentBytes": "2039568"
+      },
+      {
+        "round": "31",
+        "points": "1024",
+        "baselineMs": "25.213",
+        "currentMs": "25.492",
+        "baselineCpuMs": "15.625",
+        "currentCpuMs": "31.25",
+        "baselineBytes": "2848008",
+        "currentBytes": "2848008"
+      }
+    ]
+  },
+  "baselineSamplerIdentity": {
+    "neoforge": {
+      "samplerSha256": "36a83b1742d9edc06f188a943a21d2644e6f0e64df9c22e3495b0cf0ecd217af",
+      "densityMemoSha256": "3d97315fc17e04ea7fc7f9d03263dc3e9015b2ee150e5eb09e70b58a49a4bccb",
+      "matchesTaskStartSource": true
+    },
+    "forge": {
+      "samplerSha256": "36a83b1742d9edc06f188a943a21d2644e6f0e64df9c22e3495b0cf0ecd217af",
+      "densityMemoSha256": "3d97315fc17e04ea7fc7f9d03263dc3e9015b2ee150e5eb09e70b58a49a4bccb",
+      "matchesTaskStartSource": true
+    }
+  },
+  "files": [
+    "src/main/java/dev/xantha/vss/common/VSSConstants.java",
+    "src/main/java/dev/xantha/vss/networking/payloads/WorldgenProfileS2CPayload.java",
+    "src/main/java/dev/xantha/vss/networking/server/session/WorldgenCodecSnapshot.java",
+    "src/main/java/dev/xantha/vss/common/worldgen/GeneratorTerrainCapabilities.java",
+    "src/main/java/dev/xantha/vss/common/worldgen/TerrainPredictionPlan.java",
+    "src/main/java/dev/xantha/vss/client/prediction/ClientTerrainSampler.java",
+    "src/main/java/dev/xantha/vss/client/prediction/ClientWorldgenProfileDecoder.java",
+    "src/main/java/dev/xantha/vss/client/prediction/DensityCompilation.java",
+    "src/main/java/dev/xantha/vss/client/prediction/DensityMemo.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionBackendSelection.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionCacheStorage.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionColumnVolume.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionFlatTerrainSampler.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionLodBackends.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionLodContext.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionLodSampler.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionLodSource.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionRawDensity.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionTerrainBackends.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java",
+    "src/main/java/dev/xantha/vss/client/prediction/PredictionWorldgenCapabilities.java",
+    "src/main/java/dev/xantha/vss/client/prediction/RustWorldgenDocument.java",
+    "src/main/java/dev/xantha/vss/api/worldgen/DensityFunctionTraits.java",
+    "src/main/java/dev/xantha/vss/api/worldgen/TerrainSnapshot.java",
+    "src/main/java/dev/xantha/vss/api/worldgen/TerrainSnapshotContext.java",
+    "src/main/java/dev/xantha/vss/api/worldgen/TerrainSnapshotProvider.java",
+    "src/main/java/dev/xantha/vss/api/worldgen/TerrainSnapshots.java",
+    "src/test/java/dev/xantha/vss/testutil/TerrainPredictionFixtures.java",
+    "src/test/java/dev/xantha/vss/common/worldgen/TerrainPredictionPlanTest.java",
+    "src/test/java/dev/xantha/vss/networking/server/session/TerrainGeneratorSnapshotTest.java",
+    "src/test/java/dev/xantha/vss/client/prediction/PredictionLodBackendsTest.java",
+    "src/test/java/dev/xantha/vss/client/prediction/DensityFunctionTraitsTest.java",
+    "src/test/java/dev/xantha/vss/client/prediction/PredictionFlatTerrainSamplerTest.java",
+    "src/test/java/dev/xantha/vss/client/prediction/PredictionWorldgenCapabilitiesTest.java",
+    "src/test/java/dev/xantha/vss/client/prediction/TerrainCapabilityBenchmark.java",
+    "tools/prediction/terrain-capability-tests.gradle",
+    "src/test/java/dev/xantha/vss/client/prediction/PackagedDensityCompilerTest.java",
+    "docs/terrain-capabilities-implementation-20261010.md",
+    "docs/terrain-capabilities-validation-20261010.json"
+  ]
+}

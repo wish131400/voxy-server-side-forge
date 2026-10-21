@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-11",
+  "implementation": "Applied graphics and independent leaves settings control leaf-only alpha discard on resident prediction geometry",
+  "runtimeFPSMeasured": false,
+  "clientInstanceReplaced": false,
+  "githubPushed": false,
+  "settings": {
+    "defaultLeaves": "Follow GraphicsStatus.FAST versus FANCY/FABULOUS",
+    "explicitLeaves": "FAST/FANCY takes precedence",
+    "missingOptionalApi": "Vanilla graphics fallback"
+  },
+  "compatibility": {
+    "sodium": "0.8.12-beta.2+mc1.21.1",
+    "embeddium": "0.3.31+mc1.20.1",
+    "voxyNeo": "0.2.15-beta",
+    "voxyForge": "0.2.14-alpha-51ea1a841fff1717b261d2fbd3b3f6dafd470663",
+    "voxyVerifiedBehavior": "Leaf bake uses solid render layer and force-solid alpha behavior; not proof that all Voxy quality follows GraphicsStatus"
+  },
+  "limits": [
+    "Only confirmed LeavesBlock-only sprite rows; shared or unknown rows remain cutout",
+    "Unshaded cross/model and fluid behavior preserved",
+    "No new quad-count or vegetation-count reduction",
+    "Not a full port of all vanilla graphics settings",
+    "Synthetic measurements do not establish runtime FPS gains"
+  ],
+  "gpu": {
+    "renderer": "NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2",
+    "driver": "572.70",
+    "size": 256,
+    "drawsPerSample": 32,
+    "warmupRounds": 8,
+    "alternatingMeasuredRounds": 15,
+    "statistic": "median GL_TIME_ELAPSED",
+    "qualityComparisonConditions": 240,
+    "modes": [
+      "direct",
+      "MDI",
+      "Iris standard depth",
+      "Iris reversed depth"
+    ]
+  },
+  "platforms": {
+    "neoforge": {
+      "minecraft": "1.21.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\graphics-quality-20261011\\vss-0.3.5-neoforge-1.21.1.jar",
+      "sha256": "23df3c94e3b14bf169540b1cc6e10b6f206b41900da338331857317d1c2de222",
+      "testTotals": {
+        "voxy-scan": {
+          "tests": 157,
+          "skipped": 1,
+          "failures": 0,
+          "errors": 0,
+          "passed": 156,
+          "skippedTests": [
+            "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+          ]
+        },
+        "voxy-scan-gpu": {
+          "tests": 12,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "passed": 12,
+          "skippedTests": []
+        }
+      },
+      "qualityBenchmark": [
+        {
+          "synthetic": true,
+          "fixture": "mixed-plants",
+          "depthTest": false,
+          "size": 256,
+          "draws": 32,
+          "quads": 384,
+          "fancyMs": 0.10752,
+          "fastMs": 0.10752,
+          "reductionPercent": 0.0
+        },
+        {
+          "synthetic": true,
+          "fixture": "mixed-plants",
+          "depthTest": true,
+          "size": 256,
+          "draws": 32,
+          "quads": 384,
+          "fancyMs": 0.106496,
+          "fastMs": 0.105472,
+          "reductionPercent": 0.9615384615384581
+        },
+        {
+          "synthetic": true,
+          "fixture": "layered-canopy",
+          "depthTest": false,
+          "size": 256,
+          "draws": 32,
+          "quads": 4096,
+          "fancyMs": 0.544768,
+          "fastMs": 0.543744,
+          "reductionPercent": 0.187969924812037
+        },
+        {
+          "synthetic": true,
+          "fixture": "layered-canopy",
+          "depthTest": true,
+          "size": 256,
+          "draws": 32,
+          "quads": 4096,
+          "fancyMs": 0.203776,
+          "fastMs": 0.156672,
+          "reductionPercent": 23.115577889447238
+        }
+      ],
+      "cpuLog": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\build-graphics-quality-20261011\\cpu-final.log",
+      "gpuLog": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\build-graphics-quality-20261011\\gpu-final.log"
+    },
+    "forge": {
+      "minecraft": "1.20.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\graphics-quality-20261011\\vss-0.3.5-forge-1.20.1.jar",
+      "sha256": "81320e4776d51eb36212111914d3968fae61198404fb6abfc4334c137684385f",
+      "testTotals": {
+        "voxy-scan": {
+          "tests": 156,
+          "skipped": 1,
+          "failures": 0,
+          "errors": 0,
+          "passed": 155,
+          "skippedTests": [
+            "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+          ]
+        },
+        "voxy-scan-gpu": {
+          "tests": 12,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "passed": 12,
+          "skippedTests": []
+        }
+      },
+      "qualityBenchmark": [
+        {
+          "synthetic": true,
+          "fixture": "mixed-plants",
+          "depthTest": false,
+          "size": 256,
+          "draws": 32,
+          "quads": 384,
+          "fancyMs": 0.10752,
+          "fastMs": 0.10752,
+          "reductionPercent": 0.0
+        },
+        {
+          "synthetic": true,
+          "fixture": "mixed-plants",
+          "depthTest": true,
+          "size": 256,
+          "draws": 32,
+          "quads": 384,
+          "fancyMs": 0.106496,
+          "fastMs": 0.105472,
+          "reductionPercent": 0.9615384615384581
+        },
+        {
+          "synthetic": true,
+          "fixture": "layered-canopy",
+          "depthTest": false,
+          "size": 256,
+          "draws": 32,
+          "quads": 4096,
+          "fancyMs": 0.545792,
+          "fastMs": 0.545792,
+          "reductionPercent": 0.0
+        },
+        {
+          "synthetic": true,
+          "fixture": "layered-canopy",
+          "depthTest": true,
+          "size": 256,
+          "draws": 32,
+          "quads": 4096,
+          "fancyMs": 0.203776,
+          "fastMs": 0.156672,
+          "reductionPercent": 23.115577889447238
+        }
+      ],
+      "cpuLog": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\build-graphics-quality-20261011\\cpu-final.log",
+      "gpuLog": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\build-graphics-quality-20261011\\gpu-final.log"
+    }
+  }
+}

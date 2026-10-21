@@ -1,0 +1,206 @@
+{
+  "date": "2026-10-10",
+  "issue": "opaque whole-pass replay omits grouped standalone draws",
+  "diagnostics_directory": "C:\\Users\\Administrator\\.codex\\tmp\\vss-water-flicker-20261010",
+  "platforms": [
+    {
+      "platform": "NeoForge 1.21.1",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "jdk": 21,
+      "build": "BUILD SUCCESSFUL in 1m 34s",
+      "cpu": {
+        "tests": 114,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 113,
+        "xml_files": 18,
+        "skipped_cases": [
+          "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+        ]
+      },
+      "gpu": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 13,
+        "xml_files": 13,
+        "skipped_cases": []
+      },
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\water-flicker-20261010\\vss-0.3.5-neoforge-1.21.1.jar",
+      "bytes": 5883019,
+      "sha256": "aa9d1288bac45061c250c3ce97ee096060035d49bccb98289b15e3c0db302eec",
+      "zip_valid": true,
+      "class_check": "identical to latest main compiled class",
+      "fix_in_jar_bytecode": true,
+      "native_resources": [
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+      ],
+      "production_source_sha256": "8d7037e33ca6bfb1801ef0a04054c468e65ecad3c22f4bd1022bd1356d13a52f",
+      "gpu_test_sha256": "6ee3aa279452dde668cfe04d12724e0a62faced24b91c4c49d3344d24e399eb7"
+    },
+    {
+      "platform": "Forge 1.20.1",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "jdk": 17,
+      "build": "BUILD SUCCESSFUL in 1m 57s",
+      "cpu": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 110,
+        "xml_files": 17,
+        "skipped_cases": [
+          "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+        ]
+      },
+      "gpu": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "passed": 12,
+        "xml_files": 13,
+        "skipped_cases": [
+          "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest.installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+        ]
+      },
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\water-flicker-20261010\\vss-0.3.5-forge-1.20.1.jar",
+      "bytes": 6555226,
+      "sha256": "ec86f23cbc7a9f4db7151bdcdc06e5dcfb1e10f8ba30d85194fbb9b027ee760d",
+      "zip_valid": true,
+      "class_check": "identical to successful reobfJar output",
+      "fix_in_jar_bytecode": true,
+      "native_resources": [
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+      ],
+      "production_source_sha256": "0d30c5a922a6dc24b00e3ca196f7160cf4cb3939c7c65940ad7a92aaacab737a",
+      "gpu_test_sha256": "6ee3aa279452dde668cfe04d12724e0a62faced24b91c4c49d3344d24e399eb7"
+    }
+  ],
+  "changed_files_match_across_platforms": true,
+  "live_old_jar_cache_comparison": {
+    "width": 960,
+    "height": 540,
+    "changed_rgba_pixels": 124817,
+    "baseline_alpha180_pixels": 86096,
+    "diagnostic_alpha180_pixels": 6915,
+    "alpha180_pixels_restored": 79181,
+    "returned_cache_changed_pixels": 0
+  },
+  "live_context": {
+    "epochMs": 1791643025534,
+    "paused": false,
+    "fps": 63,
+    "renderTimingsProperty": null,
+    "availableProcessors": 16,
+    "camera": {
+      "z": 393.4596007476533,
+      "look": "(-9.778E-1 -1.960E-1 -7.378E-2)",
+      "x": 1040.45800830238,
+      "y": 310.30292517817753
+    },
+    "viewport": {
+      "width": 3840,
+      "height": 2066
+    },
+    "runtimeConfig": {
+      "predictionDistanceBlocks": 4096,
+      "predictionFineDistanceBlocks": 1536,
+      "predictionSurfaceDistanceBlocks": 512,
+      "predictionVegetationDensity": "medium",
+      "performanceTier": "high",
+      "predictionTrees": true,
+      "predictionAntialiasing": true
+    },
+    "voxyRuntimeConfig": {
+      "enabled": true,
+      "enableRendering": true,
+      "sectionRenderDistance": 16.0,
+      "subDivisionSize": 64.0,
+      "serviceThreads": 5,
+      "ingestEnabled": true,
+      "dontUseSodiumBuilderThreads": false
+    },
+    "voxy": {
+      "source": "(union:/F:/NovaEngineering-World整合包/.minecraft/versions/1.21.1-NeoForge_21.1.249/mods/.connector/voxy-0.2.15-beta_mapped_moj_1.21.1.jar%23497!/ <no signer certificates>)",
+      "pipeline": "me.cortex.voxy.client.core.NormalRenderPipeline",
+      "sectionCount": 3105,
+      "geometryCapacityBytes": 4294966272,
+      "geometryUsedBytes": 35516416
+    },
+    "leafMaterials": [
+      {
+        "name": "minecraft:block/oak_leaves",
+        "sprite": 31,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/spruce_leaves",
+        "sprite": 40,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/birch_leaves",
+        "sprite": 41,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/jungle_leaves",
+        "sprite": 42,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/cherry_leaves",
+        "sprite": 73,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/dark_oak_leaves",
+        "sprite": 83,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/acacia_leaves",
+        "sprite": 86,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/mangrove_leaves",
+        "sprite": 97,
+        "cutout": false
+      },
+      {
+        "name": "minecraft:block/bamboo_small_leaves",
+        "sprite": 184,
+        "cutout": true
+      },
+      {
+        "name": "minecraft:block/bamboo_large_leaves",
+        "sprite": 185,
+        "cutout": true
+      }
+    ],
+    "captureMs": 0.5301
+  },
+  "installed_client": {
+    "path": "F:\\NovaEngineering-World整合包\\.minecraft\\versions\\1.21.1-NeoForge_21.1.249\\mods\\vss-0.3.5-neoforge-1.21.1.jar",
+    "sha256": "1a7c3f03b10795d7fa7e5a4a1e804d48b8e91df7de68370a9c4d552a5a85d74d",
+    "new_jar_tested_in_game": false
+  },
+  "regression": {
+    "before_fix": "fails on first cached grouped-fallback frame; missing color byte at index 128",
+    "after_fix": "12 cached frames have identical full color and depth, both direct and current-frame Hi-Z",
+    "static_page_commands": "zero uploaded batches on unchanged mixed frames; per-item replay hits"
+  }
+}

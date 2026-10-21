@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-20",
+  "buildId": "refinement-blank-fix-20261020-p53",
+  "protocol": 53,
+  "productionChange": "Initialize staged GPU draws from the full boundary masks before publication; keep unstaged neighbor mask deltas incremental.",
+  "gameLaunched": false,
+  "gameInstanceModified": false,
+  "githubPushed": false,
+  "baselineEvidence": "docs/prediction-refinement-blank-audit-20261020.validation.json",
+  "testedFixtureClassesUnchangedAfterFullCompilation": 887,
+  "repositories": [
+    {
+      "platform": "neoforge",
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "buildRoot": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\tmp\\refinement-blank-release-20261020\\build-release",
+      "tests": {
+        "architectureTest": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "moduleRegressionTest": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "columnFilterTest": {
+          "tests": 64,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffTest": {
+          "tests": 120,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffGpuTest": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "test": {
+          "tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "artifact": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\refinement-blank-fix-20261020\\vss-0.3.5-neoforge-1.21.1.jar",
+        "bytes": 6227114,
+        "sha256": "1617d9d17b66bc72eebab9b194656f0ed6e41dc72eee359411a8c341e356b73b",
+        "classMajor": 65,
+        "testEntries": [],
+        "manifest": {
+          "Manifest-Version": "1.0",
+          "Specification-Title": "vss",
+          "Specification-Vendor": "Xantha",
+          "Specification-Version": "1",
+          "Implementation-Title": "voxyserverside-neoforge-1.21.1",
+          "Implementation-Version": "0.3.5-neoforge-1.21.1",
+          "Implementation-Vendor": "Xantha",
+          "Implementation-Timestamp": "2026-10-20T23:13:01+0800",
+          "VSS-Protocol": "53",
+          "VSS-Build-Id": "refinement-blank-fix-20261020-p53",
+          "MixinConfigs": "vss.compat.mixins.json,vss.strict.mixins.json,vss.lostcities.mixins.json"
+        },
+        "sceneSha256": "08bb33bb7e213ff559d32361c16baa8beb5896e4c199104e11a779d5e11bc365"
+      },
+      "inputManifest": "tools/prediction/refinement-blank-audit-20261020/neoforge-snapshot-inputs.json",
+      "inputFileCount": 522,
+      "laterWorkspaceChangesNotIncludedInArtifact": [
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionFeatureVoxels.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMeshDerivedCache.java"
+      ]
+    },
+    {
+      "platform": "forge",
+      "root": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "buildRoot": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\build-refinement-blank-fix-20261020",
+      "tests": {
+        "architectureTest": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "moduleRegressionTest": {
+          "tests": 276,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "columnFilterTest": {
+          "tests": 66,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffTest": {
+          "tests": 119,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "coarseHandoffGpuTest": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "artifact": {
+        "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\refinement-blank-fix-20261020\\vss-0.3.5-forge-1.20.1.jar",
+        "bytes": 6890107,
+        "sha256": "c582cf3f626b1f8c1bededc7fe0352378ec72e89626dc5eddd3e1d034e18affc",
+        "classMajor": 61,
+        "testEntries": [],
+        "manifest": {
+          "Manifest-Version": "1.0",
+          "Specification-Title": "vss",
+          "Specification-Vendor": "Xantha",
+          "Specification-Version": "1",
+          "Implementation-Title": "voxyserverside",
+          "Implementation-Version": "0.3.5-forge-1.20.1",
+          "Implementation-Vendor": "Xantha",
+          "Implementation-Timestamp": "2026-10-20T23:11:57+0800",
+          "VSS-Protocol": "53",
+          "VSS-Build-Id": "refinement-blank-fix-20261020-p53",
+          "MixinConfigs": "vss.compat.mixins.json,vss.strict.mixins.json,vss.lostcities.mixins.json"
+        },
+        "sceneSha256": "3391daedff510a568ad76b0c5a6b3ec1ae147b07c4ec82a1b3963a7eb78236f6"
+      },
+      "inputManifest": "tools/prediction/refinement-blank-audit-20261020/forge-build-inputs.json",
+      "inputFileCount": 524,
+      "laterWorkspaceChangesNotIncludedInArtifact": [
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayGeometry.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMeshCodec.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionMeshDerivedCache.java",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionPackedMesh.java"
+      ]
+    }
+  ]
+}

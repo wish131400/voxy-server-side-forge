@@ -1,0 +1,5395 @@
+{
+  "date": "2026-10-14",
+  "liveClientSampled": false,
+  "liveFPSMeasured": false,
+  "productionChanged": false,
+  "releaseJarBuilt": false,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+  "driver": "572.70",
+  "api": "OpenGL 4.6",
+  "finalGpuRunsSerial": true,
+  "experimentalInitialConcurrentRunsDiscarded": true,
+  "references": {
+    "Unity DOTS Instancing": "https://docs.unity3d.com/6000.0/Documentation/Manual/dots-instancing-shaders.html",
+    "UE Mesh Drawing Pipeline": "https://dev.epicgames.com/documentation/en-us/unreal-engine/mesh-drawing-pipeline-in-unreal-engine",
+    "UE HLOD": "https://dev.epicgames.com/documentation/en-us/unreal-engine/world-partition---hierarchical-level-of-detail-in-unreal-engine",
+    "UE Nanite Foliage Experimental": "https://dev.epicgames.com/documentation/en-us/unreal-engine/nanite-foliage"
+  },
+  "platforms": {
+    "neoforge": {
+      "input": [
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 200.0,
+          "cpu_ns_p95": 500.0,
+          "cpu_ns_p99": 1400.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 200.0,
+          "cpu_ns_p95": 1300.0,
+          "cpu_ns_p99": 2600.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 24400.0,
+          "cpu_ns_p95": 50000.0,
+          "cpu_ns_p99": 89700.0,
+          "allocated_bytes_median": 120960.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 19400.0,
+          "cpu_ns_p95": 40000.0,
+          "cpu_ns_p99": 51600.0,
+          "allocated_bytes_median": 6544.0,
+          "rebuilt_records_median": 1.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 23500.0,
+          "cpu_ns_p95": 44000.0,
+          "cpu_ns_p99": 91700.0,
+          "allocated_bytes_median": 120960.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 20200.0,
+          "cpu_ns_p95": 38200.0,
+          "cpu_ns_p99": 45900.0,
+          "allocated_bytes_median": 14976.0,
+          "rebuilt_records_median": 32.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 38600.0,
+          "cpu_ns_p95": 88300.0,
+          "cpu_ns_p99": 116600.0,
+          "allocated_bytes_median": 120960.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 33400.0,
+          "cpu_ns_p95": 74900.0,
+          "cpu_ns_p99": 125300.0,
+          "allocated_bytes_median": 55424.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 100.0,
+          "cpu_ns_p95": 300.0,
+          "cpu_ns_p99": 1000.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 0.0,
+          "cpu_ns_p95": 100.0,
+          "cpu_ns_p99": 100.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 105000.0,
+          "cpu_ns_p95": 167200.0,
+          "cpu_ns_p99": 188700.0,
+          "allocated_bytes_median": 245832.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 108800.0,
+          "cpu_ns_p95": 161800.0,
+          "cpu_ns_p99": 169100.0,
+          "allocated_bytes_median": 49320.0,
+          "rebuilt_records_median": 1.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 88500.0,
+          "cpu_ns_p95": 127800.0,
+          "cpu_ns_p99": 171400.0,
+          "allocated_bytes_median": 245832.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 85600.0,
+          "cpu_ns_p95": 123600.0,
+          "cpu_ns_p99": 128300.0,
+          "allocated_bytes_median": 52296.0,
+          "rebuilt_records_median": 32.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 131000.0,
+          "cpu_ns_p95": 182900.0,
+          "cpu_ns_p99": 248400.0,
+          "allocated_bytes_median": 245832.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 191600.0,
+          "cpu_ns_p95": 245100.0,
+          "cpu_ns_p99": 309100.0,
+          "allocated_bytes_median": 442440.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 0.0,
+          "cpu_ns_p95": 100.0,
+          "cpu_ns_p99": 100.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 100.0,
+          "cpu_ns_p95": 100.0,
+          "cpu_ns_p99": 200.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 236400.0,
+          "cpu_ns_p95": 380700.0,
+          "cpu_ns_p99": 492600.0,
+          "allocated_bytes_median": 491568.0,
+          "rebuilt_records_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 241200.0,
+          "cpu_ns_p95": 715600.0,
+          "cpu_ns_p99": 790100.0,
+          "allocated_bytes_median": 98496.0,
+          "rebuilt_records_median": 1.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 306200.0,
+          "cpu_ns_p95": 464200.0,
+          "cpu_ns_p99": 596000.0,
+          "allocated_bytes_median": 491568.0,
+          "rebuilt_records_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 245500.0,
+          "cpu_ns_p95": 341400.0,
+          "cpu_ns_p99": 374300.0,
+          "allocated_bytes_median": 101472.0,
+          "rebuilt_records_median": 32.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 312500.0,
+          "cpu_ns_p95": 408200.0,
+          "cpu_ns_p99": 477500.0,
+          "allocated_bytes_median": 491568.0,
+          "rebuilt_records_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 414500.0,
+          "cpu_ns_p95": 547900.0,
+          "cpu_ns_p99": 634500.0,
+          "allocated_bytes_median": 884784.0,
+          "rebuilt_records_median": 8192.0
+        }
+      ],
+      "prepare": [
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 300300.0,
+          "cpu_ns_p95": 496800.0,
+          "cpu_ns_p99": 543800.0,
+          "allocated_bytes_median": 100896.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 152400.0,
+          "cpu_ns_p95": 259100.0,
+          "cpu_ns_p99": 331900.0,
+          "allocated_bytes_median": 27360.0,
+          "range_builds_median": 1.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 266800.0,
+          "cpu_ns_p95": 387900.0,
+          "cpu_ns_p99": 414800.0,
+          "allocated_bytes_median": 100800.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 142600.0,
+          "cpu_ns_p95": 216900.0,
+          "cpu_ns_p99": 229300.0,
+          "allocated_bytes_median": 33216.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 261500.0,
+          "cpu_ns_p95": 480400.0,
+          "cpu_ns_p99": 733600.0,
+          "allocated_bytes_median": 100800.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 280100.0,
+          "cpu_ns_p95": 496500.0,
+          "cpu_ns_p99": 735800.0,
+          "allocated_bytes_median": 125376.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 1632300.0,
+          "cpu_ns_p95": 2079500.0,
+          "cpu_ns_p99": 2140300.0,
+          "allocated_bytes_median": 803192.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 740700.0,
+          "cpu_ns_p95": 937100.0,
+          "cpu_ns_p99": 1012500.0,
+          "allocated_bytes_median": 213560.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 1742100.0,
+          "cpu_ns_p95": 2271000.0,
+          "cpu_ns_p99": 2456500.0,
+          "allocated_bytes_median": 803192.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 871200.0,
+          "cpu_ns_p95": 1095600.0,
+          "cpu_ns_p99": 1232700.0,
+          "allocated_bytes_median": 219512.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 1878000.0,
+          "cpu_ns_p95": 2573600.0,
+          "cpu_ns_p99": 3145100.0,
+          "allocated_bytes_median": 803192.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 2059500.0,
+          "cpu_ns_p95": 2824700.0,
+          "cpu_ns_p99": 3233700.0,
+          "allocated_bytes_median": 999800.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 4233000.0,
+          "cpu_ns_p95": 5149500.0,
+          "cpu_ns_p99": 5886200.0,
+          "allocated_bytes_median": 1605864.0,
+          "range_builds_median": 8191.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 1935700.0,
+          "cpu_ns_p95": 2799800.0,
+          "cpu_ns_p99": 4080700.0,
+          "allocated_bytes_median": 426552.0,
+          "range_builds_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 3848200.0,
+          "cpu_ns_p95": 4687500.0,
+          "cpu_ns_p99": 5135800.0,
+          "allocated_bytes_median": 1605832.0,
+          "range_builds_median": 8191.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 2027900.0,
+          "cpu_ns_p95": 2729300.0,
+          "cpu_ns_p99": 3580200.0,
+          "allocated_bytes_median": 432472.0,
+          "range_builds_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 3995800.0,
+          "cpu_ns_p95": 5605200.0,
+          "cpu_ns_p99": 6892100.0,
+          "allocated_bytes_median": 1605928.0,
+          "range_builds_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 4402400.0,
+          "cpu_ns_p95": 5901300.0,
+          "cpu_ns_p99": 6301100.0,
+          "allocated_bytes_median": 1999144.0,
+          "range_builds_median": 8192.0
+        }
+      ],
+      "maintenance": [
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 20457700.0,
+          "elapsed_ns_p95": 24721200.0,
+          "elapsed_ns_p99": 24721200.0,
+          "ns_per_pass_median": 639303.125
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 20116300.0,
+          "elapsed_ns_p95": 24541800.0,
+          "elapsed_ns_p99": 24541800.0,
+          "ns_per_pass_median": 628634.375
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 114478400.0,
+          "elapsed_ns_p95": 127574100.0,
+          "elapsed_ns_p99": 127574100.0,
+          "ns_per_pass_median": 3577450.0
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 58114400.0,
+          "elapsed_ns_p95": 65783400.0,
+          "elapsed_ns_p99": 65783400.0,
+          "ns_per_pass_median": 1816075.0
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 24814900.0,
+          "elapsed_ns_p95": 30781900.0,
+          "elapsed_ns_p99": 30781900.0,
+          "ns_per_pass_median": 775465.625
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 25642600.0,
+          "elapsed_ns_p95": 29354700.0,
+          "elapsed_ns_p99": 29354700.0,
+          "ns_per_pass_median": 801331.25
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 198083500.0,
+          "elapsed_ns_p95": 209890000.0,
+          "elapsed_ns_p99": 209890000.0,
+          "ns_per_pass_median": 6190109.375
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 94667500.0,
+          "elapsed_ns_p95": 105191900.0,
+          "elapsed_ns_p99": 105191900.0,
+          "ns_per_pass_median": 2958359.375
+        }
+      ],
+      "forest": [
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 33792.0,
+          "gpu_ns_p95": 34816.0,
+          "gpu_ns_p99": 37888.0,
+          "cpu_ns_median": 30900.0,
+          "cpu_ns_p95": 58500.0,
+          "cpu_ns_p99": 67600.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 29696.0,
+          "gpu_ns_p95": 32768.0,
+          "gpu_ns_p99": 34816.0,
+          "cpu_ns_median": 30900.0,
+          "cpu_ns_p95": 64300.0,
+          "cpu_ns_p99": 77100.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 28672.0,
+          "gpu_ns_p99": 30720.0,
+          "cpu_ns_median": 31400.0,
+          "cpu_ns_p95": 66600.0,
+          "cpu_ns_p99": 76700.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 37888.0,
+          "gpu_ns_p95": 43008.0,
+          "gpu_ns_p99": 67584.0,
+          "cpu_ns_median": 85300.0,
+          "cpu_ns_p95": 134300.0,
+          "cpu_ns_p99": 160500.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 214.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 31744.0,
+          "gpu_ns_p95": 35840.0,
+          "gpu_ns_p99": 56320.0,
+          "cpu_ns_median": 85100.0,
+          "cpu_ns_p95": 122900.0,
+          "cpu_ns_p99": 135800.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 175.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 27648.0,
+          "gpu_ns_p95": 33792.0,
+          "gpu_ns_p99": 53248.0,
+          "cpu_ns_median": 84700.0,
+          "cpu_ns_p95": 138800.0,
+          "cpu_ns_p99": 177700.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 34816.0,
+          "gpu_ns_p95": 38912.0,
+          "gpu_ns_p99": 43008.0,
+          "cpu_ns_median": 18500.0,
+          "cpu_ns_p95": 30500.0,
+          "cpu_ns_p99": 40000.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 29696.0,
+          "gpu_ns_p95": 30720.0,
+          "gpu_ns_p99": 33792.0,
+          "cpu_ns_median": 18300.0,
+          "cpu_ns_p95": 37400.0,
+          "cpu_ns_p99": 64300.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 26624.0,
+          "gpu_ns_p95": 27648.0,
+          "gpu_ns_p99": 31744.0,
+          "cpu_ns_median": 18700.0,
+          "cpu_ns_p95": 32500.0,
+          "cpu_ns_p99": 45800.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 37888.0,
+          "gpu_ns_p95": 39936.0,
+          "gpu_ns_p99": 65536.0,
+          "cpu_ns_median": 66100.0,
+          "cpu_ns_p95": 88700.0,
+          "cpu_ns_p99": 101400.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 214.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 31744.0,
+          "gpu_ns_p95": 34816.0,
+          "gpu_ns_p99": 59392.0,
+          "cpu_ns_median": 66800.0,
+          "cpu_ns_p95": 97800.0,
+          "cpu_ns_p99": 117300.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 175.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 28672.0,
+          "gpu_ns_p95": 34816.0,
+          "gpu_ns_p99": 53248.0,
+          "cpu_ns_median": 66200.0,
+          "cpu_ns_p95": 94800.0,
+          "cpu_ns_p99": 113200.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 30720.0,
+          "gpu_ns_p95": 34816.0,
+          "gpu_ns_p99": 35840.0,
+          "cpu_ns_median": 17800.0,
+          "cpu_ns_p95": 35600.0,
+          "cpu_ns_p99": 52300.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 27648.0,
+          "gpu_ns_p99": 28672.0,
+          "cpu_ns_median": 18500.0,
+          "cpu_ns_p95": 39300.0,
+          "cpu_ns_p99": 50300.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 23552.0,
+          "gpu_ns_p95": 27648.0,
+          "gpu_ns_p99": 28672.0,
+          "cpu_ns_median": 17900.0,
+          "cpu_ns_p95": 39300.0,
+          "cpu_ns_p99": 49400.0,
+          "mdi_quads_median": 32163.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 33792.0,
+          "gpu_ns_p95": 39936.0,
+          "gpu_ns_p99": 62464.0,
+          "cpu_ns_median": 74900.0,
+          "cpu_ns_p95": 128100.0,
+          "cpu_ns_p99": 137400.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 191.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 27648.0,
+          "gpu_ns_p95": 32768.0,
+          "gpu_ns_p99": 312320.0,
+          "cpu_ns_median": 74700.0,
+          "cpu_ns_p95": 144600.0,
+          "cpu_ns_p99": 232400.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 29696.0,
+          "gpu_ns_p99": 53248.0,
+          "cpu_ns_median": 79600.0,
+          "cpu_ns_p95": 144300.0,
+          "cpu_ns_p99": 247400.0,
+          "mdi_quads_median": 32163.0,
+          "mdi_commands_median": 126.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 31744.0,
+          "gpu_ns_p95": 33792.0,
+          "gpu_ns_p99": 39936.0,
+          "cpu_ns_median": 22200.0,
+          "cpu_ns_p95": 73100.0,
+          "cpu_ns_p99": 160600.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 26624.0,
+          "gpu_ns_p95": 27648.0,
+          "gpu_ns_p99": 30720.0,
+          "cpu_ns_median": 21400.0,
+          "cpu_ns_p95": 54300.0,
+          "cpu_ns_p99": 64100.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 14336.0,
+          "gpu_ns_p95": 15360.0,
+          "gpu_ns_p99": 19456.0,
+          "cpu_ns_median": 21000.0,
+          "cpu_ns_p95": 58200.0,
+          "cpu_ns_p99": 92300.0,
+          "mdi_quads_median": 14610.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 34816.0,
+          "gpu_ns_p95": 38912.0,
+          "gpu_ns_p99": 62464.0,
+          "cpu_ns_median": 64500.0,
+          "cpu_ns_p95": 93500.0,
+          "cpu_ns_p99": 113000.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 191.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 27648.0,
+          "gpu_ns_p95": 30720.0,
+          "gpu_ns_p99": 52224.0,
+          "cpu_ns_median": 64200.0,
+          "cpu_ns_p95": 106200.0,
+          "cpu_ns_p99": 149500.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 15360.0,
+          "gpu_ns_p95": 16384.0,
+          "gpu_ns_p99": 39936.0,
+          "cpu_ns_median": 64800.0,
+          "cpu_ns_p95": 95100.0,
+          "cpu_ns_p99": 113700.0,
+          "mdi_quads_median": 14610.0,
+          "mdi_commands_median": 58.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 24576.0,
+          "gpu_ns_p95": 25600.0,
+          "gpu_ns_p99": 27648.0,
+          "cpu_ns_median": 12200.0,
+          "cpu_ns_p95": 28200.0,
+          "cpu_ns_p99": 39500.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 21504.0,
+          "gpu_ns_p95": 22528.0,
+          "gpu_ns_p99": 26624.0,
+          "cpu_ns_median": 12700.0,
+          "cpu_ns_p95": 29300.0,
+          "cpu_ns_p99": 33600.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 20480.0,
+          "gpu_ns_p95": 20480.0,
+          "gpu_ns_p99": 24576.0,
+          "cpu_ns_median": 12400.0,
+          "cpu_ns_p95": 33400.0,
+          "cpu_ns_p99": 36800.0,
+          "mdi_quads_median": 20449.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 28672.0,
+          "gpu_ns_p99": 55296.0,
+          "cpu_ns_median": 61800.0,
+          "cpu_ns_p95": 92600.0,
+          "cpu_ns_p99": 132100.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 118.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 22528.0,
+          "gpu_ns_p95": 29696.0,
+          "gpu_ns_p99": 49152.0,
+          "cpu_ns_median": 62600.0,
+          "cpu_ns_p95": 91600.0,
+          "cpu_ns_p99": 95000.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 96.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 20480.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 46080.0,
+          "cpu_ns_median": 60700.0,
+          "cpu_ns_p95": 93800.0,
+          "cpu_ns_p99": 119900.0,
+          "mdi_quads_median": 20449.0,
+          "mdi_commands_median": 80.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 22528.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 29696.0,
+          "cpu_ns_median": 15400.0,
+          "cpu_ns_p95": 29200.0,
+          "cpu_ns_p99": 35800.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 19456.0,
+          "gpu_ns_p95": 21504.0,
+          "gpu_ns_p99": 23552.0,
+          "cpu_ns_median": 14700.0,
+          "cpu_ns_p95": 31400.0,
+          "cpu_ns_p99": 39800.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 17408.0,
+          "cpu_ns_median": 15900.0,
+          "cpu_ns_p95": 31600.0,
+          "cpu_ns_p99": 34800.0,
+          "mdi_quads_median": 9277.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 24576.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 51200.0,
+          "cpu_ns_median": 61000.0,
+          "cpu_ns_p95": 95500.0,
+          "cpu_ns_p99": 113700.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 118.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 21504.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 46080.0,
+          "cpu_ns_median": 63000.0,
+          "cpu_ns_p95": 97800.0,
+          "cpu_ns_p99": 121800.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 96.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 37888.0,
+          "cpu_ns_median": 61300.0,
+          "cpu_ns_p95": 89600.0,
+          "cpu_ns_p99": 101200.0,
+          "mdi_quads_median": 9277.0,
+          "mdi_commands_median": 38.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 24576.0,
+          "gpu_ns_p95": 25600.0,
+          "gpu_ns_p99": 27648.0,
+          "cpu_ns_median": 12300.0,
+          "cpu_ns_p95": 27100.0,
+          "cpu_ns_p99": 31000.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 21504.0,
+          "gpu_ns_p95": 22528.0,
+          "gpu_ns_p99": 26624.0,
+          "cpu_ns_median": 13400.0,
+          "cpu_ns_p95": 20300.0,
+          "cpu_ns_p99": 57400.0,
+          "mdi_quads_median": 24641.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 20480.0,
+          "gpu_ns_p95": 21504.0,
+          "gpu_ns_p99": 22528.0,
+          "cpu_ns_median": 12600.0,
+          "cpu_ns_p95": 32300.0,
+          "cpu_ns_p99": 37300.0,
+          "mdi_quads_median": 20782.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 28672.0,
+          "gpu_ns_p99": 56320.0,
+          "cpu_ns_median": 63500.0,
+          "cpu_ns_p95": 95900.0,
+          "cpu_ns_p99": 100400.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 117.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 23552.0,
+          "gpu_ns_p95": 29696.0,
+          "gpu_ns_p99": 49152.0,
+          "cpu_ns_median": 64600.0,
+          "cpu_ns_p95": 86300.0,
+          "cpu_ns_p99": 113000.0,
+          "mdi_quads_median": 24641.0,
+          "mdi_commands_median": 97.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 21504.0,
+          "gpu_ns_p95": 22528.0,
+          "gpu_ns_p99": 46080.0,
+          "cpu_ns_median": 63200.0,
+          "cpu_ns_p95": 89400.0,
+          "cpu_ns_p99": 92000.0,
+          "mdi_quads_median": 20782.0,
+          "mdi_commands_median": 82.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 22528.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 25600.0,
+          "cpu_ns_median": 13400.0,
+          "cpu_ns_p95": 33800.0,
+          "cpu_ns_p99": 37000.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 14336.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 17408.0,
+          "cpu_ns_median": 14200.0,
+          "cpu_ns_p95": 20300.0,
+          "cpu_ns_p99": 25300.0,
+          "mdi_quads_median": 12255.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 16384.0,
+          "cpu_ns_median": 13300.0,
+          "cpu_ns_p95": 33700.0,
+          "cpu_ns_p99": 48600.0,
+          "mdi_quads_median": 8396.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 23552.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 54272.0,
+          "cpu_ns_median": 61800.0,
+          "cpu_ns_p95": 91000.0,
+          "cpu_ns_p99": 111700.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 117.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 13312.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 33792.0,
+          "cpu_ns_median": 63100.0,
+          "cpu_ns_p95": 109200.0,
+          "cpu_ns_p99": 114100.0,
+          "mdi_quads_median": 12255.0,
+          "mdi_commands_median": 49.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 37888.0,
+          "cpu_ns_median": 63000.0,
+          "cpu_ns_p95": 88600.0,
+          "cpu_ns_p99": 135100.0,
+          "mdi_quads_median": 8396.0,
+          "mdi_commands_median": 33.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 17408.0,
+          "gpu_ns_p95": 18432.0,
+          "gpu_ns_p99": 23552.0,
+          "cpu_ns_median": 12600.0,
+          "cpu_ns_p95": 29100.0,
+          "cpu_ns_p99": 42500.0,
+          "mdi_quads_median": 18693.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 17408.0,
+          "gpu_ns_p95": 18432.0,
+          "gpu_ns_p99": 19456.0,
+          "cpu_ns_median": 12500.0,
+          "cpu_ns_p95": 26700.0,
+          "cpu_ns_p99": 47200.0,
+          "mdi_quads_median": 16297.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 15360.0,
+          "gpu_ns_p95": 16384.0,
+          "gpu_ns_p99": 17408.0,
+          "cpu_ns_median": 12900.0,
+          "cpu_ns_p95": 30400.0,
+          "cpu_ns_p99": 62100.0,
+          "mdi_quads_median": 15131.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 17408.0,
+          "gpu_ns_p95": 19456.0,
+          "gpu_ns_p99": 48128.0,
+          "cpu_ns_median": 60400.0,
+          "cpu_ns_p95": 94200.0,
+          "cpu_ns_p99": 129700.0,
+          "mdi_quads_median": 18693.0,
+          "mdi_commands_median": 74.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 18432.0,
+          "gpu_ns_p95": 22528.0,
+          "gpu_ns_p99": 44032.0,
+          "cpu_ns_median": 61400.0,
+          "cpu_ns_p95": 97300.0,
+          "cpu_ns_p99": 108000.0,
+          "mdi_quads_median": 16297.0,
+          "mdi_commands_median": 64.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 16384.0,
+          "gpu_ns_p95": 18432.0,
+          "gpu_ns_p99": 43008.0,
+          "cpu_ns_median": 60900.0,
+          "cpu_ns_p95": 85400.0,
+          "cpu_ns_p99": 90100.0,
+          "mdi_quads_median": 15131.0,
+          "mdi_commands_median": 60.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 16384.0,
+          "cpu_ns_median": 13600.0,
+          "cpu_ns_p95": 30300.0,
+          "cpu_ns_p99": 61300.0,
+          "mdi_quads_median": 9077.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 12288.0,
+          "cpu_ns_median": 13300.0,
+          "cpu_ns_p95": 29500.0,
+          "cpu_ns_p99": 34500.0,
+          "mdi_quads_median": 7824.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 11264.0,
+          "gpu_ns_p99": 11264.0,
+          "cpu_ns_median": 13500.0,
+          "cpu_ns_p95": 21600.0,
+          "cpu_ns_p99": 28000.0,
+          "mdi_quads_median": 6654.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 31744.0,
+          "cpu_ns_median": 64100.0,
+          "cpu_ns_p95": 106400.0,
+          "cpu_ns_p99": 194700.0,
+          "mdi_quads_median": 9077.0,
+          "mdi_commands_median": 36.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 32768.0,
+          "cpu_ns_median": 63500.0,
+          "cpu_ns_p95": 103600.0,
+          "cpu_ns_p99": 141200.0,
+          "mdi_quads_median": 7824.0,
+          "mdi_commands_median": 32.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 11264.0,
+          "gpu_ns_p99": 35840.0,
+          "cpu_ns_median": 65800.0,
+          "cpu_ns_p95": 105100.0,
+          "cpu_ns_p99": 362600.0,
+          "mdi_quads_median": 6654.0,
+          "mdi_commands_median": 27.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 13312.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 16384.0,
+          "cpu_ns_median": 11200.0,
+          "cpu_ns_p95": 32200.0,
+          "cpu_ns_p99": 45700.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 13312.0,
+          "cpu_ns_median": 10600.0,
+          "cpu_ns_p95": 30900.0,
+          "cpu_ns_p99": 39200.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 12288.0,
+          "cpu_ns_median": 10400.0,
+          "cpu_ns_p95": 35000.0,
+          "cpu_ns_p99": 41200.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 41984.0,
+          "cpu_ns_median": 73800.0,
+          "cpu_ns_p95": 145800.0,
+          "cpu_ns_p99": 217100.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 36.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 39936.0,
+          "cpu_ns_median": 74700.0,
+          "cpu_ns_p95": 102600.0,
+          "cpu_ns_p99": 124300.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 31.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 37888.0,
+          "cpu_ns_median": 72600.0,
+          "cpu_ns_p95": 106600.0,
+          "cpu_ns_p99": 124700.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 29.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 13312.0,
+          "cpu_ns_median": 12300.0,
+          "cpu_ns_p95": 28100.0,
+          "cpu_ns_p99": 31700.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 15360.0,
+          "cpu_ns_median": 11600.0,
+          "cpu_ns_p95": 32500.0,
+          "cpu_ns_p99": 39700.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 11264.0,
+          "gpu_ns_p99": 11264.0,
+          "cpu_ns_median": 12500.0,
+          "cpu_ns_p95": 27700.0,
+          "cpu_ns_p99": 33500.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 46080.0,
+          "cpu_ns_median": 62900.0,
+          "cpu_ns_p95": 87600.0,
+          "cpu_ns_p99": 99600.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 36.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 36864.0,
+          "cpu_ns_median": 62800.0,
+          "cpu_ns_p95": 88400.0,
+          "cpu_ns_p99": 92700.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 31.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 32768.0,
+          "cpu_ns_median": 64000.0,
+          "cpu_ns_p95": 90000.0,
+          "cpu_ns_p99": 100200.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 29.0
+        }
+      ],
+      "retainedControl": [
+        {
+          "tiles": "128",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 1748400.0,
+          "elapsed_ns_p95": 2662600.0,
+          "elapsed_ns_p99": 2662600.0,
+          "ns_per_pass_median": 54637.5
+        },
+        {
+          "tiles": "128",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 1742900.0,
+          "elapsed_ns_p95": 10267600.0,
+          "elapsed_ns_p99": 10267600.0,
+          "ns_per_pass_median": 54465.625
+        },
+        {
+          "tiles": "128",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 2450400.0,
+          "elapsed_ns_p95": 6183500.0,
+          "elapsed_ns_p99": 6183500.0,
+          "ns_per_pass_median": 76575.0
+        },
+        {
+          "tiles": "128",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 2409300.0,
+          "elapsed_ns_p95": 10405400.0,
+          "elapsed_ns_p99": 10405400.0,
+          "ns_per_pass_median": 75290.625
+        },
+        {
+          "tiles": "128",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 4674300.0,
+          "elapsed_ns_p95": 11872200.0,
+          "elapsed_ns_p99": 11872200.0,
+          "ns_per_pass_median": 146071.875
+        },
+        {
+          "tiles": "128",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 5620500.0,
+          "elapsed_ns_p95": 14044000.0,
+          "elapsed_ns_p99": 14044000.0,
+          "ns_per_pass_median": 175640.625
+        },
+        {
+          "tiles": "512",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 2759300.0,
+          "elapsed_ns_p95": 11725800.0,
+          "elapsed_ns_p99": 11725800.0,
+          "ns_per_pass_median": 86228.125
+        },
+        {
+          "tiles": "512",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 2429500.0,
+          "elapsed_ns_p95": 10712800.0,
+          "elapsed_ns_p99": 10712800.0,
+          "ns_per_pass_median": 75921.875
+        },
+        {
+          "tiles": "512",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 4210300.0,
+          "elapsed_ns_p95": 12225900.0,
+          "elapsed_ns_p99": 12225900.0,
+          "ns_per_pass_median": 131571.875
+        },
+        {
+          "tiles": "512",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 4767800.0,
+          "elapsed_ns_p95": 12557600.0,
+          "elapsed_ns_p99": 12557600.0,
+          "ns_per_pass_median": 148993.75
+        },
+        {
+          "tiles": "512",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 7143400.0,
+          "elapsed_ns_p95": 14313900.0,
+          "elapsed_ns_p99": 14313900.0,
+          "ns_per_pass_median": 223231.25
+        },
+        {
+          "tiles": "512",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 7908100.0,
+          "elapsed_ns_p95": 15157100.0,
+          "elapsed_ns_p99": 15157100.0,
+          "ns_per_pass_median": 247128.125
+        },
+        {
+          "tiles": "1024",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 4532200.0,
+          "elapsed_ns_p95": 13075200.0,
+          "elapsed_ns_p99": 13075200.0,
+          "ns_per_pass_median": 141631.25
+        },
+        {
+          "tiles": "1024",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 5179400.0,
+          "elapsed_ns_p95": 13807300.0,
+          "elapsed_ns_p99": 13807300.0,
+          "ns_per_pass_median": 161856.25
+        },
+        {
+          "tiles": "1024",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 6960600.0,
+          "elapsed_ns_p95": 15240800.0,
+          "elapsed_ns_p99": 15240800.0,
+          "ns_per_pass_median": 217518.75
+        },
+        {
+          "tiles": "1024",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 8927800.0,
+          "elapsed_ns_p95": 16896600.0,
+          "elapsed_ns_p99": 16896600.0,
+          "ns_per_pass_median": 278993.75
+        },
+        {
+          "tiles": "1024",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 16445400.0,
+          "elapsed_ns_p95": 22203200.0,
+          "elapsed_ns_p99": 22203200.0,
+          "ns_per_pass_median": 513918.75
+        },
+        {
+          "tiles": "1024",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 12857300.0,
+          "elapsed_ns_p95": 20916100.0,
+          "elapsed_ns_p99": 20916100.0,
+          "ns_per_pass_median": 401790.625
+        },
+        {
+          "tiles": "1025",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 2111300.0,
+          "elapsed_ns_p95": 7837300.0,
+          "elapsed_ns_p99": 7837300.0,
+          "ns_per_pass_median": 65978.125
+        },
+        {
+          "tiles": "1025",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 2142100.0,
+          "elapsed_ns_p95": 6489200.0,
+          "elapsed_ns_p99": 6489200.0,
+          "ns_per_pass_median": 66940.625
+        },
+        {
+          "tiles": "1025",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 6032900.0,
+          "elapsed_ns_p95": 13783100.0,
+          "elapsed_ns_p99": 13783100.0,
+          "ns_per_pass_median": 188528.125
+        },
+        {
+          "tiles": "1025",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 5433300.0,
+          "elapsed_ns_p95": 9216300.0,
+          "elapsed_ns_p99": 9216300.0,
+          "ns_per_pass_median": 169790.625
+        },
+        {
+          "tiles": "1025",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 12057900.0,
+          "elapsed_ns_p95": 17630400.0,
+          "elapsed_ns_p99": 17630400.0,
+          "ns_per_pass_median": 376809.375
+        },
+        {
+          "tiles": "1025",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 13734800.0,
+          "elapsed_ns_p95": 20150500.0,
+          "elapsed_ns_p99": 20150500.0,
+          "ns_per_pass_median": 429212.5
+        },
+        {
+          "tiles": "1536",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 3513200.0,
+          "elapsed_ns_p95": 13994500.0,
+          "elapsed_ns_p99": 13994500.0,
+          "ns_per_pass_median": 109787.5
+        },
+        {
+          "tiles": "1536",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 3622200.0,
+          "elapsed_ns_p95": 12278600.0,
+          "elapsed_ns_p99": 12278600.0,
+          "ns_per_pass_median": 113193.75
+        },
+        {
+          "tiles": "1536",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 11059000.0,
+          "elapsed_ns_p95": 18526500.0,
+          "elapsed_ns_p99": 18526500.0,
+          "ns_per_pass_median": 345593.75
+        },
+        {
+          "tiles": "1536",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 11691000.0,
+          "elapsed_ns_p95": 18020900.0,
+          "elapsed_ns_p99": 18020900.0,
+          "ns_per_pass_median": 365343.75
+        },
+        {
+          "tiles": "1536",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 19890400.0,
+          "elapsed_ns_p95": 24607100.0,
+          "elapsed_ns_p99": 24607100.0,
+          "ns_per_pass_median": 621575.0
+        },
+        {
+          "tiles": "1536",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 19447400.0,
+          "elapsed_ns_p95": 22505100.0,
+          "elapsed_ns_p99": 22505100.0,
+          "ns_per_pass_median": 607731.25
+        },
+        {
+          "tiles": "2048",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 4150500.0,
+          "elapsed_ns_p95": 14325100.0,
+          "elapsed_ns_p99": 14325100.0,
+          "ns_per_pass_median": 129703.125
+        },
+        {
+          "tiles": "2048",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 4031500.0,
+          "elapsed_ns_p95": 10374000.0,
+          "elapsed_ns_p99": 10374000.0,
+          "ns_per_pass_median": 125984.375
+        },
+        {
+          "tiles": "2048",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 13603600.0,
+          "elapsed_ns_p95": 19163400.0,
+          "elapsed_ns_p99": 19163400.0,
+          "ns_per_pass_median": 425112.5
+        },
+        {
+          "tiles": "2048",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 14073400.0,
+          "elapsed_ns_p95": 22277000.0,
+          "elapsed_ns_p99": 22277000.0,
+          "ns_per_pass_median": 439793.75
+        },
+        {
+          "tiles": "2048",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 19555500.0,
+          "elapsed_ns_p95": 31708600.0,
+          "elapsed_ns_p99": 31708600.0,
+          "ns_per_pass_median": 611109.375
+        },
+        {
+          "tiles": "2048",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 21319600.0,
+          "elapsed_ns_p95": 32867300.0,
+          "elapsed_ns_p99": 32867300.0,
+          "ns_per_pass_median": 666237.5
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 13655900.0,
+          "elapsed_ns_p95": 22999800.0,
+          "elapsed_ns_p99": 22999800.0,
+          "ns_per_pass_median": 426746.875
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 17313900.0,
+          "elapsed_ns_p95": 23362800.0,
+          "elapsed_ns_p99": 23362800.0,
+          "ns_per_pass_median": 541059.375
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 23658800.0,
+          "elapsed_ns_p95": 29516600.0,
+          "elapsed_ns_p99": 29516600.0,
+          "ns_per_pass_median": 739337.5
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 27662300.0,
+          "elapsed_ns_p95": 31620600.0,
+          "elapsed_ns_p99": 31620600.0,
+          "ns_per_pass_median": 864446.875
+        },
+        {
+          "tiles": "3072",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 27482800.0,
+          "elapsed_ns_p95": 32044800.0,
+          "elapsed_ns_p99": 32044800.0,
+          "ns_per_pass_median": 858837.5
+        },
+        {
+          "tiles": "3072",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 23730400.0,
+          "elapsed_ns_p95": 27675000.0,
+          "elapsed_ns_p99": 27675000.0,
+          "ns_per_pass_median": 741575.0
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 24914800.0,
+          "elapsed_ns_p95": 26253000.0,
+          "elapsed_ns_p99": 26253000.0,
+          "ns_per_pass_median": 778587.5
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 22934600.0,
+          "elapsed_ns_p95": 26363200.0,
+          "elapsed_ns_p99": 26363200.0,
+          "ns_per_pass_median": 716706.25
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 32851100.0,
+          "elapsed_ns_p95": 36168000.0,
+          "elapsed_ns_p99": 36168000.0,
+          "ns_per_pass_median": 1026596.875
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 33217400.0,
+          "elapsed_ns_p95": 35503800.0,
+          "elapsed_ns_p99": 35503800.0,
+          "ns_per_pass_median": 1038043.75
+        },
+        {
+          "tiles": "4096",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 31897300.0,
+          "elapsed_ns_p95": 35010500.0,
+          "elapsed_ns_p99": 35010500.0,
+          "ns_per_pass_median": 996790.625
+        },
+        {
+          "tiles": "4096",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 29086200.0,
+          "elapsed_ns_p95": 31877000.0,
+          "elapsed_ns_p99": 31877000.0,
+          "ns_per_pass_median": 908943.75
+        }
+      ],
+      "tests": [
+        {
+          "task": "engine-forest-gpu",
+          "name": "dev.xantha.vss.client.prediction.EngineForestGpuTest",
+          "tests": "1",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T09:55:05",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "10.456"
+        },
+        {
+          "task": "engine-input",
+          "name": "dev.xantha.vss.client.prediction.EngineResidentInputTest",
+          "tests": "3",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T09:49:53",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "9.758"
+        },
+        {
+          "task": "engine-maintenance-gpu",
+          "name": "dev.xantha.vss.client.prediction.EngineMaintenanceGpuTest",
+          "tests": "1",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T09:59:17",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "27.631"
+        },
+        {
+          "task": "engine-resident-gpu",
+          "name": "dev.xantha.vss.client.prediction.RetainedGpuSelectionGpuTest",
+          "tests": "1",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T09:55:16",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "33.84"
+        }
+      ],
+      "sourceSha256": {
+        "PredictionGpuSelectionInput": "1f13765c676a9cdcafd9d850cad88afd26503278997780618a1a238f4a6e7da2",
+        "PredictionIndirectBatch": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+        "PredictionDisplayGeometry": "6e16466d8e4437d75aa0d400f8b87244b6359fa1c82351daa3873afd0de28524",
+        "PredictionRenderer": "a090e16cf310822fbed31c9d81d839005a93bdfc3874376605cf388e90b9232c",
+        "PredictionVegetation": "a1f714920ab13d2f02e70e2d0d2b99d2960fd2b7f1d49c56f5c47e4b202761d7"
+      },
+      "artifactSha256": {
+        "engine-forest-quality.csv": "30f740b47097ae8a06ae0d6bd3aca08539f280d906c67507739813c27acd899f",
+        "engine-forest.csv": "67e9abe8451899a68cd2064a538ea5f8fd3158e1fbf3ff4774e0f28b43751c8c",
+        "engine-input.csv": "73d32939da590418967b0166598dd31ebf6841c2277d858d452cccfbd49d1f91",
+        "engine-maintenance-throughput.csv": "0798fa7c70bb064c8ef139f05a4a94c0e1dde68798a58fa674f2a880b6b1028f",
+        "engine-maintenance.csv": "c56a55401f7185936adffb70ce527eedf7f771d690ac33eab2b3c9121344e21d",
+        "engine-prepare.csv": "d6fc9ba4493794aa875d5019edb5da135a3b27f480edcf6a99dfd2442c881857",
+        "retained-gpu-selection-throughput.csv": "3cddc0b71e4306ab3ecc5d42f2c2a12ba5a560ab96cc497e50dbcad792817165",
+        "retained-gpu-selection.csv": "e54de18b610c778cbf1ab085258b27db3d6aed1aac6d2060acd4f970790e7314"
+      },
+      "quality": [
+        {
+          "mode": 1,
+          "eligibleViews": 24,
+          "iouMedian": 0.8153534059363656,
+          "addedFractionMedian": 0.2264872157265836,
+          "lostFractionMedian": 0.0,
+          "sourcePixelsMin": 5,
+          "sourcePixelsMax": 439
+        },
+        {
+          "mode": 2,
+          "eligibleViews": 12,
+          "iouMedian": 0.6511156186612577,
+          "addedFractionMedian": 0.5358851674641147,
+          "lostFractionMedian": 0.0,
+          "sourcePixelsMin": 5,
+          "sourcePixelsMax": 23
+        }
+      ]
+    },
+    "forge": {
+      "input": [
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 300.0,
+          "cpu_ns_p95": 800.0,
+          "cpu_ns_p99": 2000.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "512",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 300.0,
+          "cpu_ns_p95": 1200.0,
+          "cpu_ns_p99": 2800.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 27600.0,
+          "cpu_ns_p95": 53400.0,
+          "cpu_ns_p99": 72300.0,
+          "allocated_bytes_median": 120960.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 23500.0,
+          "cpu_ns_p95": 59800.0,
+          "cpu_ns_p99": 104000.0,
+          "allocated_bytes_median": 6544.0,
+          "rebuilt_records_median": 1.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 23700.0,
+          "cpu_ns_p95": 47900.0,
+          "cpu_ns_p99": 76900.0,
+          "allocated_bytes_median": 120960.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 20400.0,
+          "cpu_ns_p95": 58100.0,
+          "cpu_ns_p99": 108400.0,
+          "allocated_bytes_median": 14976.0,
+          "rebuilt_records_median": 32.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 27900.0,
+          "cpu_ns_p95": 51100.0,
+          "cpu_ns_p99": 59500.0,
+          "allocated_bytes_median": 120960.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 32000.0,
+          "cpu_ns_p95": 72600.0,
+          "cpu_ns_p99": 123900.0,
+          "allocated_bytes_median": 120960.0,
+          "rebuilt_records_median": 512.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 100.0,
+          "cpu_ns_p95": 200.0,
+          "cpu_ns_p99": 300.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 200.0,
+          "cpu_ns_p95": 200.0,
+          "cpu_ns_p99": 500.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 270200.0,
+          "cpu_ns_p95": 531300.0,
+          "cpu_ns_p99": 812600.0,
+          "allocated_bytes_median": 770144.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 170100.0,
+          "cpu_ns_p95": 337200.0,
+          "cpu_ns_p99": 396700.0,
+          "allocated_bytes_median": 49448.0,
+          "rebuilt_records_median": 1.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 263000.0,
+          "cpu_ns_p95": 343500.0,
+          "cpu_ns_p99": 473500.0,
+          "allocated_bytes_median": 770144.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 105300.0,
+          "cpu_ns_p95": 125400.0,
+          "cpu_ns_p99": 145900.0,
+          "allocated_bytes_median": 56392.0,
+          "rebuilt_records_median": 32.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 171800.0,
+          "cpu_ns_p95": 217000.0,
+          "cpu_ns_p99": 270800.0,
+          "allocated_bytes_median": 770144.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 220800.0,
+          "cpu_ns_p95": 337200.0,
+          "cpu_ns_p99": 374500.0,
+          "allocated_bytes_median": 966728.0,
+          "rebuilt_records_median": 4096.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 0.0,
+          "cpu_ns_p95": 100.0,
+          "cpu_ns_p99": 100.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "0",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 100.0,
+          "cpu_ns_p95": 100.0,
+          "cpu_ns_p99": 1800.0,
+          "allocated_bytes_median": 0.0,
+          "rebuilt_records_median": 0.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 255700.0,
+          "cpu_ns_p95": 324900.0,
+          "cpu_ns_p99": 463600.0,
+          "allocated_bytes_median": 1540144.0,
+          "rebuilt_records_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 190100.0,
+          "cpu_ns_p95": 233700.0,
+          "cpu_ns_p99": 284400.0,
+          "allocated_bytes_median": 98600.0,
+          "rebuilt_records_median": 1.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 289300.0,
+          "cpu_ns_p95": 351400.0,
+          "cpu_ns_p99": 440200.0,
+          "allocated_bytes_median": 1540144.0,
+          "rebuilt_records_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 205400.0,
+          "cpu_ns_p95": 282300.0,
+          "cpu_ns_p99": 325600.0,
+          "allocated_bytes_median": 105544.0,
+          "rebuilt_records_median": 32.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 161,
+          "cpu_ns_median": 346900.0,
+          "cpu_ns_p95": 421200.0,
+          "cpu_ns_p99": 470400.0,
+          "allocated_bytes_median": 1540144.0,
+          "rebuilt_records_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 161,
+          "cpu_ns_median": 452100.0,
+          "cpu_ns_p95": 528900.0,
+          "cpu_ns_p99": 643100.0,
+          "allocated_bytes_median": 1933336.0,
+          "rebuilt_records_median": 8192.0
+        }
+      ],
+      "prepare": [
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 325100.0,
+          "cpu_ns_p95": 533800.0,
+          "cpu_ns_p99": 782000.0,
+          "allocated_bytes_median": 166432.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 149500.0,
+          "cpu_ns_p95": 268000.0,
+          "cpu_ns_p99": 352100.0,
+          "allocated_bytes_median": 27464.0,
+          "range_builds_median": 1.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 287100.0,
+          "cpu_ns_p95": 374700.0,
+          "cpu_ns_p99": 491900.0,
+          "allocated_bytes_median": 166336.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 142600.0,
+          "cpu_ns_p95": 203800.0,
+          "cpu_ns_p99": 406500.0,
+          "allocated_bytes_median": 37288.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 300600.0,
+          "cpu_ns_p95": 483300.0,
+          "cpu_ns_p99": 783100.0,
+          "allocated_bytes_median": 166336.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "512",
+          "changed": "512",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 319900.0,
+          "cpu_ns_p95": 553700.0,
+          "cpu_ns_p99": 743200.0,
+          "allocated_bytes_median": 190888.0,
+          "range_builds_median": 512.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 1753100.0,
+          "cpu_ns_p95": 2175200.0,
+          "cpu_ns_p99": 2339100.0,
+          "allocated_bytes_median": 1327480.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 802700.0,
+          "cpu_ns_p95": 1007600.0,
+          "cpu_ns_p99": 1061900.0,
+          "allocated_bytes_median": 213664.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 1790600.0,
+          "cpu_ns_p95": 2530500.0,
+          "cpu_ns_p99": 2577300.0,
+          "allocated_bytes_median": 1327480.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 835400.0,
+          "cpu_ns_p95": 1297000.0,
+          "cpu_ns_p99": 1380900.0,
+          "allocated_bytes_median": 223584.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 1876600.0,
+          "cpu_ns_p95": 2249300.0,
+          "cpu_ns_p99": 2364000.0,
+          "allocated_bytes_median": 1327480.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "4096",
+          "changed": "4096",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 1927800.0,
+          "cpu_ns_p95": 2379800.0,
+          "cpu_ns_p99": 2749000.0,
+          "allocated_bytes_median": 1524064.0,
+          "range_builds_median": 4096.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 4017900.0,
+          "cpu_ns_p95": 4584100.0,
+          "cpu_ns_p99": 4719100.0,
+          "allocated_bytes_median": 2654440.0,
+          "range_builds_median": 8191.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "1",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 1923800.0,
+          "cpu_ns_p95": 2240400.0,
+          "cpu_ns_p99": 2438800.0,
+          "allocated_bytes_median": 426656.0,
+          "range_builds_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 4014600.0,
+          "cpu_ns_p95": 5060700.0,
+          "cpu_ns_p99": 5955300.0,
+          "allocated_bytes_median": 2654440.0,
+          "range_builds_median": 8191.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "32",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 1951500.0,
+          "cpu_ns_p95": 2554900.0,
+          "cpu_ns_p99": 3085600.0,
+          "allocated_bytes_median": 436576.0,
+          "range_builds_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "0",
+          "samples": 81,
+          "cpu_ns_median": 3919600.0,
+          "cpu_ns_p95": 5037200.0,
+          "cpu_ns_p99": 8116900.0,
+          "allocated_bytes_median": 2654536.0,
+          "range_builds_median": 8192.0
+        },
+        {
+          "tiles": "8192",
+          "changed": "8192",
+          "mode": "1",
+          "samples": 81,
+          "cpu_ns_median": 4111000.0,
+          "cpu_ns_p95": 4829800.0,
+          "cpu_ns_p99": 5592800.0,
+          "allocated_bytes_median": 3047728.0,
+          "range_builds_median": 8192.0
+        }
+      ],
+      "maintenance": [
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 19445800.0,
+          "elapsed_ns_p95": 23790200.0,
+          "elapsed_ns_p99": 23790200.0,
+          "ns_per_pass_median": 607681.25
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 19131900.0,
+          "elapsed_ns_p95": 26127500.0,
+          "elapsed_ns_p99": 26127500.0,
+          "ns_per_pass_median": 597871.875
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 120752700.0,
+          "elapsed_ns_p95": 164875600.0,
+          "elapsed_ns_p99": 164875600.0,
+          "ns_per_pass_median": 3773521.875
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 52715700.0,
+          "elapsed_ns_p95": 64355800.0,
+          "elapsed_ns_p99": 64355800.0,
+          "ns_per_pass_median": 1647365.625
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 26440900.0,
+          "elapsed_ns_p95": 30072500.0,
+          "elapsed_ns_p99": 30072500.0,
+          "ns_per_pass_median": 826278.125
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 22013600.0,
+          "elapsed_ns_p95": 29396900.0,
+          "elapsed_ns_p99": 29396900.0,
+          "ns_per_pass_median": 687925.0
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 178659800.0,
+          "elapsed_ns_p95": 192804800.0,
+          "elapsed_ns_p99": 192804800.0,
+          "ns_per_pass_median": 5583118.75
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 72941400.0,
+          "elapsed_ns_p95": 82737600.0,
+          "elapsed_ns_p99": 82737600.0,
+          "ns_per_pass_median": 2279418.75
+        }
+      ],
+      "forest": [
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 33792.0,
+          "gpu_ns_p95": 34816.0,
+          "gpu_ns_p99": 39936.0,
+          "cpu_ns_median": 30200.0,
+          "cpu_ns_p95": 51700.0,
+          "cpu_ns_p99": 69400.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 29696.0,
+          "gpu_ns_p95": 31744.0,
+          "gpu_ns_p99": 34816.0,
+          "cpu_ns_median": 32000.0,
+          "cpu_ns_p95": 61100.0,
+          "cpu_ns_p99": 87700.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 26624.0,
+          "gpu_ns_p95": 28672.0,
+          "gpu_ns_p99": 29696.0,
+          "cpu_ns_median": 31100.0,
+          "cpu_ns_p95": 62200.0,
+          "cpu_ns_p99": 78000.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 37888.0,
+          "gpu_ns_p95": 44032.0,
+          "gpu_ns_p99": 63488.0,
+          "cpu_ns_median": 79400.0,
+          "cpu_ns_p95": 125700.0,
+          "cpu_ns_p99": 173800.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 214.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 31744.0,
+          "gpu_ns_p95": 35840.0,
+          "gpu_ns_p99": 60416.0,
+          "cpu_ns_median": 82500.0,
+          "cpu_ns_p95": 147200.0,
+          "cpu_ns_p99": 170600.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 175.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 27648.0,
+          "gpu_ns_p95": 32768.0,
+          "gpu_ns_p99": 55296.0,
+          "cpu_ns_median": 79000.0,
+          "cpu_ns_p95": 118900.0,
+          "cpu_ns_p99": 127300.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 34816.0,
+          "gpu_ns_p95": 35840.0,
+          "gpu_ns_p99": 38912.0,
+          "cpu_ns_median": 18300.0,
+          "cpu_ns_p95": 33800.0,
+          "cpu_ns_p99": 42100.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 29696.0,
+          "gpu_ns_p95": 32768.0,
+          "gpu_ns_p99": 36864.0,
+          "cpu_ns_median": 19000.0,
+          "cpu_ns_p95": 41100.0,
+          "cpu_ns_p99": 63900.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 26624.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 29696.0,
+          "cpu_ns_median": 18800.0,
+          "cpu_ns_p95": 37900.0,
+          "cpu_ns_p99": 48000.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 37888.0,
+          "gpu_ns_p95": 44032.0,
+          "gpu_ns_p99": 62464.0,
+          "cpu_ns_median": 65800.0,
+          "cpu_ns_p95": 102600.0,
+          "cpu_ns_p99": 134300.0,
+          "mdi_quads_median": 54616.0,
+          "mdi_commands_median": 214.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 31744.0,
+          "gpu_ns_p95": 35840.0,
+          "gpu_ns_p99": 52224.0,
+          "cpu_ns_median": 68100.0,
+          "cpu_ns_p95": 97200.0,
+          "cpu_ns_p99": 118100.0,
+          "mdi_quads_median": 44568.0,
+          "mdi_commands_median": 175.0
+        },
+        {
+          "mesh": "1511",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 28672.0,
+          "gpu_ns_p95": 31744.0,
+          "gpu_ns_p99": 53248.0,
+          "cpu_ns_median": 68700.0,
+          "cpu_ns_p95": 108600.0,
+          "cpu_ns_p99": 131500.0,
+          "mdi_quads_median": 37038.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 30720.0,
+          "gpu_ns_p95": 31744.0,
+          "gpu_ns_p99": 34816.0,
+          "cpu_ns_median": 12700.0,
+          "cpu_ns_p95": 30200.0,
+          "cpu_ns_p99": 54900.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 29696.0,
+          "cpu_ns_median": 13000.0,
+          "cpu_ns_p95": 30100.0,
+          "cpu_ns_p99": 40300.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 23552.0,
+          "gpu_ns_p95": 25600.0,
+          "gpu_ns_p99": 28672.0,
+          "cpu_ns_median": 12400.0,
+          "cpu_ns_p95": 33000.0,
+          "cpu_ns_p99": 52300.0,
+          "mdi_quads_median": 32163.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 33792.0,
+          "gpu_ns_p95": 39936.0,
+          "gpu_ns_p99": 70656.0,
+          "cpu_ns_median": 63800.0,
+          "cpu_ns_p95": 116600.0,
+          "cpu_ns_p99": 161200.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 191.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 27648.0,
+          "gpu_ns_p95": 31744.0,
+          "gpu_ns_p99": 52224.0,
+          "cpu_ns_median": 63700.0,
+          "cpu_ns_p95": 109100.0,
+          "cpu_ns_p99": 131200.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "739",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 28672.0,
+          "gpu_ns_p99": 53248.0,
+          "cpu_ns_median": 64200.0,
+          "cpu_ns_p95": 89700.0,
+          "cpu_ns_p99": 104800.0,
+          "mdi_quads_median": 32163.0,
+          "mdi_commands_median": 126.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 31744.0,
+          "gpu_ns_p95": 32768.0,
+          "gpu_ns_p99": 39936.0,
+          "cpu_ns_median": 12400.0,
+          "cpu_ns_p95": 30200.0,
+          "cpu_ns_p99": 35400.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 28672.0,
+          "cpu_ns_median": 13300.0,
+          "cpu_ns_p95": 33600.0,
+          "cpu_ns_p99": 57100.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 14336.0,
+          "gpu_ns_p95": 15360.0,
+          "gpu_ns_p99": 15360.0,
+          "cpu_ns_median": 13100.0,
+          "cpu_ns_p95": 31500.0,
+          "cpu_ns_p99": 47000.0,
+          "mdi_quads_median": 14610.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 34816.0,
+          "gpu_ns_p95": 41984.0,
+          "gpu_ns_p99": 60416.0,
+          "cpu_ns_median": 66100.0,
+          "cpu_ns_p95": 103800.0,
+          "cpu_ns_p99": 115600.0,
+          "mdi_quads_median": 48846.0,
+          "mdi_commands_median": 191.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 27648.0,
+          "gpu_ns_p95": 31744.0,
+          "gpu_ns_p99": 53248.0,
+          "cpu_ns_median": 65400.0,
+          "cpu_ns_p95": 104200.0,
+          "cpu_ns_p99": 140800.0,
+          "mdi_quads_median": 36963.0,
+          "mdi_commands_median": 145.0
+        },
+        {
+          "mesh": "739",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 15360.0,
+          "gpu_ns_p95": 16384.0,
+          "gpu_ns_p99": 34816.0,
+          "cpu_ns_median": 65900.0,
+          "cpu_ns_p95": 129500.0,
+          "cpu_ns_p99": 247400.0,
+          "mdi_quads_median": 14610.0,
+          "mdi_commands_median": 58.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 24576.0,
+          "gpu_ns_p95": 24576.0,
+          "gpu_ns_p99": 27648.0,
+          "cpu_ns_median": 12100.0,
+          "cpu_ns_p95": 28700.0,
+          "cpu_ns_p99": 34000.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 21504.0,
+          "gpu_ns_p95": 22528.0,
+          "gpu_ns_p99": 24576.0,
+          "cpu_ns_median": 12200.0,
+          "cpu_ns_p95": 33100.0,
+          "cpu_ns_p99": 36200.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 19456.0,
+          "gpu_ns_p95": 20480.0,
+          "gpu_ns_p99": 24576.0,
+          "cpu_ns_median": 12200.0,
+          "cpu_ns_p95": 30400.0,
+          "cpu_ns_p99": 34500.0,
+          "mdi_quads_median": 20449.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 29696.0,
+          "gpu_ns_p99": 51200.0,
+          "cpu_ns_median": 63600.0,
+          "cpu_ns_p95": 109400.0,
+          "cpu_ns_p99": 146800.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 118.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 22528.0,
+          "gpu_ns_p95": 24576.0,
+          "gpu_ns_p99": 48128.0,
+          "cpu_ns_median": 63100.0,
+          "cpu_ns_p95": 85500.0,
+          "cpu_ns_p99": 101400.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 96.0
+        },
+        {
+          "mesh": "732",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 20480.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 46080.0,
+          "cpu_ns_median": 65700.0,
+          "cpu_ns_p95": 99600.0,
+          "cpu_ns_p99": 112300.0,
+          "mdi_quads_median": 20449.0,
+          "mdi_commands_median": 80.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 22528.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 29696.0,
+          "cpu_ns_median": 14500.0,
+          "cpu_ns_p95": 36400.0,
+          "cpu_ns_p99": 37300.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 19456.0,
+          "gpu_ns_p95": 20480.0,
+          "gpu_ns_p99": 25600.0,
+          "cpu_ns_median": 13000.0,
+          "cpu_ns_p95": 31300.0,
+          "cpu_ns_p99": 58400.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 16384.0,
+          "cpu_ns_median": 14100.0,
+          "cpu_ns_p95": 37400.0,
+          "cpu_ns_p99": 52200.0,
+          "mdi_quads_median": 9277.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 23552.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 47104.0,
+          "cpu_ns_median": 67400.0,
+          "cpu_ns_p95": 125100.0,
+          "cpu_ns_p99": 146200.0,
+          "mdi_quads_median": 30208.0,
+          "mdi_commands_median": 118.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 21504.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 47104.0,
+          "cpu_ns_median": 67300.0,
+          "cpu_ns_p95": 117500.0,
+          "cpu_ns_p99": 131300.0,
+          "mdi_quads_median": 24373.0,
+          "mdi_commands_median": 96.0
+        },
+        {
+          "mesh": "732",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 16384.0,
+          "gpu_ns_p99": 36864.0,
+          "cpu_ns_median": 65100.0,
+          "cpu_ns_p95": 115400.0,
+          "cpu_ns_p99": 133000.0,
+          "mdi_quads_median": 9277.0,
+          "mdi_commands_median": 38.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 24576.0,
+          "gpu_ns_p95": 25600.0,
+          "gpu_ns_p99": 25600.0,
+          "cpu_ns_median": 15200.0,
+          "cpu_ns_p95": 37100.0,
+          "cpu_ns_p99": 42100.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 22528.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 24576.0,
+          "cpu_ns_median": 14800.0,
+          "cpu_ns_p95": 36100.0,
+          "cpu_ns_p99": 55100.0,
+          "mdi_quads_median": 24641.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 20480.0,
+          "gpu_ns_p95": 21504.0,
+          "gpu_ns_p99": 21504.0,
+          "cpu_ns_median": 14300.0,
+          "cpu_ns_p95": 31100.0,
+          "cpu_ns_p99": 36900.0,
+          "mdi_quads_median": 20782.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 25600.0,
+          "gpu_ns_p95": 31744.0,
+          "gpu_ns_p99": 51200.0,
+          "cpu_ns_median": 65000.0,
+          "cpu_ns_p95": 95900.0,
+          "cpu_ns_p99": 121400.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 117.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 23552.0,
+          "gpu_ns_p95": 28672.0,
+          "gpu_ns_p99": 48128.0,
+          "cpu_ns_median": 68600.0,
+          "cpu_ns_p95": 95100.0,
+          "cpu_ns_p99": 151000.0,
+          "mdi_quads_median": 24641.0,
+          "mdi_commands_median": 97.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 20480.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 46080.0,
+          "cpu_ns_median": 67300.0,
+          "cpu_ns_p95": 91000.0,
+          "cpu_ns_p99": 97300.0,
+          "mdi_quads_median": 20782.0,
+          "mdi_commands_median": 82.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 22528.0,
+          "gpu_ns_p95": 23552.0,
+          "gpu_ns_p99": 26624.0,
+          "cpu_ns_median": 13400.0,
+          "cpu_ns_p95": 41100.0,
+          "cpu_ns_p99": 62900.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 14336.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 18432.0,
+          "cpu_ns_median": 13500.0,
+          "cpu_ns_p95": 37500.0,
+          "cpu_ns_p99": 44300.0,
+          "mdi_quads_median": 12255.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 13312.0,
+          "cpu_ns_median": 14000.0,
+          "cpu_ns_p95": 35300.0,
+          "cpu_ns_p99": 43000.0,
+          "mdi_quads_median": 8396.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 23552.0,
+          "gpu_ns_p95": 26624.0,
+          "gpu_ns_p99": 48128.0,
+          "cpu_ns_median": 70200.0,
+          "cpu_ns_p95": 129100.0,
+          "cpu_ns_p99": 407500.0,
+          "mdi_quads_median": 29807.0,
+          "mdi_commands_median": 117.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 13312.0,
+          "gpu_ns_p95": 17408.0,
+          "gpu_ns_p99": 38912.0,
+          "cpu_ns_median": 69200.0,
+          "cpu_ns_p95": 111800.0,
+          "cpu_ns_p99": 178800.0,
+          "mdi_quads_median": 12255.0,
+          "mdi_commands_median": 49.0
+        },
+        {
+          "mesh": "1476",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 36864.0,
+          "cpu_ns_median": 69000.0,
+          "cpu_ns_p95": 110100.0,
+          "cpu_ns_p99": 153600.0,
+          "mdi_quads_median": 8396.0,
+          "mdi_commands_median": 33.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 17408.0,
+          "gpu_ns_p95": 18432.0,
+          "gpu_ns_p99": 22528.0,
+          "cpu_ns_median": 17600.0,
+          "cpu_ns_p95": 62400.0,
+          "cpu_ns_p99": 169300.0,
+          "mdi_quads_median": 18693.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 17408.0,
+          "gpu_ns_p95": 19456.0,
+          "gpu_ns_p99": 22528.0,
+          "cpu_ns_median": 17100.0,
+          "cpu_ns_p95": 58200.0,
+          "cpu_ns_p99": 91200.0,
+          "mdi_quads_median": 16297.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 16384.0,
+          "gpu_ns_p95": 17408.0,
+          "gpu_ns_p99": 20480.0,
+          "cpu_ns_median": 19700.0,
+          "cpu_ns_p95": 106800.0,
+          "cpu_ns_p99": 160800.0,
+          "mdi_quads_median": 15131.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 17408.0,
+          "gpu_ns_p95": 25600.0,
+          "gpu_ns_p99": 45056.0,
+          "cpu_ns_median": 79400.0,
+          "cpu_ns_p95": 173800.0,
+          "cpu_ns_p99": 493500.0,
+          "mdi_quads_median": 18693.0,
+          "mdi_commands_median": 74.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 18432.0,
+          "gpu_ns_p95": 19456.0,
+          "gpu_ns_p99": 44032.0,
+          "cpu_ns_median": 76300.0,
+          "cpu_ns_p95": 103800.0,
+          "cpu_ns_p99": 178900.0,
+          "mdi_quads_median": 16297.0,
+          "mdi_commands_median": 64.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 16384.0,
+          "gpu_ns_p95": 21504.0,
+          "gpu_ns_p99": 43008.0,
+          "cpu_ns_median": 73600.0,
+          "cpu_ns_p95": 145300.0,
+          "cpu_ns_p99": 418300.0,
+          "mdi_quads_median": 15131.0,
+          "mdi_commands_median": 60.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 13312.0,
+          "cpu_ns_median": 12800.0,
+          "cpu_ns_p95": 34600.0,
+          "cpu_ns_p99": 55300.0,
+          "mdi_quads_median": 9077.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 14336.0,
+          "cpu_ns_median": 10000.0,
+          "cpu_ns_p95": 35000.0,
+          "cpu_ns_p99": 61600.0,
+          "mdi_quads_median": 7824.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 11264.0,
+          "gpu_ns_p99": 11264.0,
+          "cpu_ns_median": 13300.0,
+          "cpu_ns_p95": 31400.0,
+          "cpu_ns_p99": 102200.0,
+          "mdi_quads_median": 6654.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 16384.0,
+          "gpu_ns_p99": 40960.0,
+          "cpu_ns_median": 77000.0,
+          "cpu_ns_p95": 148500.0,
+          "cpu_ns_p99": 273700.0,
+          "mdi_quads_median": 9077.0,
+          "mdi_commands_median": 36.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 37888.0,
+          "cpu_ns_median": 75200.0,
+          "cpu_ns_p95": 149600.0,
+          "cpu_ns_p99": 264400.0,
+          "mdi_quads_median": 7824.0,
+          "mdi_commands_median": 32.0
+        },
+        {
+          "mesh": "2001",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 11264.0,
+          "gpu_ns_p99": 35840.0,
+          "cpu_ns_median": 75300.0,
+          "cpu_ns_p95": 135800.0,
+          "cpu_ns_p99": 160500.0,
+          "mdi_quads_median": 6654.0,
+          "mdi_commands_median": 27.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 13312.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 15360.0,
+          "cpu_ns_median": 13600.0,
+          "cpu_ns_p95": 48900.0,
+          "cpu_ns_p99": 192000.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 16384.0,
+          "cpu_ns_median": 15000.0,
+          "cpu_ns_p95": 40800.0,
+          "cpu_ns_p99": 47700.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 15360.0,
+          "cpu_ns_median": 15100.0,
+          "cpu_ns_p95": 81300.0,
+          "cpu_ns_p99": 155700.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 17408.0,
+          "gpu_ns_p99": 40960.0,
+          "cpu_ns_median": 74500.0,
+          "cpu_ns_p95": 248700.0,
+          "cpu_ns_p99": 465600.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 36.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 59392.0,
+          "cpu_ns_median": 75200.0,
+          "cpu_ns_p95": 231600.0,
+          "cpu_ns_p99": 816500.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 31.0
+        },
+        {
+          "mesh": "359",
+          "distance": "1024",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 15360.0,
+          "gpu_ns_p99": 37888.0,
+          "cpu_ns_median": 78100.0,
+          "cpu_ns_p95": 229500.0,
+          "cpu_ns_p99": 759700.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 29.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 13312.0,
+          "cpu_ns_median": 12000.0,
+          "cpu_ns_p95": 31200.0,
+          "cpu_ns_p99": 41900.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 12288.0,
+          "gpu_ns_p99": 12288.0,
+          "cpu_ns_median": 13400.0,
+          "cpu_ns_p95": 36800.0,
+          "cpu_ns_p99": 39400.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "false",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 11264.0,
+          "gpu_ns_p99": 11264.0,
+          "cpu_ns_median": 10500.0,
+          "cpu_ns_p95": 17400.0,
+          "cpu_ns_p99": 33100.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 1.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "0",
+          "samples": 81,
+          "gpu_ns_median": 12288.0,
+          "gpu_ns_p95": 13312.0,
+          "gpu_ns_p99": 37888.0,
+          "cpu_ns_median": 64500.0,
+          "cpu_ns_p95": 120100.0,
+          "cpu_ns_p99": 230400.0,
+          "mdi_quads_median": 9130.0,
+          "mdi_commands_median": 36.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "1",
+          "samples": 81,
+          "gpu_ns_median": 11264.0,
+          "gpu_ns_p95": 14336.0,
+          "gpu_ns_p99": 29696.0,
+          "cpu_ns_median": 64900.0,
+          "cpu_ns_p95": 102600.0,
+          "cpu_ns_p99": 140300.0,
+          "mdi_quads_median": 7745.0,
+          "mdi_commands_median": 31.0
+        },
+        {
+          "mesh": "359",
+          "distance": "4096",
+          "hiz": "true",
+          "mode": "2",
+          "samples": 81,
+          "gpu_ns_median": 10240.0,
+          "gpu_ns_p95": 11264.0,
+          "gpu_ns_p99": 35840.0,
+          "cpu_ns_median": 65700.0,
+          "cpu_ns_p95": 103700.0,
+          "cpu_ns_p99": 113200.0,
+          "mdi_quads_median": 7372.0,
+          "mdi_commands_median": 29.0
+        }
+      ],
+      "retainedControl": [
+        {
+          "tiles": "128",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 2375300.0,
+          "elapsed_ns_p95": 5092800.0,
+          "elapsed_ns_p99": 5092800.0,
+          "ns_per_pass_median": 74228.125
+        },
+        {
+          "tiles": "128",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 2505300.0,
+          "elapsed_ns_p95": 10925600.0,
+          "elapsed_ns_p99": 10925600.0,
+          "ns_per_pass_median": 78290.625
+        },
+        {
+          "tiles": "128",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 5387100.0,
+          "elapsed_ns_p95": 12529400.0,
+          "elapsed_ns_p99": 12529400.0,
+          "ns_per_pass_median": 168346.875
+        },
+        {
+          "tiles": "128",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 5822500.0,
+          "elapsed_ns_p95": 16302600.0,
+          "elapsed_ns_p99": 16302600.0,
+          "ns_per_pass_median": 181953.125
+        },
+        {
+          "tiles": "128",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 8341500.0,
+          "elapsed_ns_p95": 19048400.0,
+          "elapsed_ns_p99": 19048400.0,
+          "ns_per_pass_median": 260671.875
+        },
+        {
+          "tiles": "128",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 9579100.0,
+          "elapsed_ns_p95": 17965200.0,
+          "elapsed_ns_p99": 17965200.0,
+          "ns_per_pass_median": 299346.875
+        },
+        {
+          "tiles": "512",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 4208200.0,
+          "elapsed_ns_p95": 16410100.0,
+          "elapsed_ns_p99": 16410100.0,
+          "ns_per_pass_median": 131506.25
+        },
+        {
+          "tiles": "512",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 3765000.0,
+          "elapsed_ns_p95": 13102800.0,
+          "elapsed_ns_p99": 13102800.0,
+          "ns_per_pass_median": 117656.25
+        },
+        {
+          "tiles": "512",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 7351300.0,
+          "elapsed_ns_p95": 16520600.0,
+          "elapsed_ns_p99": 16520600.0,
+          "ns_per_pass_median": 229728.125
+        },
+        {
+          "tiles": "512",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 7853400.0,
+          "elapsed_ns_p95": 13939100.0,
+          "elapsed_ns_p99": 13939100.0,
+          "ns_per_pass_median": 245418.75
+        },
+        {
+          "tiles": "512",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 16424600.0,
+          "elapsed_ns_p95": 33407600.0,
+          "elapsed_ns_p99": 33407600.0,
+          "ns_per_pass_median": 513268.75
+        },
+        {
+          "tiles": "512",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 16746000.0,
+          "elapsed_ns_p95": 23431900.0,
+          "elapsed_ns_p99": 23431900.0,
+          "ns_per_pass_median": 523312.5
+        },
+        {
+          "tiles": "1024",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 6175400.0,
+          "elapsed_ns_p95": 16841200.0,
+          "elapsed_ns_p99": 16841200.0,
+          "ns_per_pass_median": 192981.25
+        },
+        {
+          "tiles": "1024",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 5854900.0,
+          "elapsed_ns_p95": 8771300.0,
+          "elapsed_ns_p99": 8771300.0,
+          "ns_per_pass_median": 182965.625
+        },
+        {
+          "tiles": "1024",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 11869800.0,
+          "elapsed_ns_p95": 18417500.0,
+          "elapsed_ns_p99": 18417500.0,
+          "ns_per_pass_median": 370931.25
+        },
+        {
+          "tiles": "1024",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 11864400.0,
+          "elapsed_ns_p95": 19066000.0,
+          "elapsed_ns_p99": 19066000.0,
+          "ns_per_pass_median": 370762.5
+        },
+        {
+          "tiles": "1024",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 15326900.0,
+          "elapsed_ns_p95": 21696400.0,
+          "elapsed_ns_p99": 21696400.0,
+          "ns_per_pass_median": 478965.625
+        },
+        {
+          "tiles": "1024",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 14127200.0,
+          "elapsed_ns_p95": 21154100.0,
+          "elapsed_ns_p99": 21154100.0,
+          "ns_per_pass_median": 441475.0
+        },
+        {
+          "tiles": "1025",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 2209300.0,
+          "elapsed_ns_p95": 5703400.0,
+          "elapsed_ns_p99": 5703400.0,
+          "ns_per_pass_median": 69040.625
+        },
+        {
+          "tiles": "1025",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 2279200.0,
+          "elapsed_ns_p95": 6531900.0,
+          "elapsed_ns_p99": 6531900.0,
+          "ns_per_pass_median": 71225.0
+        },
+        {
+          "tiles": "1025",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 5087300.0,
+          "elapsed_ns_p95": 14115900.0,
+          "elapsed_ns_p99": 14115900.0,
+          "ns_per_pass_median": 158978.125
+        },
+        {
+          "tiles": "1025",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 5386000.0,
+          "elapsed_ns_p95": 14357100.0,
+          "elapsed_ns_p99": 14357100.0,
+          "ns_per_pass_median": 168312.5
+        },
+        {
+          "tiles": "1025",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 10370300.0,
+          "elapsed_ns_p95": 17228200.0,
+          "elapsed_ns_p99": 17228200.0,
+          "ns_per_pass_median": 324071.875
+        },
+        {
+          "tiles": "1025",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 11427300.0,
+          "elapsed_ns_p95": 18214600.0,
+          "elapsed_ns_p99": 18214600.0,
+          "ns_per_pass_median": 357103.125
+        },
+        {
+          "tiles": "1536",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 3583100.0,
+          "elapsed_ns_p95": 11802900.0,
+          "elapsed_ns_p99": 11802900.0,
+          "ns_per_pass_median": 111971.875
+        },
+        {
+          "tiles": "1536",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 3961300.0,
+          "elapsed_ns_p95": 13918800.0,
+          "elapsed_ns_p99": 13918800.0,
+          "ns_per_pass_median": 123790.625
+        },
+        {
+          "tiles": "1536",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 9692700.0,
+          "elapsed_ns_p95": 16837400.0,
+          "elapsed_ns_p99": 16837400.0,
+          "ns_per_pass_median": 302896.875
+        },
+        {
+          "tiles": "1536",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 10151400.0,
+          "elapsed_ns_p95": 17451200.0,
+          "elapsed_ns_p99": 17451200.0,
+          "ns_per_pass_median": 317231.25
+        },
+        {
+          "tiles": "1536",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 18540000.0,
+          "elapsed_ns_p95": 24305600.0,
+          "elapsed_ns_p99": 24305600.0,
+          "ns_per_pass_median": 579375.0
+        },
+        {
+          "tiles": "1536",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 16373000.0,
+          "elapsed_ns_p95": 22917400.0,
+          "elapsed_ns_p99": 22917400.0,
+          "ns_per_pass_median": 511656.25
+        },
+        {
+          "tiles": "2048",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 3511500.0,
+          "elapsed_ns_p95": 12638200.0,
+          "elapsed_ns_p99": 12638200.0,
+          "ns_per_pass_median": 109734.375
+        },
+        {
+          "tiles": "2048",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 3778400.0,
+          "elapsed_ns_p95": 12696800.0,
+          "elapsed_ns_p99": 12696800.0,
+          "ns_per_pass_median": 118075.0
+        },
+        {
+          "tiles": "2048",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 12817900.0,
+          "elapsed_ns_p95": 22338100.0,
+          "elapsed_ns_p99": 22338100.0,
+          "ns_per_pass_median": 400559.375
+        },
+        {
+          "tiles": "2048",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 13328500.0,
+          "elapsed_ns_p95": 20653000.0,
+          "elapsed_ns_p99": 20653000.0,
+          "ns_per_pass_median": 416515.625
+        },
+        {
+          "tiles": "2048",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 21333000.0,
+          "elapsed_ns_p95": 26723800.0,
+          "elapsed_ns_p99": 26723800.0,
+          "ns_per_pass_median": 666656.25
+        },
+        {
+          "tiles": "2048",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 20489900.0,
+          "elapsed_ns_p95": 25113100.0,
+          "elapsed_ns_p99": 25113100.0,
+          "ns_per_pass_median": 640309.375
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 17493800.0,
+          "elapsed_ns_p95": 23059500.0,
+          "elapsed_ns_p99": 23059500.0,
+          "ns_per_pass_median": 546681.25
+        },
+        {
+          "tiles": "3072",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 17055200.0,
+          "elapsed_ns_p95": 22552400.0,
+          "elapsed_ns_p99": 22552400.0,
+          "ns_per_pass_median": 532975.0
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 25645100.0,
+          "elapsed_ns_p95": 29895500.0,
+          "elapsed_ns_p99": 29895500.0,
+          "ns_per_pass_median": 801409.375
+        },
+        {
+          "tiles": "3072",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 23679300.0,
+          "elapsed_ns_p95": 27687900.0,
+          "elapsed_ns_p99": 27687900.0,
+          "ns_per_pass_median": 739978.125
+        },
+        {
+          "tiles": "3072",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 26266400.0,
+          "elapsed_ns_p95": 33262900.0,
+          "elapsed_ns_p99": 33262900.0,
+          "ns_per_pass_median": 820825.0
+        },
+        {
+          "tiles": "3072",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 20943300.0,
+          "elapsed_ns_p95": 26679700.0,
+          "elapsed_ns_p99": 26679700.0,
+          "ns_per_pass_median": 654478.125
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 22036100.0,
+          "elapsed_ns_p95": 26542700.0,
+          "elapsed_ns_p99": 26542700.0,
+          "ns_per_pass_median": 688628.125
+        },
+        {
+          "tiles": "4096",
+          "case": "0",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 21290700.0,
+          "elapsed_ns_p95": 25610300.0,
+          "elapsed_ns_p99": 25610300.0,
+          "ns_per_pass_median": 665334.375
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 32586800.0,
+          "elapsed_ns_p95": 37942400.0,
+          "elapsed_ns_p99": 37942400.0,
+          "ns_per_pass_median": 1018337.5
+        },
+        {
+          "tiles": "4096",
+          "case": "1",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 32333500.0,
+          "elapsed_ns_p95": 33865500.0,
+          "elapsed_ns_p99": 33865500.0,
+          "ns_per_pass_median": 1010421.875
+        },
+        {
+          "tiles": "4096",
+          "case": "2",
+          "mode": "0",
+          "samples": 21,
+          "elapsed_ns_median": 29664000.0,
+          "elapsed_ns_p95": 37701400.0,
+          "elapsed_ns_p99": 37701400.0,
+          "ns_per_pass_median": 927000.0
+        },
+        {
+          "tiles": "4096",
+          "case": "2",
+          "mode": "1",
+          "samples": 21,
+          "elapsed_ns_median": 27047400.0,
+          "elapsed_ns_p95": 30150700.0,
+          "elapsed_ns_p99": 30150700.0,
+          "ns_per_pass_median": 845231.25
+        }
+      ],
+      "tests": [
+        {
+          "task": "engine-forest-gpu",
+          "name": "dev.xantha.vss.client.prediction.EngineForestGpuTest",
+          "tests": "1",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T10:01:19",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "10.928"
+        },
+        {
+          "task": "engine-input",
+          "name": "dev.xantha.vss.client.prediction.EngineResidentInputTest",
+          "tests": "3",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T10:01:09",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "9.64"
+        },
+        {
+          "task": "engine-maintenance-gpu",
+          "name": "dev.xantha.vss.client.prediction.EngineMaintenanceGpuTest",
+          "tests": "1",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T10:02:10",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "26.315"
+        },
+        {
+          "task": "engine-resident-gpu",
+          "name": "dev.xantha.vss.client.prediction.RetainedGpuSelectionGpuTest",
+          "tests": "1",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-10-14T10:01:31",
+          "hostname": "DESKTOP-G6PR36S",
+          "time": "37.472"
+        }
+      ],
+      "sourceSha256": {
+        "PredictionGpuSelectionInput": "1f13765c676a9cdcafd9d850cad88afd26503278997780618a1a238f4a6e7da2",
+        "PredictionIndirectBatch": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+        "PredictionDisplayGeometry": "6e16466d8e4437d75aa0d400f8b87244b6359fa1c82351daa3873afd0de28524",
+        "PredictionRenderer": "7a5ec72cc619a9b9db6eae760993055647a6466bdd4dff10870cbdaf4be20999",
+        "PredictionVegetation": "2fd41d6a7cc9eb9f19f37498d96138065dd5050f8004ee043a39c75a9bfe1335"
+      },
+      "artifactSha256": {
+        "engine-forest-quality.csv": "30f740b47097ae8a06ae0d6bd3aca08539f280d906c67507739813c27acd899f",
+        "engine-forest.csv": "ba84d5fe26f7367124de9e4ad0d0209c903238a5de369e0662df4d55b26138c0",
+        "engine-input.csv": "2f57909f123f25c895059e9fdbe0245166c6093c9bd77848a38f083950d19f34",
+        "engine-maintenance-throughput.csv": "3935dc15857426a08e3e31864dafd9f9ce8ca7e4803e801ecb0280da224aa312",
+        "engine-maintenance.csv": "cc0d87e179d201b11f97df150e135739e75044ea1d5dd1b89875afb5df221d80",
+        "engine-prepare.csv": "b89dc7d167fe0533062d5bb8b6f95b31a966370f94086f09f781f07e686a601c",
+        "retained-gpu-selection-throughput.csv": "2caca3e4c3544f02bc793065906367e06f8938ab4279c94c48aca23002785307",
+        "retained-gpu-selection.csv": "7af0acbf480339971370b739e73bc4b2f60a57a622100a4cf514f55621d16551"
+      },
+      "quality": [
+        {
+          "mode": 1,
+          "eligibleViews": 24,
+          "iouMedian": 0.8153534059363656,
+          "addedFractionMedian": 0.2264872157265836,
+          "lostFractionMedian": 0.0,
+          "sourcePixelsMin": 5,
+          "sourcePixelsMax": 439
+        },
+        {
+          "mode": 2,
+          "eligibleViews": 12,
+          "iouMedian": 0.6511156186612577,
+          "addedFractionMedian": 0.5358851674641147,
+          "lostFractionMedian": 0.0,
+          "sourcePixelsMin": 5,
+          "sourcePixelsMax": 23
+        }
+      ]
+    }
+  },
+  "forestInputs": {
+    "capture": "C:\\Users\\Administrator\\.codex\\tmp\\vss-distance-render-20261010\\geometry",
+    "captureSha256": "9a4d4bf4164f265c24ec4cfbfcb6c60f79a4da3aa49ce501ebf9d888ae0c4153",
+    "eligibleTiles": 189,
+    "fixtures": [
+      {
+        "id": 1511,
+        "span": 128,
+        "spacing": 2,
+        "sourceFaces": 54847,
+        "leafFaces": 26163,
+        "variants": [
+          54847,
+          45043,
+          37513
+        ],
+        "metrics": [
+          {
+            "step": 2,
+            "replacedFaces": 20326,
+            "proxyFaces": 10522,
+            "occupiedCells": 4625,
+            "maxDisplacement": 3.4641016151377544
+          },
+          {
+            "step": 4,
+            "replacedFaces": 20326,
+            "proxyFaces": 2992,
+            "occupiedCells": 1337,
+            "maxDisplacement": 6.928203230275509
+          }
+        ],
+        "sourceSha256": "38831eb98c1b5409b340baff0477a37d5106751b688831ca16aac5cae37f8239"
+      },
+      {
+        "id": 739,
+        "span": 128,
+        "spacing": 2,
+        "sourceFaces": 48932,
+        "leafFaces": 24087,
+        "variants": [
+          48932,
+          38692,
+          32934
+        ],
+        "metrics": [
+          {
+            "step": 2,
+            "replacedFaces": 18592,
+            "proxyFaces": 8352,
+            "occupiedCells": 3919,
+            "maxDisplacement": 3.4641016151377544
+          },
+          {
+            "step": 4,
+            "replacedFaces": 18592,
+            "proxyFaces": 2594,
+            "occupiedCells": 1124,
+            "maxDisplacement": 6.928203230275509
+          }
+        ],
+        "sourceSha256": "04b092707d71b5ab43e4a8db8630adb35ba9f693fbbbeb907889b26ba2bf22a8"
+      },
+      {
+        "id": 732,
+        "span": 128,
+        "spacing": 2,
+        "sourceFaces": 30263,
+        "leafFaces": 14809,
+        "variants": [
+          30263,
+          26233,
+          21285
+        ],
+        "metrics": [
+          {
+            "step": 2,
+            "replacedFaces": 11282,
+            "proxyFaces": 7252,
+            "occupiedCells": 2992,
+            "maxDisplacement": 3.4641016151377544
+          },
+          {
+            "step": 4,
+            "replacedFaces": 11282,
+            "proxyFaces": 2304,
+            "occupiedCells": 913,
+            "maxDisplacement": 6.928203230275509
+          }
+        ],
+        "sourceSha256": "373825c7d9d645241682e5ae4c87b9fcb55fcf64e4e0e27cc09a6bf84158255d"
+      },
+      {
+        "id": 1476,
+        "span": 128,
+        "spacing": 2,
+        "sourceFaces": 29880,
+        "leafFaces": 12700,
+        "variants": [
+          29880,
+          26716,
+          21704
+        ],
+        "metrics": [
+          {
+            "step": 2,
+            "replacedFaces": 10392,
+            "proxyFaces": 7228,
+            "occupiedCells": 2866,
+            "maxDisplacement": 3.4641016151377544
+          },
+          {
+            "step": 4,
+            "replacedFaces": 10392,
+            "proxyFaces": 2216,
+            "occupiedCells": 879,
+            "maxDisplacement": 6.928203230275509
+          }
+        ],
+        "sourceSha256": "ad9f9b4e00e88bdc098501465d08902b8f0133434f9f244d76236a34e4d5d25e"
+      },
+      {
+        "id": 2001,
+        "span": 128,
+        "spacing": 2,
+        "sourceFaces": 18724,
+        "leafFaces": 5088,
+        "variants": [
+          18724,
+          17862,
+          15670
+        ],
+        "metrics": [
+          {
+            "step": 2,
+            "replacedFaces": 4174,
+            "proxyFaces": 3312,
+            "occupiedCells": 1208,
+            "maxDisplacement": 3.4641016151377544
+          },
+          {
+            "step": 4,
+            "replacedFaces": 4174,
+            "proxyFaces": 1120,
+            "occupiedCells": 405,
+            "maxDisplacement": 6.928203230275509
+          }
+        ],
+        "sourceSha256": "a87bc98944687722f6ebb3f9ed5cc1be84e5a95ed195c4d074eff481bb3599ba"
+      },
+      {
+        "id": 359,
+        "span": 64,
+        "spacing": 1,
+        "sourceFaces": 9130,
+        "leafFaces": 3289,
+        "variants": [
+          9130,
+          8379,
+          7551
+        ],
+        "metrics": [
+          {
+            "step": 2,
+            "replacedFaces": 1971,
+            "proxyFaces": 1220,
+            "occupiedCells": 462,
+            "maxDisplacement": 3.4641016151377544
+          },
+          {
+            "step": 4,
+            "replacedFaces": 1971,
+            "proxyFaces": 392,
+            "occupiedCells": 141,
+            "maxDisplacement": 6.928203230275509
+          }
+        ],
+        "sourceSha256": "a00f6a545a381517fe0a1a879f86ec17e0e96aa5bb31c45c1ba0de8f6257fa4e"
+      }
+    ],
+    "textures": [
+      {
+        "sprite": 1,
+        "resource": "assets/minecraft/textures/block/short_grass.png"
+      },
+      {
+        "sprite": 2,
+        "resource": "assets/minecraft/textures/block/tall_grass_top.png"
+      },
+      {
+        "sprite": 3,
+        "resource": "assets/minecraft/textures/block/tall_grass_bottom.png"
+      },
+      {
+        "sprite": 4,
+        "resource": "assets/minecraft/textures/block/fern.png"
+      },
+      {
+        "sprite": 5,
+        "resource": "assets/minecraft/textures/block/large_fern_top.png"
+      },
+      {
+        "sprite": 6,
+        "resource": "assets/minecraft/textures/block/large_fern_bottom.png"
+      },
+      {
+        "sprite": 7,
+        "resource": "assets/minecraft/textures/block/seagrass.png"
+      },
+      {
+        "sprite": 8,
+        "resource": "assets/minecraft/textures/block/tall_seagrass_top.png"
+      },
+      {
+        "sprite": 9,
+        "resource": "assets/minecraft/textures/block/tall_seagrass_bottom.png"
+      },
+      {
+        "sprite": 10,
+        "resource": "assets/minecraft/textures/block/kelp.png"
+      },
+      {
+        "sprite": 11,
+        "resource": "assets/minecraft/textures/block/kelp_plant.png"
+      },
+      {
+        "sprite": 12,
+        "resource": "assets/minecraft/textures/block/weeping_vines.png"
+      },
+      {
+        "sprite": 13,
+        "resource": "assets/minecraft/textures/block/weeping_vines_plant.png"
+      },
+      {
+        "sprite": 14,
+        "resource": "assets/minecraft/textures/block/twisting_vines.png"
+      },
+      {
+        "sprite": 15,
+        "resource": "assets/minecraft/textures/block/twisting_vines_plant.png"
+      },
+      {
+        "sprite": 16,
+        "resource": "assets/minecraft/textures/block/cave_vines_lit.png"
+      },
+      {
+        "sprite": 17,
+        "resource": "assets/minecraft/textures/block/cave_vines.png"
+      },
+      {
+        "sprite": 18,
+        "resource": "assets/minecraft/textures/block/cave_vines_plant_lit.png"
+      },
+      {
+        "sprite": 19,
+        "resource": "assets/minecraft/textures/block/cave_vines_plant.png"
+      },
+      {
+        "sprite": 20,
+        "resource": "assets/minecraft/textures/block/fire_0.png"
+      },
+      {
+        "sprite": 21,
+        "resource": "assets/minecraft/textures/block/soul_fire_0.png"
+      },
+      {
+        "sprite": 22,
+        "resource": "assets/minecraft/textures/block/grass_block_top.png"
+      },
+      {
+        "sprite": 23,
+        "resource": "assets/minecraft/textures/block/dirt.png"
+      },
+      {
+        "sprite": 24,
+        "resource": "assets/minecraft/textures/block/stone.png"
+      },
+      {
+        "sprite": 25,
+        "resource": "assets/minecraft/textures/block/sand.png"
+      },
+      {
+        "sprite": 26,
+        "resource": "assets/minecraft/textures/block/red_terracotta.png"
+      },
+      {
+        "sprite": 27,
+        "resource": "assets/minecraft/textures/block/netherrack.png"
+      },
+      {
+        "sprite": 28,
+        "resource": "assets/minecraft/textures/block/water_still.png"
+      },
+      {
+        "sprite": 29,
+        "resource": "assets/minecraft/textures/block/lava_still.png"
+      },
+      {
+        "sprite": 30,
+        "resource": "assets/minecraft/textures/block/snow.png"
+      },
+      {
+        "sprite": 31,
+        "resource": "assets/minecraft/textures/block/oak_leaves.png"
+      },
+      {
+        "sprite": 32,
+        "resource": "assets/minecraft/textures/block/oak_log_top.png"
+      },
+      {
+        "sprite": 33,
+        "resource": "assets/minecraft/textures/block/oak_log.png"
+      },
+      {
+        "sprite": 34,
+        "resource": "assets/minecraft/textures/block/spruce_log_top.png"
+      },
+      {
+        "sprite": 35,
+        "resource": "assets/minecraft/textures/block/spruce_log.png"
+      },
+      {
+        "sprite": 36,
+        "resource": "assets/minecraft/textures/block/birch_log_top.png"
+      },
+      {
+        "sprite": 37,
+        "resource": "assets/minecraft/textures/block/birch_log.png"
+      },
+      {
+        "sprite": 38,
+        "resource": "assets/minecraft/textures/block/jungle_log_top.png"
+      },
+      {
+        "sprite": 39,
+        "resource": "assets/minecraft/textures/block/jungle_log.png"
+      },
+      {
+        "sprite": 40,
+        "resource": "assets/minecraft/textures/block/spruce_leaves.png"
+      },
+      {
+        "sprite": 41,
+        "resource": "assets/minecraft/textures/block/birch_leaves.png"
+      },
+      {
+        "sprite": 42,
+        "resource": "assets/minecraft/textures/block/jungle_leaves.png"
+      },
+      {
+        "sprite": 43,
+        "resource": "assets/minecraft/textures/block/dandelion.png"
+      },
+      {
+        "sprite": 44,
+        "resource": "assets/minecraft/textures/block/poppy.png"
+      },
+      {
+        "sprite": 45,
+        "resource": "assets/minecraft/textures/block/gravel.png"
+      },
+      {
+        "sprite": 46,
+        "resource": "assets/minecraft/textures/block/terracotta.png"
+      },
+      {
+        "sprite": 47,
+        "resource": "assets/minecraft/textures/block/red_sand.png"
+      },
+      {
+        "sprite": 48,
+        "resource": "assets/minecraft/textures/block/coarse_dirt.png"
+      },
+      {
+        "sprite": 49,
+        "resource": "assets/minecraft/textures/block/podzol_top.png"
+      },
+      {
+        "sprite": 50,
+        "resource": "assets/minecraft/textures/block/orange_terracotta.png"
+      },
+      {
+        "sprite": 51,
+        "resource": "assets/minecraft/textures/block/grass_block_side.png"
+      },
+      {
+        "sprite": 52,
+        "resource": "assets/minecraft/textures/block/sandstone.png"
+      },
+      {
+        "sprite": 53,
+        "resource": "assets/minecraft/textures/block/deepslate.png"
+      },
+      {
+        "sprite": 54,
+        "resource": "assets/minecraft/textures/block/grass_block_snow.png"
+      },
+      {
+        "sprite": 55,
+        "resource": "assets/minecraft/textures/block/podzol_side.png"
+      },
+      {
+        "sprite": 56,
+        "resource": "assets/minecraft/textures/block/packed_ice.png"
+      },
+      {
+        "sprite": 57,
+        "resource": "assets/minecraft/textures/block/light_gray_terracotta.png"
+      },
+      {
+        "sprite": 58,
+        "resource": "assets/minecraft/textures/block/ice.png"
+      },
+      {
+        "sprite": 59,
+        "resource": "assets/minecraft/textures/block/mycelium_top.png"
+      },
+      {
+        "sprite": 60,
+        "resource": "assets/minecraft/textures/block/mycelium_side.png"
+      },
+      {
+        "sprite": 61,
+        "resource": "assets/minecraft/textures/block/mud.png"
+      },
+      {
+        "sprite": 62,
+        "resource": "assets/minecraft/textures/block/powder_snow.png"
+      },
+      {
+        "sprite": 63,
+        "resource": "assets/minecraft/textures/block/white_terracotta.png"
+      },
+      {
+        "sprite": 64,
+        "resource": "assets/minecraft/textures/block/brown_terracotta.png"
+      },
+      {
+        "sprite": 65,
+        "resource": "assets/minecraft/textures/block/yellow_terracotta.png"
+      },
+      {
+        "sprite": 66,
+        "resource": "assets/minecraft/textures/block/calcite.png"
+      },
+      {
+        "sprite": 67,
+        "resource": "assets/minecraft/textures/block/bedrock.png"
+      },
+      {
+        "sprite": 68,
+        "resource": "assets/minecraft/textures/block/deepslate_top.png"
+      },
+      {
+        "sprite": 69,
+        "resource": "assets/minecraft/textures/block/copper_ore.png"
+      },
+      {
+        "sprite": 70,
+        "resource": "assets/minecraft/textures/block/bee_nest_top.png"
+      },
+      {
+        "sprite": 71,
+        "resource": "assets/minecraft/textures/block/bee_nest_side.png"
+      },
+      {
+        "sprite": 72,
+        "resource": "assets/minecraft/textures/block/bee_nest_front.png"
+      },
+      {
+        "sprite": 73,
+        "resource": "assets/minecraft/textures/block/red_mushroom_block.png"
+      },
+      {
+        "sprite": 74,
+        "resource": "assets/minecraft/textures/block/mushroom_block_inside.png"
+      },
+      {
+        "sprite": 75,
+        "resource": "assets/minecraft/textures/block/mushroom_stem.png"
+      },
+      {
+        "sprite": 76,
+        "resource": "assets/minecraft/textures/block/brown_mushroom_block.png"
+      },
+      {
+        "sprite": 77,
+        "resource": "assets/minecraft/textures/block/clay.png"
+      },
+      {
+        "sprite": 78,
+        "resource": "assets/minecraft/textures/block/magma.png"
+      },
+      {
+        "sprite": 79,
+        "resource": "assets/minecraft/textures/block/obsidian.png"
+      },
+      {
+        "sprite": 80,
+        "resource": "assets/minecraft/textures/block/mossy_stone_bricks.png"
+      },
+      {
+        "sprite": 81,
+        "resource": "assets/minecraft/textures/block/crying_obsidian.png"
+      },
+      {
+        "sprite": 82,
+        "resource": "assets/minecraft/textures/block/oak_planks.png"
+      },
+      {
+        "sprite": 83,
+        "resource": "assets/minecraft/textures/block/stone_bricks.png"
+      },
+      {
+        "sprite": 84,
+        "resource": "assets/minecraft/textures/block/andesite.png"
+      },
+      {
+        "sprite": 85,
+        "resource": "assets/minecraft/textures/block/granite.png"
+      },
+      {
+        "sprite": 86,
+        "resource": "assets/minecraft/textures/block/dark_oak_log_top.png"
+      },
+      {
+        "sprite": 87,
+        "resource": "assets/minecraft/textures/block/dark_oak_log.png"
+      },
+      {
+        "sprite": 88,
+        "resource": "assets/minecraft/textures/block/dark_oak_leaves.png"
+      },
+      {
+        "sprite": 89,
+        "resource": "assets/minecraft/textures/block/acacia_log_top.png"
+      },
+      {
+        "sprite": 90,
+        "resource": "assets/minecraft/textures/block/acacia_log.png"
+      },
+      {
+        "sprite": 91,
+        "resource": "assets/minecraft/textures/block/acacia_leaves.png"
+      },
+      {
+        "sprite": 92,
+        "resource": "assets/minecraft/textures/block/cherry_log_top.png"
+      },
+      {
+        "sprite": 93,
+        "resource": "assets/minecraft/textures/block/cherry_log.png"
+      },
+      {
+        "sprite": 94,
+        "resource": "assets/minecraft/textures/block/cherry_leaves.png"
+      },
+      {
+        "sprite": 95,
+        "resource": "assets/minecraft/textures/block/diorite.png"
+      },
+      {
+        "sprite": 96,
+        "resource": "assets/minecraft/textures/block/smooth_basalt.png"
+      },
+      {
+        "sprite": 97,
+        "resource": "assets/minecraft/textures/block/amethyst_block.png"
+      },
+      {
+        "sprite": 98,
+        "resource": "assets/minecraft/textures/block/small_amethyst_bud.png"
+      },
+      {
+        "sprite": 99,
+        "resource": "assets/minecraft/textures/block/budding_amethyst.png"
+      },
+      {
+        "sprite": 100,
+        "resource": "assets/minecraft/textures/block/large_amethyst_bud.png"
+      },
+      {
+        "sprite": 101,
+        "resource": "assets/minecraft/textures/block/medium_amethyst_bud.png"
+      },
+      {
+        "sprite": 102,
+        "resource": "assets/minecraft/textures/block/amethyst_cluster.png"
+      },
+      {
+        "sprite": 103,
+        "resource": "assets/minecraft/textures/block/cracked_stone_bricks.png"
+      },
+      {
+        "sprite": 104,
+        "resource": "assets/minecraft/textures/block/pumpkin_top.png"
+      },
+      {
+        "sprite": 105,
+        "resource": "assets/minecraft/textures/block/pumpkin_side.png"
+      },
+      {
+        "sprite": 106,
+        "resource": "assets/minecraft/textures/block/gold_block.png"
+      },
+      {
+        "sprite": 107,
+        "resource": "assets/minecraft/textures/block/spruce_planks.png"
+      },
+      {
+        "sprite": 108,
+        "resource": "assets/minecraft/textures/block/oak_trapdoor.png"
+      },
+      {
+        "sprite": 109,
+        "resource": "assets/minecraft/textures/block/oak_door_bottom.png"
+      },
+      {
+        "sprite": 110,
+        "resource": "assets/minecraft/textures/block/oak_door_top.png"
+      },
+      {
+        "sprite": 111,
+        "resource": "assets/minecraft/textures/block/iron_bars.png"
+      },
+      {
+        "sprite": 112,
+        "resource": "assets/minecraft/textures/block/torch.png"
+      },
+      {
+        "sprite": 113,
+        "resource": "assets/minecraft/textures/block/dirt_path_top.png"
+      },
+      {
+        "sprite": 114,
+        "resource": "assets/minecraft/textures/block/dirt_path_side.png"
+      },
+      {
+        "sprite": 115,
+        "resource": "assets/minecraft/textures/block/dark_oak_planks.png"
+      },
+      {
+        "sprite": 116,
+        "resource": "assets/minecraft/textures/block/mossy_cobblestone.png"
+      },
+      {
+        "sprite": 117,
+        "resource": "assets/minecraft/textures/block/cobblestone.png"
+      },
+      {
+        "sprite": 118,
+        "resource": "assets/minecraft/textures/block/deepslate_iron_ore.png"
+      },
+      {
+        "sprite": 119,
+        "resource": "assets/minecraft/textures/block/raw_copper_block.png"
+      },
+      {
+        "sprite": 120,
+        "resource": "assets/minecraft/textures/block/white_wool.png"
+      },
+      {
+        "sprite": 121,
+        "resource": "assets/minecraft/textures/block/yellow_wool.png"
+      },
+      {
+        "sprite": 122,
+        "resource": "assets/minecraft/textures/block/vine.png"
+      },
+      {
+        "sprite": 123,
+        "resource": "assets/minecraft/textures/block/rose_bush_bottom.png"
+      },
+      {
+        "sprite": 124,
+        "resource": "assets/minecraft/textures/block/rose_bush_top.png"
+      },
+      {
+        "sprite": 125,
+        "resource": "assets/minecraft/textures/block/sugar_cane.png"
+      },
+      {
+        "sprite": 126,
+        "resource": "assets/minecraft/textures/block/oxeye_daisy.png"
+      },
+      {
+        "sprite": 127,
+        "resource": "assets/minecraft/textures/block/cornflower.png"
+      },
+      {
+        "sprite": 128,
+        "resource": "assets/minecraft/textures/block/azure_bluet.png"
+      },
+      {
+        "sprite": 129,
+        "resource": "assets/minecraft/textures/block/pink_petals.png"
+      },
+      {
+        "sprite": 130,
+        "resource": "assets/minecraft/textures/block/peony_bottom.png"
+      },
+      {
+        "sprite": 131,
+        "resource": "assets/minecraft/textures/block/peony_top.png"
+      },
+      {
+        "sprite": 132,
+        "resource": "assets/minecraft/textures/block/lily_of_the_valley.png"
+      },
+      {
+        "sprite": 133,
+        "resource": "assets/minecraft/textures/block/lilac_bottom.png"
+      },
+      {
+        "sprite": 134,
+        "resource": "assets/minecraft/textures/block/lilac_top.png"
+      },
+      {
+        "sprite": 135,
+        "resource": "assets/minecraft/textures/block/sunflower_bottom.png"
+      },
+      {
+        "sprite": 136,
+        "resource": "assets/minecraft/textures/block/sunflower_top.png"
+      },
+      {
+        "sprite": 137,
+        "resource": "assets/minecraft/textures/block/chiseled_stone_bricks.png"
+      },
+      {
+        "sprite": 138,
+        "resource": "assets/minecraft/textures/block/crafting_table_top.png"
+      },
+      {
+        "sprite": 139,
+        "resource": "assets/minecraft/textures/block/crafting_table_side.png"
+      },
+      {
+        "sprite": 140,
+        "resource": "assets/minecraft/textures/block/furnace_top.png"
+      },
+      {
+        "sprite": 141,
+        "resource": "assets/minecraft/textures/block/furnace_front.png"
+      },
+      {
+        "sprite": 142,
+        "resource": "assets/minecraft/textures/block/furnace_side.png"
+      },
+      {
+        "sprite": 143,
+        "resource": "assets/minecraft/textures/block/redstone_torch.png"
+      },
+      {
+        "sprite": 144,
+        "resource": "assets/minecraft/textures/block/ladder.png"
+      },
+      {
+        "sprite": 145,
+        "resource": "assets/minecraft/textures/block/light_gray_wool.png"
+      },
+      {
+        "sprite": 146,
+        "resource": "assets/minecraft/textures/block/allium.png"
+      },
+      {
+        "sprite": 147,
+        "resource": "assets/minecraft/textures/block/red_mushroom.png"
+      },
+      {
+        "sprite": 148,
+        "resource": "assets/minecraft/textures/block/brown_mushroom.png"
+      },
+      {
+        "sprite": 149,
+        "resource": "assets/minecraft/textures/block/sandstone_top.png"
+      },
+      {
+        "sprite": 150,
+        "resource": "assets/minecraft/textures/block/sweet_berry_bush_stage3.png"
+      },
+      {
+        "sprite": 151,
+        "resource": "assets/minecraft/textures/block/tuff.png"
+      },
+      {
+        "sprite": 152,
+        "resource": "assets/minecraft/textures/block/bubble_coral_block.png"
+      },
+      {
+        "sprite": 153,
+        "resource": "assets/minecraft/textures/block/bubble_coral_fan.png"
+      },
+      {
+        "sprite": 154,
+        "resource": "assets/minecraft/textures/block/brain_coral_fan.png"
+      },
+      {
+        "sprite": 155,
+        "resource": "assets/minecraft/textures/block/fire_coral_fan.png"
+      },
+      {
+        "sprite": 156,
+        "resource": "assets/minecraft/textures/block/tube_coral_fan.png"
+      },
+      {
+        "sprite": 157,
+        "resource": "assets/minecraft/textures/block/horn_coral_fan.png"
+      },
+      {
+        "sprite": 158,
+        "resource": "assets/minecraft/textures/block/brain_coral.png"
+      },
+      {
+        "sprite": 159,
+        "resource": "assets/minecraft/textures/block/fire_coral_block.png"
+      },
+      {
+        "sprite": 160,
+        "resource": "assets/minecraft/textures/block/brain_coral_block.png"
+      },
+      {
+        "sprite": 161,
+        "resource": "assets/minecraft/textures/block/bubble_coral.png"
+      },
+      {
+        "sprite": 162,
+        "resource": "assets/minecraft/textures/block/tube_coral.png"
+      },
+      {
+        "sprite": 163,
+        "resource": "assets/minecraft/textures/block/tube_coral_block.png"
+      },
+      {
+        "sprite": 164,
+        "resource": "assets/minecraft/textures/block/fire_coral.png"
+      },
+      {
+        "sprite": 165,
+        "resource": "assets/minecraft/textures/block/horn_coral.png"
+      },
+      {
+        "sprite": 166,
+        "resource": "assets/minecraft/textures/block/horn_coral_block.png"
+      },
+      {
+        "sprite": 167,
+        "resource": "assets/minecraft/textures/block/mangrove_leaves.png"
+      },
+      {
+        "sprite": 168,
+        "resource": "assets/minecraft/textures/block/mangrove_log_top.png"
+      },
+      {
+        "sprite": 169,
+        "resource": "assets/minecraft/textures/block/mangrove_log.png"
+      },
+      {
+        "sprite": 170,
+        "resource": "assets/minecraft/textures/block/cactus_top.png"
+      },
+      {
+        "sprite": 171,
+        "resource": "assets/minecraft/textures/block/cactus_side.png"
+      },
+      {
+        "sprite": 172,
+        "resource": "assets/minecraft/textures/block/cocoa_stage0.png"
+      },
+      {
+        "sprite": 173,
+        "resource": "assets/minecraft/textures/block/cocoa_stage1.png"
+      },
+      {
+        "sprite": 174,
+        "resource": "assets/minecraft/textures/block/cocoa_stage2.png"
+      },
+      {
+        "sprite": 175,
+        "resource": "assets/minecraft/textures/block/melon_top.png"
+      },
+      {
+        "sprite": 176,
+        "resource": "assets/minecraft/textures/block/melon_side.png"
+      },
+      {
+        "sprite": 177,
+        "resource": "assets/minecraft/textures/block/muddy_mangrove_roots_side.png"
+      },
+      {
+        "sprite": 178,
+        "resource": "assets/minecraft/textures/block/mangrove_roots_side.png"
+      },
+      {
+        "sprite": 179,
+        "resource": "assets/minecraft/textures/block/mangrove_roots_top.png"
+      },
+      {
+        "sprite": 180,
+        "resource": "assets/minecraft/textures/block/moss_block.png"
+      },
+      {
+        "sprite": 181,
+        "resource": "assets/minecraft/textures/block/muddy_mangrove_roots_top.png"
+      },
+      {
+        "sprite": 182,
+        "resource": "assets/minecraft/textures/block/dead_bush.png"
+      },
+      {
+        "sprite": 183,
+        "resource": "assets/minecraft/textures/block/blue_orchid.png"
+      },
+      {
+        "sprite": 184,
+        "resource": "assets/minecraft/textures/block/smooth_stone.png"
+      },
+      {
+        "sprite": 185,
+        "resource": "assets/minecraft/textures/block/smooth_stone_slab_side.png"
+      },
+      {
+        "sprite": 186,
+        "resource": "assets/minecraft/textures/block/white_tulip.png"
+      },
+      {
+        "sprite": 187,
+        "resource": "assets/minecraft/textures/block/pink_tulip.png"
+      },
+      {
+        "sprite": 188,
+        "resource": "assets/minecraft/textures/block/orange_tulip.png"
+      },
+      {
+        "sprite": 189,
+        "resource": "assets/minecraft/textures/block/red_tulip.png"
+      },
+      {
+        "sprite": 190,
+        "resource": "assets/minecraft/textures/block/sea_pickle.png"
+      },
+      {
+        "sprite": 191,
+        "resource": "assets/minecraft/textures/block/bamboo_stalk.png"
+      },
+      {
+        "sprite": 192,
+        "resource": "assets/minecraft/textures/block/bamboo_stalk.png"
+      },
+      {
+        "sprite": 193,
+        "resource": "assets/minecraft/textures/block/bamboo_stalk.png"
+      },
+      {
+        "sprite": 194,
+        "resource": "assets/minecraft/textures/block/bamboo_stalk.png"
+      },
+      {
+        "sprite": 195,
+        "resource": "assets/minecraft/textures/block/bamboo_stalk.png"
+      },
+      {
+        "sprite": 196,
+        "resource": "assets/minecraft/textures/block/bamboo_small_leaves.png"
+      },
+      {
+        "sprite": 197,
+        "resource": "assets/minecraft/textures/block/bamboo_large_leaves.png"
+      }
+    ],
+    "textureJar": "C:\\Users\\Administrator\\.gradle\\caches\\neoformruntime\\artifacts\\minecraft_1.21.1_client.jar",
+    "textureJarSha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+    "productionIntegration": false,
+    "preparationSeconds": 3.913318699997035
+  },
+  "interpretation": {
+    "resident": "Stable cached normalized records reduce downstream preparation on sparse updates and unrelated global epoch changes; scans and extra cache memory remain. Full replacement regresses. Prototype not enabled.",
+    "forest": "Surface-derived binary canopy proxies reduce GPU work but increase foliage coverage and fill holes. This is not Nanite virtualized geometry or its volumetric shading. Prototype not enabled.",
+    "bounds": "512x512 standalone contexts and prescribed scenarios; no Minecraft frame time or full-game CPU/GPU utilization inference. Tiny distant masks make IoU sensitive to individual pixels.",
+    "notTested": "Production Iris integration, real client FPS, resource-pack leaf textures, dynamic whole-world proxy handoff, temporal occlusion changes, repeated-part instancing, RDG, complete Nanite."
+  }
+}

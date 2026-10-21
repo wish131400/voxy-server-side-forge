@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-12",
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER / OpenGL 4.6",
+  "client_started": false,
+  "retained": {
+    "prepared_pass_local_cache": {
+      "single_replacement_ms": [0.0759, 0.0538],
+      "sixteen_replacements_ms": [0.0508, 0.0381],
+      "local_coverage_ms": [0.0554, 0.0530],
+      "new_list_ms": [0.0485, 0.0335]
+    },
+    "meshlet_direction_culling": {
+      "production_back_facing_gpu_ms": [0.257024, 0.030720],
+      "production_front_facing_gpu_ms": [0.273408, 0.273408],
+      "production_quads": 524288,
+      "extra_direction_bytes": 4096
+    },
+    "visible_workload_hiz_policy": {
+      "production_gpu_ms": [0.574464, 0.219136],
+      "old_restarts": 210,
+      "new_comparisons": 1,
+      "current_frame_depth": true
+    },
+    "seam_index_and_residency": "retained from the previous validated round"
+  },
+  "rejected": {
+    "mapped_readback": "GPU and/or CPU regression",
+    "early_shader_backface": "unstable across views",
+    "screen_size_parent_selection": "content and geometric error cannot be bounded by spacing alone"
+  },
+  "artifacts": {
+    "neoforge": {
+      "path": "lib/render-completion-20261012/vss-0.3.5-neoforge-1.21.1.jar",
+      "sha256": "2dab7c45e7cee3fdd337516674ab911182fbbbf428e46f265d4b430b32049c54",
+      "class_major": 65
+    },
+    "forge": {
+      "path": "lib/render-completion-20261012/vss-0.3.5-forge-1.20.1.jar",
+      "sha256": "075d57b99bc71b2381a472a5d8ea6cecf59e7ae705b4c7a8e468600c01251eb6",
+      "class_major": 61
+    }
+  },
+  "verification": {
+    "neoforge": {"regression": [131, 0, 0, 0], "cpu_benchmark": [2, 0, 0, 0], "gpu": [1, 0, 0, 0]},
+    "forge": {"regression": [129, 0, 0, 0], "cpu_benchmark": [2, 0, 0, 0], "gpu": [1, 0, 0, 0]}
+  }
+}

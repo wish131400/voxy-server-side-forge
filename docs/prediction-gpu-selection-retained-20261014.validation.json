@@ -1,0 +1,1128 @@
+{
+  "date": "2026-10-14",
+  "liveClientProfiled": false,
+  "clientLaunched": false,
+  "installedInstanceModified": false,
+  "githubPushed": false,
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER / OpenGL 4.6 / driver 572.70",
+  "retained": "Flat resident command selection, compaction and indirect count in a bounded heavy rotating Hi-Z case",
+  "rolledBackOrExcluded": [
+    "New 64-command coarse-node prefilter",
+    "New queue traversal",
+    "No-Hi-Z selection",
+    "Stationary selection",
+    "512/1024 tile selection",
+    "1536/2048 simplified selection",
+    "Selection during translation",
+    "Selection of seam input",
+    "Water, Iris and spyglass paths"
+  ],
+  "guards": {
+    "terrainTiles": 3072,
+    "residentOpaqueQuads": 1572864,
+    "visibleOpaqueQuads": 524288,
+    "seamTiles": 0,
+    "requiresCurrentFrameHiz": true,
+    "requiresRotationAtFixedPosition": true,
+    "explicitDisableProperty": "vss.disableGpuPredictionSelection"
+  },
+  "platforms": [
+    {
+      "platform": "neoforge",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\gpu-selection-retained-20261014\\vss-0.3.5-neoforge-1.21.1.jar",
+      "jarBytes": 6066987,
+      "jarSha256": "0632b157ff8b8f11d1d4f2a9a678d236e602581a9c719f7ecb1b6de3b66e3a88",
+      "javaClassMajor": 65,
+      "tests": {
+        "loading-benefit": {
+          "tests": 233,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:43:04"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionCpuCachePolicyTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:43:04"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionDemandLifecycleTest",
+              "tests": "14",
+              "timestamp": "2026-10-14T06:43:05"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:43:05"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:43:05"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionGpuSelectionInputTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:43:05"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionGpuSelectionPolicyTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:43:05"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+              "tests": "14",
+              "timestamp": "2026-10-14T06:43:05"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLoadingBenefitTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:43:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLoadingProgressIntegrationTest",
+              "tests": "6",
+              "timestamp": "2026-10-14T06:43:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLoadingSettingsTest",
+              "tests": "3",
+              "timestamp": "2026-10-14T06:43:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+              "tests": "18",
+              "timestamp": "2026-10-14T06:43:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMainReductionTest",
+              "tests": "9",
+              "timestamp": "2026-10-14T06:43:08"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMediumCoverageTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:43:08"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMemoryLifecycleTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:43:08"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMotionPaceTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+              "tests": "3",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+              "tests": "6",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRefinementConvergenceTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionScreenDetailTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+              "tests": "3",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+              "tests": "11",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionTurnMainTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+              "tests": "12",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionViewRefinementTest",
+              "tests": "14",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionVisibilityFeedbackTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionVisibleHandoffTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+              "tests": "19",
+              "timestamp": "2026-10-14T06:43:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionWorkViewTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:43:16"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.VssLodSampleCacheTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:43:16"
+            }
+          ]
+        },
+        "loading-benefit-gpu": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:17"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:24"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:30"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMainReductionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:35"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMemoryResidencyGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:44"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:49"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:51"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:43:58"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRenderTargetGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:44:04"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:44:15"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionTurnMainGpuTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:44:20"
+            }
+          ]
+        },
+        "gpu-selection-benefit": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.RetainedGpuSelectionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:44:26"
+            }
+          ]
+        },
+        "gpu-selection-fallback": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.RetainedSelectionFallbackGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:56:08"
+            }
+          ]
+        }
+      },
+      "throughput": [
+        {
+          "tiles": 128,
+          "case": 0,
+          "baselineMs": 0.08249375,
+          "candidateMs": 0.0857125,
+          "savingPercent": -3.901810743238121,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 128,
+          "case": 1,
+          "baselineMs": 0.083340625,
+          "candidateMs": 0.092271875,
+          "savingPercent": -10.716562300798671,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 128,
+          "case": 2,
+          "baselineMs": 0.151478125,
+          "candidateMs": 0.147771875,
+          "savingPercent": 2.446722917913058,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 512,
+          "case": 0,
+          "baselineMs": 0.081134375,
+          "candidateMs": 0.075646875,
+          "savingPercent": 6.7634710934791675,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 512,
+          "case": 1,
+          "baselineMs": 0.135034375,
+          "candidateMs": 0.135275,
+          "savingPercent": -0.1781953669204528,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 512,
+          "case": 2,
+          "baselineMs": 0.2277125,
+          "candidateMs": 0.215215625,
+          "savingPercent": 5.488005708953181,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1024,
+          "case": 0,
+          "baselineMs": 0.139109375,
+          "candidateMs": 0.14228125,
+          "savingPercent": -2.28013029315961,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1024,
+          "case": 1,
+          "baselineMs": 0.19759375,
+          "candidateMs": 0.194190625,
+          "savingPercent": 1.7222837260793988,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1024,
+          "case": 2,
+          "baselineMs": 0.3305,
+          "candidateMs": 0.333546875,
+          "savingPercent": -0.9218986384266215,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1025,
+          "case": 0,
+          "baselineMs": 0.0537625,
+          "candidateMs": 0.060484375,
+          "savingPercent": -12.50290630086026,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1025,
+          "case": 1,
+          "baselineMs": 0.166234375,
+          "candidateMs": 0.162753125,
+          "savingPercent": 2.094181784002247,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1025,
+          "case": 2,
+          "baselineMs": 0.314240625,
+          "candidateMs": 0.319771875,
+          "savingPercent": -1.7601957098958732,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1536,
+          "case": 0,
+          "baselineMs": 0.12014375,
+          "candidateMs": 0.10605625,
+          "savingPercent": 11.725537116995255,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1536,
+          "case": 1,
+          "baselineMs": 0.289409375,
+          "candidateMs": 0.2938625,
+          "savingPercent": -1.5386941076114047,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1536,
+          "case": 2,
+          "baselineMs": 0.478084375,
+          "candidateMs": 0.493353125,
+          "savingPercent": -3.1937354154274455,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 2048,
+          "case": 0,
+          "baselineMs": 0.124228125,
+          "candidateMs": 0.12285625,
+          "savingPercent": 1.1043191708801858,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 2048,
+          "case": 1,
+          "baselineMs": 0.362803125,
+          "candidateMs": 0.375040625,
+          "savingPercent": -3.373041508393837,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 2048,
+          "case": 2,
+          "baselineMs": 0.55004375,
+          "candidateMs": 0.572896875,
+          "savingPercent": -4.15478314225004,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 3072,
+          "case": 0,
+          "baselineMs": 0.351353125,
+          "candidateMs": 0.360021875,
+          "savingPercent": -2.467247160531172,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 3072,
+          "case": 1,
+          "baselineMs": 0.5754125,
+          "candidateMs": 0.551878125,
+          "savingPercent": 4.090000651706383,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 3072,
+          "case": 2,
+          "baselineMs": 0.725996875,
+          "candidateMs": 0.50246875,
+          "savingPercent": 30.789130462854953,
+          "selectedFramesPerBatch": [
+            32
+          ]
+        },
+        {
+          "tiles": 4096,
+          "case": 0,
+          "baselineMs": 0.468253125,
+          "candidateMs": 0.476384375,
+          "savingPercent": -1.7365073644730167,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 4096,
+          "case": 1,
+          "baselineMs": 0.725253125,
+          "candidateMs": 0.711846875,
+          "savingPercent": 1.8484925521692896,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 4096,
+          "case": 2,
+          "baselineMs": 0.9005875,
+          "candidateMs": 0.600778125,
+          "savingPercent": 33.29042153038988,
+          "selectedFramesPerBatch": [
+            32
+          ]
+        }
+      ],
+      "sourceSha256": {
+        "PredictionGpuCommandSelector.java": "6c2c42370faef039502803bc914a087336e575e5b8fe146450aa3ba04629b786",
+        "PredictionGpuSelectionPolicy.java": "9df0ceda733d951bd6d80f11847a8676d8be89b840d892833cdbb24188e8245a",
+        "PredictionGpuSelectionInput.java": "1f13765c676a9cdcafd9d850cad88afd26503278997780618a1a238f4a6e7da2",
+        "PredictionIndirectBatch.java": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+        "PredictionVisiblePlan.java": "551acad7257d5fe63da6e6e8e1679dc18a9d69ed206f24afb0316115eddc38b5",
+        "PredictionOcclusionCuller.java": "e7231a9617f3fd2437ba67971779fc7c3bfd2fa62a90d24aaae0a76cc9ac7f32",
+        "PredictionRenderer.java": "a090e16cf310822fbed31c9d81d839005a93bdfc3874376605cf388e90b9232c"
+      },
+      "imagePairs": 72,
+      "depthPairs": 72,
+      "counterAndGlStateChecks": true
+    },
+    {
+      "platform": "forge",
+      "repository": "C:\\Users\\Administrator\\Desktop\\voxyserverside",
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\gpu-selection-retained-20261014\\vss-0.3.5-forge-1.20.1.jar",
+      "jarBytes": 6737280,
+      "jarSha256": "394dae0b6e4d973649af1c86ba2e6c153cae6fa85ae969542df81fbdbf40247a",
+      "javaClassMajor": 61,
+      "tests": {
+        "loading-benefit": {
+          "tests": 231,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:46:58"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionCpuCachePolicyTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:46:58"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionDemandLifecycleTest",
+              "tests": "14",
+              "timestamp": "2026-10-14T06:46:58"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:46:59"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:46:59"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionGpuSelectionInputTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:47:00"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionGpuSelectionPolicyTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:47:00"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+              "tests": "13",
+              "timestamp": "2026-10-14T06:47:00"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLoadingBenefitTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:47:02"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLoadingProgressIntegrationTest",
+              "tests": "6",
+              "timestamp": "2026-10-14T06:47:02"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLoadingSettingsTest",
+              "tests": "3",
+              "timestamp": "2026-10-14T06:47:02"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+              "tests": "18",
+              "timestamp": "2026-10-14T06:47:02"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMainReductionTest",
+              "tests": "9",
+              "timestamp": "2026-10-14T06:47:03"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMediumCoverageTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:47:03"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMemoryLifecycleTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:47:04"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMotionPaceTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:47:06"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+              "tests": "3",
+              "timestamp": "2026-10-14T06:47:06"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:47:06"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+              "tests": "6",
+              "timestamp": "2026-10-14T06:47:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRefinementConvergenceTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:47:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:47:07"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:47:08"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionScreenDetailTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:47:08"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:08"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+              "tests": "3",
+              "timestamp": "2026-10-14T06:47:08"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+              "tests": "11",
+              "timestamp": "2026-10-14T06:47:09"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionTurnMainTest",
+              "tests": "7",
+              "timestamp": "2026-10-14T06:47:09"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:47:09"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+              "tests": "12",
+              "timestamp": "2026-10-14T06:47:10"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionViewRefinementTest",
+              "tests": "14",
+              "timestamp": "2026-10-14T06:47:10"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionVisibilityFeedbackTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:47:10"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:47:10"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:47:10"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest",
+              "tests": "20",
+              "timestamp": "2026-10-14T06:47:11"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionWorkViewTest",
+              "tests": "5",
+              "timestamp": "2026-10-14T06:47:16"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.VssLodSampleCacheTest",
+              "tests": "4",
+              "timestamp": "2026-10-14T06:47:16"
+            }
+          ]
+        },
+        "loading-benefit-gpu": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:17"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:23"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:29"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMainReductionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:34"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionMemoryResidencyGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:43"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:48"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:50"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRefinementOcclusionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:47:57"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionRenderTargetGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:48:02"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionSeamResidencyGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:48:14"
+            },
+            {
+              "name": "dev.xantha.vss.client.prediction.PredictionTurnMainGpuTest",
+              "tests": "2",
+              "timestamp": "2026-10-14T06:48:19"
+            }
+          ]
+        },
+        "gpu-selection-benefit": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.RetainedGpuSelectionGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:48:25"
+            }
+          ]
+        },
+        "gpu-selection-fallback": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": [
+            {
+              "name": "dev.xantha.vss.client.prediction.RetainedSelectionFallbackGpuTest",
+              "tests": "1",
+              "timestamp": "2026-10-14T06:57:24"
+            }
+          ]
+        }
+      },
+      "throughput": [
+        {
+          "tiles": 128,
+          "case": 0,
+          "baselineMs": 0.085765625,
+          "candidateMs": 0.091875,
+          "savingPercent": -7.123337584259426,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 128,
+          "case": 1,
+          "baselineMs": 0.079884375,
+          "candidateMs": 0.080303125,
+          "savingPercent": -0.5241951257677124,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 128,
+          "case": 2,
+          "baselineMs": 0.132565625,
+          "candidateMs": 0.138134375,
+          "savingPercent": -4.200749628721634,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 512,
+          "case": 0,
+          "baselineMs": 0.076365625,
+          "candidateMs": 0.07486875,
+          "savingPercent": 1.9601424070057827,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 512,
+          "case": 1,
+          "baselineMs": 0.13745,
+          "candidateMs": 0.140009375,
+          "savingPercent": -1.8620407420880447,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 512,
+          "case": 2,
+          "baselineMs": 0.205159375,
+          "candidateMs": 0.20926875,
+          "savingPercent": -2.0030159479672793,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1024,
+          "case": 0,
+          "baselineMs": 0.132921875,
+          "candidateMs": 0.140478125,
+          "savingPercent": -5.684730222169998,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1024,
+          "case": 1,
+          "baselineMs": 0.189253125,
+          "candidateMs": 0.197446875,
+          "savingPercent": -4.3295189973745485,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1024,
+          "case": 2,
+          "baselineMs": 0.330390625,
+          "candidateMs": 0.32418125,
+          "savingPercent": 1.879404114447869,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1025,
+          "case": 0,
+          "baselineMs": 0.060828125,
+          "candidateMs": 0.058609375,
+          "savingPercent": 3.6475725661443636,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1025,
+          "case": 1,
+          "baselineMs": 0.1802375,
+          "candidateMs": 0.1887,
+          "savingPercent": -4.6951938414592,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1025,
+          "case": 2,
+          "baselineMs": 0.32243125,
+          "candidateMs": 0.3174875,
+          "savingPercent": 1.5332725968714378,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1536,
+          "case": 0,
+          "baselineMs": 0.11526875,
+          "candidateMs": 0.1132125,
+          "savingPercent": 1.7838746407851325,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1536,
+          "case": 1,
+          "baselineMs": 0.291140625,
+          "candidateMs": 0.301790625,
+          "savingPercent": -3.658026082756405,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 1536,
+          "case": 2,
+          "baselineMs": 0.465628125,
+          "candidateMs": 0.468525,
+          "savingPercent": -0.6221434755471433,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 2048,
+          "case": 0,
+          "baselineMs": 0.117221875,
+          "candidateMs": 0.123175,
+          "savingPercent": -5.078510303644257,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 2048,
+          "case": 1,
+          "baselineMs": 0.3668,
+          "candidateMs": 0.3582,
+          "savingPercent": 2.3446019629225767,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 2048,
+          "case": 2,
+          "baselineMs": 0.515090625,
+          "candidateMs": 0.5129875,
+          "savingPercent": 0.4083019371591168,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 3072,
+          "case": 0,
+          "baselineMs": 0.372784375,
+          "candidateMs": 0.382415625,
+          "savingPercent": -2.5835980920605905,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 3072,
+          "case": 1,
+          "baselineMs": 0.549125,
+          "candidateMs": 0.543159375,
+          "savingPercent": 1.0863874345549696,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 3072,
+          "case": 2,
+          "baselineMs": 0.669596875,
+          "candidateMs": 0.500128125,
+          "savingPercent": 25.309071222890633,
+          "selectedFramesPerBatch": [
+            32
+          ]
+        },
+        {
+          "tiles": 4096,
+          "case": 0,
+          "baselineMs": 0.48319375,
+          "candidateMs": 0.458928125,
+          "savingPercent": 5.02192443507391,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 4096,
+          "case": 1,
+          "baselineMs": 0.681796875,
+          "candidateMs": 0.69755,
+          "savingPercent": -2.310530537412636,
+          "selectedFramesPerBatch": [
+            0
+          ]
+        },
+        {
+          "tiles": 4096,
+          "case": 2,
+          "baselineMs": 0.83745,
+          "candidateMs": 0.605271875,
+          "savingPercent": 27.724416383067652,
+          "selectedFramesPerBatch": [
+            32
+          ]
+        }
+      ],
+      "sourceSha256": {
+        "PredictionGpuCommandSelector.java": "6c2c42370faef039502803bc914a087336e575e5b8fe146450aa3ba04629b786",
+        "PredictionGpuSelectionPolicy.java": "9df0ceda733d951bd6d80f11847a8676d8be89b840d892833cdbb24188e8245a",
+        "PredictionGpuSelectionInput.java": "1f13765c676a9cdcafd9d850cad88afd26503278997780618a1a238f4a6e7da2",
+        "PredictionIndirectBatch.java": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+        "PredictionVisiblePlan.java": "551acad7257d5fe63da6e6e8e1679dc18a9d69ed206f24afb0316115eddc38b5",
+        "PredictionOcclusionCuller.java": "e7231a9617f3fd2437ba67971779fc7c3bfd2fa62a90d24aaae0a76cc9ac7f32",
+        "PredictionRenderer.java": "7a5ec72cc619a9b9db6eae760993055647a6466bdd4dff10870cbdaf4be20999"
+      },
+      "imagePairs": 72,
+      "depthPairs": 72,
+      "counterAndGlStateChecks": true
+    }
+  ]
+}

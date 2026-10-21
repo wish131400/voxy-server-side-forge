@@ -1,0 +1,192 @@
+{
+  "task": "memory-residency-20261010",
+  "completedLocalDate": "2026-10-11",
+  "version": "0.3.5",
+  "artifacts": {
+    "neoforge": {
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\memory-residency-20261010\\vss-0.3.5-neoforge-1.21.1.jar",
+      "bytes": 5901220,
+      "sha256": "9caf6ca6b45ba8e447c1d6264a2bf62897d6d7c18d915bbfc1ec06b32f3153a1",
+      "version": "0.3.5-neoforge-1.21.1",
+      "classMajor": {
+        "PredictionOwnershipData": 65,
+        "PredictionOwnershipRuns": 65,
+        "PredictionMetadataCache": 65,
+        "PredictionCompressionRetry": 65,
+        "PredictionCpuCachePolicy": 65,
+        "PredictionPackedMesh": 65,
+        "PredictionGpuTile": 65,
+        "PredictionSubmissionCoverage": 65,
+        "PredictionTileManager": 65,
+        "PredictionMemoryBudget": 65,
+        "PredictionMeshRestore": 65
+      },
+      "classOutputMatch": true,
+      "natives": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      },
+      "tests": {
+        "memory-residency": {
+          "classes": 26,
+          "tests": 190,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            [
+              "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest",
+              "realCorpusRoundTripAndEncodingCost()"
+            ]
+          ]
+        },
+        "memory-residency-gpu": {
+          "classes": 9,
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            [
+              "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest",
+              "installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+            ]
+          ]
+        }
+      }
+    },
+    "forge": {
+      "jar": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\memory-residency-20261010\\vss-0.3.5-forge-1.20.1.jar",
+      "bytes": 6573549,
+      "sha256": "24be68a35a5d62367fc08ec3e940cde36f61f66dbd187039ad3500d48dd12079",
+      "version": "0.3.5-forge-1.20.1",
+      "classMajor": {
+        "PredictionOwnershipData": 61,
+        "PredictionOwnershipRuns": 61,
+        "PredictionMetadataCache": 61,
+        "PredictionCompressionRetry": 61,
+        "PredictionCpuCachePolicy": 61,
+        "PredictionPackedMesh": 61,
+        "PredictionGpuTile": 61,
+        "PredictionSubmissionCoverage": 61,
+        "PredictionTileManager": 61,
+        "PredictionMemoryBudget": 61,
+        "PredictionMeshRestore": 61
+      },
+      "classOutputMatch": "reobfJar output SHA256 exact",
+      "natives": {
+        "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+        "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+        "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+        "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+        "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+      },
+      "tests": {
+        "memory-residency": {
+          "classes": 25,
+          "tests": 188,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            [
+              "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest",
+              "realCorpusRoundTripAndEncodingCost()"
+            ]
+          ]
+        },
+        "memory-residency-gpu": {
+          "classes": 9,
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "skips": [
+            [
+              "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest",
+              "installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "sourceSha256": {
+    "neoforge": {
+      "PredictionOwnershipRuns.java": "271cf53cdd7ba1178b7dad8e8a23c95285d324c6be376cc932d8047fa2a4ea79",
+      "PredictionPackedMesh.java": "76f05a7db38432bf07f2d7cf0a2b8911b3d2b38abe8982546feece10f07de275",
+      "PredictionGpuTile.java": "46659aaeb24f3acc4c08f94ea0f3d75d63d3c2c3b85a5d13c787280764031723",
+      "PredictionSubmissionCoverage.java": "fab6356827e3943f6da0b7ba5a21b4f95614e363789b28f6864892e5ab851818",
+      "PredictionTileManager.java": "502c9ccdd5cfb3faecc53d049bd241969e50f301af4338e80fbe322f276a06f6",
+      "PredictionMemoryBudget.java": "244fbcb88841c9386d3317ac2114222838f872a7ce06016284f82ded78ef6ec3",
+      "PredictionMeshRestore.java": "9d10b68cd8dd30f08cefdc97756c6d636759ef10328ebe11eafeb10647983a7a",
+      "PredictionOwnershipData.java": "5d518fe81691e552433dd22c25716572cb4ede77754591cf70da7b2c6e4f7208",
+      "PredictionMetadataCache.java": "35feebe38b17110a3cdad4839cc9e93e63730815af42919eb1448b616d746db3",
+      "PredictionCompressionRetry.java": "e76870fd4245780a4b5f5dc39d1895b1cdc3bc9090fe5868712370b42aeb7985",
+      "PredictionCpuCachePolicy.java": "e27e480e97dbdf52d6ecf7fa4fa8b3db9589106d9c81e85bbc8d96713d98138b"
+    },
+    "forge": {
+      "PredictionOwnershipRuns.java": "36849304e4b195977a9149d4d358bd52d34ea5b0532f0ba5d9bc1c2ee9e1f92e",
+      "PredictionPackedMesh.java": "812a559b422b0f49f5c68f2205543ccb654b34229d59c3969fe0663302743349",
+      "PredictionGpuTile.java": "46659aaeb24f3acc4c08f94ea0f3d75d63d3c2c3b85a5d13c787280764031723",
+      "PredictionSubmissionCoverage.java": "b2d46dd1a0bbd0dba654633dd9f95299e869715a8d38d27422e1932524939171",
+      "PredictionTileManager.java": "a153238823629110af5d2d6aa3927fb0e8f91bda419ff9a3e236258106309bcc",
+      "PredictionMemoryBudget.java": "f594935d36d92484594fa4f0356f84785077f079f9def7649c913e4a9333f496",
+      "PredictionMeshRestore.java": "0986498d3273fb09d828e19d6432df2a59138ffe576b52abf37b3b370b53e4c2",
+      "PredictionOwnershipData.java": "1ddbaf555299d4349ad634412184f42b7c7f81eb27121632e5a1a396d3adf179",
+      "PredictionMetadataCache.java": "610822512f310b151e2faac5b5d956aff16983aa9bcf543b4a89065869df7384",
+      "PredictionCompressionRetry.java": "f59ac50d43fe0a9791389e21e84391fa090eedf82d171bd29a49c8e8452ef095",
+      "PredictionCpuCachePolicy.java": "f7d1c1922fbfd9a5eaddf6812f9830651afdd4168a45ce527450ba48fdeb564c"
+    }
+  },
+  "replay": {
+    "meshes": 3890,
+    "quads": 22668765,
+    "runs": 13476498,
+    "oldBytes": 391316362,
+    "hotBytes": 173326688,
+    "coldBytes": 115305893,
+    "legacyBuildMs": 1000.931,
+    "compactBuildMs": 1687.352,
+    "legacyFilterMs": 93.38,
+    "compactFilterMs": 113.161,
+    "hotSavedBytes": 217989674,
+    "coldSavedBytes": 276010469,
+    "hotReductionPercent": 55.706761885923896,
+    "coldReductionPercent": 70.53384315169525
+  },
+  "cpuCache": {
+    "high": "clamp(maxHeap / 12, 128 MiB, 768 MiB)",
+    "lowFraction": 0.75,
+    "coldAgeSeconds": 10,
+    "maintenanceIntervalSeconds": 2,
+    "maxEvictionsPerPass": 32,
+    "nearProtectionBlocks": 256,
+    "scope": "only stored, reusable cold tiles with coverage fallback; not a global VSS heap cap"
+  },
+  "metadataQueue": {
+    "maxJobs": 16,
+    "workspaceBytes": 67108864,
+    "reservedMultiple": 3,
+    "heapHeadroomBytes": 134217728,
+    "codec": "existing session LZ4/Zstd; exact words",
+    "gpuResidentPinned": true
+  },
+  "compressionRetry": {
+    "maxJobs": 8,
+    "workspaceBytes": 67108864,
+    "heapHeadroomBytes": 134217728,
+    "trigger": "two publish compressor slots busy",
+    "resetEpochProtected": true
+  },
+  "limits": [
+    "Offline replay is not a game heap/FPS after measurement.",
+    "JVM committed heap may remain high after object reclamation.",
+    "Active coverage, seam summaries, samples, working allocations, native buffers, GPU memory and other mods are separate.",
+    "Replay build/filter timings are one pass including JIT and fixed order; not a steady-state speed comparison.",
+    "No deploy, restart, push, forced GC, heap dump or new client sampling during this implementation."
+  ]
+}

@@ -1,0 +1,3734 @@
+{
+  "date": "2026-10-12",
+  "scope": "Voxy/Sodium design candidates; synthetic component A/B, not live game FPS",
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER; NVIDIA 572.70; OpenGL 4.6",
+  "method": {
+    "gpu_warmups": 24,
+    "gpu_measured_rounds": 81,
+    "order": "alternating paired baseline/candidate",
+    "target_pixels": [
+      256,
+      256
+    ],
+    "cpu_time": "prepare and submit, excluding glFinish and synchronous query readback",
+    "gpu_time": "GL_TIME_ELAPSED surrounding production prepare/submission interval",
+    "direction_repetitions": 64,
+    "representation_repetitions": 128,
+    "water_draws": 1024,
+    "worker_warmups": 5,
+    "worker_measured_rounds": 21,
+    "prepare_warmups": 400,
+    "prepare_measured_rounds": 301,
+    "baseline": "exact beginning-of-turn dirty worktree snapshots; not Git HEAD"
+  },
+  "decisions": [
+    {
+      "candidate": "direct-mode conservative meshlet direction ranges",
+      "decision": "retain",
+      "guard": "keep seams, morph, unknown and double-sided; reject <12.5% quad reduction or >max(4,2*input_ranges) fragments"
+    },
+    {
+      "candidate": "water sorting triggered by X/Z only",
+      "decision": "retain",
+      "guard": "ownership, GPU residency and geometry revisions still invalidate; horizontal ordering unchanged"
+    },
+    {
+      "candidate": "2x2 local terrain LOD with exact joining rings",
+      "decision": "reject",
+      "reason": "tested implementation increased quads, commands, storage, build and GPU cost"
+    },
+    {
+      "candidate": "2-block occupied canopy proxy",
+      "decision": "reject",
+      "reason": "GPU faster but filled layered gaps, added occupancy and lost minority materials"
+    }
+  ],
+  "limitations": [
+    "No whole-game FPS, P95 or P99 comparison was performed.",
+    "Repeating synthetic geometry amplifies component cost; it is not a captured current scene.",
+    "Local terrain selection uses assumed projection scale/depth, not the full live perspective selector.",
+    "Canopy worker values are single diagnostic samples, not repeated worker A/B.",
+    "Latest NeoForge candidate GPU XML contains only the water rerun; earlier direction/representation CSVs remain.",
+    "Conditional upload estimation, page relocation and bamboo caching were not implemented without hotspot evidence."
+  ],
+  "repositories": {
+    "neoforge": {
+      "root": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1",
+      "changed_production_files": [
+        "PredictionMeshletBounds.java",
+        "PredictionPackedMesh.java",
+        "PredictionRenderer.java"
+      ],
+      "new_production_files": [
+        "PredictionCommandDirections.java"
+      ],
+      "baseline_source_sha256": {
+        "BetterEndCompat.java": "af11b8c0b39d9417431c021f421e043cd372d55b0a55672b1b42a3f19ad628a7",
+        "BlueprintBiomeCompat.java": "b3192cfade7c55335175d2ca0b0bf07162d9dbc51338b11d0da1b4f02fc383e0",
+        "ClientCaptureExtractor.java": "1c1eef8443f32b43289083162afbc141883217f263c14c6bd721dc657b746721",
+        "ClientColumnSample.java": "7a52e7a7e5d9d6cd569a3119551c67b39582050096139f34dc8399544a328bc1",
+        "ClientPredictionState.java": "e84889b6336526f005dbda444d71d2139f255c41695751a547a19508b05313e8",
+        "ClientSurfaceResolver.java": "20c7d4b51012bc77331137cdcf3b16f1f828b2fd4321ed20b19bc51ce85a8477",
+        "ClientTerrainSampler.java": "ba4b6ee1e8b005cdaf155ae6dd7f6b7fe634b75a488b236c2b61f6d37aab261c",
+        "ClientWorldgenProfileDecoder.java": "db2f8bd8c440e3b6b0639d309b3afd665866e1092735df24fd61cbf60fefeaf2",
+        "ClientWorldgenRegistries.java": "6ddcc44e7290071dc0df2cd9a8d5df80128d847915ff800acf2b5f2dc8ed1e0e",
+        "DensityCompilation.java": "d49efb47828cf63d3da8e0212cc635c2c1b97db94339c2a0770f0de23d15492a",
+        "DensityCompilerSupport.java": "adf237c0394be3d1fe83637123690d8f72786087878f1ce7668c9b31ea7a350c",
+        "DensityGraphCompiler.java": "ae8bd0e7089f344044fcc696a5685d9bfcbbb2f818abf3c29a51e2fb53a42a55",
+        "DensityMemo.java": "5e607f533605b3394c7356fd25e9a85139f8b8646ee917b7969c0d1c4ccde641",
+        "ExactCoverageGate.java": "39579644ec43d5a99f585dbfc689f3e12a4f78057a1f30054927ea4b4329aa47",
+        "FreeTerraForgedCompat.java": "31795c2499166c2ab10975b6bcb99e0e46c296a6e75c226ae3a4ee4b41698818",
+        "FreeTerraForgedDensity.java": "9d0ee4d8136378a8408bd44ea7f56af52e66534540412bc2cb0b00da3833697c",
+        "FreeTerraForgedNativeFilters.java": "6cad2f56628626332d354e062dd779d8d0538275f7df347151da0fca49708c83",
+        "FreeTerraForgedTerrainSampler.java": "355a2a502861a98d8cc904a73c6a3c6305d507f1a3492dd08e0d312cdbe49d70",
+        "FreeTerraForgedWater.java": "429852872bc111e4e6e22bac84566e0534a644cbcfb323274d751c8d59047e4c",
+        "GlProgram.java": "d3587e9ab95966fc98d56416d0e288183590d06867b942f8c491e7814015f6cd",
+        "LostCityHints.java": "1e00e7d830f309dfc356fd8fc8614852562afb8a8b24929333bf187fa43f6e37",
+        "MinecraftColumnTerrainSampler.java": "094b67bcb99f384f1e903bcfb0b5bcd5fdc34748d2ddd6dee4bd4125fa7572ab",
+        "PredictionAdaptiveDisplayGrid.java": "d9ad5124efb4c2b21bb9f72b28379e62734440e40e30892147cbc815f90287c2",
+        "PredictionAquaticLod.java": "f68b091d5bc03d9e9a930d6a65db275816ccd3e6d161882fa5ea1d47c99872d9",
+        "PredictionAtlasSampler.java": "f2dc0202bdfdf91eef87e74ab2df3e6ba34fe370b51dc212009a1c52483b49c1",
+        "PredictionBackendSelection.java": "8a9e3a1f4e939dc9740b4e97be43c4748d1471a8b61d3c6ca9f2eb0de78a0d77",
+        "PredictionBamboo.java": "3ad2f453e34fb4feb934cddc37f89040ae19b58f91e80205dbf7e13e8c8119cc",
+        "PredictionBiomeCache.java": "786418f91bec881327d57a94b47c05585986daf0e8ca6240e4a218f20a30daad",
+        "PredictionBlockModel.java": "3f54af2dffc2c7a5a66f06695af0af94125f0443d05ea4355d4442ee739459c1",
+        "PredictionBoundaryWalls.java": "2e1f7a1a47b5212eb0d0f0090e958c2d176bb911e2d5d4fefa65e6622bc14e14",
+        "PredictionCacheMappings.java": "20ebcf746ea0daacad2b284d766be8446c2791cff91610c889eaa99c00f33f59",
+        "PredictionCacheMigration.java": "f0bc7adb4a38fd5780dc653bec5d3f306e33864333877be868b9f6f0c4ac70a5",
+        "PredictionCacheStorage.java": "2731d39763570699e43e3c9883369f4f26ebd63477c1c037d59f7fedd5f03509",
+        "PredictionCaptureRefresh.java": "a5cdf038c1208910960268d0028f67b12d803bf2057948ce76edd60353c0ee7d",
+        "PredictionCityGeometry.java": "a493c7881e8e4cf63e1bb8f1ebc572343e0b1fcc8998ecc2542a2862e3616494",
+        "PredictionCityMeshCache.java": "4a6e8a6cb27beee8c728727b17a547ab3def8eff303e4237628674cbc2b5f59e",
+        "PredictionClimateSampler.java": "10557bbc434fc212c50a54e03a1050220e64157257a7966a6be18b7e7d80b9f3",
+        "PredictionColorCache.java": "931970db17974feb6aaa4e752f235295eda8a710def3372eba2342d07fa6ff71",
+        "PredictionColumnVolume.java": "5a42b688571d3bf1ffd3158788dd082203fce047ef0cf90168d4547bfcbbee30",
+        "PredictionCompressionRetry.java": "e76870fd4245780a4b5f5dc39d1895b1cdc3bc9090fe5868712370b42aeb7985",
+        "PredictionCoverageBudget.java": "da2671734124249262a0693a525d2acbdc06dfa8fda481007517d2e77596a81a",
+        "PredictionCoverageOffsets.java": "e689d4ad8e1582494268e49af7805885d6ae4a989bd40df007fecc314d5acab1",
+        "PredictionCoverageOwners.java": "2c26ae76bd6c255a1ba111ba96a5bd144e55b9ad0c865b6606d9f746a2b33193",
+        "PredictionCoverageSweep.java": "863ca003ab5e21f35f7e742842f9327a3a2592e3a6cdced582c3f4596c102c82",
+        "PredictionCpuBudget.java": "df326c516f2c7e9018d15e5274f09226a6255c9415bf85251806d8732135115f",
+        "PredictionCpuCachePolicy.java": "e27e480e97dbdf52d6ecf7fa4fa8b3db9589106d9c81e85bbc8d96713d98138b",
+        "PredictionDecorationLevel.java": "f5ecd8ec714931b06b8e9deb7c9d21dc6bb585ffe3933163ed93934894effe93",
+        "PredictionDensityOrder.java": "af2889d275242e81acd46d72df20ded85b3bceb1c83a9a9e763647a2a8b40791",
+        "PredictionDepthBound.java": "f04faa71e80a67f511a2841fac52a3d26c968bc49c2fa553606593b5fd9382cd",
+        "PredictionDetailBands.java": "c3769a892827469bc8fa39e8d5c958ce43cab0b23b9314da85685533a84df415",
+        "PredictionDimensionProfiles.java": "c7f384296e8971579a7fee62ca9a353f7742d6e76aa3fde18c89813bfa466cd1",
+        "PredictionDiskCache.java": "288127d53a1bd749e0cf3b5ac38e1f362e55352146e4cb84b0cc03e02878927e",
+        "PredictionDisplayGeometry.java": "e5ebb122a59176252c5865ef5fc46c0f7cec0c8378cecfe142464888a9c7fa24",
+        "PredictionDisplayLod.java": "8dd754e1c94db95dec4808a59e6916295157032d6a99dd910d2d80853934c8e4",
+        "PredictionDrawRanges.java": "3d4cfb7692b194d4ec7e6d05376a78e7d7d8e8a17b1a247fdc9ce9641b26ce8b",
+        "PredictionEdgeFilter.java": "e833fd716e15222c0c36c6021b1f6e828caed37b870f601e58d0d9a5d59e5c20",
+        "PredictionEndSpikes.java": "57ede3f0719e488e668ed7064620e5c8520a8f3e7f839998809ef18b1d0a161f",
+        "PredictionExactCoverageIndex.java": "925c37a3ad40792f2c4207e690e0a1bca137d0a27fa5b0dd6614c727a813ed77",
+        "PredictionExactCoverageMask.java": "08a1521b1991d6028e185bbb2e9a95adc6e57658fb5bd2663309a6195298df8c",
+        "PredictionExteriorColumns.java": "b994969e9dcf0cfb6c9054d28741a641a33297ccba158931879aeb888258ecd1",
+        "PredictionFeatureHandoff.java": "80725be05f435bea029c5de8d252c2f3962d522126217977557576f1360961d8",
+        "PredictionFlatTerrainSampler.java": "f1013b4baf0d4e100f11fa6ade3bda8db1683a8b8b1c5f887d7cb57b945c6e25",
+        "PredictionFluidOcclusion.java": "d7ebd0efe6a526f146eb84c33f7f76f85f3eb1f69f0e12e0537ff54463f87751",
+        "PredictionFogBridge.java": "572004c590636ec8a2a1a6a256c84bf226530581e8741759dbf4da870befcc03",
+        "PredictionFrameCapture.java": "90f60fa2b20eae6feee5f82e4efe8bb760dd19ab668ec4256786529dbba39d1e",
+        "PredictionFramePace.java": "2a7571656022fcbde7d34aa1638483cc99238b9ada304eee57dd9d7b40a54a2f",
+        "PredictionFramePlan.java": "b7a3969a19bb48438672f5d7921f4c15c535796584ed8b6e93e1aa46df0c26cd",
+        "PredictionGeometryStats.java": "47a53062d3eea37597910902a1a899d45a9b376ba82ea85eedc00fd9eb0063ff",
+        "PredictionGlState.java": "ad4ab36b31def225286873407885df144e92c71ca65d62737b80fee122bf48d7",
+        "PredictionGpuEncoding.java": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e",
+        "PredictionGpuResidency.java": "cfdba7b21160e7f3e534cd281245d48a3355d52d4d0419ce22c5541c888cf9ec",
+        "PredictionGpuTile.java": "4c8b2b1f20d28a5dce01973f99ee8842f8c4520165d49f0986850633da6a84cc",
+        "PredictionGraphicsQuality.java": "ae9777c5505c2c17440550af57805da958627882b098a54fa1c8ca4db1a68b40",
+        "PredictionGraphicsSupport.java": "f8428991fb30c8920171e436e125bd5e7ee4c259a4d5672ccce51b6caa2256d4",
+        "PredictionHeightCache.java": "79c09d6c2cdd66d2b4bb81b8edc68e0e7d9047eeb518725798db4fc06c5fa6e5",
+        "PredictionIdleRefinement.java": "263bc8566531748f7e19358d4f37c9fb24faaadce63ac82daaabc866165e7314",
+        "PredictionIndirectBatch.java": "26d74751048787fb34f3976bf35907d2c665978c800669e9dce546fa2dab9f61",
+        "PredictionInitializationTiming.java": "4e0b2490ea2d07ccd92bf23722f71c27a49b935171c976ff9b6db3af9380499c",
+        "PredictionInteriorEdits.java": "49f5c487b0ec8a3b35be53a00618a0b3c768939cad6a946d27c0a8845f58b64a",
+        "PredictionIrisBridge.java": "282cad21d5d7729d913a1ca8596a022585d424bd2c45a661759308a4c98ca4f5",
+        "PredictionJavaExterior.java": "1c12b9b3f5460f258af2ab878b82cd5a18bef23917c10d5d9269f93a2ecdd239",
+        "PredictionLeafStates.java": "29bd9a1d80c065a72ec0b5eadd0295b422fc43a26a871107119d67ac057a6a3e",
+        "PredictionLighting.java": "6d13e90bd05cd8d8254dd1f00abaaff644c74476a5b137c99a7be27fb3df7c99",
+        "PredictionLoadingProgress.java": "eeb3a6b92a6c7a9d764d60e2e55d5726faa7e8c639eef70c79b8348e8c571d84",
+        "PredictionLocalTemplates.java": "fedf1ce262987c90fa07033c06c02ad5562d70363619c20bfa35aa3a1c593223",
+        "PredictionLodBackends.java": "437405da97ae5997f80ebe5cec31d0744aad58c146416477c04a1400f9e6c5ce",
+        "PredictionLodContext.java": "d4fecbf80a7e744909d9c81c4ec7f47f671687bc72012813076d04f35391ac96",
+        "PredictionLodPlanner.java": "3835b1534a6867eef25ed6f5ae72785419c8fbf57f5bc9b8fa6339b46d655499",
+        "PredictionLodSampler.java": "80b8fefc34857a3c713109338aa67b759ec290ead6818d60f09faac1389f84eb",
+        "PredictionLodSeams.java": "f2b72b76977c0753d10888c3ae57763ae48afe5211f5c3e043e3b50c8efdff5d",
+        "PredictionLodSource.java": "9ee63c147d1ef5afb8fa4f1f7afd3364cfeab9875e6302eaedf8ec72f013eb60",
+        "PredictionMaterialPalette.java": "30b54655d56b446466425a05e35105fdf4cb995726ea7322961553ca2f630ebc",
+        "PredictionMediumCoverage.java": "a92b7e96818c4bd39f987e7aa2cb8326b2cab3d57c650314654631e727d2de55",
+        "PredictionMemoryBudget.java": "244fbcb88841c9386d3317ac2114222838f872a7ce06016284f82ded78ef6ec3",
+        "PredictionMesh.java": "134b03d8ac317d32c37bc13e6dd97c99862dde3204bb472db905912b36aaa537",
+        "PredictionMeshBuilder.java": "ba7526deef8f78e10713dc716e002012a47dcf1631ffb0ba2b739e94bf7c1f0f",
+        "PredictionMeshCodec.java": "8c1b9ea74ae6b6e7ece26270c7f80224aa1c5121b8b701401d946dc40884bcf9",
+        "PredictionMeshCompression.java": "2ca8d354fc5349c86c915cf1d1ef843c897a973a41a4f775fcf95fbd6be12859",
+        "PredictionMeshFailure.java": "615539cde33bf011f0aded277303a1320bbf51652b35a63e7c23f63c8c51f9e3",
+        "PredictionMeshletBounds.java": "7356a3438c9a94846fd3d0f76e6fa121a5fb0a38c012f95a7baefffe676c0a1e",
+        "PredictionMeshResources.java": "5490b2dc70fd7ba57578821f60da427322c2ad56f2166417cc0ce98e56bf0c22",
+        "PredictionMeshRestore.java": "9d10b68cd8dd30f08cefdc97756c6d636759ef10328ebe11eafeb10647983a7a",
+        "PredictionMetadataCache.java": "35feebe38b17110a3cdad4839cc9e93e63730815af42919eb1448b616d746db3",
+        "PredictionMissingRegistry.java": "2bdd95680ce44b207b0c999cc7d701c7d23d7d0916082cc56946708cd03406cf",
+        "PredictionMorph.java": "2e9ebd2f23106ceeb1338a30d915b5ecf0b0e5cf57d8a1a95fe7c908f83feb3c",
+        "PredictionNormalDepthBridge.java": "6977fe9d9f277a4554a815653585879a9fff54e830d9648f26ddd1f8c8eced14",
+        "PredictionNormalTranslucencyBridge.java": "8e21c181995d1dbbf77cbe21f98a8add4c27c8daa203bad80ce5431ecf27d147",
+        "PredictionOcclusionCuller.java": "957ecf5aac4110226b9ffcdf76021f3f8c8baeb2efc343e659e6131aa4745371",
+        "PredictionOcclusionPolicy.java": "eb3e7838b0f38fef65f59d2f62b32ce07c3ce120cd12e16a30bc6627ee648eed",
+        "PredictionOpaqueBatches.java": "6f1b7a3bc271e03db6b1cf94f7b7d81bd73488190c69fb4cfab5c9b537812848",
+        "PredictionOwnershipData.java": "5d518fe81691e552433dd22c25716572cb4ede77754591cf70da7b2c6e4f7208",
+        "PredictionOwnershipRuns.java": "271cf53cdd7ba1178b7dad8e8a23c95285d324c6be376cc932d8047fa2a4ea79",
+        "PredictionPackedMesh.java": "d165409cc7e70300c7aa96efc052d7c8f8bf7029684deca4b83543d3c54c20be",
+        "PredictionPauseLimit.java": "b2396208833663e0bef7726c7c0fa82e5e8c486229e8a0ce8d5f6c64727837c1",
+        "PredictionPerformanceProfile.java": "69ac1711d77ec83c632941b0e795adfd6c1eb3fd2973c936df37b4afd756a491",
+        "PredictionPixelUnpack.java": "966a9863a07728bd738d8a447de1a2c5b8545ef698792e89336f19a37e6a11b3",
+        "PredictionPlacementExecutor.java": "9e2a710c397d6d26d54b6625f1d0533287c6f0530d4f57057cbc5c80620110ed",
+        "PredictionPreviewHandoff.java": "a8f48a830ebef03f9e44f26447eabf95663a28d6361f70607a5b59b986bf858f",
+        "PredictionQuadBufferPool.java": "df8578fdb3843d176cde763b8e275879cdcf2ee8f6837077c412bda5b505166a",
+        "PredictionQuadMerger.java": "ad6041e1e760ad8c276572fee4abc7c6f0db6a48deb126a32006325649db771f",
+        "PredictionQuadMesh.java": "b6ef6c79fa5296ba97256461c7bce5ca14d50154cc376de779ba9bc191907fac",
+        "PredictionQueueTimings.java": "dea98ab487c3203ca207698f6f8fd83c123749783f29d4943064d9489d20c1d4",
+        "PredictionRawDensity.java": "28b4270c79ae2bdfd5e2d86cce890275eae52d00e4e82d24c7b39150f655a74b",
+        "PredictionRealBoundarySeams.java": "9a81af30e561c60928d2328bb1849b0c5c21f72a4fddcc0fa4f2905f65385e79",
+        "PredictionRefinementOcclusion.java": "8b2254d4797fb4ada7a0eb8037cba9e079fbb790de39cdffe8455e461e3edc9e",
+        "PredictionRegionStorage.java": "ba1484b5b9b6eb640828f73d633011839808c356456b759d2dab87bf6c8524d2",
+        "PredictionRelief.java": "68ff99e2be4fd915f98342abfcd69a171aa782c66e36f60ee5fa3429170c6e1b",
+        "PredictionRenderCapture.java": "ee5392fcc536b955b81c17a8f6e070f770beae28f9ee8283520d2bf23449197f",
+        "PredictionRenderer.java": "5560b387f4d5f4d502a65b290239eb4c183cfbb1b9d692a52b63d5c85ae13586",
+        "PredictionRenderGeometry.java": "e89f257398559bb04afe008e0bcab7052f110e6b2db657e25c47fe2df488fca3",
+        "PredictionRenderResidency.java": "dd1603f7bab16c2bdbb027485242d9ded7ac68c6776910c63d398b48e3927fce",
+        "PredictionRenderTarget.java": "5cc163395f5d7074f649ea3bc6eff81e3dc717d623baa48793e0e4d963a38779",
+        "PredictionRenderTimings.java": "ce8e91429b0c8d7b71a60e97e16d05beb78b31ba296a81b4c2c0ee6ba45634cc",
+        "PredictionResources.java": "7ef09787f178a76c3397dfa96bd39f08581eada4e010809c063f07c8f5a3584c",
+        "PredictionSampleCompaction.java": "6aee93ae535b35bdd0da0a931be4eb0cbe18db73dbab3d49d2e816a555cc507e",
+        "PredictionSampleStore.java": "2b80dfebd49e74df4e8bf053b076e176a9a5c64d263001c7ad76a9e3ba68090a",
+        "PredictionScanMerge.java": "6cd1ffd39ee53ffef8c7adf3bc407049842f66c69320363168e225b1c96f308f",
+        "PredictionScanMesher2D.java": "7818bff2468ca4af42ee315a64d8e2d11e3f36108eafc2048105befe45fcf661",
+        "PredictionScopeFamilies.java": "cd0a1771ea4ef5066eb11b0b819bc7a366bd72e35ad827b4d103e3b3abfe17c3",
+        "PredictionScreenDetail.java": "9239ddf3807ceab19bcd10d14e7c70c43d6d0b9e8de5918ce2544cdd4c323277",
+        "PredictionSeamIndex.java": "bd3ce1f61daffb24d33dc83e44bdd44f48f18df0738eed62eb36290dabd00315",
+        "PredictionSeamMasks.java": "e6e190df43cc0598487c5be2b63bc1b838887712e6077f39b09ce28e760b2905",
+        "PredictionSeamMesh.java": "b33e660ba9755169fdc7584ac9bef580927240f35b606ebd694ea726955f7ff8",
+        "PredictionSeamWalls.java": "c8b91b2e1bbc6f8b274c80e2580f545b26a3c5e62f2c159cc32af2a9f01354d2",
+        "PredictionSimpleVegetation.java": "6d741190980efa5b325123878cad0f50c7a8b7f8510061a2b435e89a2831c23b",
+        "PredictionSnowSurfaces.java": "58cd9de1578f2b6c59f2e27a4df16e4e18b6a2c3f90b5bf1299659f1383e4015",
+        "PredictionSpatialIndex.java": "61a0f5055421d9c7d94bd4ec77bc13def60767e9e43e9b71aea055756f74ece3",
+        "PredictionSpatialOrder.java": "4cf0bd868d3cb1cfa119f0930e7f4e11530cca5482ba68a98f98acd630485187",
+        "PredictionStructureTemplates.java": "c1edb19a25e27dfcc789e889cf582371efe5300f81609e9f85cf335604b0e344",
+        "PredictionSubmissionCoverage.java": "01a84c959ee8e9088c3550b6e241426b936cfe49f9e557f1611ffb173915ccfc",
+        "PredictionSurfaceEdits.java": "28cdf8bd0e5c79e44d15ed1db89564e84ff7732877f2f99745aa5a451002d140",
+        "PredictionSurfaceFeatureAdapters.java": "f2858f0e46e2dd78a7d9101aca4000f6f3b1a6b3ec3676d4bbc5ec89875f81be",
+        "PredictionSurfaceShapes.java": "bb8b96965f78ccf57ff40dfd4534a5e2ec03a0032f3b59b87f86c21d6f7c296e",
+        "PredictionSurfaceStructures.java": "2865248c0e6e122b739eab2517b580df9f08261ab0b015577a30449f066a52f8",
+        "PredictionTemplateAccess.java": "9b45f3964b146cfde8df56506baa603639c73c89303d7740705886098977c03f",
+        "PredictionTemplateRepository.java": "351aca6d1d182ecc5ce8d707ed9f8775ed8c23aa8537123b2f6051736b2cdb06",
+        "PredictionTemplateStore.java": "833d0d402031fb59a29f373938b905459302c34d4de562f0a24228ccfc02ad3e",
+        "PredictionTerrainArena.java": "4d22b96f62496bbf06eb7aaae0d3255cb3393d322ec8065bde0016129cc61733",
+        "PredictionTerrainBackend.java": "d03c45a7d315f7c36785b92dc88c356bc39dcf84c563d260507b5a0f08f5e8b5",
+        "PredictionTerrainBackends.java": "4a5840e8990d0205f8d09752fd5453baa2c2a8700f4c24d7bdcb1f2bd7b3d181",
+        "PredictionTerrainColors.java": "308260753ce06170b6cf619fc88d9cf70f34d8b054936d557b5ab5608e818362",
+        "PredictionTerrainProgram.java": "e6a96b7567764f39217d3e45fb56604fef04ac3814ba740de6ab86814cc57990",
+        "PredictionTileManager.java": "38f3ee865e9b1c3e2e0b549040be7e268343d5419f5f434eba6817a98fadeb50",
+        "PredictionTileResidencyPolicy.java": "d11fbb827f074e90c77dae7848c8688dcaae823afded2e22dc3cca77c1bf456e",
+        "PredictionTileTable.java": "0dfeef7e6afc553bf80ed223b49fed81a4b80c1e808e9730bed9dc234dba61a0",
+        "PredictionTintCache.java": "d1dbfb28bb67efb885d402abc0494ca935982d1d89a0ed17ccfdd00d5349548a",
+        "PredictionTransitionPlan.java": "50d0ed86a295470c3b69e348532c10327e12e7122af193b395d600e2b5fc9c5c",
+        "PredictionTreeModels.java": "ee880f2c6cc8e7bd95c05d5af33e7ef7afdf881d28d461dd78d8179b234b3d31",
+        "PredictionUploadBudget.java": "5d1f6ac9290604079e74c7b74df705ff427aefd34c0e5f80c41b09a17f6a6ef2",
+        "PredictionUploadStaging.java": "fd1280a1058232f60a2f6518724aedd955b506a10ae3aa4cf87bdf51013f47b1",
+        "PredictionVanillaMask.java": "e2317006763dcfe503dbcedc6a2782403cb273537fd72cbc3b33828fa3e7e4b6",
+        "PredictionVegetation.java": "f9efc5a4c98a895fe33e44ecb1c001a84e8ca2abb175a11dc9318e748f747c12",
+        "PredictionVegetationDisplayCache.java": "37a633b6fe71629181b838ec7caf815d2a08c976b31ad6f557b97a084cf50362",
+        "PredictionVegetationRanges.java": "cae4067485b90fe74aded9ed248fd18fde4215487a3a7eb1ba8b7c29255052d5",
+        "PredictionVegetationRuns.java": "77faf3797343672b7abebf4298971b5f4e77f409465051487edad5b334f607eb",
+        "PredictionVegetationSelection.java": "5e7306e26545b0da37c77b38a7658094735305aa1a35284b5a045ba122141e7a",
+        "PredictionVegetationTraits.java": "44d60ef93e5d70965b528c14e5896ae6ca3d12903fa4a4f94119eb0ec583e25b",
+        "PredictionVisibilityFeedback.java": "82b5f63fcb24d29abdd8b077aebdafbaf7cfeea26e46164cf592291e73773c22",
+        "PredictionVisiblePlan.java": "3de9a5cba56de3db63daea2b9e24845106ac0407f98b070c2261a6c3538562e1",
+        "PredictionVoxyBoundaryBridge.java": "04cb89c293e810376e71da0268d6d9cb2e5cf32925444d3225870f3a012ccec0",
+        "PredictionVoxyDepth.java": "e3960e687384bdbf4d83ffe8ad9eb9c3417ed2b80653bc5ec3aa2207280202d8",
+        "PredictionVoxyOwnership.java": "8d187742dac0cb8c1ad0a0ec08acab8700417d2232b8fed27a97212b22cfafcd",
+        "PredictionWallEvidence.java": "4189d21deacf17c453746c6642cbbfcc6d9c076d510960083c392649eeddf4ff",
+        "PredictionWorkDeferred.java": "53f703cb2d74328815b51e58ac9878ed5d1b992603e8773f6f5311c700730d7e",
+        "PredictionWorkOrder.java": "fdff27f42a296bf0dbae0308ef8627724fa4c3f318f5a46a4d64ada089cba3fa",
+        "PredictionWorkView.java": "5d10f61adaa9d8f834a2272feb88f47674dea6c4d53b904bd42d6b8d843ad948",
+        "PredictionWorldgenCapabilities.java": "fa82c7cd019484038682e01405c5b16ddc71afa8eebbc26d1df22d0989c04fbf",
+        "RustReferenceCapture.java": "66599008a3920667b2baec6f719fbac62aca6b39500552c899fe5b12c5ad1743",
+        "RustReferenceExport.java": "b133ba7f821d7fdb96c807f7de4880333d889ee37061fb67f25964078b1bfdbb",
+        "RustTerrainSampler.java": "cbcf847fedbf73a9e908114e05df0ac4084b8fa08906d6bae5b817f7d28b6d21",
+        "RustVegetationDescriptors.java": "5f70209deacf9608da46a0feaf9f8d3b833d7907928fd879b369bb1b2fe80e45",
+        "RustVegetationStage.java": "91120206455052bf005f24e82ce1dab8825cd05a406276c074401597e971b2a4",
+        "RustWorldgenBackend.java": "d61605437302c6f1974d670229dd0d15c22ee5838ee884d27b46e6edc54a0a26",
+        "RustWorldgenDocument.java": "274fd988828eb8bedadcd7d08000dcc5eda21863bdebfcbc363cafdf0a9001fb",
+        "SpyglassOverlayTiming.java": "e96405d289604990204e6e715a946bd8e46bcb74fea2261d9aa22b9612e6b707",
+        "TerraBlenderBackend.java": "5a6ee50349eb188ec6772add3adcce4e1e5a30eb7aeb94992dfb89dda6894073",
+        "TerrablenderUniqueness.java": "a08f7758d16143f688261a6824acce21bf97a3f8300d7cd97a5a45c5fc47462d",
+        "VssLodFaceGroup.java": "161096a11b421930bd2b96c5831b95ab711032298d1c986d6dee6e092dec3596",
+        "VssLodFocus.java": "f978008fc14bb1ac9e196365b07c36885801bf6d0ddb0258ee04f5eacb1b19cf",
+        "VssLodFog.java": "92a9cfc3a229760953c3ec0bd5e6ef968f54896096e32c5100a9f8c12c029f74",
+        "VssLodGreedyMesher.java": "b9669233db9390aac6667923f235ab7737b275fc054477d50cae9da7b67331e1",
+        "VssLodLayout.java": "dba3149005403e14b7d25eace1f8f880681941130ce2d38cf027a61ac03106c5",
+        "VssLodProjection.java": "298ee3d05a0546b7aee3400d5582b73247fc84244d4e993dc5a0818262a98b38",
+        "VssLodSampleCache.java": "7d8f4b60f248d7ea0cd803a4e9cc84cb9df4366dfed30165a9902850dc6e7c2a",
+        "VssLodSpriteTable.java": "c6c35cdcde2aa7b79ed47104e829f9562da5db6214aabd81ef1b0710458cc6cb",
+        "VssNativePlatform.java": "9b0a155a2fe5d5cdd56770cd6d8761dc6d952ea5daf4b4162b8c42b92783631b"
+      },
+      "final_changed_source_sha256": {
+        "PredictionMeshletBounds.java": "806828345e5177577067b97138d3b2faf4af1d07cebbd0ed700c2a72107d68df",
+        "PredictionPackedMesh.java": "0bec11d120e931e53e0b953fb0146aa184e7f1701b25ed065aa893edb5aa125d",
+        "PredictionRenderer.java": "4a262a404fdc8e21e4bc8ec98060cfdc6302802a6fd795671abe90ea50f72ad7",
+        "PredictionCommandDirections.java": "6bad56860694ad85cd20e0074839a81accebac2e424693c78e1f2f8ac2ed7bd9"
+      },
+      "tests": {
+        "design-benefit-cpu": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.BenefitCanopyTest",
+            "dev.xantha.vss.client.prediction.BenefitLocalTerrainTest",
+            "dev.xantha.vss.client.prediction.BenefitPreparedPassTest"
+          ],
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "design-benefit-gpu": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.BenefitWaterSubmissionGpuTest"
+          ],
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "design-benefit-production-gpu": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.PredictionCommandDirectionGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionOcclusionWorkloadGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionVegetationLodGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest"
+          ],
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "design-benefit-regression": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.PredictionAquaticSubmissionTest",
+            "dev.xantha.vss.client.prediction.PredictionCommandDirectionsTest",
+            "dev.xantha.vss.client.prediction.PredictionCommandDirectionTest",
+            "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+            "dev.xantha.vss.client.prediction.PredictionCrossEncodingTest",
+            "dev.xantha.vss.client.prediction.PredictionDisplayErrorTest",
+            "dev.xantha.vss.client.prediction.PredictionDisplayGeometryTest",
+            "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+            "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+            "dev.xantha.vss.client.prediction.PredictionGraphicsQualityTest",
+            "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+            "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+            "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+            "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+            "dev.xantha.vss.client.prediction.PredictionParentSelectionExperimentTest",
+            "dev.xantha.vss.client.prediction.PredictionPassStorageTest",
+            "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+            "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+            "dev.xantha.vss.client.prediction.PredictionRectangleEncodingTest",
+            "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+            "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+            "dev.xantha.vss.client.prediction.PredictionScanMergeTest",
+            "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+            "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+            "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+            "dev.xantha.vss.client.prediction.PredictionSpatialOrderTest",
+            "dev.xantha.vss.client.prediction.PredictionSpriteTableTest",
+            "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+            "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+            "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+            "dev.xantha.vss.client.prediction.PredictionVegetationMaterialTest",
+            "dev.xantha.vss.client.prediction.PredictionVisibleHandoffTest",
+            "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+            "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+            "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest"
+          ],
+          "tests": 202,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "csv_metrics": {
+        "benefit-direction.csv": [
+          {
+            "scenario": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 433152.0,
+                "p95": 434176.0,
+                "min": 432128.0,
+                "max": 1424384.0
+              },
+              "cpu_ns": {
+                "median": 49900.0,
+                "p95": 83799.0,
+                "min": 35000.0,
+                "max": 95499.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1024.0,
+                "p95": 1024.0,
+                "min": 0.0,
+                "max": 3072.0
+              },
+              "cpu_ns": {
+                "median": 53700.0,
+                "p95": 80800.0,
+                "min": 37300.0,
+                "max": 151100.0
+              },
+              "quads": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              },
+              "commands": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          },
+          {
+            "scenario": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1471488.0,
+                "p95": 2293760.0,
+                "min": 1441792.0,
+                "max": 2499584.0
+              },
+              "cpu_ns": {
+                "median": 44601.0,
+                "p95": 74101.0,
+                "min": 32000.0,
+                "max": 120201.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1468416.0,
+                "p95": 2171904.0,
+                "min": 1443840.0,
+                "max": 2950144.0
+              },
+              "cpu_ns": {
+                "median": 45199.0,
+                "p95": 67401.0,
+                "min": 33400.0,
+                "max": 80900.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 873472.0,
+                "p95": 1492992.0,
+                "min": 850944.0,
+                "max": 1710080.0
+              },
+              "cpu_ns": {
+                "median": 33600.0,
+                "p95": 51700.0,
+                "min": 26399.0,
+                "max": 73601.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 741376.0,
+                "p95": 1299456.0,
+                "min": 727040.0,
+                "max": 1789952.0
+              },
+              "cpu_ns": {
+                "median": 35500.0,
+                "p95": 65199.0,
+                "min": 27399.0,
+                "max": 80401.0
+              },
+              "quads": {
+                "median": 524288.0,
+                "p95": 524288.0,
+                "min": 524288.0,
+                "max": 524288.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "scenario": "3",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1472512.0,
+                "p95": 2301952.0,
+                "min": 1441792.0,
+                "max": 2429952.0
+              },
+              "cpu_ns": {
+                "median": 29699.0,
+                "p95": 48800.0,
+                "min": 20200.0,
+                "max": 80700.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "3",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1470464.0,
+                "p95": 2353152.0,
+                "min": 1441792.0,
+                "max": 2668544.0
+              },
+              "cpu_ns": {
+                "median": 32900.0,
+                "p95": 52299.0,
+                "min": 22000.0,
+                "max": 72500.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "4",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1473536.0,
+                "p95": 2277376.0,
+                "min": 1446912.0,
+                "max": 2393088.0
+              },
+              "cpu_ns": {
+                "median": 27800.0,
+                "p95": 46299.0,
+                "min": 20600.0,
+                "max": 54900.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "4",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1471488.0,
+                "p95": 2273280.0,
+                "min": 1436672.0,
+                "max": 2386944.0
+              },
+              "cpu_ns": {
+                "median": 29099.0,
+                "p95": 48099.0,
+                "min": 21800.0,
+                "max": 92200.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "5",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 754688.0,
+                "p95": 1458176.0,
+                "min": 740352.0,
+                "max": 1596416.0
+              },
+              "cpu_ns": {
+                "median": 26001.0,
+                "p95": 39199.0,
+                "min": 20200.0,
+                "max": 50501.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "5",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 751616.0,
+                "p95": 762880.0,
+                "min": 740352.0,
+                "max": 1695744.0
+              },
+              "cpu_ns": {
+                "median": 25300.0,
+                "p95": 44000.0,
+                "min": 20700.0,
+                "max": 56500.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          }
+        ],
+        "benefit-water-full.csv": [
+          {
+            "path": "vertical",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 232600.0,
+                "p95": 316901.0,
+                "min": 99599.0,
+                "max": 379700.0
+              },
+              "gpu_ns": {
+                "median": 100352.0,
+                "p95": 107520.0,
+                "min": 92160.0,
+                "max": 111616.0
+              },
+              "whole_hits": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          },
+          {
+            "path": "vertical",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 46600.0,
+                "p95": 74000.0,
+                "min": 35001.0,
+                "max": 101300.0
+              },
+              "gpu_ns": {
+                "median": 99328.0,
+                "p95": 106496.0,
+                "min": 91136.0,
+                "max": 108544.0
+              },
+              "whole_hits": {
+                "median": 64.0,
+                "p95": 100.0,
+                "min": 24.0,
+                "max": 104.0
+              }
+            }
+          },
+          {
+            "path": "horizontal",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 105200.0,
+                "p95": 152000.0,
+                "min": 91299.0,
+                "max": 1262100.0
+              },
+              "gpu_ns": {
+                "median": 87040.0,
+                "p95": 92160.0,
+                "min": 81920.0,
+                "max": 547840.0
+              },
+              "whole_hits": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          },
+          {
+            "path": "horizontal",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 100999.0,
+                "p95": 155201.0,
+                "min": 84899.0,
+                "max": 1121700.0
+              },
+              "gpu_ns": {
+                "median": 87040.0,
+                "p95": 91136.0,
+                "min": 80896.0,
+                "max": 95232.0
+              },
+              "whole_hits": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          }
+        ],
+        "benefit-local-build.csv": [
+          {
+            "scenario": "0",
+            "samples": 21,
+            "metrics": {
+              "whole_ns": {
+                "median": 6243400.0,
+                "p95": 9242200.0,
+                "min": 3905800.0,
+                "max": 13326400.0
+              },
+              "local_ns": {
+                "median": 10571100.0,
+                "p95": 12696900.0,
+                "min": 4704700.0,
+                "max": 14645000.0
+              },
+              "whole_words": {
+                "median": 230700.0,
+                "p95": 230700.0,
+                "min": 230700.0,
+                "max": 230700.0
+              },
+              "local_words": {
+                "median": 261552.0,
+                "p95": 261552.0,
+                "min": 261552.0,
+                "max": 261552.0
+              }
+            }
+          },
+          {
+            "scenario": "1",
+            "samples": 21,
+            "metrics": {
+              "whole_ns": {
+                "median": 4002800.0,
+                "p95": 9096700.0,
+                "min": 3638600.0,
+                "max": 9138800.0
+              },
+              "local_ns": {
+                "median": 4960900.0,
+                "p95": 10357600.0,
+                "min": 4418500.0,
+                "max": 11425600.0
+              },
+              "whole_words": {
+                "median": 241476.0,
+                "p95": 241476.0,
+                "min": 241476.0,
+                "max": 241476.0
+              },
+              "local_words": {
+                "median": 265980.0,
+                "p95": 265980.0,
+                "min": 265980.0,
+                "max": 265980.0
+              }
+            }
+          }
+        ],
+        "benefit-representations.csv": [
+          {
+            "candidate": "local-terrain",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 329728.0,
+                "p95": 331776.0,
+                "min": 327680.0,
+                "max": 331776.0
+              },
+              "cpu_ns": {
+                "median": 37501.0,
+                "p95": 85500.0,
+                "min": 28399.0,
+                "max": 142700.0
+              },
+              "quads": {
+                "median": 137216.0,
+                "p95": 137216.0,
+                "min": 137216.0,
+                "max": 137216.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "local-terrain",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 525312.0,
+                "p95": 530432.0,
+                "min": 522240.0,
+                "max": 1532928.0
+              },
+              "cpu_ns": {
+                "median": 37899.0,
+                "p95": 70700.0,
+                "min": 28099.0,
+                "max": 91700.0
+              },
+              "quads": {
+                "median": 262144.0,
+                "p95": 262144.0,
+                "min": 262144.0,
+                "max": 262144.0
+              },
+              "commands": {
+                "median": 512.0,
+                "p95": 512.0,
+                "min": 512.0,
+                "max": 512.0
+              }
+            }
+          },
+          {
+            "candidate": "local-terrain",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 434176.0,
+                "p95": 436224.0,
+                "min": 430080.0,
+                "max": 1327104.0
+              },
+              "cpu_ns": {
+                "median": 26800.0,
+                "p95": 53100.0,
+                "min": 18900.0,
+                "max": 111401.0
+              },
+              "quads": {
+                "median": 216448.0,
+                "p95": 216448.0,
+                "min": 216448.0,
+                "max": 216448.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "local-terrain",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 617472.0,
+                "p95": 621568.0,
+                "min": 611328.0,
+                "max": 1410048.0
+              },
+              "cpu_ns": {
+                "median": 26600.0,
+                "p95": 51301.0,
+                "min": 18400.0,
+                "max": 70799.0
+              },
+              "quads": {
+                "median": 335104.0,
+                "p95": 335104.0,
+                "min": 335104.0,
+                "max": 335104.0
+              },
+              "commands": {
+                "median": 512.0,
+                "p95": 512.0,
+                "min": 512.0,
+                "max": 512.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 463872.0,
+                "p95": 467968.0,
+                "min": 460800.0,
+                "max": 1273856.0
+              },
+              "cpu_ns": {
+                "median": 17500.0,
+                "p95": 42801.0,
+                "min": 14600.0,
+                "max": 63399.0
+              },
+              "quads": {
+                "median": 886784.0,
+                "p95": 886784.0,
+                "min": 886784.0,
+                "max": 886784.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 243712.0,
+                "p95": 251904.0,
+                "min": 229376.0,
+                "max": 1143808.0
+              },
+              "cpu_ns": {
+                "median": 18499.0,
+                "p95": 39700.0,
+                "min": 14800.0,
+                "max": 66299.0
+              },
+              "quads": {
+                "median": 425984.0,
+                "p95": 425984.0,
+                "min": 425984.0,
+                "max": 425984.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 345088.0,
+                "p95": 346112.0,
+                "min": 343040.0,
+                "max": 1218560.0
+              },
+              "cpu_ns": {
+                "median": 19500.0,
+                "p95": 39600.0,
+                "min": 15300.0,
+                "max": 333700.0
+              },
+              "quads": {
+                "median": 886784.0,
+                "p95": 886784.0,
+                "min": 886784.0,
+                "max": 886784.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 176128.0,
+                "p95": 177152.0,
+                "min": 171008.0,
+                "max": 974848.0
+              },
+              "cpu_ns": {
+                "median": 19100.0,
+                "p95": 39300.0,
+                "min": 12700.0,
+                "max": 56499.0
+              },
+              "quads": {
+                "median": 425984.0,
+                "p95": 425984.0,
+                "min": 425984.0,
+                "max": 425984.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 345088.0,
+                "p95": 347136.0,
+                "min": 342016.0,
+                "max": 1619968.0
+              },
+              "cpu_ns": {
+                "median": 16500.0,
+                "p95": 30901.0,
+                "min": 13800.0,
+                "max": 38700.0
+              },
+              "quads": {
+                "median": 886784.0,
+                "p95": 886784.0,
+                "min": 886784.0,
+                "max": 886784.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 174080.0,
+                "p95": 176128.0,
+                "min": 172032.0,
+                "max": 634880.0
+              },
+              "cpu_ns": {
+                "median": 16600.0,
+                "p95": 32801.0,
+                "min": 11400.0,
+                "max": 75200.0
+              },
+              "quads": {
+                "median": 425984.0,
+                "p95": 425984.0,
+                "min": 425984.0,
+                "max": 425984.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1054720.0,
+                "p95": 1061888.0,
+                "min": 1044480.0,
+                "max": 1885184.0
+              },
+              "cpu_ns": {
+                "median": 16800.0,
+                "p95": 30201.0,
+                "min": 14200.0,
+                "max": 54500.0
+              },
+              "quads": {
+                "median": 2296832.0,
+                "p95": 2296832.0,
+                "min": 2296832.0,
+                "max": 2296832.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 316416.0,
+                "p95": 320512.0,
+                "min": 312320.0,
+                "max": 1046528.0
+              },
+              "cpu_ns": {
+                "median": 16700.0,
+                "p95": 34200.0,
+                "min": 14400.0,
+                "max": 41401.0
+              },
+              "quads": {
+                "median": 622592.0,
+                "p95": 622592.0,
+                "min": 622592.0,
+                "max": 622592.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 868352.0,
+                "p95": 1684480.0,
+                "min": 865280.0,
+                "max": 1884160.0
+              },
+              "cpu_ns": {
+                "median": 16300.0,
+                "p95": 28999.0,
+                "min": 14100.0,
+                "max": 45800.0
+              },
+              "quads": {
+                "median": 2296832.0,
+                "p95": 2296832.0,
+                "min": 2296832.0,
+                "max": 2296832.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 249856.0,
+                "p95": 250880.0,
+                "min": 247808.0,
+                "max": 251904.0
+              },
+              "cpu_ns": {
+                "median": 17200.0,
+                "p95": 32700.0,
+                "min": 14299.0,
+                "max": 36200.0
+              },
+              "quads": {
+                "median": 622592.0,
+                "p95": 622592.0,
+                "min": 622592.0,
+                "max": 622592.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 867328.0,
+                "p95": 1487872.0,
+                "min": 863232.0,
+                "max": 1833984.0
+              },
+              "cpu_ns": {
+                "median": 16200.0,
+                "p95": 31900.0,
+                "min": 13901.0,
+                "max": 64200.0
+              },
+              "quads": {
+                "median": 2296832.0,
+                "p95": 2296832.0,
+                "min": 2296832.0,
+                "max": 2296832.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 248832.0,
+                "p95": 249856.0,
+                "min": 244736.0,
+                "max": 249856.0
+              },
+              "cpu_ns": {
+                "median": 16700.0,
+                "p95": 39101.0,
+                "min": 13900.0,
+                "max": 47900.0
+              },
+              "quads": {
+                "median": 622592.0,
+                "p95": 622592.0,
+                "min": 622592.0,
+                "max": 622592.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 10759168.0,
+                "p95": 11952128.0,
+                "min": 9917440.0,
+                "max": 12249088.0
+              },
+              "cpu_ns": {
+                "median": 27600.0,
+                "p95": 51899.0,
+                "min": 14200.0,
+                "max": 68401.0
+              },
+              "quads": {
+                "median": 18863104.0,
+                "p95": 18863104.0,
+                "min": 18863104.0,
+                "max": 18863104.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 544768.0,
+                "p95": 550912.0,
+                "min": 541696.0,
+                "max": 1454080.0
+              },
+              "cpu_ns": {
+                "median": 32100.0,
+                "p95": 49900.0,
+                "min": 15300.0,
+                "max": 59700.0
+              },
+              "quads": {
+                "median": 1138688.0,
+                "p95": 1138688.0,
+                "min": 1138688.0,
+                "max": 1138688.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 7605248.0,
+                "p95": 8161280.0,
+                "min": 6951936.0,
+                "max": 8763392.0
+              },
+              "cpu_ns": {
+                "median": 22300.0,
+                "p95": 39600.0,
+                "min": 14699.0,
+                "max": 44600.0
+              },
+              "quads": {
+                "median": 18863104.0,
+                "p95": 18863104.0,
+                "min": 18863104.0,
+                "max": 18863104.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 448512.0,
+                "p95": 450560.0,
+                "min": 444416.0,
+                "max": 1530880.0
+              },
+              "cpu_ns": {
+                "median": 26101.0,
+                "p95": 38700.0,
+                "min": 11900.0,
+                "max": 60700.0
+              },
+              "quads": {
+                "median": 1138688.0,
+                "p95": 1138688.0,
+                "min": 1138688.0,
+                "max": 1138688.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 6947840.0,
+                "p95": 7910400.0,
+                "min": 6937600.0,
+                "max": 9137152.0
+              },
+              "cpu_ns": {
+                "median": 26200.0,
+                "p95": 42301.0,
+                "min": 14101.0,
+                "max": 51500.0
+              },
+              "quads": {
+                "median": 18863104.0,
+                "p95": 18863104.0,
+                "min": 18863104.0,
+                "max": 18863104.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 444416.0,
+                "p95": 445440.0,
+                "min": 442368.0,
+                "max": 1483776.0
+              },
+              "cpu_ns": {
+                "median": 23499.0,
+                "p95": 40100.0,
+                "min": 12400.0,
+                "max": 61101.0
+              },
+              "quads": {
+                "median": 1138688.0,
+                "p95": 1138688.0,
+                "min": 1138688.0,
+                "max": 1138688.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          }
+        ],
+        "benefit-prepare.csv": [
+          {
+            "water": "false",
+            "path": "stationary",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 500.0,
+                "p95": 900.0,
+                "min": 400.0,
+                "max": 27700.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "stationary",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 500.0,
+                "p95": 800.0,
+                "min": 300.0,
+                "max": 43400.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "vertical",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 2000.0,
+                "p95": 21400.0,
+                "min": 1900.0,
+                "max": 46700.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "vertical",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 2000.0,
+                "p95": 17300.0,
+                "min": 1800.0,
+                "max": 53400.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "horizontal",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 1900.0,
+                "p95": 3000.0,
+                "min": 1800.0,
+                "max": 13800.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "horizontal",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 1800.0,
+                "p95": 13600.0,
+                "min": 1700.0,
+                "max": 616600.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "crossing",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 1800.0,
+                "p95": 3000.0,
+                "min": 1700.0,
+                "max": 7600.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "crossing",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 1800.0,
+                "p95": 77500.0,
+                "min": 1700.0,
+                "max": 276800.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "stationary",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 400.0,
+                "p95": 1200.0,
+                "min": 300.0,
+                "max": 10200.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "stationary",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 500.0,
+                "p95": 1500.0,
+                "min": 300.0,
+                "max": 8000.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "vertical",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 8000.0,
+                "p95": 13500.0,
+                "min": 7600.0,
+                "max": 42300.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "vertical",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 200.0,
+                "p95": 300.0,
+                "min": 100.0,
+                "max": 1100.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "horizontal",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 12400.0,
+                "p95": 27400.0,
+                "min": 8200.0,
+                "max": 58200.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "horizontal",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 12300.0,
+                "p95": 28700.0,
+                "min": 8300.0,
+                "max": 63200.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "crossing",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 16900.0,
+                "p95": 35000.0,
+                "min": 8900.0,
+                "max": 71800.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "crossing",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 16300.0,
+                "p95": 35600.0,
+                "min": 8400.0,
+                "max": 58500.0
+              }
+            }
+          }
+        ]
+      },
+      "canopy_quality": [
+        {
+          "shape": "0",
+          "source_leaves": "15360",
+          "coarse_voxels": "4096",
+          "added_occupied_cells": "11264",
+          "material_mismatches": "0",
+          "bridged_gaps": "0",
+          "exact_trunks": "true"
+        },
+        {
+          "shape": "1",
+          "source_leaves": "46080",
+          "coarse_voxels": "10752",
+          "added_occupied_cells": "33792",
+          "material_mismatches": "0",
+          "bridged_gaps": "5120",
+          "exact_trunks": "true"
+        },
+        {
+          "shape": "2",
+          "source_leaves": "23808",
+          "coarse_voxels": "10752",
+          "added_occupied_cells": "56064",
+          "material_mismatches": "1728",
+          "bridged_gaps": "5120",
+          "exact_trunks": "true"
+        }
+      ],
+      "raw_csv_sha256": {
+        "benefit-canopy-quality.csv": "2314ae42f7ab54683c75d8253afb68a730d1d39d82ce775de7c17e205b81aaad",
+        "benefit-direction.csv": "35d06c9637dcd74a08d2ae0c9154b5359e0ec8f0a399ff38c4c1f1ecdb6f6c21",
+        "benefit-local-build.csv": "d0231f0221092ed3325c9b8f91ff8df12e5bacac7d7176ed8bba45fed2daee29",
+        "benefit-prepare.csv": "8435649117a39ba4390ffcd4012b49c390b1a9b0404f4ae3aeabf8ecac414b29",
+        "benefit-representations.csv": "323369a68aa2aaaa07851ada43877765e946fe081ed27ab7da8d4404c1c23c2b",
+        "benefit-water-full.csv": "24d6b8c7562997085b4c5ef36dd0c0fd10ead58781b8c7d25b762d91dda7256c",
+        "command-direction.csv": "8d4758ffa55e323e344c337fe120afe781f1538f3add3a1c0839cdbd9bc89418",
+        "parent-selection.csv": "e59548e857f5ab76b8aae2ffab88590b11b5126a7bdc0a3545468889dbfd6752",
+        "production-command-direction.csv": "2eb436bb731240213b5e8897b74e835f63b935e1ccf701b04d5887d43b6c0be0",
+        "production-visible-workload-policy.csv": "7c0551d48d4e45c9946b9780663ebf14e4ccbfece9342e1146c2170a17355416",
+        "terrain-lod.csv": "d893a71a4c9626944bd09224a91ad5297cf7398a35e3ccec94577d32e262c7c3",
+        "vegetation-lod.csv": "42b170c3e7856e830b1838057e58f23f3b683fd6da90ed180bfdd4c099abf7e5",
+        "visible-workload-policy.csv": "1674637b1b71cd0d43bb4c63f5df1339ca168e462de6505a35203a71ef25f327"
+      },
+      "jar": {
+        "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/lib/design-benefit-20261012/vss-0.3.5-neoforge-1.21.1.jar",
+        "bytes": 5952885,
+        "sha256": "3101aba82ae5c7bd87984753efe924e19b7e44b09f5bd700ff9c5ba488495acd",
+        "native_sha256": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "zip_integrity": "passed",
+        "experimental_classes": [],
+        "natives_equal_previous": true
+      }
+    },
+    "forge": {
+      "root": "C:/Users/Administrator/Desktop/voxyserverside",
+      "changed_production_files": [
+        "PredictionMeshletBounds.java",
+        "PredictionPackedMesh.java",
+        "PredictionRenderer.java"
+      ],
+      "new_production_files": [
+        "PredictionCommandDirections.java"
+      ],
+      "baseline_source_sha256": {
+        "BetterEndCompat.java": "73905c3a5a42e6b095347aa076becb023a6e36244061b0f5a17c8e30db162c9a",
+        "BlueprintBiomeCompat.java": "44717821fe176f80b1de0a2c861c9691a83338575fbd374c32be8d784fe2a939",
+        "ClientCaptureExtractor.java": "11c19c6be236d15fdab5f9d91fad561f2c1cbfab8c74a111a3e582f6d99e1d3a",
+        "ClientColumnSample.java": "f108ebb3d9450af0fd70d2c5b811b6c70f029e357880226764adbee62877a002",
+        "ClientPredictionState.java": "1f03de6efec5ae85bd030f08e03553234402de7dc68c05ef02d99950db6947d7",
+        "ClientSurfaceResolver.java": "20c7d4b51012bc77331137cdcf3b16f1f828b2fd4321ed20b19bc51ce85a8477",
+        "ClientTerrainSampler.java": "ba4b6ee1e8b005cdaf155ae6dd7f6b7fe634b75a488b236c2b61f6d37aab261c",
+        "ClientWorldgenProfileDecoder.java": "d3a86cbe9f048f1114ab6dccd84961d1b7ae8771e4861cf25f999b6cf67c0825",
+        "ClientWorldgenRegistries.java": "5e1c301267ef386814973725e365ad404a1d44762aeb5665f1d1bc70df5bb64c",
+        "DensityCompilation.java": "b673a93e4af8c75735afdb47f83eb9719a20a93e8a1d04e8aa3937c756549446",
+        "DensityCompilerSupport.java": "adf237c0394be3d1fe83637123690d8f72786087878f1ce7668c9b31ea7a350c",
+        "DensityGraphCompiler.java": "ae8bd0e7089f344044fcc696a5685d9bfcbbb2f818abf3c29a51e2fb53a42a55",
+        "DensityMemo.java": "5e607f533605b3394c7356fd25e9a85139f8b8646ee917b7969c0d1c4ccde641",
+        "ExactCoverageGate.java": "6683b72e64ed41fcd675f006487199543fd3d8f36684ad67fd2e8a44110ca047",
+        "FreeTerraForgedCompat.java": "31795c2499166c2ab10975b6bcb99e0e46c296a6e75c226ae3a4ee4b41698818",
+        "FreeTerraForgedDensity.java": "9d0ee4d8136378a8408bd44ea7f56af52e66534540412bc2cb0b00da3833697c",
+        "FreeTerraForgedNativeFilters.java": "6cad2f56628626332d354e062dd779d8d0538275f7df347151da0fca49708c83",
+        "FreeTerraForgedTerrainSampler.java": "355a2a502861a98d8cc904a73c6a3c6305d507f1a3492dd08e0d312cdbe49d70",
+        "FreeTerraForgedWater.java": "429852872bc111e4e6e22bac84566e0534a644cbcfb323274d751c8d59047e4c",
+        "GlProgram.java": "363fe16fe5ab6f24f550d7a1bea9b6f0f3bfc18084884be4002219b0b655f516",
+        "LostCityHints.java": "d0421eb87825507ac6ab5dffc0bbbb61e0a9436cb78da2e03770e9b3f82a3e6f",
+        "MinecraftColumnTerrainSampler.java": "db8294b7207a5eefc066b4b3eaec5c320db4d971ec1a442008e0e89ed11a8503",
+        "PredictionAdaptiveDisplayGrid.java": "45ebc84ec646801b80d66abd80837f59b718909e6e5a8f8dce539c26d09115b6",
+        "PredictionAquaticLod.java": "f68b091d5bc03d9e9a930d6a65db275816ccd3e6d161882fa5ea1d47c99872d9",
+        "PredictionAtlasSampler.java": "34cbf5887ff16c46d785183a97038984e2f86f6b796b11ae3d1e8a1606d8e24e",
+        "PredictionBackendSelection.java": "8a9e3a1f4e939dc9740b4e97be43c4748d1471a8b61d3c6ca9f2eb0de78a0d77",
+        "PredictionBamboo.java": "3ad2f453e34fb4feb934cddc37f89040ae19b58f91e80205dbf7e13e8c8119cc",
+        "PredictionBiomeCache.java": "c69a3334b403c5b32884a1b5a845be418a489668d8fa555d2bc607812819f882",
+        "PredictionBlockModel.java": "a7193a6cee6e5b81fcdedc9d1e67726f645c109b2aacc1d13678c91fb60c3eab",
+        "PredictionBoundaryWalls.java": "2e1f7a1a47b5212eb0d0f0090e958c2d176bb911e2d5d4fefa65e6622bc14e14",
+        "PredictionCacheMappings.java": "20ebcf746ea0daacad2b284d766be8446c2791cff91610c889eaa99c00f33f59",
+        "PredictionCacheMigration.java": "f0bc7adb4a38fd5780dc653bec5d3f306e33864333877be868b9f6f0c4ac70a5",
+        "PredictionCacheStorage.java": "2731d39763570699e43e3c9883369f4f26ebd63477c1c037d59f7fedd5f03509",
+        "PredictionCaptureRefresh.java": "a5cdf038c1208910960268d0028f67b12d803bf2057948ce76edd60353c0ee7d",
+        "PredictionCityGeometry.java": "a493c7881e8e4cf63e1bb8f1ebc572343e0b1fcc8998ecc2542a2862e3616494",
+        "PredictionCityMeshCache.java": "4a6e8a6cb27beee8c728727b17a547ab3def8eff303e4237628674cbc2b5f59e",
+        "PredictionClimateSampler.java": "10557bbc434fc212c50a54e03a1050220e64157257a7966a6be18b7e7d80b9f3",
+        "PredictionColorCache.java": "931970db17974feb6aaa4e752f235295eda8a710def3372eba2342d07fa6ff71",
+        "PredictionColumnVolume.java": "5c9fc7d973339fbed98bbc45760c2085337025f423b4b1cb18f8dcc10e3e4b35",
+        "PredictionCompressionRetry.java": "f59ac50d43fe0a9791389e21e84391fa090eedf82d171bd29a49c8e8452ef095",
+        "PredictionCoverageBudget.java": "da2671734124249262a0693a525d2acbdc06dfa8fda481007517d2e77596a81a",
+        "PredictionCoverageOffsets.java": "e689d4ad8e1582494268e49af7805885d6ae4a989bd40df007fecc314d5acab1",
+        "PredictionCoverageOwners.java": "2c26ae76bd6c255a1ba111ba96a5bd144e55b9ad0c865b6606d9f746a2b33193",
+        "PredictionCoverageSweep.java": "863ca003ab5e21f35f7e742842f9327a3a2592e3a6cdced582c3f4596c102c82",
+        "PredictionCpuBudget.java": "5017ba64c12411869e017f7f555b6fdc7c6b3b7579cffecf6c0536af43eb672e",
+        "PredictionCpuCachePolicy.java": "f7d1c1922fbfd9a5eaddf6812f9830651afdd4168a45ce527450ba48fdeb564c",
+        "PredictionDecorationLevel.java": "fda4a126f63629fb1a6919889905886394fe0bd07aa3dec77cecc8a427c453d0",
+        "PredictionDensityOrder.java": "af2889d275242e81acd46d72df20ded85b3bceb1c83a9a9e763647a2a8b40791",
+        "PredictionDepthBound.java": "f04faa71e80a67f511a2841fac52a3d26c968bc49c2fa553606593b5fd9382cd",
+        "PredictionDetailBands.java": "c3769a892827469bc8fa39e8d5c958ce43cab0b23b9314da85685533a84df415",
+        "PredictionDimensionProfiles.java": "c7f384296e8971579a7fee62ca9a353f7742d6e76aa3fde18c89813bfa466cd1",
+        "PredictionDiskCache.java": "6050fbc8a0396c9fe60996f8db2923577d9d212c184dade55e26606d060dba4b",
+        "PredictionDisplayGeometry.java": "e5ebb122a59176252c5865ef5fc46c0f7cec0c8378cecfe142464888a9c7fa24",
+        "PredictionDisplayLod.java": "8dd754e1c94db95dec4808a59e6916295157032d6a99dd910d2d80853934c8e4",
+        "PredictionDrawRanges.java": "99845cb3c5c01422b97ea276cb437efad1f673e34b40e4d250b7e973abb286f6",
+        "PredictionEdgeFilter.java": "e833fd716e15222c0c36c6021b1f6e828caed37b870f601e58d0d9a5d59e5c20",
+        "PredictionEndSpikes.java": "a93718e5af92e4700cff012272c86dd12d7f57badcd67edb476dc1fa36aa662c",
+        "PredictionExactCoverageIndex.java": "925c37a3ad40792f2c4207e690e0a1bca137d0a27fa5b0dd6614c727a813ed77",
+        "PredictionExactCoverageMask.java": "08a1521b1991d6028e185bbb2e9a95adc6e57658fb5bd2663309a6195298df8c",
+        "PredictionExteriorColumns.java": "b994969e9dcf0cfb6c9054d28741a641a33297ccba158931879aeb888258ecd1",
+        "PredictionFeatureHandoff.java": "80725be05f435bea029c5de8d252c2f3962d522126217977557576f1360961d8",
+        "PredictionFlatTerrainSampler.java": "2b71833a659e787b3498adde7b3e6be13889384cfc68ad685978db97b65476e0",
+        "PredictionFluidOcclusion.java": "39de89eedcaad5eec39c753bfefa4de758d203f2407a023fcaa10841c9a1784b",
+        "PredictionFogBridge.java": "572004c590636ec8a2a1a6a256c84bf226530581e8741759dbf4da870befcc03",
+        "PredictionFrameCapture.java": "90f60fa2b20eae6feee5f82e4efe8bb760dd19ab668ec4256786529dbba39d1e",
+        "PredictionFramePace.java": "2a7571656022fcbde7d34aa1638483cc99238b9ada304eee57dd9d7b40a54a2f",
+        "PredictionFramePlan.java": "94d0629fe2d1bad1e38623ef99afa400715d7f27aa732010a90eea6868d7fddb",
+        "PredictionGeometryStats.java": "28c4d772e5c76128d398251e8edfd5af4ddf4a214bb139f3c195803cd033a436",
+        "PredictionGlState.java": "ad4ab36b31def225286873407885df144e92c71ca65d62737b80fee122bf48d7",
+        "PredictionGpuEncoding.java": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e",
+        "PredictionGpuResidency.java": "c046ec0e7c8f6ce01123829a4e4af61118535f0c54c9504f58bfcc95c478b00b",
+        "PredictionGpuTile.java": "f2e9a2c865c2e889637d406957edc89e2d0a027fbee9296e7d53a078fbdb94b6",
+        "PredictionGraphicsQuality.java": "ae9777c5505c2c17440550af57805da958627882b098a54fa1c8ca4db1a68b40",
+        "PredictionGraphicsSupport.java": "b97379224815aac8fd81a346bbed2c7d7c38a2705b7080ee9336a922c8c2cfde",
+        "PredictionHeightCache.java": "b45808d2a784ceec327653107500b25067156112bc90874a92895016232c178d",
+        "PredictionIdleRefinement.java": "263bc8566531748f7e19358d4f37c9fb24faaadce63ac82daaabc866165e7314",
+        "PredictionIndirectBatch.java": "3546f92cc825bb451afee62eae484c61c513f113ec1047cf5c8f5e5a7f0012a3",
+        "PredictionInitializationTiming.java": "4e0b2490ea2d07ccd92bf23722f71c27a49b935171c976ff9b6db3af9380499c",
+        "PredictionInteriorEdits.java": "49f5c487b0ec8a3b35be53a00618a0b3c768939cad6a946d27c0a8845f58b64a",
+        "PredictionIrisBridge.java": "1d382aaf20e737e2477f9f8ecfb8f076cd2619e149b9cf91cdafc214763c1114",
+        "PredictionJavaExterior.java": "1c12b9b3f5460f258af2ab878b82cd5a18bef23917c10d5d9269f93a2ecdd239",
+        "PredictionLeafStates.java": "29bd9a1d80c065a72ec0b5eadd0295b422fc43a26a871107119d67ac057a6a3e",
+        "PredictionLighting.java": "fc50d1e89d0537a51f8a058f932e9824cec5347b902719326549e4a4acfcc590",
+        "PredictionLoadingProgress.java": "eeb3a6b92a6c7a9d764d60e2e55d5726faa7e8c639eef70c79b8348e8c571d84",
+        "PredictionLocalTemplates.java": "8a781430ad16df01f7651c6243838c6136e3936f9775e4f12b00bac5d5dbc338",
+        "PredictionLodBackends.java": "437405da97ae5997f80ebe5cec31d0744aad58c146416477c04a1400f9e6c5ce",
+        "PredictionLodContext.java": "a209c031e40a37bf84746c6948bb434b0b15f0bb96f81a3b17e018caaf29631d",
+        "PredictionLodPlanner.java": "3c8fe19a591c86b2caf68bd3f934a5791d30871ec99d9f3e12d9fa6cecfd9b5d",
+        "PredictionLodSampler.java": "80b8fefc34857a3c713109338aa67b759ec290ead6818d60f09faac1389f84eb",
+        "PredictionLodSeams.java": "fd831428b6c58ca68964acac6c4e5470669688d0841483f96596e64ca5efbaa0",
+        "PredictionLodSource.java": "9ee63c147d1ef5afb8fa4f1f7afd3364cfeab9875e6302eaedf8ec72f013eb60",
+        "PredictionMaterialPalette.java": "8462b0b9d503fd4c03f2cff84324f2c3aa0c1656f57767cd9e8fd487eff92a5d",
+        "PredictionMediumCoverage.java": "a92b7e96818c4bd39f987e7aa2cb8326b2cab3d57c650314654631e727d2de55",
+        "PredictionMemoryBudget.java": "f594935d36d92484594fa4f0356f84785077f079f9def7649c913e4a9333f496",
+        "PredictionMesh.java": "98c2395d9ab8736b973de2883bd1dfcf99f363e261dace4d6f0af8d651dc0b58",
+        "PredictionMeshBuilder.java": "496863f4fdafbfa963a4f764abacb17bc4f22edc77e0021a53dbcd883bbd8b99",
+        "PredictionMeshCodec.java": "d3a7ae238cf0740a0affc76e8e84311c3131e47d0ef4a4a5f25d06e773a1a5c3",
+        "PredictionMeshCompression.java": "2ca8d354fc5349c86c915cf1d1ef843c897a973a41a4f775fcf95fbd6be12859",
+        "PredictionMeshFailure.java": "615539cde33bf011f0aded277303a1320bbf51652b35a63e7c23f63c8c51f9e3",
+        "PredictionMeshletBounds.java": "bf520cc905a83ccc1ddeb2e5bd2b317d53242573e80352768a1cec4731642dfa",
+        "PredictionMeshResources.java": "5490b2dc70fd7ba57578821f60da427322c2ad56f2166417cc0ce98e56bf0c22",
+        "PredictionMeshRestore.java": "0986498d3273fb09d828e19d6432df2a59138ffe576b52abf37b3b370b53e4c2",
+        "PredictionMetadataCache.java": "610822512f310b151e2faac5b5d956aff16983aa9bcf543b4a89065869df7384",
+        "PredictionMissingRegistry.java": "d7c0484be3150b3206d6e87bfc5fd7d99b173a05225049ec875e7eda265f4e45",
+        "PredictionMorph.java": "2e9ebd2f23106ceeb1338a30d915b5ecf0b0e5cf57d8a1a95fe7c908f83feb3c",
+        "PredictionMotionPace.java": "3acced0649279bf53fdfa0a699a8ed5f80bbb718f7e5b83a556ff11524040e2c",
+        "PredictionNormalDepthBridge.java": "ef822ef8f0e116f0d09220839b6a59e7a7596c3426e7d3eb668b9f207ddbb713",
+        "PredictionNormalTranslucencyBridge.java": "c8b10ef149e5d104b21044fd65c089509e52736516eaee976aae0e6482ee5f27",
+        "PredictionOcclusionCuller.java": "957ecf5aac4110226b9ffcdf76021f3f8c8baeb2efc343e659e6131aa4745371",
+        "PredictionOcclusionPolicy.java": "eb3e7838b0f38fef65f59d2f62b32ce07c3ce120cd12e16a30bc6627ee648eed",
+        "PredictionOpaqueBatches.java": "6f1b7a3bc271e03db6b1cf94f7b7d81bd73488190c69fb4cfab5c9b537812848",
+        "PredictionOwnershipData.java": "1ddbaf555299d4349ad634412184f42b7c7f81eb27121632e5a1a396d3adf179",
+        "PredictionOwnershipRuns.java": "36849304e4b195977a9149d4d358bd52d34ea5b0532f0ba5d9bc1c2ee9e1f92e",
+        "PredictionPackedMesh.java": "2e662af9db1cd8c935ada961cc2b932023268e7c9c74607bcaf9802fc7f136c0",
+        "PredictionPauseLimit.java": "b2396208833663e0bef7726c7c0fa82e5e8c486229e8a0ce8d5f6c64727837c1",
+        "PredictionPerformanceProfile.java": "69ac1711d77ec83c632941b0e795adfd6c1eb3fd2973c936df37b4afd756a491",
+        "PredictionPixelUnpack.java": "966a9863a07728bd738d8a447de1a2c5b8545ef698792e89336f19a37e6a11b3",
+        "PredictionPlacementExecutor.java": "9e2a710c397d6d26d54b6625f1d0533287c6f0530d4f57057cbc5c80620110ed",
+        "PredictionPreviewHandoff.java": "a8f48a830ebef03f9e44f26447eabf95663a28d6361f70607a5b59b986bf858f",
+        "PredictionQuadBufferPool.java": "bbba9c8cb235db23324dd8e8ba1ae3e80d91805b76530fcf02717e1934ba759b",
+        "PredictionQuadMerger.java": "ad6041e1e760ad8c276572fee4abc7c6f0db6a48deb126a32006325649db771f",
+        "PredictionQuadMesh.java": "e5976a56e3eb9451cae3a805c5c5357fba462fba2d7695bc98200747b83c564d",
+        "PredictionQueueTimings.java": "dea98ab487c3203ca207698f6f8fd83c123749783f29d4943064d9489d20c1d4",
+        "PredictionRawDensity.java": "28b4270c79ae2bdfd5e2d86cce890275eae52d00e4e82d24c7b39150f655a74b",
+        "PredictionRealBoundarySeams.java": "9a81af30e561c60928d2328bb1849b0c5c21f72a4fddcc0fa4f2905f65385e79",
+        "PredictionRefinementOcclusion.java": "8b2254d4797fb4ada7a0eb8037cba9e079fbb790de39cdffe8455e461e3edc9e",
+        "PredictionRegionStorage.java": "6d6852c25d92f1f3ea099b0b1a4ab6ea171a1fe502a2a3a1ad9523c1c766da47",
+        "PredictionRelief.java": "87b5b11634cb0fe11d86e3ef9615592eae20e3841ee959627c48070cf87c0bb6",
+        "PredictionRenderCapture.java": "96d6315d0e191a6ffcdb0bd58a8d53a29b7a5f103b728a361b095408c06178d4",
+        "PredictionRenderer.java": "bb8b12dba7227d445321e8b0c653f86bbd8ca4b94acc8e97cd7e77264ae71ce1",
+        "PredictionRenderGeometry.java": "b5a6e872272bfca8110900317a112331b7d487989b7b472c4afdc3a11032d33c",
+        "PredictionRenderResidency.java": "2eb724aa441ac84316c705a8ed046b3d93af34d9d069caf3e019c1c8bb3e8642",
+        "PredictionRenderTarget.java": "ceec457166e4c3bea23f76bd652b6028df21b1877469b49f360decdad767dc66",
+        "PredictionRenderTimings.java": "ce8e91429b0c8d7b71a60e97e16d05beb78b31ba296a81b4c2c0ee6ba45634cc",
+        "PredictionResources.java": "7ef09787f178a76c3397dfa96bd39f08581eada4e010809c063f07c8f5a3584c",
+        "PredictionSampleCompaction.java": "6aee93ae535b35bdd0da0a931be4eb0cbe18db73dbab3d49d2e816a555cc507e",
+        "PredictionSampleStore.java": "2b80dfebd49e74df4e8bf053b076e176a9a5c64d263001c7ad76a9e3ba68090a",
+        "PredictionScanMerge.java": "6cd1ffd39ee53ffef8c7adf3bc407049842f66c69320363168e225b1c96f308f",
+        "PredictionScanMesher2D.java": "7818bff2468ca4af42ee315a64d8e2d11e3f36108eafc2048105befe45fcf661",
+        "PredictionScopeFamilies.java": "cd0a1771ea4ef5066eb11b0b819bc7a366bd72e35ad827b4d103e3b3abfe17c3",
+        "PredictionScreenDetail.java": "9239ddf3807ceab19bcd10d14e7c70c43d6d0b9e8de5918ce2544cdd4c323277",
+        "PredictionSeamIndex.java": "bd3ce1f61daffb24d33dc83e44bdd44f48f18df0738eed62eb36290dabd00315",
+        "PredictionSeamMasks.java": "e6e190df43cc0598487c5be2b63bc1b838887712e6077f39b09ce28e760b2905",
+        "PredictionSeamMesh.java": "e5d533f0717ca83c28420ae045e6299e2699563140bfa9b468601cd2bab3785b",
+        "PredictionSeamWalls.java": "c8b91b2e1bbc6f8b274c80e2580f545b26a3c5e62f2c159cc32af2a9f01354d2",
+        "PredictionSimpleVegetation.java": "6d741190980efa5b325123878cad0f50c7a8b7f8510061a2b435e89a2831c23b",
+        "PredictionSnowSurfaces.java": "6066d387ab524e86fdf406b5007cb88f1bb92ed33bd0dc3bda37c0acd0de8def",
+        "PredictionSpatialIndex.java": "0a5e0ac684682b489a9024eef08f20efe5785907e7e9676bee2d920baacad6d6",
+        "PredictionSpatialOrder.java": "4cf0bd868d3cb1cfa119f0930e7f4e11530cca5482ba68a98f98acd630485187",
+        "PredictionStructureTemplates.java": "fd48fc8ef5682fcae4d25c0dea3cf429d8603c5f2629da613e425c4691b25700",
+        "PredictionSubmissionCoverage.java": "01a84c959ee8e9088c3550b6e241426b936cfe49f9e557f1611ffb173915ccfc",
+        "PredictionSurfaceEdits.java": "f58b42b6da962e981bf39bdc75629a1c86070390a9dced00fdfc96d8d01cf3b0",
+        "PredictionSurfaceFeatureAdapters.java": "f2858f0e46e2dd78a7d9101aca4000f6f3b1a6b3ec3676d4bbc5ec89875f81be",
+        "PredictionSurfaceShapes.java": "bb8b96965f78ccf57ff40dfd4534a5e2ec03a0032f3b59b87f86c21d6f7c296e",
+        "PredictionSurfaceStructures.java": "61b3fde5fd69160e8a0389fffefd4ee73b1586affd01f70e0ed4cfc28ffd8824",
+        "PredictionTemplateAccess.java": "6d2e11f5a27e65dc01f6456be0343fb76b3a3e1a56727eb04ae50c96261b7185",
+        "PredictionTemplateRepository.java": "7cea278cc9ef9bd5e1ad128debdec0a7a9772a4643e3f244b1a8405eb2fd4ba5",
+        "PredictionTemplateStore.java": "9d9a3190a7016cdf7d37998729dfbb9151f34c13646f811bfbb17fe870518911",
+        "PredictionTerrainArena.java": "2ef726aedfb8fe8c02ae107d7885b53f82fcf808543ed18c1ed0e076b7c806d3",
+        "PredictionTerrainBackend.java": "d03c45a7d315f7c36785b92dc88c356bc39dcf84c563d260507b5a0f08f5e8b5",
+        "PredictionTerrainBackends.java": "4a5840e8990d0205f8d09752fd5453baa2c2a8700f4c24d7bdcb1f2bd7b3d181",
+        "PredictionTerrainColors.java": "308260753ce06170b6cf619fc88d9cf70f34d8b054936d557b5ab5608e818362",
+        "PredictionTerrainProgram.java": "e6a96b7567764f39217d3e45fb56604fef04ac3814ba740de6ab86814cc57990",
+        "PredictionTileManager.java": "dc3c6dacae2862809eaa07e8bb45e1153f6cce476860e3b62b1341dd1bd0475d",
+        "PredictionTileResidencyPolicy.java": "d11fbb827f074e90c77dae7848c8688dcaae823afded2e22dc3cca77c1bf456e",
+        "PredictionTileTable.java": "c22b50a49efae17067131eff45b14c4e904b61fc37472e3fbc21b7252ef91c91",
+        "PredictionTintCache.java": "d1dbfb28bb67efb885d402abc0494ca935982d1d89a0ed17ccfdd00d5349548a",
+        "PredictionTransitionPlan.java": "50d0ed86a295470c3b69e348532c10327e12e7122af193b395d600e2b5fc9c5c",
+        "PredictionTreeModels.java": "ee880f2c6cc8e7bd95c05d5af33e7ef7afdf881d28d461dd78d8179b234b3d31",
+        "PredictionUploadBudget.java": "5d1f6ac9290604079e74c7b74df705ff427aefd34c0e5f80c41b09a17f6a6ef2",
+        "PredictionUploadStaging.java": "fd1280a1058232f60a2f6518724aedd955b506a10ae3aa4cf87bdf51013f47b1",
+        "PredictionVanillaMask.java": "80ebf70ae448a5d9002aec075e490889cf92e6e5937b5d93d63f8cd6f5bf981a",
+        "PredictionVegetation.java": "2fd41d6a7cc9eb9f19f37498d96138065dd5050f8004ee043a39c75a9bfe1335",
+        "PredictionVegetationDisplayCache.java": "37a633b6fe71629181b838ec7caf815d2a08c976b31ad6f557b97a084cf50362",
+        "PredictionVegetationRanges.java": "121cab3501ce6b915e12db989aba975e6b7a88ed6a4f09fa6e45ac3d37a3e941",
+        "PredictionVegetationRuns.java": "77faf3797343672b7abebf4298971b5f4e77f409465051487edad5b334f607eb",
+        "PredictionVegetationSelection.java": "5e7306e26545b0da37c77b38a7658094735305aa1a35284b5a045ba122141e7a",
+        "PredictionVegetationTraits.java": "7b23e45e19bdac2514dd6f96b9e9dd12ed1a3997e6e54dc355eaff7ec0403715",
+        "PredictionVisibilityFeedback.java": "427bb893fd5d66e7024f920d21c76a07ee2a75a452a2996d3e9c1fcf779058ed",
+        "PredictionVisiblePlan.java": "e92958dd3799ff1fe758cbaacb48f73a38a8965799598baa4f7d48338b57f5e1",
+        "PredictionVoxyBoundaryBridge.java": "04cb89c293e810376e71da0268d6d9cb2e5cf32925444d3225870f3a012ccec0",
+        "PredictionVoxyDepth.java": "df901eb7fc8759bf540ec9f3e43d5201bf706d72f60580c2a695ff19708b0365",
+        "PredictionVoxyOwnership.java": "8d187742dac0cb8c1ad0a0ec08acab8700417d2232b8fed27a97212b22cfafcd",
+        "PredictionWallEvidence.java": "4189d21deacf17c453746c6642cbbfcc6d9c076d510960083c392649eeddf4ff",
+        "PredictionWorkDeferred.java": "de68428609fd873bff64f347436684e268052d561684c74c530773b54221d8c5",
+        "PredictionWorkOrder.java": "fdff27f42a296bf0dbae0308ef8627724fa4c3f318f5a46a4d64ada089cba3fa",
+        "PredictionWorkView.java": "d9e9d92aac8fdb223139c63bd2637cf6a8443ce5f5dc2e392cf13101a1981185",
+        "PredictionWorldgenCapabilities.java": "fa82c7cd019484038682e01405c5b16ddc71afa8eebbc26d1df22d0989c04fbf",
+        "RustReferenceCapture.java": "9c95db72dd3d9631e26dfbafe93b4fd2eacaf3b3ab31ed975af059f6c0d30a3f",
+        "RustReferenceExport.java": "eee71419502edcc63a98dd096038d0632010137a89c624b7c30212070ef84d3e",
+        "RustTerrainSampler.java": "39d41cbf33e094f39c5b9a7a29730c7e9c85ed974cd7618aad417d3fc05fe3db",
+        "RustVegetationDescriptors.java": "5f70209deacf9608da46a0feaf9f8d3b833d7907928fd879b369bb1b2fe80e45",
+        "RustVegetationStage.java": "91120206455052bf005f24e82ce1dab8825cd05a406276c074401597e971b2a4",
+        "RustWorldgenBackend.java": "8fcfe5ac301bc99fbc67da4b1b6407bd4f36d82e210555cfafcb719a758f7aa3",
+        "RustWorldgenDocument.java": "274fd988828eb8bedadcd7d08000dcc5eda21863bdebfcbc363cafdf0a9001fb",
+        "SpyglassOverlayTiming.java": "e96405d289604990204e6e715a946bd8e46bcb74fea2261d9aa22b9612e6b707",
+        "TerraBlenderBackend.java": "42d536637b9df630183a59952944c528523742849e02b0f42738c97e440a2d81",
+        "TerrablenderUniqueness.java": "a08f7758d16143f688261a6824acce21bf97a3f8300d7cd97a5a45c5fc47462d",
+        "VssLodFaceGroup.java": "30eda03ffa0f0279dc520fc03fb3c944ad6e9ccc6f089662e83bc9f352d99b08",
+        "VssLodFocus.java": "b92a8089685450e237d3fc975e9ef446fc7c9dde1afc6ed06afbd9f21a01e8d0",
+        "VssLodFog.java": "14dc49c7757077944bae43aa57fed45f025cd0a3fa135daf509554c842d47ce0",
+        "VssLodGreedyMesher.java": "b9669233db9390aac6667923f235ab7737b275fc054477d50cae9da7b67331e1",
+        "VssLodLayout.java": "88428e7576535281223ac4769deb4067257a3c16b4763212a3d5e498967dfdfb",
+        "VssLodProjection.java": "5a4b44dec12260000fcba32a902db4b272c1bb69d7c50cd95a281fc34555f335",
+        "VssLodSampleCache.java": "7d8f4b60f248d7ea0cd803a4e9cc84cb9df4366dfed30165a9902850dc6e7c2a",
+        "VssLodSpriteTable.java": "75c2ed07a054d73c871d4fe2ecad12cd6597a05ac25b9afebcf21d5c65b5a934",
+        "VssNativePlatform.java": "ca1e4053d107a20f14998c223dd18792b75b28834ece891f41eb25ec8a1970ea"
+      },
+      "final_changed_source_sha256": {
+        "PredictionMeshletBounds.java": "4ddfa39f9e7589da9824b5b168c6c9cb0a975816527a5bcd2dec6ed0aeac58ce",
+        "PredictionPackedMesh.java": "0266ac399e56bd50547abc6810b69b76b73b4f377aa092c9cd481e5670c0a1be",
+        "PredictionRenderer.java": "58b9e480d9ab5592ceb1b8fafab0a8e0058190bb3f66c669b74a301bd9e54ae0",
+        "PredictionCommandDirections.java": "6bad56860694ad85cd20e0074839a81accebac2e424693c78e1f2f8ac2ed7bd9"
+      },
+      "tests": {
+        "design-benefit-cpu": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.BenefitCanopyTest",
+            "dev.xantha.vss.client.prediction.BenefitLocalTerrainTest",
+            "dev.xantha.vss.client.prediction.BenefitPreparedPassTest"
+          ],
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "design-benefit-gpu": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.BenefitDirectionGpuTest",
+            "dev.xantha.vss.client.prediction.BenefitRepresentationsGpuTest",
+            "dev.xantha.vss.client.prediction.BenefitWaterSubmissionGpuTest"
+          ],
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "design-benefit-production-gpu": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.PredictionCommandDirectionGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionCompactGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionDisplayLodGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionFeatureHandoffGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionOcclusionGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionOcclusionWorkloadGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionProductionBatchGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionVegetationLodGpuTest",
+            "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest"
+          ],
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "design-benefit-regression": {
+          "classes": [
+            "dev.xantha.vss.client.prediction.PredictionAquaticSubmissionTest",
+            "dev.xantha.vss.client.prediction.PredictionCommandDirectionsTest",
+            "dev.xantha.vss.client.prediction.PredictionCommandDirectionTest",
+            "dev.xantha.vss.client.prediction.PredictionCoverageOwnersTest",
+            "dev.xantha.vss.client.prediction.PredictionCrossEncodingTest",
+            "dev.xantha.vss.client.prediction.PredictionDisplayErrorTest",
+            "dev.xantha.vss.client.prediction.PredictionDisplayGeometryTest",
+            "dev.xantha.vss.client.prediction.PredictionFeatureHandoffTest",
+            "dev.xantha.vss.client.prediction.PredictionGpuResidencyTest",
+            "dev.xantha.vss.client.prediction.PredictionGraphicsQualityTest",
+            "dev.xantha.vss.client.prediction.PredictionIncrementalRenderTest",
+            "dev.xantha.vss.client.prediction.PredictionLodSeamsTest",
+            "dev.xantha.vss.client.prediction.PredictionMeshCodecTest",
+            "dev.xantha.vss.client.prediction.PredictionOcclusionPolicyTest",
+            "dev.xantha.vss.client.prediction.PredictionParentSelectionExperimentTest",
+            "dev.xantha.vss.client.prediction.PredictionPassStorageTest",
+            "dev.xantha.vss.client.prediction.PredictionPreparedPassLocalTest",
+            "dev.xantha.vss.client.prediction.PredictionRealBoundarySeamsTest",
+            "dev.xantha.vss.client.prediction.PredictionRectangleEncodingTest",
+            "dev.xantha.vss.client.prediction.PredictionRegionalOwnershipTest",
+            "dev.xantha.vss.client.prediction.PredictionResourceInvalidationTest",
+            "dev.xantha.vss.client.prediction.PredictionScanMergeTest",
+            "dev.xantha.vss.client.prediction.PredictionScopedResidencyTest",
+            "dev.xantha.vss.client.prediction.PredictionSeamIndexTest",
+            "dev.xantha.vss.client.prediction.PredictionSeamResidencyTest",
+            "dev.xantha.vss.client.prediction.PredictionSpatialOrderTest",
+            "dev.xantha.vss.client.prediction.PredictionSpriteTableTest",
+            "dev.xantha.vss.client.prediction.PredictionSubmissionCoverageTest",
+            "dev.xantha.vss.client.prediction.PredictionTurnOptimizationTest",
+            "dev.xantha.vss.client.prediction.PredictionUploadHandoffTest",
+            "dev.xantha.vss.client.prediction.PredictionVegetationMaterialTest",
+            "dev.xantha.vss.client.prediction.PredictionVoxyCoverageInvalidationTest",
+            "dev.xantha.vss.client.prediction.PredictionVoxyStableOwnershipTest",
+            "dev.xantha.vss.client.prediction.PredictionWarmSurfaceRestoreTest"
+          ],
+          "tests": 201,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "csv_metrics": {
+        "benefit-direction.csv": [
+          {
+            "scenario": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 433152.0,
+                "p95": 434176.0,
+                "min": 432128.0,
+                "max": 1145856.0
+              },
+              "cpu_ns": {
+                "median": 48100.0,
+                "p95": 90600.0,
+                "min": 33301.0,
+                "max": 111399.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1024.0,
+                "p95": 1024.0,
+                "min": 0.0,
+                "max": 1024.0
+              },
+              "cpu_ns": {
+                "median": 50401.0,
+                "p95": 70400.0,
+                "min": 37300.0,
+                "max": 100099.0
+              },
+              "quads": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              },
+              "commands": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          },
+          {
+            "scenario": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1470464.0,
+                "p95": 2340864.0,
+                "min": 1438720.0,
+                "max": 2718720.0
+              },
+              "cpu_ns": {
+                "median": 43400.0,
+                "p95": 78300.0,
+                "min": 26400.0,
+                "max": 88201.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1470464.0,
+                "p95": 2225152.0,
+                "min": 1435648.0,
+                "max": 2737152.0
+              },
+              "cpu_ns": {
+                "median": 43099.0,
+                "p95": 85199.0,
+                "min": 28800.0,
+                "max": 127300.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 869376.0,
+                "p95": 1664000.0,
+                "min": 852992.0,
+                "max": 1759232.0
+              },
+              "cpu_ns": {
+                "median": 28700.0,
+                "p95": 50100.0,
+                "min": 22900.0,
+                "max": 73100.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 739328.0,
+                "p95": 753664.0,
+                "min": 721920.0,
+                "max": 1691648.0
+              },
+              "cpu_ns": {
+                "median": 29899.0,
+                "p95": 48101.0,
+                "min": 22500.0,
+                "max": 76700.0
+              },
+              "quads": {
+                "median": 524288.0,
+                "p95": 524288.0,
+                "min": 524288.0,
+                "max": 524288.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "scenario": "3",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1467392.0,
+                "p95": 2275328.0,
+                "min": 1444864.0,
+                "max": 2395136.0
+              },
+              "cpu_ns": {
+                "median": 28700.0,
+                "p95": 49000.0,
+                "min": 17800.0,
+                "max": 69001.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "3",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1474560.0,
+                "p95": 2285568.0,
+                "min": 1440768.0,
+                "max": 2455552.0
+              },
+              "cpu_ns": {
+                "median": 29401.0,
+                "p95": 46400.0,
+                "min": 19699.0,
+                "max": 56499.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "4",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1470464.0,
+                "p95": 2182144.0,
+                "min": 1435648.0,
+                "max": 2418688.0
+              },
+              "cpu_ns": {
+                "median": 26500.0,
+                "p95": 45501.0,
+                "min": 19400.0,
+                "max": 49800.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "4",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1472512.0,
+                "p95": 2262016.0,
+                "min": 1441792.0,
+                "max": 2391040.0
+              },
+              "cpu_ns": {
+                "median": 27999.0,
+                "p95": 43299.0,
+                "min": 19299.0,
+                "max": 64500.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "5",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 753664.0,
+                "p95": 1327104.0,
+                "min": 740352.0,
+                "max": 1692672.0
+              },
+              "cpu_ns": {
+                "median": 25001.0,
+                "p95": 45400.0,
+                "min": 18800.0,
+                "max": 58801.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          },
+          {
+            "scenario": "5",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 752640.0,
+                "p95": 766976.0,
+                "min": 736256.0,
+                "max": 1655808.0
+              },
+              "cpu_ns": {
+                "median": 25500.0,
+                "p95": 42800.0,
+                "min": 18100.0,
+                "max": 50800.0
+              },
+              "quads": {
+                "median": 1048576.0,
+                "p95": 1048576.0,
+                "min": 1048576.0,
+                "max": 1048576.0
+              },
+              "commands": {
+                "median": 64.0,
+                "p95": 64.0,
+                "min": 64.0,
+                "max": 64.0
+              }
+            }
+          }
+        ],
+        "benefit-water-full.csv": [
+          {
+            "path": "vertical",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 235500.0,
+                "p95": 328099.0,
+                "min": 80500.0,
+                "max": 464000.0
+              },
+              "gpu_ns": {
+                "median": 100352.0,
+                "p95": 106496.0,
+                "min": 90112.0,
+                "max": 110592.0
+              },
+              "whole_hits": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          },
+          {
+            "path": "vertical",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 41199.0,
+                "p95": 70400.0,
+                "min": 30899.0,
+                "max": 350100.0
+              },
+              "gpu_ns": {
+                "median": 100352.0,
+                "p95": 106496.0,
+                "min": 91136.0,
+                "max": 566272.0
+              },
+              "whole_hits": {
+                "median": 64.0,
+                "p95": 100.0,
+                "min": 24.0,
+                "max": 104.0
+              }
+            }
+          },
+          {
+            "path": "horizontal",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 81700.0,
+                "p95": 111501.0,
+                "min": 70200.0,
+                "max": 1317101.0
+              },
+              "gpu_ns": {
+                "median": 86016.0,
+                "p95": 91136.0,
+                "min": 79872.0,
+                "max": 92160.0
+              },
+              "whole_hits": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          },
+          {
+            "path": "horizontal",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "cpu_ns": {
+                "median": 83999.0,
+                "p95": 135300.0,
+                "min": 69800.0,
+                "max": 1181399.0
+              },
+              "gpu_ns": {
+                "median": 87040.0,
+                "p95": 91136.0,
+                "min": 79872.0,
+                "max": 93184.0
+              },
+              "whole_hits": {
+                "median": 0.0,
+                "p95": 0.0,
+                "min": 0.0,
+                "max": 0.0
+              }
+            }
+          }
+        ],
+        "benefit-local-build.csv": [
+          {
+            "scenario": "0",
+            "samples": 21,
+            "metrics": {
+              "whole_ns": {
+                "median": 4591001.0,
+                "p95": 7484101.0,
+                "min": 3842001.0,
+                "max": 8126100.0
+              },
+              "local_ns": {
+                "median": 5713399.0,
+                "p95": 14653700.0,
+                "min": 4741800.0,
+                "max": 15684300.0
+              },
+              "whole_words": {
+                "median": 230700.0,
+                "p95": 230700.0,
+                "min": 230700.0,
+                "max": 230700.0
+              },
+              "local_words": {
+                "median": 261552.0,
+                "p95": 261552.0,
+                "min": 261552.0,
+                "max": 261552.0
+              }
+            }
+          },
+          {
+            "scenario": "1",
+            "samples": 21,
+            "metrics": {
+              "whole_ns": {
+                "median": 4893300.0,
+                "p95": 6173300.0,
+                "min": 4276000.0,
+                "max": 7461000.0
+              },
+              "local_ns": {
+                "median": 7076500.0,
+                "p95": 9306200.0,
+                "min": 5439200.0,
+                "max": 10204300.0
+              },
+              "whole_words": {
+                "median": 241476.0,
+                "p95": 241476.0,
+                "min": 241476.0,
+                "max": 241476.0
+              },
+              "local_words": {
+                "median": 265980.0,
+                "p95": 265980.0,
+                "min": 265980.0,
+                "max": 265980.0
+              }
+            }
+          }
+        ],
+        "benefit-representations.csv": [
+          {
+            "candidate": "local-terrain",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 330752.0,
+                "p95": 331776.0,
+                "min": 327680.0,
+                "max": 888832.0
+              },
+              "cpu_ns": {
+                "median": 39700.0,
+                "p95": 72100.0,
+                "min": 26200.0,
+                "max": 101000.0
+              },
+              "quads": {
+                "median": 137216.0,
+                "p95": 137216.0,
+                "min": 137216.0,
+                "max": 137216.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "local-terrain",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 527360.0,
+                "p95": 1337344.0,
+                "min": 522240.0,
+                "max": 1502208.0
+              },
+              "cpu_ns": {
+                "median": 38999.0,
+                "p95": 65100.0,
+                "min": 27300.0,
+                "max": 117600.0
+              },
+              "quads": {
+                "median": 262144.0,
+                "p95": 262144.0,
+                "min": 262144.0,
+                "max": 262144.0
+              },
+              "commands": {
+                "median": 512.0,
+                "p95": 512.0,
+                "min": 512.0,
+                "max": 512.0
+              }
+            }
+          },
+          {
+            "candidate": "local-terrain",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 434176.0,
+                "p95": 437248.0,
+                "min": 432128.0,
+                "max": 1268736.0
+              },
+              "cpu_ns": {
+                "median": 26401.0,
+                "p95": 41500.0,
+                "min": 18200.0,
+                "max": 79400.0
+              },
+              "quads": {
+                "median": 216448.0,
+                "p95": 216448.0,
+                "min": 216448.0,
+                "max": 216448.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "local-terrain",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 618496.0,
+                "p95": 623616.0,
+                "min": 613376.0,
+                "max": 1384448.0
+              },
+              "cpu_ns": {
+                "median": 25700.0,
+                "p95": 46999.0,
+                "min": 18899.0,
+                "max": 207601.0
+              },
+              "quads": {
+                "median": 335104.0,
+                "p95": 335104.0,
+                "min": 335104.0,
+                "max": 335104.0
+              },
+              "commands": {
+                "median": 512.0,
+                "p95": 512.0,
+                "min": 512.0,
+                "max": 512.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 464896.0,
+                "p95": 467968.0,
+                "min": 461824.0,
+                "max": 1424384.0
+              },
+              "cpu_ns": {
+                "median": 20100.0,
+                "p95": 31801.0,
+                "min": 15600.0,
+                "max": 50600.0
+              },
+              "quads": {
+                "median": 886784.0,
+                "p95": 886784.0,
+                "min": 886784.0,
+                "max": 886784.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 243712.0,
+                "p95": 250880.0,
+                "min": 231424.0,
+                "max": 1080320.0
+              },
+              "cpu_ns": {
+                "median": 20900.0,
+                "p95": 36599.0,
+                "min": 16001.0,
+                "max": 53199.0
+              },
+              "quads": {
+                "median": 425984.0,
+                "p95": 425984.0,
+                "min": 425984.0,
+                "max": 425984.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 345088.0,
+                "p95": 346112.0,
+                "min": 343040.0,
+                "max": 346112.0
+              },
+              "cpu_ns": {
+                "median": 23299.0,
+                "p95": 37999.0,
+                "min": 12101.0,
+                "max": 71100.0
+              },
+              "quads": {
+                "median": 886784.0,
+                "p95": 886784.0,
+                "min": 886784.0,
+                "max": 886784.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 176128.0,
+                "p95": 177152.0,
+                "min": 171008.0,
+                "max": 956416.0
+              },
+              "cpu_ns": {
+                "median": 24900.0,
+                "p95": 41200.0,
+                "min": 10599.0,
+                "max": 48601.0
+              },
+              "quads": {
+                "median": 425984.0,
+                "p95": 425984.0,
+                "min": 425984.0,
+                "max": 425984.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "0",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 345088.0,
+                "p95": 347136.0,
+                "min": 343040.0,
+                "max": 1137664.0
+              },
+              "cpu_ns": {
+                "median": 16300.0,
+                "p95": 35201.0,
+                "min": 9101.0,
+                "max": 87800.0
+              },
+              "quads": {
+                "median": 886784.0,
+                "p95": 886784.0,
+                "min": 886784.0,
+                "max": 886784.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "0",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 175104.0,
+                "p95": 176128.0,
+                "min": 171008.0,
+                "max": 177152.0
+              },
+              "cpu_ns": {
+                "median": 15601.0,
+                "p95": 32100.0,
+                "min": 9700.0,
+                "max": 57699.0
+              },
+              "quads": {
+                "median": 425984.0,
+                "p95": 425984.0,
+                "min": 425984.0,
+                "max": 425984.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 1056768.0,
+                "p95": 1925120.0,
+                "min": 1046528.0,
+                "max": 2108416.0
+              },
+              "cpu_ns": {
+                "median": 17900.0,
+                "p95": 31299.0,
+                "min": 13999.0,
+                "max": 33400.0
+              },
+              "quads": {
+                "median": 2296832.0,
+                "p95": 2296832.0,
+                "min": 2296832.0,
+                "max": 2296832.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 317440.0,
+                "p95": 319488.0,
+                "min": 313344.0,
+                "max": 868352.0
+              },
+              "cpu_ns": {
+                "median": 17100.0,
+                "p95": 35699.0,
+                "min": 13900.0,
+                "max": 122000.0
+              },
+              "quads": {
+                "median": 622592.0,
+                "p95": 622592.0,
+                "min": 622592.0,
+                "max": 622592.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 868352.0,
+                "p95": 1562624.0,
+                "min": 865280.0,
+                "max": 1778688.0
+              },
+              "cpu_ns": {
+                "median": 24200.0,
+                "p95": 34600.0,
+                "min": 12600.0,
+                "max": 77800.0
+              },
+              "quads": {
+                "median": 2296832.0,
+                "p95": 2296832.0,
+                "min": 2296832.0,
+                "max": 2296832.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 249856.0,
+                "p95": 250880.0,
+                "min": 247808.0,
+                "max": 1155072.0
+              },
+              "cpu_ns": {
+                "median": 24000.0,
+                "p95": 35699.0,
+                "min": 12700.0,
+                "max": 74601.0
+              },
+              "quads": {
+                "median": 622592.0,
+                "p95": 622592.0,
+                "min": 622592.0,
+                "max": 622592.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "1",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 867328.0,
+                "p95": 869376.0,
+                "min": 862208.0,
+                "max": 1828864.0
+              },
+              "cpu_ns": {
+                "median": 21100.0,
+                "p95": 34601.0,
+                "min": 13100.0,
+                "max": 68501.0
+              },
+              "quads": {
+                "median": 2296832.0,
+                "p95": 2296832.0,
+                "min": 2296832.0,
+                "max": 2296832.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "1",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 248832.0,
+                "p95": 249856.0,
+                "min": 244736.0,
+                "max": 1342464.0
+              },
+              "cpu_ns": {
+                "median": 21801.0,
+                "p95": 34500.0,
+                "min": 14000.0,
+                "max": 62600.0
+              },
+              "quads": {
+                "median": 622592.0,
+                "p95": 622592.0,
+                "min": 622592.0,
+                "max": 622592.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 10655744.0,
+                "p95": 11794432.0,
+                "min": 9852928.0,
+                "max": 12250112.0
+              },
+              "cpu_ns": {
+                "median": 28100.0,
+                "p95": 47200.0,
+                "min": 13599.0,
+                "max": 65099.0
+              },
+              "quads": {
+                "median": 18863104.0,
+                "p95": 18863104.0,
+                "min": 18863104.0,
+                "max": 18863104.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-180",
+            "case": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 545792.0,
+                "p95": 885760.0,
+                "min": 541696.0,
+                "max": 1603584.0
+              },
+              "cpu_ns": {
+                "median": 27200.0,
+                "p95": 43500.0,
+                "min": 16500.0,
+                "max": 51899.0
+              },
+              "quads": {
+                "median": 1138688.0,
+                "p95": 1138688.0,
+                "min": 1138688.0,
+                "max": 1138688.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 7702528.0,
+                "p95": 8956928.0,
+                "min": 6952960.0,
+                "max": 9256960.0
+              },
+              "cpu_ns": {
+                "median": 25200.0,
+                "p95": 44299.0,
+                "min": 12900.0,
+                "max": 58900.0
+              },
+              "quads": {
+                "median": 18863104.0,
+                "p95": 18863104.0,
+                "min": 18863104.0,
+                "max": 18863104.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-1800",
+            "case": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 448512.0,
+                "p95": 451584.0,
+                "min": 445440.0,
+                "max": 1235968.0
+              },
+              "cpu_ns": {
+                "median": 25300.0,
+                "p95": 41799.0,
+                "min": 12900.0,
+                "max": 64800.0
+              },
+              "quads": {
+                "median": 1138688.0,
+                "p95": 1138688.0,
+                "min": 1138688.0,
+                "max": 1138688.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "2",
+            "mode": "0",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 7756800.0,
+                "p95": 8734720.0,
+                "min": 6939648.0,
+                "max": 9012224.0
+              },
+              "cpu_ns": {
+                "median": 25201.0,
+                "p95": 43199.0,
+                "min": 13400.0,
+                "max": 50200.0
+              },
+              "quads": {
+                "median": 18863104.0,
+                "p95": 18863104.0,
+                "min": 18863104.0,
+                "max": 18863104.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          },
+          {
+            "candidate": "canopy-distance-4096",
+            "case": "2",
+            "mode": "1",
+            "samples": 81,
+            "metrics": {
+              "gpu_ns": {
+                "median": 443392.0,
+                "p95": 446464.0,
+                "min": 442368.0,
+                "max": 1218560.0
+              },
+              "cpu_ns": {
+                "median": 27099.0,
+                "p95": 45400.0,
+                "min": 11600.0,
+                "max": 90100.0
+              },
+              "quads": {
+                "median": 1138688.0,
+                "p95": 1138688.0,
+                "min": 1138688.0,
+                "max": 1138688.0
+              },
+              "commands": {
+                "median": 128.0,
+                "p95": 128.0,
+                "min": 128.0,
+                "max": 128.0
+              }
+            }
+          }
+        ],
+        "benefit-prepare.csv": [
+          {
+            "water": "false",
+            "path": "stationary",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 401.0,
+                "p95": 601.0,
+                "min": 299.0,
+                "max": 9100.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "stationary",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 400.0,
+                "p95": 601.0,
+                "min": 299.0,
+                "max": 28000.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "vertical",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 14201.0,
+                "p95": 25800.0,
+                "min": 13999.0,
+                "max": 60400.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "vertical",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 14200.0,
+                "p95": 24500.0,
+                "min": 13900.0,
+                "max": 73601.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "horizontal",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 1900.0,
+                "p95": 2001.0,
+                "min": 1799.0,
+                "max": 5200.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "horizontal",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 1900.0,
+                "p95": 13499.0,
+                "min": 1799.0,
+                "max": 609500.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "crossing",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 2100.0,
+                "p95": 2700.0,
+                "min": 1999.0,
+                "max": 5200.0
+              }
+            }
+          },
+          {
+            "water": "false",
+            "path": "crossing",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 2100.0,
+                "p95": 85500.0,
+                "min": 1999.0,
+                "max": 442801.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "stationary",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 299.0,
+                "p95": 301.0,
+                "min": 199.0,
+                "max": 9500.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "stationary",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 200.0,
+                "p95": 201.0,
+                "min": 99.0,
+                "max": 5000.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "vertical",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 7800.0,
+                "p95": 8300.0,
+                "min": 7599.0,
+                "max": 32000.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "vertical",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 101.0,
+                "p95": 201.0,
+                "min": 99.0,
+                "max": 399.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "horizontal",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 12101.0,
+                "p95": 26099.0,
+                "min": 7900.0,
+                "max": 102900.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "horizontal",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 11900.0,
+                "p95": 26601.0,
+                "min": 8100.0,
+                "max": 63700.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "crossing",
+            "mode": "0",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 17500.0,
+                "p95": 43300.0,
+                "min": 8900.0,
+                "max": 174200.0
+              }
+            }
+          },
+          {
+            "water": "true",
+            "path": "crossing",
+            "mode": "1",
+            "samples": 301,
+            "metrics": {
+              "cpu_ns": {
+                "median": 17600.0,
+                "p95": 38999.0,
+                "min": 8700.0,
+                "max": 139700.0
+              }
+            }
+          }
+        ]
+      },
+      "canopy_quality": [
+        {
+          "shape": "0",
+          "source_leaves": "15360",
+          "coarse_voxels": "4096",
+          "added_occupied_cells": "11264",
+          "material_mismatches": "0",
+          "bridged_gaps": "0",
+          "exact_trunks": "true"
+        },
+        {
+          "shape": "1",
+          "source_leaves": "46080",
+          "coarse_voxels": "10752",
+          "added_occupied_cells": "33792",
+          "material_mismatches": "0",
+          "bridged_gaps": "5120",
+          "exact_trunks": "true"
+        },
+        {
+          "shape": "2",
+          "source_leaves": "23808",
+          "coarse_voxels": "10752",
+          "added_occupied_cells": "56064",
+          "material_mismatches": "1728",
+          "bridged_gaps": "5120",
+          "exact_trunks": "true"
+        }
+      ],
+      "raw_csv_sha256": {
+        "benefit-canopy-quality.csv": "2314ae42f7ab54683c75d8253afb68a730d1d39d82ce775de7c17e205b81aaad",
+        "benefit-direction.csv": "f142cc71160e5c8ebb14bed533e2d4b598d50900ae90fc0bbf1b0e6a48e52699",
+        "benefit-local-build.csv": "74c14b027f17e3869dce8e264172d33bb81261c71cac6a0a103eb1944d04bf48",
+        "benefit-prepare.csv": "30cc59b2fbe53f7224d34fe46cf359b9c13fb3af6aa66e82d081a0351d389a91",
+        "benefit-representations.csv": "8114d55f3a33a66c8ae8a5faead593358f9c00bc3e1448e0dc8d32c9b2a0fa16",
+        "benefit-water-full.csv": "4b45e258328b4a0e6da4e1b3674289f4f44ed21cf2f76bbe27b4284153818047",
+        "command-direction.csv": "bca43c3335bd734583eba603f1ca7e1e514257728d49f218c685420796f18d85",
+        "parent-selection.csv": "e59548e857f5ab76b8aae2ffab88590b11b5126a7bdc0a3545468889dbfd6752",
+        "production-command-direction.csv": "f264c89a58bacf968f4b8f4c62b8ef1ebc97c1830bdc2894985832d18e5b6c4d",
+        "production-visible-workload-policy.csv": "41aedf2c872f820a307c82be62faa08a9e4590bd217a748faa4cb58e1dd9d69a",
+        "terrain-lod.csv": "b4697794c0e1acb0af5146095ba0c8e6c4d68d116a28ed75f4f186dfa0d1c211",
+        "vegetation-lod.csv": "5e6d8a6bb4aadb19c500cb9fa2ebaf7805c34170abafc3c0a48f87a681f03405",
+        "visible-workload-policy.csv": "3e963c9e8649b51d9a4642fc7177cb54102222184b1f9043b57b2ddd2d2b55d2"
+      },
+      "jar": {
+        "path": "C:/Users/Administrator/Desktop/voxyserverside/lib/design-benefit-20261012/vss-0.3.5-forge-1.20.1.jar",
+        "bytes": 6625203,
+        "sha256": "d56b0ff85d221012d1c00f731c1baad4e2bd1b6f6df6ef498964549dbf1390ca",
+        "native_sha256": {
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so": "4f62809eed0b1c1cebab74db8c9783572135ca61d497316985632dcf5c1918d0",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so": "0dccb14e0a9daabee53f85e967daf054cb9d8ae84153ff4e05506f3d9629030d",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib": "62b386b15783cd8d89087cd375f22b4e957491c33594b34e9802c75cada76123",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib": "f66ecf71f4ff048e0701f3c3a8b8e6076a4c914e89909beb3c96764499080564",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll": "03447c3f2ad8ef552a1449bb81c1d69c1e04de8e682fe9d91360afaa607b97d5"
+        },
+        "zip_integrity": "passed",
+        "experimental_classes": [],
+        "natives_equal_previous": true
+      }
+    }
+  }
+}

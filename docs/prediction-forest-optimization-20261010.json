@@ -1,0 +1,237 @@
+{
+  "date": "2026-10-10",
+  "scope": [
+    "seam-and-whole-pass-cpu",
+    "lossless-rectangle-gpu-format",
+    "screen-error-display-lod",
+    "fixed-cell-shader-reuse"
+  ],
+  "constraints": {
+    "subagentsUsed": false,
+    "githubCommittedOrPushed": false,
+    "clientJarReplaced": false,
+    "clientStoppedOrStarted": false
+  },
+  "runtimeBeforeAfterMeasured": false,
+  "displayLod": {
+    "maximumGeometryErrorPixels": 1.5,
+    "entryGeometryErrorPixels": 1.2,
+    "sourceRecordsPreserved": true,
+    "maximumAdditionalQuadRatio": 0.5,
+    "maximumVariantQuadRatio": 0.65,
+    "minimumSavedQuads": 64,
+    "guards": [
+      "near",
+      "scope",
+      "morph",
+      "mixed-ownership",
+      "unavailable-representation"
+    ],
+    "protectedGeometry": [
+      "tile-edge-row",
+      "water",
+      "model",
+      "cutout",
+      "real-boundary-columns"
+    ]
+  },
+  "rectangleFormat": {
+    "recordBytes": 20,
+    "paletteAdditional": true,
+    "lossless": true,
+    "gpuOnly": true,
+    "diskCanonicalAndCpuPaletteCompatible": true
+  },
+  "offlineMeasures": {
+    "quads": 22667547,
+    "baselineBytes": 751479136,
+    "rectangleBytes": 494105680,
+    "meshes": 3890,
+    "displaySamples": 114,
+    "variantSamples": 48,
+    "sampleTerrain": 1511614,
+    "sampleFarQuads": 843016,
+    "sampleBaselineBytes": 51081952,
+    "sampleWithLodBytes": 42871312,
+    "geometrySavedBytes": 257373456,
+    "geometrySavedPercent": 34.24891572771489,
+    "samplePotentialFacesSavedPercent": 44.23073615354184,
+    "sampleWithLodSavedBytes": 8210640,
+    "sampleWithLodSavedPercent": 16.073465634202854,
+    "samplePotentialFacesAreActualClientFrame": false,
+    "payloadDifferenceIsMeasuredGpuAllocatedMemory": false
+  },
+  "gpuMicrobenchmark": {
+    "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "tiles": 128,
+    "quads": 171776,
+    "rasterizerDiscard": true,
+    "batched": true,
+    "fullFacesGpuMedianMs": {
+      "baseline32Bytes": 0.049152,
+      "rectangle20Bytes": 0.054272
+    },
+    "partialFacesGpuMedianMs": {
+      "baseline32Bytes": 0.02048,
+      "rectangle20Bytes": 0.022528
+    },
+    "runtimeFpsClaim": false
+  },
+  "validation": {
+    "sources": [
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionPackedMesh.java",
+        "neoforge": "a60312152a0280f0867bb8c569e7cc6c759304055063fcb7bbe3f148eac87918",
+        "forge": "5d6f33e41aba6d6571620ad52a2a771c145753014ed4deff3ad2047cbb584439"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionLodSeams.java",
+        "neoforge": "f2b72b76977c0753d10888c3ae57763ae48afe5211f5c3e043e3b50c8efdff5d",
+        "forge": "fd831428b6c58ca68964acac6c4e5470669688d0841483f96596e64ca5efbaa0"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuEncoding.java",
+        "neoforge": "621778c37db9fd74ca11a2282d178b26a425f37a5cfc272eb700bf1360b689c3",
+        "forge": "621778c37db9fd74ca11a2282d178b26a425f37a5cfc272eb700bf1360b689c3"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java",
+        "neoforge": "3f2351d56aa5cd2fde8514245db78863b1129589a2638b4f265165159a7e5dcc",
+        "forge": "3e821fd158234de46ec89b399f2a6d973f420a601277c0b858a6538c3ff9c907"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java",
+        "neoforge": "b5e3ae5e9cc7f03953e67f78bd6464b8da515dd063cba4194a252db680110896",
+        "forge": "3df3c6ec8bd5a101c87774de3baf2a5f5cb7e553748ae9e1710ffc91f75d9263"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionGpuResidency.java",
+        "neoforge": "f996fd21820ac3a1e64394c3e5e374dfdc5be9802792606c59b37626fda1064f",
+        "forge": "4aba383d3fae65ff250257ffaf26ffd28e7fe43be0943649ae6dae5950f5c2c1"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionTerrainProgram.java",
+        "neoforge": "71bf3df170889c2b281eea111d37a2950185f1c3e10bf06fa751c74b3a5c5b18",
+        "forge": "71bf3df170889c2b281eea111d37a2950185f1c3e10bf06fa751c74b3a5c5b18"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayGeometry.java",
+        "neoforge": "4202d66b6ece6f237d7c2af43aaf81d6e926191b4bec4358dfa4926b3aa0e29f",
+        "forge": "4202d66b6ece6f237d7c2af43aaf81d6e926191b4bec4358dfa4926b3aa0e29f"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/VssLodSpriteTable.java",
+        "neoforge": "c040f50b712728dc47a0a728c9682123308587706f05f57e5812f8e506ffd790",
+        "forge": "21f3e0e554da59eb1edb2c011427cda7321ed0a44dc3edc63419f4f609d1854a"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayLod.java",
+        "neoforge": "9658f01cc34dab8dea0a771dd7f2c4ce18878182954a6678c2b5170d547f6866",
+        "forge": "9658f01cc34dab8dea0a771dd7f2c4ce18878182954a6678c2b5170d547f6866"
+      },
+      {
+        "file": "src/main/java/dev/xantha/vss/client/prediction/PredictionWorkView.java",
+        "neoforge": "5d10f61adaa9d8f834a2272feb88f47674dea6c4d53b904bd42d6b8d843ad948",
+        "forge": "d9e9d92aac8fdb223139c63bd2637cf6a8443ce5f5dc2e392cf13101a1981185"
+      }
+    ],
+    "testSourcesSynchronized": 7,
+    "platforms": {
+      "neoforge": {
+        "cpu": {
+          "tests": 113,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 112,
+          "skippedCases": [
+            "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+          ]
+        },
+        "gpu": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 13,
+          "skippedCases": []
+        },
+        "artifact": {
+          "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\lib\\forest-optimization-20261010\\vss-0.3.5-neoforge-1.21.1.jar",
+          "sha256": "032fe84f91ea10932501a8ce6ff4d7e7a3f56709aed1f72d6ef4b32b4491fd24",
+          "bytes": 5876927,
+          "zipIntegrity": true,
+          "nativeResourcesVerified": [
+            "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+            "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+            "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+            "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+            "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+          ],
+          "touchedClassesVerified": 45,
+          "latestCompiledClassesIdentical": true,
+          "reobfuscatedOutputIdentical": false
+        }
+      },
+      "forge": {
+        "cpu": {
+          "tests": 110,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 109,
+          "skippedCases": [
+            "dev.xantha.vss.client.prediction.PredictionGpuEncodingTest.realCorpusRoundTripAndEncodingCost()"
+          ]
+        },
+        "gpu": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "passed": 12,
+          "skippedCases": [
+            "dev.xantha.vss.client.prediction.PredictionVoxyDepthConventionGpuTest.installedFinalBlitPreservesPhysicalWaterDepthDespitePropertyMismatch()"
+          ]
+        },
+        "artifact": {
+          "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\lib\\forest-optimization-20261010\\vss-0.3.5-forge-1.20.1.jar",
+          "sha256": "cc82a06ed89de0426d7020d82466e44f66345190a92735716ba84bddc9a0142b",
+          "bytes": 6549098,
+          "zipIntegrity": true,
+          "nativeResourcesVerified": [
+            "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+            "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+            "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+            "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+            "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+          ],
+          "touchedClassesVerified": 45,
+          "latestCompiledClassesIdentical": false,
+          "reobfuscatedOutputIdentical": true
+        }
+      }
+    },
+    "offline": {
+      "quads": 22667547,
+      "baselineBytes": 751479136,
+      "rectangleBytes": 494105680,
+      "meshes": 3890,
+      "displaySamples": 114,
+      "variantSamples": 48,
+      "sampleTerrain": 1511614,
+      "sampleFarQuads": 843016,
+      "sampleBaselineBytes": 51081952,
+      "sampleWithLodBytes": 42871312
+    }
+  },
+  "localEvidenceDirectory": "C:/Users/Administrator/.codex/tmp/vss-forest-optimization-20261010",
+  "clientAcceptance": [
+    "same-position-forest",
+    "movement-and-turn",
+    "telescope",
+    "mixed-voxy-boundary",
+    "water",
+    "cpu-gpu-and-long-frames"
+  ]
+}

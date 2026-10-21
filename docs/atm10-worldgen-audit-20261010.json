@@ -1,0 +1,2146 @@
+{
+  "date": "2026-10-10",
+  "scope": "ATM 10 8.2 / Minecraft 1.21.1 / NeoForge; static resource and bytecode audit, not an in-game acceptance test",
+  "pack": {
+    "curseforgeProject": 925200,
+    "curseforgeFile": 8945086,
+    "version": "8.2",
+    "manifestSha256": "a082b4920c14b5853b200c788c1c12b0e188c6d7d197f59b92792c89aeb52eea",
+    "modlistSha256": "25f4402252df313703c16c2ee778927bc840e3ce73fa141ec462466b4eff82f1",
+    "officialRepositoryCommit": "e5e3d1d83ec6885bb9a5e9fb309fb8e9730db025",
+    "repoModlistEqualsPackModlist": true,
+    "manifestFileCount": 495
+  },
+  "vss": {
+    "repository": "voxyserverside-neoforge-1.21.1",
+    "head": "1c9fd92c25db18605ba62d3ecbaf703248953f73",
+    "workingTreeIncludesIssue9Fix": true
+  },
+  "templateBudgetSimulation": {
+    "scope": "57 inspected mod JARs only; excludes vanilla, other mods and overrides",
+    "templateCount": 12508,
+    "templateBytes": 144610349,
+    "includedBytes": 5242875,
+    "totals": {
+      "included": 113,
+      "total_cap": 12382,
+      "file_cap": 13
+    },
+    "mods": {
+      "mss": {
+        "included": 31,
+        "total_cap": 100
+      },
+      "mes": {
+        "included": 12,
+        "total_cap": 103
+      },
+      "mvs": {
+        "included": 57,
+        "total_cap": 298
+      },
+      "mns": {
+        "included": 13,
+        "total_cap": 463
+      },
+      "mostructures": {
+        "total_cap": 119
+      },
+      "tombstone": {
+        "total_cap": 10
+      },
+      "biomeswevegone": {
+        "total_cap": 576
+      },
+      "cataclysm": {
+        "total_cap": 188
+      },
+      "dungeons_arise": {
+        "total_cap": 873,
+        "file_cap": 4
+      },
+      "repurposed_structures": {
+        "total_cap": 3162
+      },
+      "deeperdarker": {
+        "total_cap": 79
+      },
+      "the_bumblezone": {
+        "total_cap": 844,
+        "file_cap": 6
+      },
+      "allthemodium": {
+        "total_cap": 39
+      },
+      "structory_towers": {
+        "total_cap": 31
+      },
+      "explorify": {
+        "total_cap": 165
+      },
+      "formationsoverworld": {
+        "total_cap": 82
+      },
+      "formationsnether": {
+        "total_cap": 36
+      },
+      "betterfortresses": {
+        "total_cap": 169
+      },
+      "irons_spellbooks": {
+        "total_cap": 236
+      },
+      "apotheosis": {
+        "total_cap": 5
+      },
+      "aether": {
+        "total_cap": 34
+      },
+      "twilightforest": {
+        "total_cap": 274
+      },
+      "betterwitchhuts": {
+        "total_cap": 6
+      },
+      "undergarden": {
+        "total_cap": 142
+      },
+      "betterjungletemples": {
+        "total_cap": 127
+      },
+      "ad_astra": {
+        "total_cap": 56
+      },
+      "eternal_starlight": {
+        "total_cap": 24
+      },
+      "structory": {
+        "total_cap": 238
+      },
+      "yungsextras": {
+        "total_cap": 62
+      },
+      "nullscape": {
+        "file_cap": 2,
+        "total_cap": 19
+      },
+      "iceandfire": {
+        "total_cap": 26
+      },
+      "ars_nouveau": {
+        "total_cap": 6
+      },
+      "ohthetreesyoullgrow": {
+        "total_cap": 6
+      },
+      "betterendisland": {
+        "total_cap": 41
+      },
+      "betterdeserttemples": {
+        "total_cap": 198
+      },
+      "betterstrongholds": {
+        "total_cap": 97
+      },
+      "illagerwarship": {
+        "total_cap": 2
+      },
+      "betteroceanmonuments": {
+        "total_cap": 58,
+        "file_cap": 1
+      },
+      "immersiveengineering": {
+        "total_cap": 72
+      },
+      "t_and_t": {
+        "total_cap": 837
+      },
+      "ctov": {
+        "total_cap": 2093
+      },
+      "betterdungeons": {
+        "total_cap": 227
+      },
+      "underground_villages": {
+        "total_cap": 128
+      },
+      "waystones": {
+        "total_cap": 3
+      },
+      "villagesandpillages": {
+        "total_cap": 28
+      }
+    }
+  },
+  "mods": [
+    {
+      "modId": "ctov",
+      "name": "ChoiceTheorem's Overhauled Village",
+      "version": "3.6.3",
+      "jarName": "[Neoforge]ctov-3.6.3.jar",
+      "sha1": "c5fe733d743af20f84eb87dd75b5bb57684f3e05",
+      "sha256": "4815b19b83541f09cba556e222612bc5ddcc31f7c4ba2198f4b4d6376cca8b2e",
+      "url": "https://cdn.modrinth.com/data/fgmhI8kH/versions/ztzRUnQ7/%5BNeoforge%5Dctov-3.6.3.jar",
+      "projectId": "fgmhI8kH",
+      "bytes": 7139609,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 78,
+      "structureSteps": {
+        "surface_structures": 78
+      },
+      "placementTypes": {},
+      "templateCount": 2093,
+      "templateBytes": 7425693,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": [
+        {
+          "resource": "data/ctov/tags/worldgen/process_list/village/beach/house_natures_spirit.json",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ]
+    },
+    {
+      "modId": "ad_astra",
+      "name": "Ad Astra",
+      "version": "1.16.26",
+      "jarName": "adastra-1.21.1-1.16.26-neoforge.jar",
+      "sha1": "b6c4560cc625a6847e016af576954ff1f0431d99",
+      "sha256": "b8d1441e284db2e1e8ce5ffe739452633c90725312e476db8d8a0a4b64126856",
+      "url": "https://cdn.modrinth.com/data/3ufwT9JF/versions/9pnKHdCG/adastra-1.21.1-1.16.26-neoforge.jar",
+      "projectId": "3ufwT9JF",
+      "bytes": 7301791,
+      "dimensions": [
+        {
+          "id": "ad_astra:earth_orbit",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        },
+        {
+          "id": "ad_astra:glacio",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        },
+        {
+          "id": "ad_astra:glacio_orbit",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        },
+        {
+          "id": "ad_astra:mars",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        },
+        {
+          "id": "ad_astra:mars_orbit",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        },
+        {
+          "id": "ad_astra:mercury",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        },
+        {
+          "id": "ad_astra:mercury_orbit",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        },
+        {
+          "id": "ad_astra:moon",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        },
+        {
+          "id": "ad_astra:moon_orbit",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        },
+        {
+          "id": "ad_astra:venus",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        },
+        {
+          "id": "ad_astra:venus_orbit",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        }
+      ],
+      "generatorClasses": [],
+      "biomeSourceClasses": [
+        {
+          "name": "earth/terrarium/adastra/common/registry/ModBiomeSources",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "earth/terrarium/adastra/common/world/biome/CratersBiomeSource",
+          "super": "net/minecraft/world/level/biome/BiomeSource"
+        }
+      ],
+      "placementClasses": [],
+      "structureCount": 8,
+      "structureSteps": {
+        "surface_structures": 8
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 8
+      },
+      "templateCount": 56,
+      "templateBytes": 940340,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "aether",
+      "name": "The Aether",
+      "version": "1.5.10",
+      "jarName": "aether-1.21.1-1.5.10-neoforge.jar",
+      "sha1": "5b5592989c6d2aabf80a9f100e18c258813db497",
+      "sha256": "b19386301560a017a458e9790a7b59999e270f93010def0b61e7cbe4c8630dbf",
+      "url": "https://mediafilez.forgecdn.net/files/7043/502/aether-1.21.1-1.5.10-neoforge.jar",
+      "projectId": "curseforge:255308",
+      "bytes": 40223909,
+      "dimensions": [
+        {
+          "id": "aether:the_aether",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        }
+      ],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 4,
+      "structureSteps": {
+        "surface_structures": 3,
+        "top_layer_modification": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 3
+      },
+      "templateCount": 34,
+      "templateBytes": 307904,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "allthemodium",
+      "name": "Allthemodium",
+      "version": "3.0.1",
+      "jarName": "allthemodium-3.0.1_mc_1.21.1.jar",
+      "sha1": "1abb27a2bcbd2b51399300096cff3faf9d7589ac",
+      "sha256": "870004c1d6fbd0891ff322b9ff9e8d42c6aaa082ace7562e25948f1636b5c6f1",
+      "url": "https://cdn.modrinth.com/data/YDA6eZ1t/versions/YHejKr3B/allthemodium-3.0.1_mc_1.21.1.jar",
+      "projectId": "YDA6eZ1t",
+      "bytes": 1966440,
+      "dimensions": [
+        {
+          "id": "allthemodium:mining",
+          "generatorType": "allthemodium:flat",
+          "biomeSourceType": null
+        },
+        {
+          "id": "allthemodium:the_beyond",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:fixed"
+        },
+        {
+          "id": "allthemodium:the_other",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        }
+      ],
+      "generatorClasses": [
+        {
+          "name": "com/thevortex/allthemodium/chunkgenerator/CustomFlatLevelSource",
+          "super": "net/minecraft/world/level/chunk/ChunkGenerator"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 3,
+      "structureSteps": {
+        "surface_structures": 2,
+        "underground_structures": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 3
+      },
+      "templateCount": 39,
+      "templateBytes": 1202344,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "apotheosis",
+      "name": "Apotheosis",
+      "version": "8.8.0",
+      "jarName": "Apotheosis-1.21.1-8.8.0.jar",
+      "sha1": "1e4837fcaf24fe73dba1082656736d872690b303",
+      "sha256": "11848e1129595d1e9ac302679128364d2fedf2085d9539797c808a9929abf972",
+      "url": "https://cdn.modrinth.com/data/rqFWfVlz/versions/nEWTeHFF/Apotheosis-1.21.1-8.8.0.jar",
+      "projectId": "rqFWfVlz",
+      "bytes": 7156644,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 4,
+      "structureSteps": {
+        "surface_structures": 4
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 5,
+      "templateBytes": 35306,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "ars_nouveau",
+      "name": "Ars Nouveau",
+      "version": "5.13.1",
+      "jarName": "ars_nouveau-1.21.1-5.13.1.jar",
+      "sha1": "02782d071ee5fab3b5c4b8ced67b7e1748277dfd",
+      "sha256": "99dff85e8778f7ae21dfd51cdedadf20f555a834fc757c0afe5f03c10eea96f2",
+      "url": "https://cdn.modrinth.com/data/TKB6INcv/versions/qEFs5RRw/ars_nouveau-1.21.1-5.13.1.jar",
+      "projectId": "TKB6INcv",
+      "bytes": 20107711,
+      "dimensions": [],
+      "generatorClasses": [
+        {
+          "name": "com/hollingsworth/arsnouveau/common/world/dimension/PlanariumChunkGenerator",
+          "super": "net/minecraft/world/level/chunk/ChunkGenerator"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 3,
+      "structureSteps": {
+        "surface_structures": 3
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 6,
+      "templateBytes": 339817,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "artifacts",
+      "name": "Artifacts",
+      "version": "13.2.3",
+      "jarName": "artifacts-neoforge-13.2.3.jar",
+      "sha1": "8247516201418bda17ef76d5ba02a3d71698477c",
+      "sha256": "5841434f9ac404de3d3fdd05880f699b41d4388c4047aba4eccc70e356892e48",
+      "url": "https://cdn.modrinth.com/data/P0Mu4wcQ/versions/aE1GPGY4/artifacts-neoforge-13.2.3.jar",
+      "projectId": "P0Mu4wcQ",
+      "bytes": 1086882,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "bibliobiomes",
+      "name": "Bibliobiomes Legacy",
+      "version": "1.6.1",
+      "jarName": "bibliobiomes-1.21.1-1.6.1.jar",
+      "sha1": "9a895a17fdfb2efbd44f3b19098dc42cf7f77926",
+      "sha256": "a1c15706159314c1a6c84fb3e0295ceb4539cdc20cf42c0e05b0b036ce46d007",
+      "url": "https://cdn.modrinth.com/data/DSrUt8Cp/versions/5rKuaFdv/bibliobiomes-1.21.1-1.6.1.jar",
+      "projectId": "DSrUt8Cp",
+      "bytes": 20181755,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "deeperdarker",
+      "name": "Deeper and Darker",
+      "version": "1.4.1",
+      "jarName": "deeperdarker-neoforge-1.21.1-1.4.1.jar",
+      "sha1": "b6094adde68bd4b909bc75c64901e1f3fb99ad8f",
+      "sha256": "eee3f51222b0bcc714def002ff089ac9e131d3cae4575b542fd0a7dd101fe0af",
+      "url": "https://cdn.modrinth.com/data/fnAffV0n/versions/TuD0Zvi3/deeperdarker-neoforge-1.21.1-1.4.1.jar",
+      "projectId": "fnAffV0n",
+      "bytes": 3906057,
+      "dimensions": [
+        {
+          "id": "deeperdarker:otherside",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        }
+      ],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 1,
+      "structureSteps": {
+        "underground_structures": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 79,
+      "templateBytes": 243133,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "dungeoncrawl",
+      "name": "Dungeon Crawl",
+      "version": "2.3.17",
+      "jarName": "DungeonCrawl-NeoForge-1.21-2.3.17.jar",
+      "sha1": "3abb84c4fcf1229fced0cc5e88fa6e9baa0aa4a7",
+      "sha256": "853cd59208f17c25188a419b48d1a9fed3acebf676bb1ddd026fa4e7fb56dad4",
+      "url": "https://cdn.modrinth.com/data/q0rRg4lH/versions/D7lKpb69/DungeonCrawl-NeoForge-1.21-2.3.17.jar",
+      "projectId": "q0rRg4lH",
+      "bytes": 738480,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 1,
+      "structureSteps": {
+        "underground_structures": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "dungeons_arise",
+      "name": "When Dungeons Arise",
+      "version": "2.1.68",
+      "jarName": "DungeonsArise-1.21.1-2.1.68-release.jar",
+      "sha1": "c651339154da7b9e9cf47a80fdef22c4d59cad5c",
+      "sha256": "7eee1eca7e3b2c6c1bede055934f391ae2e8349ffe33e106f451176d2cfcf0e4",
+      "url": "https://cdn.modrinth.com/data/8DfbfASn/versions/XIRJSFQ0/DungeonsArise-1.21.1-2.1.68-release.jar",
+      "projectId": "8DfbfASn",
+      "bytes": 11842679,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 40,
+      "structureSteps": {
+        "surface_structures": 34,
+        "underground_structures": 3,
+        "fluid_springs": 2,
+        "strongholds": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 2
+      },
+      "templateCount": 877,
+      "templateBytes": 31607868,
+      "oversizeTemplates": [
+        {
+          "id": "dungeons_arise:infested_temple/infested_temple_main_0",
+          "resource": "data/dungeons_arise/structure/infested_temple/infested_temple_main_0.nbt",
+          "bytes": 2773346
+        },
+        {
+          "id": "dungeons_arise:keep_kayra/keep_kayra_main_0",
+          "resource": "data/dungeons_arise/structure/keep_kayra/keep_kayra_main_0.nbt",
+          "bytes": 3822066
+        },
+        {
+          "id": "dungeons_arise:kisegi_sanctuary/kisegi_sanctuary_main_0",
+          "resource": "data/dungeons_arise/structure/kisegi_sanctuary/kisegi_sanctuary_main_0.nbt",
+          "bytes": 3939141
+        },
+        {
+          "id": "dungeons_arise:mining_complex/mining_complex_main_0",
+          "resource": "data/dungeons_arise/structure/mining_complex/mining_complex_main_0.nbt",
+          "bytes": 1396435
+        }
+      ],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "eternal_starlight",
+      "name": "Eternal Starlight",
+      "version": "0.9.1+1.21.1+neoforge",
+      "jarName": "eternalstarlight-0.9.1+1.21.1+neoforge.jar",
+      "sha1": "5b9235c764787242085de386aaeb02372b1ab03c",
+      "sha256": "e77369ad1a779036b243ef0f7b24776640a3ff84968e6f3be1931bc953e92b09",
+      "url": "https://cdn.modrinth.com/data/XvcfUGfB/versions/IyTc0Vvj/eternalstarlight-0.9.1%2B1.21.1%2Bneoforge.jar",
+      "projectId": "XvcfUGfB",
+      "bytes": 59325382,
+      "dimensions": [
+        {
+          "id": "eternal_starlight:starlight",
+          "generatorType": "eternal_starlight:biome_based",
+          "biomeSourceType": "eternal_starlight:multi_noise"
+        }
+      ],
+      "generatorClasses": [
+        {
+          "name": "cn/leolezury/eternalstarlight/common/world/gen/chunkgenerator/ESChunkGenerator",
+          "super": "net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator"
+        }
+      ],
+      "biomeSourceClasses": [
+        {
+          "name": "cn/leolezury/eternalstarlight/common/world/gen/biomesource/ESBiomeSource",
+          "super": "net/minecraft/world/level/biome/BiomeSource"
+        }
+      ],
+      "placementClasses": [
+        {
+          "name": "cn/leolezury/eternalstarlight/common/registry/ESStructurePlacementTypes",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "cn/leolezury/eternalstarlight/common/world/gen/structure/placement/AvoidLandmarkStructurePlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        },
+        {
+          "name": "cn/leolezury/eternalstarlight/common/world/gen/structure/placement/LandmarkStructurePlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/StructurePlacement"
+        }
+      ],
+      "structureCount": 8,
+      "structureSteps": {
+        "surface_structures": 7,
+        "underground_structures": 1
+      },
+      "placementTypes": {
+        "eternal_starlight:landmark": 2,
+        "minecraft:random_spread": 5,
+        "eternal_starlight:avoid_landmark": 1
+      },
+      "templateCount": 24,
+      "templateBytes": 177764,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "explorify",
+      "name": "Explorify",
+      "version": "1.6.5",
+      "jarName": "Explorify v1.6.5.mod.jar",
+      "sha1": "5fb28be29200a41b034e423d87823eb19ad651cd",
+      "sha256": "2dc76398b48b2aae9b4024642da098b0880125572de160cb5ecf91d102890cad",
+      "url": "https://cdn.modrinth.com/data/HSfsxuTo/versions/CuBdAr31/Explorify%20v1.6.5.mod.jar",
+      "projectId": "HSfsxuTo",
+      "bytes": 767884,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 23,
+      "structureSteps": {
+        "surface_structures": 23
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 14
+      },
+      "templateCount": 165,
+      "templateBytes": 361455,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "forbidden_arcanus",
+      "name": "Forbidden Arcanus",
+      "version": "2.6.1",
+      "jarName": "forbidden_arcanus-2.6.1.jar",
+      "sha1": "1de105be68b88de87a5e6749f320c790d550c120",
+      "sha256": "8d5ef1557fcdd0ba9fe98c38458751bcbecb118c30924daa6fbdea0a54bf5785",
+      "url": "https://cdn.modrinth.com/data/MdlnLS7Q/versions/fNjxgZPH/forbidden_arcanus-2.6.1.jar",
+      "projectId": "MdlnLS7Q",
+      "bytes": 3402083,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "formations",
+      "name": "Formations",
+      "version": "1.0.4",
+      "jarName": "formations-1.0.4-neoforge-mc1.21.jar",
+      "sha1": "3845f96c9304f6956688f7a35205e9354bf411b0",
+      "sha256": "2d9b50575fdf42e59d5dacda23ce5d01fc5cb19db02a1278329e3ad40893848e",
+      "url": "https://cdn.modrinth.com/data/tPe4xnPd/versions/ybUmDE8h/formations-1.0.4-neoforge-mc1.21.jar",
+      "projectId": "tPe4xnPd",
+      "bytes": 287525,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/supermartijn642/formations/structure/StructurePlacement",
+          "super": "java/lang/Enum"
+        }
+      ],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "formationsnether",
+      "name": "Formations Nether",
+      "version": "1.0.5+b",
+      "jarName": "formationsnether-1.0.5b-mc1.21+.jar",
+      "sha1": "6b0e0f58399fc0ba3a69fd1ddda860a534e469c6",
+      "sha256": "b903e98fdeacb5b70b10baafe224c512a6efa843c53f0386d50cc48ce4ad19c9",
+      "url": "https://cdn.modrinth.com/data/cGvQGRls/versions/Z3DsEJun/formationsnether-1.0.5b-mc1.21%2B.jar",
+      "projectId": "cGvQGRls",
+      "bytes": 330916,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 21,
+      "structureSteps": {
+        "underground_structures": 2,
+        "surface_structures": 19
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 3
+      },
+      "templateCount": 36,
+      "templateBytes": 113667,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "formationsoverworld",
+      "name": "Formations Overworld",
+      "version": "1.0.5+c",
+      "jarName": "formationsoverworld-1.0.5c-mc1.21+.jar",
+      "sha1": "717033f8239062de6eeac77d9664258fc6c657bc",
+      "sha256": "8ac52001fd43b70bdb72209198152ae44137b476cf9124618f3c7106b95524ba",
+      "url": "https://cdn.modrinth.com/data/KX1XC0Oo/versions/jRPqlunS/formationsoverworld-1.0.5c-mc1.21%2B.jar",
+      "projectId": "KX1XC0Oo",
+      "bytes": 600780,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 30,
+      "structureSteps": {
+        "surface_structures": 30
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 3
+      },
+      "templateCount": 82,
+      "templateBytes": 442752,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "iceandfire",
+      "name": "Ice And Fire Community Edition",
+      "version": "2.0-beta.17",
+      "jarName": "iceandfire-2.0-beta.17.jar",
+      "sha1": "a14c9ca16da7a108bb454000e560a0f8495ff0fe",
+      "sha256": "ee52349445615417e69ab64cf15dbb96b9332a9117225119d281695c5f8d90f0",
+      "url": "https://cdn.modrinth.com/data/VpmCsizY/versions/kdvvFM7V/iceandfire-2.0-beta.17.jar",
+      "projectId": "VpmCsizY",
+      "bytes": 20848811,
+      "dimensions": [
+        {
+          "id": "iceandfire:dread_land",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        }
+      ],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 13,
+      "structureSteps": {
+        "surface_structures": 10,
+        "underground_structures": 3
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 9
+      },
+      "templateCount": 26,
+      "templateBytes": 126360,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "illagerwarship",
+      "name": "Illager-Warship",
+      "version": "1.0.1",
+      "jarName": "illagerwarship-1.0.1-neoforge-1.21.1.jar",
+      "sha1": "538db7de4264f6d07ca2a5e7a947777ad8216225",
+      "sha256": "e4c132c07d1aa04edc55b6e405657992c3d36da6f9f25ec8f460db405c5a7b32",
+      "url": "https://cdn.modrinth.com/data/tUpIHo95/versions/hT0OWFS2/illagerwarship-1.0.1-neoforge-1.21.1.jar",
+      "projectId": "tUpIHo95",
+      "bytes": 71280,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 1,
+      "structureSteps": {
+        "surface_structures": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 2,
+      "templateBytes": 320658,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "immersiveengineering",
+      "name": "Immersive Engineering",
+      "version": "12.4.2-194",
+      "jarName": "ImmersiveEngineering-1.21.1-12.4.2-194.jar",
+      "sha1": "a4e90c2df8009040f6d022433c5d76635944dd59",
+      "sha256": "45942985a4a4aebf265b8e22a0c54a96208637471f36f2532ff5d4911322debc",
+      "url": "https://cdn.modrinth.com/data/tIm2nV03/versions/uNRARSH2/ImmersiveEngineering-1.21.1-12.4.2-194.jar",
+      "projectId": "tIm2nV03",
+      "bytes": 14232121,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 72,
+      "templateBytes": 136848,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "irons_spellbooks",
+      "name": "Iron's Spells 'n Spellbooks",
+      "version": "1.21.1-3.16.3",
+      "jarName": "irons_spellbooks-1.21.1-3.16.3.jar",
+      "sha1": "017fd8140c477f9ae602cf95594f1c23bef1d6e3",
+      "sha256": "13d644474ddba4f8478b4ce68294687fd509c994b3f344a224142b102dbe6f73",
+      "url": "https://mediafilez.forgecdn.net/files/8680/204/irons_spellbooks-1.21.1-3.16.3.jar",
+      "projectId": "curseforge:855414",
+      "bytes": 13890046,
+      "dimensions": [
+        {
+          "id": "irons_spellbooks:pocket_dimension",
+          "generatorType": "minecraft:flat",
+          "biomeSourceType": null
+        }
+      ],
+      "generatorClasses": [
+        {
+          "name": "io/redspace/ironsspellbooks/mixin/NoiseChunkGeneratorMixin",
+          "super": "java/lang/Object"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 5,
+      "structureSteps": {
+        "underground_decoration": 4,
+        "fluid_springs": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 3
+      },
+      "templateCount": 236,
+      "templateBytes": 1943959,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": [
+        {
+          "resource": "data/irons_spellbooks/worldgen/processor_list/randomize_deepslate.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/processor_list/randomize_mud_bricks.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure/catacombs.json",
+          "message": "Expecting property name enclosed in double quotes: line 9 column 3 (char 286)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure/evoker_fort.json",
+          "message": "Expecting property name enclosed in double quotes: line 9 column 3 (char 285)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure/mangrove_hut.json",
+          "message": "Expecting property name enclosed in double quotes: line 5 column 3 (char 105)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure/mountain_tower.json",
+          "message": "Expecting property name enclosed in double quotes: line 6 column 3 (char 152)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure_set/ancient_battleground.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure_set/citadel.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure_set/evoker_fort.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure_set/mangrove_hut.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure_set/mountain_tower.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/structure_set/pyromancer_tower.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/template_pool/mangrove_hut_pool.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        },
+        {
+          "resource": "data/irons_spellbooks/worldgen/template_pool/mountain_tower_pool.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        }
+      ]
+    },
+    {
+      "modId": "cataclysm",
+      "name": "L_Ender's Cataclysm 1.21.1",
+      "version": "3.33",
+      "jarName": "L_Ender's Cataclysm 1.21.1-3.33.jar",
+      "sha1": "f0310277167c82fd16a5c2bab220b5c5c262f133",
+      "sha256": "371956d0c2e3b56729ee93b955e936875d210e372fe734cdb74326d89ef79875",
+      "url": "https://cdn.modrinth.com/data/46KJle7n/versions/PsPYpoCC/L_Ender%27s%20Cataclysm%201.21.1-3.33.jar",
+      "projectId": "46KJle7n",
+      "bytes": 73375667,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/github/L_Ender/cataclysm/init/ModStructurePlacementType",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/github/L_Ender/cataclysm/world/structures/placements/CataclysmRandomSpread",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 15,
+      "structureSteps": {
+        "surface_structures": 13,
+        "underground_decoration": 1,
+        "underground_structures": 1
+      },
+      "placementTypes": {
+        "cataclysm:cataclysm_random_spread": 9,
+        "minecraft:random_spread": 2
+      },
+      "templateCount": 188,
+      "templateBytes": 23210241,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "lithostitched",
+      "name": "Lithostitched",
+      "version": "1.8.0",
+      "jarName": "lithostitched-1.8.0-neoforge-21.1.jar",
+      "sha1": "fe7eb612a0fa0c41ce94d914162d298755bb25a3",
+      "sha256": "204699b4e3aa3176e2da5b145c6c66887363821f2bd671ba77bd94750036e169",
+      "url": "https://cdn.modrinth.com/data/XaDC71GB/versions/sPmtDq1X/lithostitched-1.8.0-neoforge-21.1.jar",
+      "projectId": "XaDC71GB",
+      "bytes": 979783,
+      "dimensions": [],
+      "generatorClasses": [
+        {
+          "name": "dev/worldgen/lithostitched/mixin/common/ChunkGeneratorAccessor",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "dev/worldgen/lithostitched/mixin/common/NoiseBasedChunkGeneratorAccessor",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "dev/worldgen/lithostitched/mixin/common/NoiseBasedChunkGeneratorMixin",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "dev/worldgen/lithostitched/mixin/common/bandlands/NoiseBasedChunkGeneratorMixin",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "dev/worldgen/lithostitched/mixin/common/compat/terrablender/NoiseBasedChunkGeneratorMixin",
+          "super": "java/lang/Object"
+        }
+      ],
+      "biomeSourceClasses": [
+        {
+          "name": "dev/worldgen/lithostitched/api/tag/LithostitchedBiomeSourceTags",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "dev/worldgen/lithostitched/impl/worldgen/biomeinjector/internal/InjectorBiomeSource",
+          "super": "net/minecraft/world/level/biome/BiomeSource"
+        },
+        {
+          "name": "dev/worldgen/lithostitched/mixin/common/BiomeSourceInvoker",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "dev/worldgen/lithostitched/mixin/common/MultiNoiseBiomeSourceAccessor",
+          "super": "java/lang/Object"
+        }
+      ],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "mes",
+      "name": "MoogsEndStructures",
+      "version": "2.1.1",
+      "jarName": "MoogsEndStructures-universal-1.21-2.1.1.jar",
+      "sha1": "ef5f57f0e5d06a2f8bec5c073e01ddb061ad477a",
+      "sha256": "00726445a0b2aaa9ab61ac5fa8a165280a45a0e22f1d67898d0b4934614729d5",
+      "url": "https://cdn.modrinth.com/data/r4PuRGfV/versions/S7bUhX4n/MoogsEndStructures-universal-1.21-2.1.1.jar",
+      "projectId": "r4PuRGfV",
+      "bytes": 2285901,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 25,
+      "structureSteps": {
+        "surface_structures": 25
+      },
+      "placementTypes": {
+        "moogs_structures:advanced_random_spread": 25
+      },
+      "templateCount": 115,
+      "templateBytes": 10361868,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "mns",
+      "name": "MoogsNetherStructures",
+      "version": "3.1.1",
+      "jarName": "MoogsNetherStructures-universal-1.21-3.1.1.jar",
+      "sha1": "78845cb7bccaa7812bacce4efdd5481b81b8c347",
+      "sha256": "46e0506264bd66df1ec6fb031f75d6b7f4660ad5f874b5df446dc1a3beebe7f6",
+      "url": "https://cdn.modrinth.com/data/nGUXvjTa/versions/OLTqXnsN/MoogsNetherStructures-universal-1.21-3.1.1.jar",
+      "projectId": "nGUXvjTa",
+      "bytes": 3916038,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 52,
+      "structureSteps": {
+        "surface_structures": 51,
+        "underground_structures": 1
+      },
+      "placementTypes": {
+        "moogs_structures:advanced_random_spread": 42
+      },
+      "templateCount": 476,
+      "templateBytes": 7241841,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "mss",
+      "name": "MoogsSoaringStructures",
+      "version": "2.2.0",
+      "jarName": "MoogsSoaringStructures-universal-1.21-2.2.0.jar",
+      "sha1": "1284c673b46a50b0557c2c018f677323484665f6",
+      "sha256": "2caca5b2dab3ea4541eb3207bab9d5efcc034e3bf7d89788fd95d7b582d24ed2",
+      "url": "https://cdn.modrinth.com/data/RJCLIx7k/versions/O20bIWkj/MoogsSoaringStructures-universal-1.21-2.2.0.jar",
+      "projectId": "RJCLIx7k",
+      "bytes": 5022443,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 35,
+      "structureSteps": {
+        "surface_structures": 35
+      },
+      "placementTypes": {
+        "moogs_structures:advanced_random_spread": 28
+      },
+      "templateCount": 131,
+      "templateBytes": 17918541,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "moogs_structures",
+      "name": "Moog's Structure Lib",
+      "version": "3.3.1",
+      "jarName": "MoogsStructureLib-neoforge-1.21.1-3.3.1.jar",
+      "sha1": "f4cd725a16d9994b9929723ef7535416b5533e22",
+      "sha256": "f3ed1be05117d706a96a3f0d6a7a975d156eff69d705bd16ab47fafde846ec22",
+      "url": "https://cdn.modrinth.com/data/1oUDhxuy/versions/u3jTXBML/MoogsStructureLib-neoforge-1.21.1-3.3.1.jar",
+      "projectId": "1oUDhxuy",
+      "bytes": 436563,
+      "dimensions": [],
+      "generatorClasses": [
+        {
+          "name": "com/finndog/moogs_structures/mixins/structures/ChunkGeneratorMixin",
+          "super": "java/lang/Object"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/finndog/moogs_structures/modinit/MoogsStructuresStructurePlacementType",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/finndog/moogs_structures/world/structures/placements/AdvancedRandomSpread",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "mvs",
+      "name": "MoogsVoyagerStructures",
+      "version": "5.1.2",
+      "jarName": "MoogsVoyagerStructures-universal-1.21-5.1.2.jar",
+      "sha1": "4937108a96fb24ead53079b2021837d45e5816de",
+      "sha256": "a1bb674a5fbae269bfd688340b8a25fb1ddd90e1ffa4e3ac38f3c782f42682a8",
+      "url": "https://cdn.modrinth.com/data/OQAgZMH1/versions/1ac5ccix/MoogsVoyagerStructures-universal-1.21-5.1.2.jar",
+      "projectId": "OQAgZMH1",
+      "bytes": 2241881,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 130,
+      "structureSteps": {
+        "surface_structures": 130
+      },
+      "placementTypes": {
+        "moogs_structures:advanced_random_spread": 116
+      },
+      "templateCount": 355,
+      "templateBytes": 3821722,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "mostructures",
+      "name": "Mo' Structures",
+      "version": "1.6.0+1.21.1",
+      "jarName": "mostructures-neoforge-1.6.0+1.21.1.jar",
+      "sha1": "f374bd80196e5dfe1f3fc8f4703ce9c20334ff02",
+      "sha256": "63b41898366ac6370c1cbff7879fa23fce3ebc53ab12a1e66188d6106836f709",
+      "url": "https://cdn.modrinth.com/data/PTGd6dWp/versions/7XsO4Qud/mostructures-neoforge-1.6.0%2B1.21.1.jar",
+      "projectId": "PTGd6dWp",
+      "bytes": 779607,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "io/github/frqnny/mostructures/structure/ModStructurePlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 21,
+      "structureSteps": {
+        "surface_structures": 21
+      },
+      "placementTypes": {
+        "mostructures:type": 17
+      },
+      "templateCount": 119,
+      "templateBytes": 1645897,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "naturesaura",
+      "name": "NaturesAura",
+      "version": "41.10",
+      "jarName": "NaturesAura-41.10.jar",
+      "sha1": "58e4f9a07e5320432d11aaa3d876337edeeeb8db",
+      "sha256": "5401704e76fb59719d48cd3aa76f088220ae90d8e3b1f4859365ad260355700c",
+      "url": "https://cdn.modrinth.com/data/4cJkN3aF/versions/kJ1hHmK0/NaturesAura-41.10.jar",
+      "projectId": "4cJkN3aF",
+      "bytes": 1553371,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "nullscape",
+      "name": "Nullscape",
+      "version": "1.2.14",
+      "jarName": "Nullscape_1.21.x_v1.2.14.jar",
+      "sha1": "ae8e1cbd5de6cf6f450bb44cd69cd284dad690dd",
+      "sha256": "8749c6fdda659335e50116c18e012cdf8699b3789859c82559af2c6f425c93ae",
+      "url": "https://cdn.modrinth.com/data/LPjGiSO4/versions/3fv8O3xX/Nullscape_1.21.x_v1.2.14.jar",
+      "projectId": "LPjGiSO4",
+      "bytes": 355748,
+      "dimensions": [
+        {
+          "id": "minecraft:the_end",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        }
+      ],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 2,
+      "structureSteps": {
+        "surface_structures": 2
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 3
+      },
+      "templateCount": 21,
+      "templateBytes": 1101467,
+      "oversizeTemplates": [
+        {
+          "id": "nullscape:destroy_start",
+          "resource": "data/nullscape/structure/destroy_start.nbt",
+          "bytes": 531932
+        },
+        {
+          "id": "nullscape:destroy1",
+          "resource": "data/nullscape/structure/destroy1.nbt",
+          "bytes": 531904
+        }
+      ],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "occultism",
+      "name": "Occultism",
+      "version": "1.224.4",
+      "jarName": "occultism-1.21.1-neoforge-1.224.4.jar",
+      "sha1": "2b36ac3d36e0c94f43851be0312be6255915e4e0",
+      "sha256": "b82a5ed9468d64beac21139aff5f15db287104668d8e98db7eafc042c9a79178",
+      "url": "https://cdn.modrinth.com/data/sbJh4AZw/versions/g2DSjK89/occultism-1.21.1-neoforge-1.224.4.jar",
+      "projectId": "sbJh4AZw",
+      "bytes": 6951660,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "biomeswevegone",
+      "name": "Oh The Biomes We've Gone",
+      "version": "2.6.0",
+      "jarName": "Oh-The-Biomes-Weve-Gone-NeoForge-2.6.0.jar",
+      "sha1": "4611dc5bb4240333178e14e81f76168f78167448",
+      "sha256": "d63c45e82bb88d533119d9c814fa43738fd0cca5506c04daad774a1bf8946f93",
+      "url": "https://cdn.modrinth.com/data/NTi7d3Xc/versions/aPEcdSHb/Oh-The-Biomes-Weve-Gone-NeoForge-2.6.0.jar",
+      "projectId": "NTi7d3Xc",
+      "bytes": 20484967,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 18,
+      "structureSteps": {
+        "surface_structures": 12,
+        "raw_generation": 6
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 11
+      },
+      "templateCount": 576,
+      "templateBytes": 1790645,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "ohthetreesyoullgrow",
+      "name": "Oh The Trees You'll Grow",
+      "version": "5.3.2",
+      "jarName": "Oh-The-Trees-Youll-Grow-neoforge-1.21.1-5.3.2.jar",
+      "sha1": "1867792e4e3d9fc6bb7acabb31cbec7a3d49ecad",
+      "sha256": "571feb4d223ee2b5661ed3450ea5c68db18627badcef4d59095a329fc03a7685",
+      "url": "https://cdn.modrinth.com/data/g8NOG5OR/versions/ozzakIcu/Oh-The-Trees-Youll-Grow-neoforge-1.21.1-5.3.2.jar",
+      "projectId": "g8NOG5OR",
+      "bytes": 167431,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 6,
+      "templateBytes": 4928,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "regions_unexplored",
+      "name": "Regions Unexplored",
+      "version": "0.5.9",
+      "jarName": "regions_unexplored-neoforge-1.21.1-0.5.9.jar",
+      "sha1": "064c2da020731fadd07e095707320431df12288d",
+      "sha256": "6cad2d8438d6c2aa08dd8eb8c07d38fda1a685ad5a731c8a5814a0ebdaa2d31d",
+      "url": "https://cdn.modrinth.com/data/Tkikq67H/versions/KrbwbPuJ/regions_unexplored-neoforge-1.21.1-0.5.9.jar",
+      "projectId": "Tkikq67H",
+      "bytes": 5365182,
+      "dimensions": [],
+      "generatorClasses": [
+        {
+          "name": "net/regions_unexplored/mixin/access/NoiseBasedChunkGeneratorAccess",
+          "super": "java/lang/Object"
+        }
+      ],
+      "biomeSourceClasses": [
+        {
+          "name": "net/regions_unexplored/mixin/access/BiomeSourceAccess",
+          "super": "java/lang/Object"
+        }
+      ],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "repurposed_structures",
+      "name": "Repurposed Structures",
+      "version": "7.5.22+1.21.1-neoforge",
+      "jarName": "repurposed_structures-7.5.22+1.21.1-neoforge.jar",
+      "sha1": "a64f6b2d331d5c3a5feefcd18d23f4585a42b097",
+      "sha256": "64e64109acf7673b969aca9b3cca0bb555777cd7038aa16aa32a1548d753f257",
+      "url": "https://cdn.modrinth.com/data/QDNS5oAT/versions/8duZuWci/repurposed_structures-7.5.22%2B1.21.1-neoforge.jar",
+      "projectId": "QDNS5oAT",
+      "bytes": 8246760,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/telepathicgrunt/repurposedstructures/modinit/RSStructurePlacementType",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/telepathicgrunt/repurposedstructures/world/structures/placements/AdvancedRandomSpread",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 107,
+      "structureSteps": {
+        "surface_structures": 84,
+        "vegetal_decoration": 7,
+        "underground_structures": 12,
+        "strongholds": 2,
+        "top_layer_modification": 2
+      },
+      "placementTypes": {
+        "repurposed_structures:advanced_random_spread": 37
+      },
+      "templateCount": 3162,
+      "templateBytes": 7346945,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "structory",
+      "name": "Structory",
+      "version": "1.3.17",
+      "jarName": "Structory_26.2_v1.3.7.jar",
+      "sha1": "8a9a1a1b3f74398310420b6fbe2c26ef142bed42",
+      "sha256": "e9079b2bb9bc2efb9b0f1244376488e41f8b50f25415094d8f03dc753cdfb131",
+      "url": "https://cdn.modrinth.com/data/aKCwCJlY/versions/TUbwu7eG/Structory_26.2_v1.3.7.jar",
+      "projectId": "aKCwCJlY",
+      "bytes": 1261346,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 15,
+      "structureSteps": {
+        "raw_generation": 11,
+        "surface_structures": 4
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 5
+      },
+      "templateCount": 238,
+      "templateBytes": 2041688,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "structory_towers",
+      "name": "Structory: Towers",
+      "version": "1.0.16",
+      "jarName": "Structory_Towers_26.1_v1.0.16.jar",
+      "sha1": "ed22fe659cb3020f2e86b7619ce721714b9546be",
+      "sha256": "a9c1715219642c87d105bd944a0316c9a22cd3caf83836e21bcaaee3fd4f04e2",
+      "url": "https://cdn.modrinth.com/data/j3FONRYr/versions/ioKwCTuD/Structory_Towers_26.1_v1.0.16.jar",
+      "projectId": "j3FONRYr",
+      "bytes": 491545,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 21,
+      "structureSteps": {
+        "surface_structures": 21
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 5
+      },
+      "templateCount": 31,
+      "templateBytes": 277663,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "t_and_t",
+      "name": "Towns and Towers",
+      "version": "1.13.11",
+      "jarName": "t_and_t-fabric-neoforge-1.13.11.jar",
+      "sha1": "8f00e36a11568c0b66bbdf5c0e9ee492e511b303",
+      "sha256": "270fc0d1c99e54bc15f43d64bdaac60a90cb896efc357af624988e677136440f",
+      "url": "https://cdn.modrinth.com/data/DjLobEOy/versions/DZxwgj6V/t_and_t-fabric-neoforge-1.13.11.jar",
+      "projectId": "DjLobEOy",
+      "bytes": 3553006,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 60,
+      "structureSteps": {
+        "fluid_springs": 57,
+        "underground_decoration": 3
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 3
+      },
+      "templateCount": 837,
+      "templateBytes": 4355422,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "the_bumblezone",
+      "name": "The Bumblezone",
+      "version": "7.16.1+1.21.1-neoforge",
+      "jarName": "the_bumblezone-7.16.1+1.21.1-neoforge.jar",
+      "sha1": "b374036e9f4e0f2d824a6b3b33ccf9eac54ced52",
+      "sha256": "6ee54e212726212b8a9f5dce6536e5b36ce8408c05a048f7eeb7ec00bab939be",
+      "url": "https://cdn.modrinth.com/data/38tpSycf/versions/o2Cj5ooR/the_bumblezone-7.16.1%2B1.21.1-neoforge.jar",
+      "projectId": "38tpSycf",
+      "bytes": 69691277,
+      "dimensions": [
+        {
+          "id": "the_bumblezone:the_bumblezone",
+          "generatorType": "the_bumblezone:chunk_generator",
+          "biomeSourceType": "the_bumblezone:biome_source"
+        }
+      ],
+      "generatorClasses": [
+        {
+          "name": "com/telepathicgrunt/the_bumblezone/worldgen/dimension/BzChunkGenerator",
+          "super": "net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator"
+        }
+      ],
+      "biomeSourceClasses": [
+        {
+          "name": "com/telepathicgrunt/the_bumblezone/worldgen/dimension/BzBiomeSource",
+          "super": "net/minecraft/world/level/biome/BiomeSource"
+        }
+      ],
+      "placementClasses": [
+        {
+          "name": "com/telepathicgrunt/the_bumblezone/modinit/BzStructurePlacementType",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/telepathicgrunt/the_bumblezone/worldgen/structures/placements/AdvancedRandomSpread",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 33,
+      "structureSteps": {
+        "surface_structures": 31,
+        "local_modifications": 1,
+        "underground_structures": 1
+      },
+      "placementTypes": {
+        "the_bumblezone:advanced_random_spread": 10
+      },
+      "templateCount": 850,
+      "templateBytes": 9339001,
+      "oversizeTemplates": [
+        {
+          "id": "the_bumblezone:sempiternal_sanctum/blue/sanctum_body",
+          "resource": "data/the_bumblezone/structure/sempiternal_sanctum/blue/sanctum_body.nbt",
+          "bytes": 605879
+        },
+        {
+          "id": "the_bumblezone:sempiternal_sanctum/green/sanctum_body",
+          "resource": "data/the_bumblezone/structure/sempiternal_sanctum/green/sanctum_body.nbt",
+          "bytes": 605879
+        },
+        {
+          "id": "the_bumblezone:sempiternal_sanctum/purple/sanctum_body",
+          "resource": "data/the_bumblezone/structure/sempiternal_sanctum/purple/sanctum_body.nbt",
+          "bytes": 605875
+        },
+        {
+          "id": "the_bumblezone:sempiternal_sanctum/red/sanctum_body",
+          "resource": "data/the_bumblezone/structure/sempiternal_sanctum/red/sanctum_body.nbt",
+          "bytes": 605869
+        },
+        {
+          "id": "the_bumblezone:sempiternal_sanctum/white/sanctum_body",
+          "resource": "data/the_bumblezone/structure/sempiternal_sanctum/white/sanctum_body.nbt",
+          "bytes": 605890
+        },
+        {
+          "id": "the_bumblezone:sempiternal_sanctum/yellow/sanctum_body",
+          "resource": "data/the_bumblezone/structure/sempiternal_sanctum/yellow/sanctum_body.nbt",
+          "bytes": 605881
+        }
+      ],
+      "jsonInspectionWarnings": [
+        {
+          "resource": "data/the_bumblezone/worldgen/placed_feature/structure_spawned/item_frame_with_random_music_disc.json",
+          "message": "Expecting property name enclosed in double quotes: line 2 column 3 (char 5)"
+        }
+      ]
+    },
+    {
+      "modId": "undergarden",
+      "name": "The Undergarden",
+      "version": "0.9.6",
+      "jarName": "The_Undergarden-1.21.1-0.9.6.jar",
+      "sha1": "75f1753eefa0b7b8e3afd7377deaf9fe71392476",
+      "sha256": "49e3db6ce2cf6864e9d45f0633de95bc3ef72cbd5ebffee493fca7198d30ccb0",
+      "url": "https://cdn.modrinth.com/data/Ejfl5qDL/versions/sY4KZ9q3/The_Undergarden-1.21.1-0.9.6.jar",
+      "projectId": "Ejfl5qDL",
+      "bytes": 45294936,
+      "dimensions": [
+        {
+          "id": "undergarden:undergarden",
+          "generatorType": "undergarden:noise",
+          "biomeSourceType": "minecraft:multi_noise"
+        }
+      ],
+      "generatorClasses": [
+        {
+          "name": "quek/undergarden/world/gen/UGNoiseBasedChunkGenerator",
+          "super": "net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 4,
+      "structureSteps": {
+        "surface_structures": 4
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 4
+      },
+      "templateCount": 142,
+      "templateBytes": 302371,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "tombstone",
+      "name": "Corail Tombstone",
+      "version": "9.5.6",
+      "jarName": "tombstone-neoforge-1.21.1-9.5.6.jar",
+      "sha1": "d830d16caa20b0d23a44ed6b1d339bc22afc2460",
+      "sha256": "520e2a3cb5fb8001da20a23aaf39a7fd8fd937af962c2b43c55460099e30b23b",
+      "url": "https://cdn.modrinth.com/data/YT5K34AB/versions/e68NhQJm/tombstone-neoforge-1.21.1-9.5.6.jar",
+      "projectId": "YT5K34AB",
+      "bytes": 2520705,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 2,
+      "structureSteps": {
+        "surface_structures": 2
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 10,
+      "templateBytes": 4242,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "twilightforest",
+      "name": "The Twilight Forest",
+      "version": "4.8.3345",
+      "jarName": "twilightforest-1.21.1-4.8.3345-universal.jar",
+      "sha1": "9cfd4154928433e2f1f6cfc3deb48c284debb580",
+      "sha256": "493da16d10210f9f53a3c33b3d8fcb4ae9b14016ee420d753c894562bd9aba35",
+      "url": "https://mediafilez.forgecdn.net/files/7797/302/twilightforest-1.21.1-4.8.3345-universal.jar",
+      "projectId": "curseforge:227639",
+      "bytes": 27154121,
+      "dimensions": [
+        {
+          "id": "twilightforest:twilight_forest",
+          "generatorType": "minecraft:noise",
+          "biomeSourceType": "twilightforest:twilight_biomes"
+        }
+      ],
+      "generatorClasses": [],
+      "biomeSourceClasses": [
+        {
+          "name": "twilightforest/world/components/biomesources/TFBiomeProvider",
+          "super": "net/minecraft/world/level/biome/BiomeSource"
+        }
+      ],
+      "placementClasses": [
+        {
+          "name": "twilightforest/init/TFStructurePlacementTypes",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "twilightforest/world/components/structures/placements/AvoidLandmarkGridPlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        },
+        {
+          "name": "twilightforest/world/components/structures/placements/LandmarkGridPlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/StructurePlacement"
+        }
+      ],
+      "structureCount": 21,
+      "structureSteps": {
+        "surface_structures": 17,
+        "underground_structures": 3,
+        "top_layer_modification": 1
+      },
+      "placementTypes": {
+        "twilightforest:landmark_grid": 16,
+        "twilightforest:avoid_landmark_grid": 3
+      },
+      "templateCount": 274,
+      "templateBytes": 580893,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "underground_villages",
+      "name": "Underground Villages Mod",
+      "version": "4.0.3",
+      "jarName": "UndergroundVillages-neoforge-1.21.1-4.0.3.jar",
+      "sha1": "7eb055cfadf940882aac57dcc4a7162774a53a95",
+      "sha256": "ac0ab60eca797feec5e66e444098a404c1cb1a3e7727c5b5c2ef65d5dd9685e8",
+      "url": "https://mediafilez.forgecdn.net/files/6722/723/UndergroundVillages-neoforge-1.21.1-4.0.3.jar",
+      "projectId": "curseforge:606989",
+      "bytes": 282058,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 1,
+      "structureSteps": {
+        "underground_decoration": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 128,
+      "templateBytes": 222607,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "villagesandpillages",
+      "name": "Villages & Pillages",
+      "version": "1.0.3",
+      "jarName": "villagesandpillages-neoforge-mc1.21.1-1.0.3.jar",
+      "sha1": "f587626ba0b421f976f4bd1141bcdc3ca9d21abb",
+      "sha256": "c87f37893eaa173dea7d80193da547dd3c282a0c6471265206bc2e669fdad2f6",
+      "url": "https://cdn.modrinth.com/data/klXONLDA/versions/3BGfKjMb/villagesandpillages-neoforge-mc1.21.1-1.0.3.jar",
+      "projectId": "klXONLDA",
+      "bytes": 241257,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 1,
+      "structureSteps": {
+        "surface_structures": 1
+      },
+      "placementTypes": {
+        "yungsapi:enhanced_random_spread": 1
+      },
+      "templateCount": 28,
+      "templateBytes": 74655,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "waystones",
+      "name": "Waystones",
+      "version": "21.1.45",
+      "jarName": "waystones-neoforge-1.21.1-21.1.45.jar",
+      "sha1": "6ec1a176a102212db4f6391886db52ed103c830f",
+      "sha256": "02c78df4a5e774cdc741d2fec8a19dac5c918ca8bd18da47444a4270322ee937",
+      "url": "https://cdn.modrinth.com/data/LOpKHB2A/versions/Is55014l/waystones-neoforge-1.21.1-21.1.45.jar",
+      "projectId": "LOpKHB2A",
+      "bytes": 1219809,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 3,
+      "templateBytes": 2933,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "yungsapi",
+      "name": "YUNG's API",
+      "version": "1.21.1-NeoForge-5.1.9",
+      "jarName": "YungsApi-1.21.1-NeoForge-5.1.9.jar",
+      "sha1": "2c4b740c8ad27bbcb2a21b85b64f011b809aed91",
+      "sha256": "375e0b2f988ab4f5bde182166c0f0b102377adc8f823660c24ade08b0b3cde56",
+      "url": "https://cdn.modrinth.com/data/Ua7DFN59/versions/2prKITKh/YungsApi-1.21.1-NeoForge-5.1.9.jar",
+      "projectId": "Ua7DFN59",
+      "bytes": 413763,
+      "dimensions": [],
+      "generatorClasses": [
+        {
+          "name": "com/yungnickyoung/minecraft/yungsapi/mixin/locate/ChunkGeneratorMixin",
+          "super": "java/lang/Object"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/yungnickyoung/minecraft/yungsapi/module/StructurePlacementTypeModuleNeoForge",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/yungnickyoung/minecraft/yungsapi/module/StructurePlacementTypeModule",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/yungnickyoung/minecraft/yungsapi/world/structure/placement/EnhancedRandomSpread",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "betterdeserttemples",
+      "name": "YUNG's Better Desert Temples",
+      "version": "1.21.1-NeoForge-4.1.5",
+      "jarName": "YungsBetterDesertTemples-1.21.1-NeoForge-4.1.5.jar",
+      "sha1": "90529257dbd92558998c65178294bc7b2fd16a64",
+      "sha256": "2c3191ad447092cc7873a06e92f16bd3e2ff9dc31e93268b8893d06dd89e1fd6",
+      "url": "https://cdn.modrinth.com/data/XNlO7sBv/versions/GQ9iNWkI/YungsBetterDesertTemples-1.21.1-NeoForge-4.1.5.jar",
+      "projectId": "XNlO7sBv",
+      "bytes": 905839,
+      "dimensions": [],
+      "generatorClasses": [
+        {
+          "name": "com/yungnickyoung/minecraft/betterdeserttemples/mixin/accessor/ChunkGeneratorStructureStateAccessor",
+          "super": "java/lang/Object"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/yungnickyoung/minecraft/betterdeserttemples/module/StructurePlacementTypeModule",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/yungnickyoung/minecraft/betterdeserttemples/world/placement/BetterDesertTemplePlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 1,
+      "structureSteps": {
+        "surface_structures": 1
+      },
+      "placementTypes": {
+        "betterdeserttemples:desert_temple": 1
+      },
+      "templateCount": 198,
+      "templateBytes": 1149542,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "betterdungeons",
+      "name": "YUNG's Better Dungeons",
+      "version": "1.21.1-NeoForge-5.1.4",
+      "jarName": "YungsBetterDungeons-1.21.1-NeoForge-5.1.4.jar",
+      "sha1": "73a660c13063450e555e5e2c015ae24d606b32b4",
+      "sha256": "61816c3b7c9d92c6b44f93dce87ceb0a22827f20285d5d9c4d10d519d734de04",
+      "url": "https://cdn.modrinth.com/data/o1C1Dkj5/versions/D6aZn0Em/YungsBetterDungeons-1.21.1-NeoForge-5.1.4.jar",
+      "projectId": "o1C1Dkj5",
+      "bytes": 782160,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 5,
+      "structureSteps": {
+        "underground_structures": 5
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 5
+      },
+      "templateCount": 227,
+      "templateBytes": 241305,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "betterendisland",
+      "name": "YUNG's Better End Island",
+      "version": "1.21.1-NeoForge-3.1.2",
+      "jarName": "YungsBetterEndIsland-1.21.1-NeoForge-3.1.2.jar",
+      "sha1": "832f2c17425debe74a9f267f4136f1a0f0221d19",
+      "sha256": "8005f1ea798d09fc05dad07a21ed1f393a523a718197cdbd37b1ce6d9a17e4a4",
+      "url": "https://cdn.modrinth.com/data/2BwBOmBQ/versions/I52NZ1qK/YungsBetterEndIsland-1.21.1-NeoForge-3.1.2.jar",
+      "projectId": "2BwBOmBQ",
+      "bytes": 398130,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 41,
+      "templateBytes": 310698,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "betterjungletemples",
+      "name": "YUNG's Better Jungle Temples",
+      "version": "1.21.1-NeoForge-3.1.2",
+      "jarName": "YungsBetterJungleTemples-1.21.1-NeoForge-3.1.2.jar",
+      "sha1": "d6b7ce6cf351b09cbd23147ff166c35cfdc572e8",
+      "sha256": "a0d57b78c7a1891796f342b1f09c214bc27bedf0a3a894f029dfdb2db9f813d0",
+      "url": "https://cdn.modrinth.com/data/z9Ve58Ih/versions/P00i2hJn/YungsBetterJungleTemples-1.21.1-NeoForge-3.1.2.jar",
+      "projectId": "z9Ve58Ih",
+      "bytes": 795839,
+      "dimensions": [],
+      "generatorClasses": [
+        {
+          "name": "com/yungnickyoung/minecraft/betterjungletemples/mixin/accessor/ChunkGeneratorStructureStateAccessor",
+          "super": "java/lang/Object"
+        }
+      ],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/yungnickyoung/minecraft/betterjungletemples/module/StructurePlacementTypeModule",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/yungnickyoung/minecraft/betterjungletemples/world/placement/BetterJungleTemplePlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 1,
+      "structureSteps": {
+        "surface_structures": 1
+      },
+      "placementTypes": {
+        "betterjungletemples:jungle_temple": 1
+      },
+      "templateCount": 127,
+      "templateBytes": 1287914,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": [
+        {
+          "resource": "data/betterjungletemples/worldgen/template_pool/floor_1_room.json",
+          "message": "Expecting value: line 5 column 5 (char 105)"
+        },
+        {
+          "resource": "data/betterjungletemples/worldgen/template_pool/floor_2_pit.json",
+          "message": "Expecting value: line 27 column 5 (char 792)"
+        },
+        {
+          "resource": "data/betterjungletemples/worldgen/template_pool/floor_2_room.json",
+          "message": "Expecting value: line 5 column 5 (char 105)"
+        }
+      ]
+    },
+    {
+      "modId": "bettermineshafts",
+      "name": "YUNG's Better Mineshafts",
+      "version": "1.21.1-NeoForge-5.1.1",
+      "jarName": "YungsBetterMineshafts-1.21.1-NeoForge-5.1.1.jar",
+      "sha1": "6a14e1d8201f068ca87ef8333e471c5378955906",
+      "sha256": "5625930dfb3240820d6e4ecf55fff0c39f70ce782fad117a4d418251184c7be0",
+      "url": "https://cdn.modrinth.com/data/HjmxVlSr/versions/Go3nbneL/YungsBetterMineshafts-1.21.1-NeoForge-5.1.1.jar",
+      "projectId": "HjmxVlSr",
+      "bytes": 493967,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 13,
+      "structureSteps": {
+        "underground_structures": 13
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 0,
+      "templateBytes": 0,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "betterfortresses",
+      "name": "YUNG's Better Nether Fortresses",
+      "version": "1.21.1-NeoForge-3.1.5",
+      "jarName": "YungsBetterNetherFortresses-1.21.1-NeoForge-3.1.5.jar",
+      "sha1": "4061ece2141475227646649046fc14c2da505922",
+      "sha256": "5450a64a7036237f449496837e08f3e5b3aa1d7974a10df43944172def75d8ff",
+      "url": "https://cdn.modrinth.com/data/Z2mXHnxP/versions/iopJiJQp/YungsBetterNetherFortresses-1.21.1-NeoForge-3.1.5.jar",
+      "projectId": "Z2mXHnxP",
+      "bytes": 609639,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 1,
+      "structureSteps": {
+        "surface_structures": 1
+      },
+      "placementTypes": {
+        "yungsapi:enhanced_random_spread": 1
+      },
+      "templateCount": 169,
+      "templateBytes": 543933,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": [
+        {
+          "resource": "data/betterfortresses/worldgen/template_pool/bridge.json",
+          "message": "Expecting value: line 57 column 5 (char 1617)"
+        },
+        {
+          "resource": "data/betterfortresses/worldgen/template_pool/halls.json",
+          "message": "Expecting value: line 241 column 5 (char 6981)"
+        },
+        {
+          "resource": "data/betterfortresses/worldgen/template_pool/halls_terminators.json",
+          "message": "Expecting value: line 56 column 5 (char 1607)"
+        }
+      ]
+    },
+    {
+      "modId": "betteroceanmonuments",
+      "name": "YUNG's Better Ocean Monuments",
+      "version": "1.21.1-NeoForge-4.1.2",
+      "jarName": "YungsBetterOceanMonuments-1.21.1-NeoForge-4.1.2.jar",
+      "sha1": "fba629defdb92ad99ec4f411895afb6e19555a18",
+      "sha256": "cdcf8fe0e08c75261048d43c6ed4898972d23e096dd04a2524c136f06416ab02",
+      "url": "https://cdn.modrinth.com/data/3dT9sgt4/versions/yFjEcj2g/YungsBetterOceanMonuments-1.21.1-NeoForge-4.1.2.jar",
+      "projectId": "3dT9sgt4",
+      "bytes": 1025571,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 1,
+      "structureSteps": {
+        "surface_structures": 1
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 1
+      },
+      "templateCount": 59,
+      "templateBytes": 3324824,
+      "oversizeTemplates": [
+        {
+          "id": "betteroceanmonuments:start",
+          "resource": "data/betteroceanmonuments/structure/start.nbt",
+          "bytes": 1749146
+        }
+      ],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "betterstrongholds",
+      "name": "YUNG's Better Strongholds",
+      "version": "1.21.1-NeoForge-5.1.3",
+      "jarName": "YungsBetterStrongholds-1.21.1-NeoForge-5.1.3.jar",
+      "sha1": "5d06a5850af7c577612d4592706a8e156bbe1cbf",
+      "sha256": "a9cab2fc01538368862365691f7d215309801aed0b390351681b6b60a1db7b58",
+      "url": "https://cdn.modrinth.com/data/kidLKymU/versions/8U0dIfSM/YungsBetterStrongholds-1.21.1-NeoForge-5.1.3.jar",
+      "projectId": "kidLKymU",
+      "bytes": 461244,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [
+        {
+          "name": "com/yungnickyoung/minecraft/betterstrongholds/module/StructurePlacementTypeModule",
+          "super": "java/lang/Object"
+        },
+        {
+          "name": "com/yungnickyoung/minecraft/betterstrongholds/world/placement/BetterStrongholdsPlacement",
+          "super": "net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement"
+        }
+      ],
+      "structureCount": 1,
+      "structureSteps": {
+        "strongholds": 1
+      },
+      "placementTypes": {
+        "betterstrongholds:stronghold": 1
+      },
+      "templateCount": 97,
+      "templateBytes": 340689,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "betterwitchhuts",
+      "name": "YUNG's Better Witch Huts",
+      "version": "1.21.1-NeoForge-4.1.1",
+      "jarName": "YungsBetterWitchHuts-1.21.1-NeoForge-4.1.1.jar",
+      "sha1": "bbf6c91f4a2829c58bc024eaaab821986bc93de6",
+      "sha256": "888b1e6d1ada21982a75abfb4afb040c9bc2cc68777ec5fcd1199b978e3d4f8d",
+      "url": "https://cdn.modrinth.com/data/t5FRdP87/versions/AvedwcIe/YungsBetterWitchHuts-1.21.1-NeoForge-4.1.1.jar",
+      "projectId": "t5FRdP87",
+      "bytes": 174789,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 2,
+      "structureSteps": {
+        "surface_structures": 2
+      },
+      "placementTypes": {
+        "minecraft:random_spread": 2
+      },
+      "templateCount": 6,
+      "templateBytes": 10296,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    },
+    {
+      "modId": "yungsextras",
+      "name": "YUNG's Extras",
+      "version": "1.21.1-NeoForge-5.1.1",
+      "jarName": "YungsExtras-1.21.1-NeoForge-5.1.1.jar",
+      "sha1": "62833733aaf407f36bdacf648ed4b2ef9940662b",
+      "sha256": "0cd26474e514f5dc3114aaf5ec7e049bcd285f0c5db191bb45223193f35df70d",
+      "url": "https://cdn.modrinth.com/data/ZYgyPyfq/versions/N2EpMhR7/YungsExtras-1.21.1-NeoForge-5.1.1.jar",
+      "projectId": "ZYgyPyfq",
+      "bytes": 198183,
+      "dimensions": [],
+      "generatorClasses": [],
+      "biomeSourceClasses": [],
+      "placementClasses": [],
+      "structureCount": 0,
+      "structureSteps": {},
+      "placementTypes": {},
+      "templateCount": 62,
+      "templateBytes": 29710,
+      "oversizeTemplates": [],
+      "jsonInspectionWarnings": []
+    }
+  ]
+}

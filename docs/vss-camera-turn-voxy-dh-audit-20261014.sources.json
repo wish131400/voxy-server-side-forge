@@ -1,0 +1,254 @@
+{
+  "date": "2026-10-14",
+  "scope": "Source review only; no performance recording, production edits, build or client replacement. Working-tree hashes do not prove per-method equivalence to the installed JAR.",
+  "vss": [
+    {
+      "root": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1",
+      "head": "1c9fd92c25db18605ba62d3ecbaf703248953f73",
+      "files": [
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionFramePlan.java",
+          "sha256": "b7a3969a19bb48438672f5d7921f4c15c535796584ed8b6e93e1aa46df0c26cd",
+          "line_count": 59
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java",
+          "sha256": "a80045d9ddb13205a2a1b6b223a3a6f25d65b149a57ac2d49a70542e4eb4c90f",
+          "line_count": 2305
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionSpatialIndex.java",
+          "sha256": "61a0f5055421d9c7d94bd4ec77bc13def60767e9e43e9b71aea055756f74ece3",
+          "line_count": 165
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionSeamIndex.java",
+          "sha256": "bd3ce1f61daffb24d33dc83e44bdd44f48f18df0738eed62eb36290dabd00315",
+          "line_count": 71
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionVisiblePlan.java",
+          "sha256": "3de9a5cba56de3db63daea2b9e24845106ac0407f98b070c2261a6c3538562e1",
+          "line_count": 232
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionOpaqueBatches.java",
+          "sha256": "6f1b7a3bc271e03db6b1cf94f7b7d81bd73488190c69fb4cfab5c9b537812848",
+          "line_count": 120
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java",
+          "sha256": "26d74751048787fb34f3976bf35907d2c665978c800669e9dce546fa2dab9f61",
+          "line_count": 877
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionOcclusionCuller.java",
+          "sha256": "957ecf5aac4110226b9ffcdf76021f3f8c8baeb2efc343e659e6131aa4745371",
+          "line_count": 346
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionOcclusionPolicy.java",
+          "sha256": "eb3e7838b0f38fef65f59d2f62b32ce07c3ce120cd12e16a30bc6627ee648eed",
+          "line_count": 67
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java",
+          "sha256": "397c7c063869b25360501a3a70b1b1d8f4f328221927e0b852828955c0d8b81c",
+          "line_count": 3650
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionWorkView.java",
+          "sha256": "5d10f61adaa9d8f834a2272feb88f47674dea6c4d53b904bd42d6b8d843ad948",
+          "line_count": 138
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/ClientPredictionState.java",
+          "sha256": "1fcdfc2cf4d0e2a96e783766453ba6094dd2ffd80d82d576f8c1eb825f67fe13",
+          "line_count": 883
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayLod.java",
+          "sha256": "8dd754e1c94db95dec4808a59e6916295157032d6a99dd910d2d80853934c8e4",
+          "line_count": 40
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/src/main/java/dev/xantha/vss/client/prediction/PredictionGpuEncoding.java",
+          "sha256": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e",
+          "line_count": 248
+        }
+      ]
+    },
+    {
+      "root": "C:/Users/Administrator/Desktop/voxyserverside",
+      "head": "8c6e8f6d74f6b84f27cbe0225060fb94c39345c7",
+      "files": [
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionFramePlan.java",
+          "sha256": "94d0629fe2d1bad1e38623ef99afa400715d7f27aa732010a90eea6868d7fddb",
+          "line_count": 60
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionRenderer.java",
+          "sha256": "96c77263b05d5c8430d127636a6ebb3369ddb34d9f9b4eff9447ea09145cc5af",
+          "line_count": 2301
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionSpatialIndex.java",
+          "sha256": "0a5e0ac684682b489a9024eef08f20efe5785907e7e9676bee2d920baacad6d6",
+          "line_count": 165
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionSeamIndex.java",
+          "sha256": "bd3ce1f61daffb24d33dc83e44bdd44f48f18df0738eed62eb36290dabd00315",
+          "line_count": 71
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionVisiblePlan.java",
+          "sha256": "e92958dd3799ff1fe758cbaacb48f73a38a8965799598baa4f7d48338b57f5e1",
+          "line_count": 232
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionOpaqueBatches.java",
+          "sha256": "6f1b7a3bc271e03db6b1cf94f7b7d81bd73488190c69fb4cfab5c9b537812848",
+          "line_count": 120
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionIndirectBatch.java",
+          "sha256": "3546f92cc825bb451afee62eae484c61c513f113ec1047cf5c8f5e5a7f0012a3",
+          "line_count": 877
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionOcclusionCuller.java",
+          "sha256": "957ecf5aac4110226b9ffcdf76021f3f8c8baeb2efc343e659e6131aa4745371",
+          "line_count": 346
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionOcclusionPolicy.java",
+          "sha256": "eb3e7838b0f38fef65f59d2f62b32ce07c3ce120cd12e16a30bc6627ee648eed",
+          "line_count": 67
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java",
+          "sha256": "2e45ffd41a28e8ce2cebd2767089dd5edd28369c17746e6832fd2ef837cbd914",
+          "line_count": 3648
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionWorkView.java",
+          "sha256": "d9e9d92aac8fdb223139c63bd2637cf6a8443ce5f5dc2e392cf13101a1981185",
+          "line_count": 138
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/ClientPredictionState.java",
+          "sha256": "ab6490c2e378a2cd3fc950cc03920cef9c68c0f1212179a66abf13b6d5d5c484",
+          "line_count": 883
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionDisplayLod.java",
+          "sha256": "8dd754e1c94db95dec4808a59e6916295157032d6a99dd910d2d80853934c8e4",
+          "line_count": 40
+        },
+        {
+          "path": "C:/Users/Administrator/Desktop/voxyserverside/src/main/java/dev/xantha/vss/client/prediction/PredictionGpuEncoding.java",
+          "sha256": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e",
+          "line_count": 248
+        }
+      ]
+    }
+  ],
+  "upstream": {
+    "voxy": {
+      "root": "C:/Users/Administrator/Desktop/voxy-263-git2",
+      "head": "b0207f6fcc0a55fa6b33f5c916932e8560a71845",
+      "source_version": "0.2.20-beta",
+      "source_files": [
+        {
+          "path": "src/main/java/me/cortex/voxy/client/core/AbstractRenderPipeline.java",
+          "sha256": "ed5405531b2b63ceb1956d5467f2056ec9aa8423708055ee7168613da5ffe2a7"
+        },
+        {
+          "path": "src/main/java/me/cortex/voxy/client/core/rendering/section/backend/mdic/MDICSectionRenderer.java",
+          "sha256": "53173061aba995427b70cfb1f6d05d99dcb26aacae200b39aa9e6dcf8afc47ff"
+        },
+        {
+          "path": "src/main/java/me/cortex/voxy/client/core/rendering/section/geometry/BasicAsyncGeometryManager.java",
+          "sha256": "88977b6bec2d1c14a3b2cb0eb3d5a90c15767afbb66000be84972121568d23f2"
+        },
+        {
+          "path": "src/main/resources/assets/voxy/shaders/lod/hierarchical/traversal_dev.comp",
+          "sha256": "a8b4902d324d37766bd1a01a91a147886ca832a8a170471ffa5330602f0fbe79"
+        },
+        {
+          "path": "src/main/resources/assets/voxy/shaders/lod/hierarchical/screenspace.glsl",
+          "sha256": "f0c1c91b64e9277916d1af429532a52323452ca60e6269a4374b24f9e927aeca"
+        }
+      ],
+      "installed": {
+        "path": "F:/NovaEngineering-World整合包/.minecraft/versions/1.21.1-NeoForge_21.1.249/mods/voxy-0.2.15-beta.jar",
+        "version": "0.2.15-beta",
+        "sha256": "802d49edc07c4e4a7af15ffd59337a82af383dfd551b67c278233098737e2f52",
+        "shader_files": [
+          {
+            "path": "assets/voxy/shaders/lod/hierarchical/traversal_dev.comp",
+            "sha256": "272fba6e1e623a395342be1f418200d0e896fdab78776205064c79cebdf3c67c"
+          },
+          {
+            "path": "assets/voxy/shaders/lod/hierarchical/screenspace.glsl",
+            "sha256": "371676aa891a5a4876f5db1a75905da041cfdd3b88a6caaa795f154d793c8a54"
+          },
+          {
+            "path": "assets/voxy/shaders/lod/gl46/buildtranslucents.comp",
+            "sha256": "c086df86cdba4c6209c0785dba14670cfba146e63fe641d080ad786a5405904c"
+          }
+        ],
+        "javap_verified": [
+          "MDICSectionRenderer.buildDrawCalls: glDispatchComputeIndirect",
+          "MDICSectionRenderer.renderTerrain: glMultiDrawElementsIndirectCountARB",
+          "BasicAsyncGeometryManager.GEOMETRY_ELEMENT_SIZE = 8",
+          "AbstractRenderPipeline.innerPrimaryWork: HiZBuffer.buildMipChain and CPU node manager tick"
+        ]
+      }
+    },
+    "dh": {
+      "root": "C:/Users/Administrator/.codex/tmp/vss-dh-merge-review-20261012/upstream-dh-core",
+      "head": "285de488b10995951529a31ca1df2c92628e5397",
+      "files": [
+        {
+          "path": "core/src/main/java/com/seibel/distanthorizons/core/render/RenderBufferHandler.java",
+          "sha256": "29ecd9aed2f89f3d8b6e4c4e02cc3a51e1276be017aa61ba89bc9e4ca84a90bc"
+        },
+        {
+          "path": "core/src/main/java/com/seibel/distanthorizons/core/world/DhClientWorld.java",
+          "sha256": "45659342cf4cf88b13f8045b9080d3ba2fb6b33f1b422cdac4b02890c4eed944"
+        },
+        {
+          "path": "core/src/main/java/com/seibel/distanthorizons/core/world/IDhClientWorld.java",
+          "sha256": "89c58c0634320205064ad9257a16d2fb707c6a64be2e450a0ba9175f62ad1e99"
+        },
+        {
+          "path": "core/src/main/java/com/seibel/distanthorizons/core/level/ClientLevelModule.java",
+          "sha256": "3b9d8da5088522078eedd7dfb234680e8d0e0a618e19b6014fb251db1f4ffb64"
+        },
+        {
+          "path": "core/src/main/java/com/seibel/distanthorizons/core/render/QuadTree/LodQuadTree.java",
+          "sha256": "3e5be5f66eb7094a8dc91cefa62d1fdd60ed71f635fbc5117343049816b5aa62"
+        },
+        {
+          "path": "core/src/main/java/com/seibel/distanthorizons/core/render/QuadTree/LodRenderSection.java",
+          "sha256": "83d87dcffbdfcb0e54a98cc045b45c6b4149c94b2883f95b8d4704488a20e8c4"
+        },
+        {
+          "path": "core/src/main/java/com/seibel/distanthorizons/core/dataObjects/transformers/FullDataToRenderDataTransformer.java",
+          "sha256": "024594d3701a985c718422876df9c978d72e32b4ec66b6710f756d4077a8b69f"
+        }
+      ],
+      "running_comparison": false
+    }
+  },
+  "installed_vss": {
+    "path": "F:/NovaEngineering-World整合包/.minecraft/versions/1.21.1-NeoForge_21.1.249/mods/vss-0.3.5-neoforge-1.21.1.jar",
+    "sha256": "35bc9f8f5b646707d4d4f95bdb1ce3a44cb1e436d9f2c900e5bc50011b42e2ff",
+    "compared_artifact": "C:/Users/Administrator/Desktop/voxyserverside-neoforge-1.21.1/lib/near-detail-20261013/vss-0.3.5-neoforge-1.21.1.jar",
+    "artifact_sha256": "35bc9f8f5b646707d4d4f95bdb1ce3a44cb1e436d9f2c900e5bc50011b42e2ff"
+  },
+  "report_sha256": "3907df4622136ed460379230fd430b19b730c89cf0e23337d72a1b4b55984614"
+}

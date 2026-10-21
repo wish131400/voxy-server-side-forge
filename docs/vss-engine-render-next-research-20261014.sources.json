@@ -1,0 +1,615 @@
+{
+  "date": "2026-10-14",
+  "scope": "Official-documentation and current-source research; no new performance benchmark or production changes.",
+  "collected_at_utc": "2026-10-14T12:53:00.223232+00:00",
+  "report_sha256": "a94e0175f4813d26618f61d41d5be4852ad99589143a010399c51072276ee202",
+  "sources": [
+    {
+      "id": "unity-resident",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/urp/gpu-resident-drawer.html",
+      "http_status": 200,
+      "title": "Unity - Manual: Enable the GPU Resident Drawer in URP",
+      "text_chars": 3692,
+      "captured_at_utc": "2026-10-14T12:40:56.477621+00:00",
+      "html_sha256": "8d9b48c0ffc77578d1c5f1ac3d2ae7b624920abbe400cb046b2d04210f90e5e6",
+      "text_sha256": "f23020412fdb58e17a1f1c8397e7eaf42a19e6c8007f35708cc72b5fabff0541",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-resident.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-resident.html"
+    },
+    {
+      "id": "unity-dots",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/dots-instancing-shaders.html",
+      "http_status": 200,
+      "title": "Unity - Manual: DOTS Instancing shaders in URP",
+      "text_chars": 3573,
+      "captured_at_utc": "2026-10-14T12:40:57.424119+00:00",
+      "html_sha256": "f92e0d1715ffa89ee1e15456891fc873f5fbb94dd5509dd3677b0cb2a6dc4336",
+      "text_sha256": "71d807ab18aa968e89f9acf2d34d902e4ddf7b4bd6c873fbae84cba79a773992",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-dots.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-dots.html"
+    },
+    {
+      "id": "unity-brg-how",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/batch-renderer-group-how.html",
+      "http_status": 200,
+      "title": "Unity - Manual: Introduction to the BatchRendererGroup API in URP",
+      "text_chars": 4193,
+      "captured_at_utc": "2026-10-14T12:44:57.321182+00:00",
+      "html_sha256": "99b01f8739dc33c0136761f9babac216a0e50a92433fe1ad12cf23b3b7442e0a",
+      "text_sha256": "ca5b1bc4e4fd6b492d1b5924e52c8ded35c201e009297f5fee011ee5edb482d3",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-brg-how.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-brg-how.html"
+    },
+    {
+      "id": "shader-conditionals",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/shader-conditionals.html",
+      "http_status": 200,
+      "title": "Unity - Manual: How Unity compiles branching shaders",
+      "text_chars": 3592,
+      "captured_at_utc": "2026-10-14T12:47:59.810328+00:00",
+      "html_sha256": "96ca6e025a3e12a357643dce30c266832cb3ccfcaf0737784bbb373dcb08d2bb",
+      "text_sha256": "976325023bd7c63053e5efb4e4a5526afd740f966b29920784cc111c6a78dc42",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\shader-conditionals.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\shader-conditionals.html"
+    },
+    {
+      "id": "unity-mip-api",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/ScriptReference/TextureImporterSettings-mipMapsPreserveCoverage.html",
+      "http_status": 200,
+      "title": "Unity - Scripting API: TextureImporterSettings.mipMapsPreserveCoverage",
+      "text_chars": 1663,
+      "captured_at_utc": "2026-10-14T12:44:57.113681+00:00",
+      "html_sha256": "45ae62bbdf040fd15e77323412289b6a96bd59fe6a3c2b584f09a02799849ff5",
+      "text_sha256": "f99fd71a7c3aeb94975a65a7a2c2f0079f4c09893d1589e124629b36f77a3555",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-mip-api.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-mip-api.html"
+    },
+    {
+      "id": "unity-occlusion",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/urp/gpu-culling.html",
+      "http_status": 200,
+      "title": "Unity - Manual: Enable GPU occlusion culling in URP",
+      "text_chars": 3586,
+      "captured_at_utc": "2026-10-14T12:40:55.436120+00:00",
+      "html_sha256": "400311df502499e577dc602e4f9a17d876c12250c41d62e6a85926c1f964a8d0",
+      "text_sha256": "999ac08ded4cf8b73d6b3829a7f1c6e6dbae52a6ddcfff7e4088b798a9d9d186",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-occlusion.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-occlusion.html"
+    },
+    {
+      "id": "unity-rendergraph",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/Manual/urp/render-graph-introduction.html",
+      "http_status": 200,
+      "title": "Unity - Manual: Introduction to the render graph system in URP",
+      "text_chars": 4269,
+      "captured_at_utc": "2026-10-14T12:44:59.468144+00:00",
+      "html_sha256": "16e2ccc5a1a4bd922e3d6062bae398f0ee521abb1fb7349ecce35a99b7ab6972",
+      "text_sha256": "d900155228a42487a3253a16b6b00986268aa010e142e1d23f460ab625c6a857",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-rendergraph.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\unity-rendergraph.html"
+    },
+    {
+      "id": "ue-mesh",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/mesh-drawing-pipeline-in-unreal-engine",
+      "http_status": 200,
+      "title": "Mesh Drawing Pipeline in Unreal Engine | Unreal Engine 5.8 Documentation | Epic Developer Community",
+      "text_chars": 20283,
+      "captured_at_utc": "2026-10-14T12:40:55.966121+00:00",
+      "html_sha256": "bb8ee16e56ff60b78743e6e2cc9a2ffd81d2960a0e79979039bd2e31156de222",
+      "text_sha256": "445d6165cc75e2bbd139b234546940fa1e26f1d5751f85e05f63847deeaa7927",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-mesh.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-mesh.html"
+    },
+    {
+      "id": "ue-assemblies",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/nanite-assemblies",
+      "http_status": 200,
+      "title": "Nanite Assemblies | Unreal Engine 5.8 Documentation | Epic Developer Community",
+      "text_chars": 8733,
+      "captured_at_utc": "2026-10-14T12:44:56.375102+00:00",
+      "html_sha256": "26e5180a6beb54102e8cc4dcdd5c350b1977f5fca15d809dabd66a1d3ec53d2f",
+      "text_sha256": "37dc4b0983367c7ad8421f4e605359c412d2bbec1434096ff2b72e4efb3708eb",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-assemblies.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-assemblies.html"
+    },
+    {
+      "id": "ue-foliage",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/nanite-foliage",
+      "http_status": 200,
+      "title": "Nanite Foliage | Unreal Engine 5.8 Documentation | Epic Developer Community",
+      "text_chars": 13338,
+      "captured_at_utc": "2026-10-14T12:41:01.896621+00:00",
+      "html_sha256": "893dd6e9015966021805df38c0580337b243eecb8dee1745f8f632b8a221c0e8",
+      "text_sha256": "edab1a5b0c99531b9455a1a89473724fe9655f2777c3d6ef5963f14d23f33fec",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-foliage.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-foliage.html"
+    },
+    {
+      "id": "ue-impostor",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/impostor-baker-plugin-in-unreal-engine",
+      "http_status": 200,
+      "title": "Impostor Baker Plugin in Unreal Engine | Unreal Engine 5.8 Documentation | Epic Developer Community",
+      "text_chars": 23974,
+      "captured_at_utc": "2026-10-14T12:44:58.665772+00:00",
+      "html_sha256": "8c63660bc51f8318fa56f1795921f373388d098244c74bbdf68231aca5ef0269",
+      "text_sha256": "5477bc4fdeedbd087467d841459cc921f560c16abbb83dd7170198978bd38c5e",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-impostor.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-impostor.html"
+    },
+    {
+      "id": "ue-rdg",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/render-dependency-graph-in-unreal-engine",
+      "http_status": 200,
+      "title": "Render Dependency Graph in Unreal Engine | Unreal Engine 5.8 Documentation | Epic Developer Community",
+      "text_chars": 75142,
+      "captured_at_utc": "2026-10-14T12:40:59.333120+00:00",
+      "html_sha256": "eeeb4d34b54cdd6bb9d3f56d4a10ac27e016c5cd30a6ddbe960b70228568fb39",
+      "text_sha256": "53863a00a7e2476e4aa86d6cf88bcc1d99599a0f7e1a25c08c48aeab6fad2dcb",
+      "local_text_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-rdg.txt",
+      "local_html_path": "C:\\Users\\Administrator\\.codex\\tmp\\vss-engine-next-20261014\\ue-rdg.html"
+    }
+  ],
+  "source_evidence": [
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionGpuSelectionInput.java",
+      "sha256": "f9df139c1405f43eb35201ac79bf601105e1752853ed3aed0a4a09341ef0a6ec",
+      "anchors": [
+        {
+          "text": "void update(",
+          "lines": [
+            34
+          ]
+        },
+        {
+          "text": "for (int i = 0; i < recordCount;",
+          "lines": [
+            44
+          ]
+        },
+        {
+          "text": "void clear()",
+          "lines": [
+            179
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionRenderer.java",
+      "sha256": "b2104d53dcf1bc89cdd13762c23398e305475bf3d95594b94c5c481389acffb5",
+      "anchors": [
+        {
+          "text": "private static final class PreparedPass",
+          "lines": [
+            129
+          ]
+        },
+        {
+          "text": "boolean sameGeometry =",
+          "lines": [
+            193
+          ]
+        },
+        {
+          "text": "for (Draw draw : draws)",
+          "lines": [
+            232,
+            342,
+            381,
+            466,
+            1752,
+            1862
+          ]
+        },
+        {
+          "text": "long replayed = batch ?",
+          "lines": [
+            1949
+          ]
+        },
+        {
+          "text": "private static long drawIris",
+          "lines": [
+            2072
+          ]
+        },
+        {
+          "text": "draw.gpu().bindTerrain(program, water)",
+          "lines": [
+            2058,
+            2092
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionIndirectBatch.java",
+      "sha256": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+      "anchors": [
+        {
+          "text": "long replayPass(",
+          "lines": [
+            268
+          ]
+        },
+        {
+          "text": "&& plan.wholeAverage == average",
+          "lines": [
+            272
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionTerrainProgram.java",
+      "sha256": "b27760a673223dbb69d522924da97d32c7f8dac098458cb91ae833e87e76d89e",
+      "anchors": [
+        {
+          "text": "static PredictionTerrainProgram createBatch()",
+          "lines": [
+            145
+          ]
+        },
+        {
+          "text": "static PredictionTerrainProgram createIris(",
+          "lines": [
+            195
+          ]
+        },
+        {
+          "text": "void renderFeature(",
+          "lines": [
+            857
+          ]
+        },
+        {
+          "text": "footprint <= 0.0625",
+          "lines": [
+            1015
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionIrisBridge.java",
+      "sha256": "282cad21d5d7729d913a1ca8596a022585d424bd2c45a661759308a4c98ca4f5",
+      "anchors": [
+        {
+          "text": "try { snapshotDepth(texture, w, h); }",
+          "lines": [
+            203
+          ]
+        },
+        {
+          "text": "GL43.glCopyImageSubData(",
+          "lines": [
+            241
+          ]
+        },
+        {
+          "text": "static final class State",
+          "lines": [
+            263
+          ]
+        },
+        {
+          "text": "for (int target = 0; target < TARGETS.length;",
+          "lines": [
+            294,
+            322
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionMeshBuilder.java",
+      "sha256": "ba7526deef8f78e10713dc716e002012a47dcf1631ffb0ba2b739e94bf7c1f0f",
+      "anchors": [
+        {
+          "text": "private static void addPlacedVegetation(",
+          "lines": [
+            957
+          ]
+        },
+        {
+          "text": "out.triangle(x, bottom, z, nx, plant",
+          "lines": [
+            1012,
+            1014
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionGpuEncoding.java",
+      "sha256": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e",
+      "anchors": [
+        {
+          "text": "final class PredictionGpuEncoding",
+          "lines": [
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\VssLodSpriteTable.java",
+      "sha256": "c6c35cdcde2aa7b79ed47104e829f9562da5db6214aabd81ef1b0710458cc6cb",
+      "anchors": [
+        {
+          "text": "static synchronized int registerModelFace(",
+          "lines": [
+            822
+          ]
+        },
+        {
+          "text": "GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST",
+          "lines": [
+            1008
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "neoforge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside-neoforge-1.21.1\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionRenderTarget.java",
+      "sha256": "231fc33abe68c18b39406f5c2e5bddc236fac5df3a8d3a2b02c1acdd727a021d",
+      "anchors": [
+        {
+          "text": "void writeDepth(RenderTarget main, VssLodProjection.MatrixData projection, boolean deferredWater)",
+          "lines": [
+            293
+          ]
+        },
+        {
+          "text": "if (deferredWater) waterDepthHistory.beforeExport(main)",
+          "lines": [
+            298
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionGpuSelectionInput.java",
+      "sha256": "f9df139c1405f43eb35201ac79bf601105e1752853ed3aed0a4a09341ef0a6ec",
+      "anchors": [
+        {
+          "text": "void update(",
+          "lines": [
+            34
+          ]
+        },
+        {
+          "text": "for (int i = 0; i < recordCount;",
+          "lines": [
+            44
+          ]
+        },
+        {
+          "text": "void clear()",
+          "lines": [
+            179
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionRenderer.java",
+      "sha256": "6244d45fb898eb211f8b676f23580fea6e94be043adbd7fbf606c94c83c9f15f",
+      "anchors": [
+        {
+          "text": "private static final class PreparedPass",
+          "lines": [
+            129
+          ]
+        },
+        {
+          "text": "boolean sameGeometry =",
+          "lines": [
+            193
+          ]
+        },
+        {
+          "text": "for (Draw draw : draws)",
+          "lines": [
+            232,
+            342,
+            381,
+            466,
+            1753,
+            1863
+          ]
+        },
+        {
+          "text": "long replayed = batch ?",
+          "lines": [
+            1950
+          ]
+        },
+        {
+          "text": "private static long drawIris",
+          "lines": [
+            2072
+          ]
+        },
+        {
+          "text": "draw.gpu().bindTerrain(program, water)",
+          "lines": [
+            2058,
+            2092
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionIndirectBatch.java",
+      "sha256": "a18e3248eb5c386dd239a422059f010db7643a3bbf32a2482faed0f0542c92fa",
+      "anchors": [
+        {
+          "text": "long replayPass(",
+          "lines": [
+            268
+          ]
+        },
+        {
+          "text": "&& plan.wholeAverage == average",
+          "lines": [
+            272
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionTerrainProgram.java",
+      "sha256": "b27760a673223dbb69d522924da97d32c7f8dac098458cb91ae833e87e76d89e",
+      "anchors": [
+        {
+          "text": "static PredictionTerrainProgram createBatch()",
+          "lines": [
+            145
+          ]
+        },
+        {
+          "text": "static PredictionTerrainProgram createIris(",
+          "lines": [
+            195
+          ]
+        },
+        {
+          "text": "void renderFeature(",
+          "lines": [
+            857
+          ]
+        },
+        {
+          "text": "footprint <= 0.0625",
+          "lines": [
+            1015
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionIrisBridge.java",
+      "sha256": "1d382aaf20e737e2477f9f8ecfb8f076cd2619e149b9cf91cdafc214763c1114",
+      "anchors": [
+        {
+          "text": "try { snapshotDepth(texture, w, h); }",
+          "lines": [
+            208
+          ]
+        },
+        {
+          "text": "GL43.glCopyImageSubData(",
+          "lines": [
+            246
+          ]
+        },
+        {
+          "text": "static final class State",
+          "lines": [
+            268
+          ]
+        },
+        {
+          "text": "for (int target = 0; target < TARGETS.length;",
+          "lines": [
+            299,
+            327
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionMeshBuilder.java",
+      "sha256": "496863f4fdafbfa963a4f764abacb17bc4f22edc77e0021a53dbcd883bbd8b99",
+      "anchors": [
+        {
+          "text": "private static void addPlacedVegetation(",
+          "lines": [
+            957
+          ]
+        },
+        {
+          "text": "out.triangle(x, bottom, z, nx, plant",
+          "lines": [
+            1012,
+            1014
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionGpuEncoding.java",
+      "sha256": "7745773afb027f764618ca1c981c8404e936ef61ae4918d4d74c55e0007e7b4e",
+      "anchors": [
+        {
+          "text": "final class PredictionGpuEncoding",
+          "lines": [
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\VssLodSpriteTable.java",
+      "sha256": "75c2ed07a054d73c871d4fe2ecad12cd6597a05ac25b9afebcf21d5c65b5a934",
+      "anchors": [
+        {
+          "text": "static synchronized int registerModelFace(",
+          "lines": [
+            796
+          ]
+        },
+        {
+          "text": "GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST",
+          "lines": [
+            978
+          ]
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "path": "C:\\Users\\Administrator\\Desktop\\voxyserverside\\src\\main\\java\\dev\\xantha\\vss\\client\\prediction\\PredictionRenderTarget.java",
+      "sha256": "940de1ab91e8a52df73297c8ca96f85be58416f67ee7d4e9ba5e6874eaff9228",
+      "anchors": [
+        {
+          "text": "void writeDepth(RenderTarget main, VssLodProjection.MatrixData projection, boolean deferredWater)",
+          "lines": [
+            293
+          ]
+        },
+        {
+          "text": "if (deferredWater) waterDepthHistory.beforeExport(main)",
+          "lines": [
+            298
+          ]
+        }
+      ]
+    }
+  ],
+  "previous_evidence": [
+    "docs/vss-engine-render-integration-20261014.md",
+    "docs/prediction-gpu-selection-retained-20261014.md",
+    "docs/prediction-vegetation-render-20261011.md",
+    "docs/lossless-render-implementation.md"
+  ],
+  "measurement_status": "No new timings; priorities are source-supported hypotheses. Prior experimental timings must retain their fixture limitations."
+}

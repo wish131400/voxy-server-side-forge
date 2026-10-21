@@ -1,0 +1,180 @@
+{
+  "date": "2026-10-13",
+  "baseline_client_sha256": "9e3893335a41d880603d432169e1bd0e65810b43ed17c686b4db2a2ae413659f",
+  "runtime_configuration": {
+    "predictionVegetationDensity": "medium",
+    "predictionDetail": "normal",
+    "performanceTier": "medium",
+    "predictionDistanceBlocks": 4096,
+    "predictionFineDistanceBlocks": 1536,
+    "predictionSurfaceDistanceBlocks": 512,
+    "predictionTrees": true,
+    "predictionSpyglassLoading": false
+  },
+  "near_detail": {
+    "window_seconds": 15.002,
+    "snapshots": 6,
+    "paused_snapshots": 0,
+    "dimension": "ResourceKey[minecraft:dimension / minecraft:overworld]",
+    "start": {
+      "readyTiles": 4172,
+      "pending": 0,
+      "built": 8419,
+      "supersededBuilds": 36661
+    },
+    "end": {
+      "readyTiles": 4172,
+      "pending": 0,
+      "built": 8419,
+      "supersededBuilds": 37501
+    },
+    "executor_completed_start": 44352,
+    "executor_completed_end": 45192,
+    "frontier_lod": 3,
+    "frontier_span_blocks": 512,
+    "resident_cell_axis": 8,
+    "requested_cell_axis": 32,
+    "old_running_demand_current": false,
+    "root_cause": "Admission included medium bootstrap demand; running cancellation omitted it."
+  },
+  "grass_source_sample": {
+    "source_maps": 128,
+    "original": 22508,
+    "selected": 11342,
+    "vegetation": 22300,
+    "keptVegetation": 11134,
+    "woody": 0
+  },
+  "same_cache_forest_comparison": {
+    "scanned_source_regions": 512,
+    "scanned_blocks": 117912,
+    "woody_source_regions": 134,
+    "comparison_source_maps": 64,
+    "woody_blocks": 17942,
+    "canopy_components": 141,
+    "multi_trunk_components": 55,
+    "trunk_groups_within_source_maps": 246,
+    "medium_expected_trunk_groups": 142,
+    "old_kept_trunk_groups": 157,
+    "repaired_kept_trunk_groups": 142,
+    "old_root_decision_mismatches": 55,
+    "repaired_root_decision_mismatches": 0,
+    "old_woody_blocks": 11916,
+    "repaired_woody_blocks": 10948
+  },
+  "touching_crowns_fixture": {
+    "trees": 64,
+    "original_block_records": 704,
+    "low": {
+      "trunk_groups": 13,
+      "block_records": 143
+    },
+    "medium": {
+      "trunk_groups": 31,
+      "block_records": 341
+    },
+    "high": {
+      "trunk_groups": 64,
+      "block_records": 704
+    }
+  },
+  "comparison_limits": [
+    "Counts are source-map block records and trunk groups, not GPU quads or deduplicated world trees.",
+    "The repaired helper did not redefine production classes or change runtime rendering.",
+    "No post-install FPS, GPU benchmark, or live repaired-world screenshot was measured."
+  ],
+  "artifacts": [
+    {
+      "label": "near-detail-density-20261013",
+      "platform": "neoforge",
+      "jar": "vss-0.3.5-neoforge-1.21.1.jar",
+      "bytes": 5965358,
+      "sha256": "35bc9f8f5b646707d4d4f95bdb1ce3a44cb1e436d9f2c900e5bc50011b42e2ff",
+      "tests": {
+        "classes": 13,
+        "tests": 104,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "forge_reobfuscated": false,
+      "checks": {
+        "zip_crc": true,
+        "platform_metadata": true,
+        "production_classes": true,
+        "classfile_major": 65,
+        "native_binaries": [
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+        ],
+        "language_resources_match_source": true,
+        "diagnostic_or_test_classes_leaked": false
+      },
+      "source_sha256": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java": "3a6d7ec132a2a72e328927baaca3253c7961ddc790d1bc0896129d38abb80c0c",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVegetationSelection.java": "74fef1e08249297271566c51da7f7925702462021ba3d7fec8519d0b2233aa18",
+        "src/main/java/dev/xantha/vss/config/PredictionVegetationDensity.java": "8ced7d872afad6996ba6063c2b1ed854fd8f166046e31ecdd1b54fd97d0f3355",
+        "src/main/java/dev/xantha/vss/config/VSSClientConfig.java": "7cdb3b4c28c0b341b17bf4e84ce75c8f4c8178c1f214436a621c84037a389404",
+        "src/main/resources/assets/vss/lang/zh_cn.json": "a70bd2af95751fedc3687231dd9844f77dd78d9fba160bef3a158133a07ab61f",
+        "src/main/resources/assets/vss/lang/en_us.json": "71b97e1a18c3901a57ef04fa9f60b64c45c7ab4babe4c9c4531da30b24a682e0",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionDemandLifecycleTest.java": "a804fa85dcd6266f92c4b662d52236556d3a48d1209ff2d6372b8b65bd5ced9a",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionVegetationSettingsTest.java": "c590e90978f55b8dba4a6d817c0d48f2512d5a72f6896d6667533498e55bd9cb",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionPreviewHandoffTest.java": "ad2483ddb2f16c4ae522c1b275116747f552a693a00d2324bda66313ddb4ec39",
+        "tools/prediction/near-detail-tests.gradle": "785058368692b749eaddcbcacf008702e545bfdc3a6c41237d126460b2c91414"
+      },
+      "report": "../../docs/vss-near-detail-density-20261013.md",
+      "post_install_fps_measured": false,
+      "installed_game_jar_replaced": false,
+      "github_pushed": false
+    },
+    {
+      "label": "near-detail-density-20261013",
+      "platform": "forge",
+      "jar": "vss-0.3.5-forge-1.20.1.jar",
+      "bytes": 6637706,
+      "sha256": "ee381cd15b11210199800bd4ae95ada9447fbefe08dd59ed2dc6ba2aaff2d1ed",
+      "tests": {
+        "classes": 13,
+        "tests": 105,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "forge_reobfuscated": true,
+      "checks": {
+        "zip_crc": true,
+        "platform_metadata": true,
+        "production_classes": true,
+        "classfile_major": 61,
+        "native_binaries": [
+          "META-INF/vss-natives/linux-aarch64/libvss_native_core.so",
+          "META-INF/vss-natives/linux-x86_64/libvss_native_core.so",
+          "META-INF/vss-natives/macos-aarch64/libvss_native_core.dylib",
+          "META-INF/vss-natives/macos-x86_64/libvss_native_core.dylib",
+          "META-INF/vss-natives/windows-x86_64/vss_native_core.dll"
+        ],
+        "language_resources_match_source": true,
+        "diagnostic_or_test_classes_leaked": false
+      },
+      "source_sha256": {
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionTileManager.java": "ecfee7126192838f291aee7ad79144dfde334253c53299bede4a9716ecf8660f",
+        "src/main/java/dev/xantha/vss/client/prediction/PredictionVegetationSelection.java": "74fef1e08249297271566c51da7f7925702462021ba3d7fec8519d0b2233aa18",
+        "src/main/java/dev/xantha/vss/config/PredictionVegetationDensity.java": "8ced7d872afad6996ba6063c2b1ed854fd8f166046e31ecdd1b54fd97d0f3355",
+        "src/main/java/dev/xantha/vss/config/VSSClientConfig.java": "44c00e9fcc7dbe569fbc2bf875b16a5b549bf9dc84c43c14f54b155220e39ff7",
+        "src/main/resources/assets/vss/lang/zh_cn.json": "1d72a85efe13442f90551134657bd88356736f8d25a21622b12e2d65a8d59490",
+        "src/main/resources/assets/vss/lang/en_us.json": "1716df6d518373b89daed3a686b6c36743f0df434e0cbe2e4d843ff30b6b3f05",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionDemandLifecycleTest.java": "a804fa85dcd6266f92c4b662d52236556d3a48d1209ff2d6372b8b65bd5ced9a",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionVegetationSettingsTest.java": "9d18a4bd39813125fa3d4ea3a7ed6b9061b61292c347d23bac748f694fd0c7ed",
+        "src/test/java/dev/xantha/vss/client/prediction/PredictionPreviewHandoffTest.java": "f8212244c276994585054046280db2ee2771944c6501c3d96cd203cfa5f4d9f9",
+        "tools/prediction/near-detail-tests.gradle": "785058368692b749eaddcbcacf008702e545bfdc3a6c41237d126460b2c91414"
+      },
+      "report": "../../docs/vss-near-detail-density-20261013.md",
+      "post_install_fps_measured": false,
+      "installed_game_jar_replaced": false,
+      "github_pushed": false
+    }
+  ]
+}
