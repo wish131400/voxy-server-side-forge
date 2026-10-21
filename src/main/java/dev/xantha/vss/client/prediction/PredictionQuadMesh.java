@@ -259,6 +259,18 @@ public final class PredictionQuadMesh {
                 water.widths(), water.heights(), water.count(), cellAxis);
     }
 
+    static long projectedRetainedBytes(int axis, int terrain, int water, boolean compact, boolean waterCompact) {
+        if (axis <= 0 || terrain < 0 || water < 0) return Long.MAX_VALUE;
+        try {
+            long fixed = Math.addExact(768L, Math.multiplyExact(10L, Math.multiplyExact((long) axis, axis)));
+            long terrainBytes = Math.multiplyExact(compact ? 89L : 125L, terrain);
+            long waterBytes = Math.multiplyExact(waterCompact ? 84L : 120L, water);
+            return Math.addExact(Math.addExact(fixed, terrainBytes), waterBytes);
+        } catch (ArithmeticException overflow) {
+            return Long.MAX_VALUE;
+        }
+    }
+
     /** Cell-disjoint worker segments become one upload, preserving their exact faces. */
     static PredictionQuadMesh combine(java.util.List<PredictionQuadMesh> parts) {
         if (parts.isEmpty()) throw new IllegalArgumentException("missing mesh segments");
@@ -273,6 +285,9 @@ public final class PredictionQuadMesh {
             compact &= part.normals.length == part.quadCount * 3;
             waterCompact &= part.waterNormals.length == part.waterQuadCount * 3;
         }
+        // One smooth segment expands every normal in its combined terrain/fluid stream.
+        if (projectedRetainedBytes(axis, count, waterCount, compact, waterCompact)
+                > PredictionMemoryBudget.RETAINED_MESH_BYTES) throw new PredictionMemoryBudget.MeshLimitException();
         float[] positions = new float[count * 12], normals = new float[count * (compact ? 3 : 12)];
         int[] colors = new int[count * 4], cells = new int[count], origins = new int[count];
         byte[] groups = new byte[count];

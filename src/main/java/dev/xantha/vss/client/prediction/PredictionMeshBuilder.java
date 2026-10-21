@@ -478,7 +478,7 @@ public final class PredictionMeshBuilder {
             PredictionQuadMesh part = mesh.packed();
             bytes += part.retainedHeapBytes();
             // Bound detached geometry while keeping the temporary triangle buffer small.
-            if (bytes > PredictionMeshCodec.MAX_BYTES) throw new PredictionMemoryBudget.MeshLimitException();
+            if (bytes > PredictionMemoryBudget.RETAINED_MESH_BYTES) throw new PredictionMemoryBudget.MeshLimitException();
             parts.add(part);
             vertices = Math.addExact(vertices, mesh.vertexCount());
             waterVertices = Math.addExact(waterVertices, mesh.waterVertexCount());

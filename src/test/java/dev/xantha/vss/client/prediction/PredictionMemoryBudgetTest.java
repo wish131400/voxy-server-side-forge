@@ -195,14 +195,14 @@ class PredictionMemoryBudgetTest {
                     var reservation = attempt.get(3, TimeUnit.SECONDS);
                     if (reservation != null) reservations.add(reservation);
                 }
-                assertEquals(3, reservations.size(), "512 MiB free minus 128 MiB safety fits three 128 MiB workspaces");
+                assertEquals(2, reservations.size(), "512 MiB free minus 128 MiB safety fits two 192 MiB workspaces");
             } finally {
                 reservations.forEach(PredictionMemoryBudget.Reservation::close);
             }
         }
         finally { workers.shutdownNow(); }
         assertEquals(0, budget.usedBytes());
-        assertEquals(3, budget.availableBuildSlots());
+        assertEquals(2, budget.availableBuildSlots());
     }
 
     @Test

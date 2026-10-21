@@ -5,7 +5,8 @@ import java.util.function.LongSupplier;
 /** JVM-pressure admission for production; fixed allowances remain available for deterministic tests. */
 final class PredictionMemoryBudget {
     static final long MIB = 1024L * 1024L;
-    static final long BUILD_BYTES = 128L * MIB;
+    static final long BUILD_BYTES = 192L * MIB;
+    static final long RETAINED_MESH_BYTES = 64L * MIB;
     static final PredictionMemoryBudget SHARED = runtimeBudget();
     private final long limit;
     private final long minimumFree;
