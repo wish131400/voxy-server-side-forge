@@ -53,3 +53,42 @@ __pycache__/
 /minecraft-window.png
 /sampling-current.png
 /screen-now.png
+
+# Isolated local Gradle caches, build trees and profiling output.
+/.gradle-*/
+/build-*
+/merge-budget-run-*.txt
+*.jfr
+*.sparkprofile
+
+# Raw captures and copied source snapshots are local experiment inputs.
+# Reusable fixtures under java/, src/ and baseline-src/ remain versioned.
+/tools/prediction/**/before-src/
+/tools/prediction/**/before-files/
+/tools/prediction/**/before-resources/
+/tools/prediction/**/before-tests/
+/tools/prediction/**/production-src/
+/tools/prediction/**/regression-src/
+/tools/prediction/**/pre-integration/
+/tools/prediction/**/baseline/
+/tools/prediction/**/comparison-src/
+/tools/prediction/**/inputs/
+/tools/prediction/**/live/
+/tools/prediction/**/profile/
+/tools/prediction/**/diagnostics/
+/tools/prediction/**/active/
+/tools/prediction/**/results/
+/tools/prediction/far-terrain-20261014/instrumented-baseline.java
+/tools/prediction/**/*.csv
+/tools/prediction/**/*.tsv
+/tools/prediction/**/*.xml
+/tools/prediction/**/*.json
+/tools/prediction/**/*.jsonl
+/tools/prediction/**/*.png
+/tools/prediction/**/*.rgba
+/tools/prediction/**/*.bin
+/tools/prediction/**/*.dll
+/tools/prediction/**/*.mf
+/tools/prediction/**/*.patch
+/tools/prediction/**/*.txt
+!/tools/prediction/**/test-sources.txt
