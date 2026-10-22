@@ -68,6 +68,7 @@ public final class ServerNetworkingLifecycle {
     }
 
     public void applyRuntimeConfig() {
+        columnCache.refreshCoverageConfig();
         generationService.applyRuntimeConfig();
         queuedColumnSender.applyRuntimeConfig();
         int resizedThreads = diskRuntime.resizeReadExecutor();
@@ -122,11 +123,13 @@ public final class ServerNetworkingLifecycle {
         playerRegistry.clear();
         DirtyColumnBroadcaster.clear();
         columnCache.clear();
+        columnCache.openCoverage();
         persistentStore.clearMemory();
         diskRuntime.resetPendingCounts();
     }
 
     public void onServerStopping(MinecraftServer server) {
+        columnCache.closeCoverage();
         chunky.clear();
         persistentColumnWriter.flushInvalidationsBlocking(server);
         if (!diskRuntime.awaitPendingWrites(5_000L)) {
