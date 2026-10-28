@@ -3,7 +3,6 @@ package dev.xantha.vss.client;
 import com.google.common.collect.ImmutableList;
 import dev.xantha.vss.common.VSSLogger;
 import dev.xantha.vss.config.VSSClientConfig;
-import dev.xantha.vss.config.PredictionVegetationDensity;
 import dev.xantha.vss.config.VSSServerConfig;
 import dev.xantha.vss.networking.client.VSSClientNetworking;
 import dev.xantha.vss.networking.server.VSSServerNetworking;
@@ -419,17 +418,7 @@ public final class VSSVoxyOptionsIntegration {
                 .build());
 
         groups.add(OptionGroup.createBuilder()
-                .add(OptionImpl.createBuilder(PredictionVegetationDensity.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_trees"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_trees.tooltip"))
-                        .setControl(option -> new CyclingControl<>(option, PredictionVegetationDensity.class,
-                                new Component[]{
-                                        Component.translatable("vss.voxy_options.vegetation_low"),
-                                        Component.translatable("vss.voxy_options.vegetation_medium"),
-                                        Component.translatable("vss.voxy_options.vegetation_high")}))
-                        .setBinding((config, value) -> config.predictionVegetationDensity = value.configName(),
-                                config -> PredictionVegetationDensity.fromName(config.predictionVegetationDensity))
-                        .setImpact(OptionImpact.HIGH).build())
+
                 .add(OptionImpl.createBuilder(boolean.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.prediction_spyglass_loading"))
                         .setTooltip(Component.translatable("vss.voxy_options.prediction_spyglass_loading.tooltip"))
@@ -437,18 +426,7 @@ public final class VSSVoxyOptionsIntegration {
                         .setBinding((config, value) -> config.predictionSpyglassLoading = value,
                                 config -> config.predictionSpyglassLoading)
                         .setImpact(OptionImpact.HIGH).build())
-                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_antialiasing"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_antialiasing.tooltip"))
-                        .setControl(TickBoxControl::new)
-                        .setBinding((config, value) -> config.predictionAntialiasing = value, config -> config.predictionAntialiasing)
-                        .setImpact(OptionImpact.LOW).build())
-                .add(OptionImpl.createBuilder(boolean.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_structures"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_structures.tooltip"))
-                        .setControl(TickBoxControl::new)
-                        .setBinding((config, value) -> config.predictionStructures = value, config -> config.predictionStructures)
-                        .setImpact(OptionImpact.HIGH).build())
+
                 .build());
 
         groups.add(OptionGroup.createBuilder()
@@ -458,12 +436,7 @@ public final class VSSVoxyOptionsIntegration {
                         .setControl(option -> new SliderControl(option, 1024, 65536, 1024, value -> Component.literal(value + " blocks")))
                         .setBinding((config, value) -> config.predictionDistanceBlocks = value, config -> config.predictionDistanceBlocks)
                         .setImpact(OptionImpact.HIGH).build())
-                .add(OptionImpl.createBuilder(int.class, clientStorage)
-                        .setName(Component.translatable("vss.voxy_options.prediction_surface_distance"))
-                        .setTooltip(Component.translatable("vss.voxy_options.prediction_surface_distance.tooltip"))
-                        .setControl(option -> new SliderControl(option, 128, 2048, 128, value -> Component.literal(value + " blocks")))
-                        .setBinding((config, value) -> config.predictionSurfaceDistanceBlocks = value, config -> config.predictionSurfaceDistanceBlocks)
-                        .setImpact(OptionImpact.HIGH).build())
+
                 .build());
 
         return new OptionPage(Component.translatable("vss.voxy_options.prediction_title"), ImmutableList.copyOf(groups));
