@@ -212,7 +212,7 @@ class PredictionNetherDecorationTest {
         level.endFeature(false);
         assertTrue(chunk.getBlockState(pos).isAir());
         assertTrue(level.placed().isEmpty());
-        assertThrows(UnsupportedOperationException.class,()->level.getChunk(3,0,net.minecraft.world.level.chunk.ChunkStatus.FEATURES,true));
+        assertThrows(PredictionDecorationLevel.LocalPlacementFailure.class,()->level.getChunk(3,0,net.minecraft.world.level.chunk.ChunkStatus.FEATURES,true));
     }
 
     @Test void nativeRegisteredNetherDecorationsUseTheInteriorStage() throws Exception {
