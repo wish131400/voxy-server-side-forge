@@ -69,6 +69,7 @@ sourceSets {
             setSrcDirs(['src/main/resources'])
             include 'META-INF/mods.toml'
             include 'META-INF/vss-natives/**'
+            include 'META-INF/vss-native-build.json'
             include 'META-INF/THIRD_PARTY_LICENSES.md'
             include 'pack.mcmeta'
             include 'icon.png'

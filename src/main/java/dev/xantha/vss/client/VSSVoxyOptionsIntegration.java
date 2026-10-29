@@ -354,6 +354,14 @@ public final class VSSVoxyOptionsIntegration {
 
             groups.add(OptionGroup.createBuilder()
                     .add(OptionImpl.createBuilder(int.class, serverStorage)
+                        .setName(Component.translatable("vss.voxy_options.singleplayer_generation_concurrency"))
+                        .setTooltip(Component.translatable("vss.voxy_options.singleplayer_generation_concurrency.tooltip"))
+                        .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_GENERATION_LIMIT,
+                                VSSServerConfig.MAX_GENERATION_CONCURRENCY_LIMIT_PER_PLAYER, 1, VSSVoxyOptionsIntegration::formatColumns))
+                        .setBinding((config, value) -> config.singleplayerGenerationConcurrencyLimit = value, config -> config.singleplayerGenerationConcurrencyLimit)
+                        .setImpact(OptionImpact.HIGH)
+                        .build())
+                    .add(OptionImpl.createBuilder(int.class, serverStorage)
                         .setName(Component.translatable("vss.voxy_options.generation_player_concurrency"))
                         .setTooltip(Component.translatable("vss.voxy_options.generation_player_concurrency.tooltip"))
                         .setControl(option -> new SliderControl(option, VSSServerConfig.MIN_GENERATION_LIMIT,

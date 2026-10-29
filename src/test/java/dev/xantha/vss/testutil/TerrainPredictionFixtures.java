@@ -16,6 +16,7 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 
 public final class TerrainPredictionFixtures {
     private static RegistryAccess access;
+    private static HolderLookup.Provider sourceLookup;
     private TerrainPredictionFixtures() { }
     public static void bootstrap() {
         if (net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get() == null)
@@ -32,12 +33,14 @@ public final class TerrainPredictionFixtures {
     public static synchronized RegistryAccess access() {
         if (access == null) {
             var lookup = net.minecraft.data.registries.VanillaRegistries.createLookup();
+            sourceLookup = lookup;
             var values = new ArrayList<Registry<?>>();
             net.minecraft.resources.RegistryDataLoader.WORLDGEN_REGISTRIES.forEach(data -> values.add(copy(lookup.lookupOrThrow(data.key()))));
             access = new RegistryAccess.ImmutableRegistryAccess(values);
         }
         return access;
     }
+    public static synchronized HolderLookup.Provider sourceLookup() { access(); return sourceLookup; }
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static <T> Registry<T> copy(HolderLookup.RegistryLookup<T> source) {
         var result = new MappedRegistry<T>((net.minecraft.resources.ResourceKey) source.key(), Lifecycle.stable());
@@ -45,8 +48,18 @@ public final class TerrainPredictionFixtures {
         return result.freeze();
     }
     public static NoiseBasedChunkGenerator noise() {
-        return new NoiseBasedChunkGenerator(new FixedBiomeSource(access().registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS)),
-                access().registryOrThrow(Registries.NOISE_SETTINGS).getHolderOrThrow(NoiseGeneratorSettings.OVERWORLD));
+        var registries = access();
+        var original = sourceLookup.lookupOrThrow(Registries.NOISE_SETTINGS).getOrThrow(NoiseGeneratorSettings.OVERWORLD).value();
+        // Datagen holders retain their lookup owner. Rebind to runtime registries
+        // through the same strict codec contract used by the actual client decoder.
+        var encoded = NoiseGeneratorSettings.DIRECT_CODEC.encodeStart(
+                net.minecraft.resources.RegistryOps.create(com.mojang.serialization.JsonOps.INSTANCE, sourceLookup), original)
+                .getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
+        var rebound = NoiseGeneratorSettings.DIRECT_CODEC.parse(
+                net.minecraft.resources.RegistryOps.create(com.mojang.serialization.JsonOps.INSTANCE, registries), encoded)
+                .getOrThrow(false, message -> { throw new IllegalArgumentException(message); });
+        return new NoiseBasedChunkGenerator(new FixedBiomeSource(registries.registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS)),
+                net.minecraft.core.Holder.direct(rebound));
     }
     public static JsonObject emptyRegistries() {
         var result = new JsonObject();
