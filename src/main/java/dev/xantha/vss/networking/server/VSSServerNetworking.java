@@ -315,7 +315,8 @@ public final class VSSServerNetworking {
 
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && !isServerStopping()) {
+        if (event.getEntity() instanceof ServerPlayer player && !isServerStopping()
+                && VSSNetworking.CHANNEL.isRemotePresent(player.connection.connection)) {
             VSSNetworking.sendToPlayer(player, new HandshakeRequestS2CPayload());
         }
     }

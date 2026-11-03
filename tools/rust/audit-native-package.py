@@ -58,7 +58,7 @@ with zipfile.ZipFile(args.jar) as archive:
     packaged = {name for name in archive.namelist() if name.startswith("META-INF/vss-natives/") and not name.endswith("/")}
     assert packaged == {f"META-INF/vss-natives/{key}/{value[1]}" for key, value in targets.items()}
     for platform, (target, filename) in targets.items():
-        path = crate / "target" / target / "release" / filename
+        path = root / "src/main/resources/META-INF/vss-natives" / platform / filename
         data = path.read_bytes()
         entry = f"META-INF/vss-natives/{platform}/{filename}"
         assert archive.read(entry) == data

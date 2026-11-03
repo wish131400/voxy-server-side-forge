@@ -14,3 +14,7 @@
 | [旧版发布与更新记录](releases/README.md) | 4 |
 
 少量报告由现有脚本生成或被证据清单引用，因此保留原路径，并在分类页登记。JSON、CSV 等证据文件保持原位；工具旁的实验说明见 [预测实验索引](../development/prediction-experiments.md)。
+
+- [真实区块接管预测体素修复（2026-11-02）](rendering/real-authority-repair-20261102.md)
+
+- [存储接管辅助类启动崩溃修复（2026-11-02）](rendering/storage-helper-loading-20261102.md)

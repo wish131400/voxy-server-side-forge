@@ -42,9 +42,13 @@ public final class VSSVoxyOptionsIntegration {
                     addPages(typed, pages);
                 }
             }
-            screenClass.getMethod("setPage", OptionPage.class).invoke(screen, pages.get(0));
+            // setPage rebuilds widgets and needs the font supplied by Screen.init.
+            Field currentPage = screenClass.getDeclaredField("currentPage");
+            currentPage.setAccessible(true);
+            currentPage.set(screen, pages.get(0));
             return screen instanceof Screen sodiumScreen ? sodiumScreen : null;
-        } catch (Throwable ignored) {
+        } catch (Throwable failure) {
+            VSSLogger.warn("Failed to open VSS Embeddium options screen", failure);
             return null;
         }
     }

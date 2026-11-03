@@ -1,8 +1,5 @@
 package dev.xantha.vss.client.prediction;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -13,48 +10,37 @@ import dev.xantha.vss.networking.payloads.WorldgenProfileS2CPayload.DimensionPro
 
 /** Ensures density and biome queries can see FreeTerraForged's filtered tiles. */
 final class FreeTerraForgedTerrainSampler extends ClientTerrainSampler implements AutoCloseable {
-    private final Object cache;
-    private final MethodHandle provide;
-    private final MethodHandle cellLookup;
+    private final FreeTerraForgedCells cells;
+    private final AutoCloseable runtimeOwner;
     private final FreeTerraForgedWater water;
 
     FreeTerraForgedTerrainSampler(DimensionProfile profile, NoiseBasedChunkGenerator generator,
             RandomState randomState, LevelHeightAccessor heights,
             ClientWorldgenRegistries registries, RegistryAccess clientRegistries) {
+        this(profile, generator, randomState, heights, registries, clientRegistries, null);
+    }
+
+    FreeTerraForgedTerrainSampler(DimensionProfile profile, NoiseBasedChunkGenerator generator,
+            RandomState randomState, LevelHeightAccessor heights,
+            ClientWorldgenRegistries registries, RegistryAccess clientRegistries, AutoCloseable runtimeOwner) {
         super(profile.seed(), profile, generator, randomState, heights,
                 generator.generatorSettings().value().seaLevel(), registries, clientRegistries);
         try {
             var api = new FreeTerraForgedCompat.Api(getClass().getClassLoader());
             Object context = api.context.invoke(randomState);
-            cache = context == null ? null : context.getClass().getField("cache").get(context);
-            provide = cache == null ? null : MethodHandles.publicLookup()
-                    .unreflect(cache.getClass().getMethod("provideAtChunk", int.class, int.class))
-                    .asType(MethodType.methodType(Object.class, Object.class, int.class, int.class));
-            Class<?> tileType = cache == null ? null : cache.getClass().getMethod("provideAtChunk", int.class, int.class).getReturnType();
-            cellLookup = tileType == null ? null : MethodHandles.publicLookup()
-                    .unreflect(tileType.getMethod("lookup", int.class, int.class))
-                    .asType(MethodType.methodType(Object.class, Object.class, int.class, int.class));
+            cells = context == null ? null : new FreeTerraForgedCells(context);
+            this.runtimeOwner = runtimeOwner;
             water = context == null ? null : new FreeTerraForgedWater(context);
             dev.xantha.vss.common.VSSLogger.info("VSS FreeTerraForged adapter ready: dimension="
-                    + profile.dimension() + ", filteredTerrain=" + (cache != null));
+                    + profile.dimension() + ", filteredTerrain=" + (cells != null)
+                    + ", storage=" + (cells == null ? "inactive" : cells.tiled() ? "tile" : "chunk"));
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException("FreeTerraForged filtered tile API unavailable", failure);
         }
     }
 
     private Object prepare(int blockX, int blockZ) {
-        if (provide == null || FreeTerraForgedDensity.coarse()) return null;
-        try {
-            // Use the mod's cache ownership/expiry. Holding its pooled tiles in
-            // another cache would let eviction recycle cells still in use.
-            Object tile = (Object) provide.invokeExact(cache, blockX >> 4, blockZ >> 4);
-            if (tile == null) throw new IllegalStateException("FreeTerraForged returned no terrain tile");
-            return tile;
-        } catch (RuntimeException | Error failure) {
-            throw failure;
-        } catch (Throwable failure) {
-            throw new IllegalStateException("FreeTerraForged tile generation failed", failure);
-        }
+        return cells == null || FreeTerraForgedDensity.coarse() ? null : cells.cellAt(blockX, blockZ);
     }
 
     @Override public int surfaceY(int x, int z) { prepare(x, z); return super.surfaceY(x, z); }
@@ -85,8 +71,7 @@ final class FreeTerraForgedTerrainSampler extends ClientTerrainSampler implement
     @Override ClientColumnSample resolveSurface(ClientColumnSample sample, int x, int z, TerrainFunction terrain) {
         if (water != null && !FreeTerraForgedDensity.coarse()) {
             try {
-                Object tile = prepare(x, z);
-                Object cell = (Object) cellLookup.invokeExact(tile, x, z);
+                Object cell = prepare(x, z);
                 int waterY = cell == null ? Integer.MIN_VALUE : Math.min(
                         profile().minY() + profile().height(), water.surfaceY(cell));
                 if (waterY > sample.surfaceY() && waterY > sample.fluidY()) {
@@ -107,8 +92,11 @@ final class FreeTerraForgedTerrainSampler extends ClientTerrainSampler implement
     }
 
     @Override public void close() {
-        try { FreeTerraForgedCompat.releaseTileCache(cache); }
-        catch (ReflectiveOperationException failure) {
+        try {
+            if (runtimeOwner != null) runtimeOwner.close();
+            else if (cells != null) cells.close();
+        }
+        catch (Exception failure) {
             dev.xantha.vss.common.VSSLogger.warn("Could not release FreeTerraForged prediction tile cache", failure);
         }
         finally { super.close(); }

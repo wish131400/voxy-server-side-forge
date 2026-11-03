@@ -54,6 +54,9 @@ public final class VoxyMixinHarness extends MixinServiceAbstract implements ICla
             transformer = (IMixinTransformer) constructor.newInstance();
         }
         byte[] bytes = classes.get(name.replace('.', '/') + ".class");
+        if (bytes == null) try (InputStream input = getResourceAsStream(name.replace('.', '/') + ".class")) {
+            if (input != null) bytes = input.readAllBytes();
+        }
         if (bytes == null) throw new ClassNotFoundException(name);
         return transformer.transformClass(MixinEnvironment.getCurrentEnvironment(), name, bytes);
     }

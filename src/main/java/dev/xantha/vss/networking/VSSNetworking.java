@@ -36,11 +36,12 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public final class VSSNetworking {
     private static final String PROTOCOL = Integer.toString(VSSConstants.PROTOCOL_VERSION);
+    // Accept peers without VSS while keeping the protocol exact when it is installed.
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(VSSConstants.MOD_ID, "main"),
             () -> PROTOCOL,
-            PROTOCOL::equals,
-            PROTOCOL::equals);
+            NetworkRegistry.acceptMissingOr(PROTOCOL),
+            NetworkRegistry.acceptMissingOr(PROTOCOL));
 
     private VSSNetworking() {
     }
