@@ -100,8 +100,9 @@ final class PredictionExteriorColumns {
             if (cliff) { queued[i] = true; queue.add(i); }
         }
         int changed = 0;
-        int[] pending = new int[8], xs = new int[8], zs = new int[8], bottoms = new int[8], tops = new int[8];
-        int[] requestIndex = new int[8];
+        int batchSize = sampler instanceof FreeTerraForgedTerrainSampler ? 64 : 8;
+        int[] pending = new int[batchSize], xs = new int[batchSize], zs = new int[batchSize];
+        int[] bottoms = new int[batchSize], tops = new int[batchSize], requestIndex = new int[batchSize];
         while (!queue.isEmpty()) {
             if (Thread.currentThread().isInterrupted() || !valid.getAsBoolean())
                 throw new java.util.concurrent.CancellationException();

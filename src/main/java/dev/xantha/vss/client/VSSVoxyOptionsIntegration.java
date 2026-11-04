@@ -445,8 +445,10 @@ public final class VSSVoxyOptionsIntegration {
                 .add(OptionImpl.createBuilder(int.class, clientStorage)
                         .setName(Component.translatable("vss.voxy_options.prediction_distance_blocks"))
                         .setTooltip(Component.translatable("vss.voxy_options.prediction_distance_blocks.tooltip"))
-                        .setControl(option -> new SliderControl(option, 1024, 65536, 1024, value -> Component.literal(value + " blocks")))
-                        .setBinding((config, value) -> config.predictionDistanceBlocks = value, config -> config.predictionDistanceBlocks)
+                        .setControl(option -> new SliderControl(option, VSSClientConfig.MIN_PREDICTION_DISTANCE_BLOCKS / 16,
+                                VSSClientConfig.MAX_LOD_DISTANCE_CHUNKS, 64, VSSVoxyOptionsIntegration::formatChunks))
+                        .setBinding((config, value) -> config.setPredictionDistanceChunks(value),
+                                VSSClientConfig::getPredictionDistanceChunks)
                         .setImpact(OptionImpact.HIGH).build())
 
                 .build());

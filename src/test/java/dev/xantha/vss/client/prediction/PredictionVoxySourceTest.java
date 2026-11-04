@@ -9,6 +9,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class PredictionVoxySourceTest {
+
+    @Test void relocatedHorizonProvesOldPredictionAbsentBeforeDeferredCpuRetirement() {
+        try(var source=new PredictionVoxySource()) {
+            source.put(tile(0,0,0,32,1,8));
+            long pos=VoxyPredictionBridge.position(0,0,0,0);
+            source.window(0,0,1024);assertTrue(source.mayHavePrediction(pos,MAPPER));
+            source.window(10000,10000,1024);
+            assertFalse(source.mayHavePrediction(pos,MAPPER),"Resident CPU data outside the new horizon cannot pin a native mesh");
+        }
+    }
     @Test void deferredRemovalDoesNotBlockTheCallerOrDeleteReactivatedTiles() throws Exception {
         try(var source=new PredictionVoxySource()) {
             var tile=tile(0,0,0,32,1,8);source.put(tile);

@@ -251,6 +251,7 @@ public class ClientTerrainSampler implements AutoCloseable {
     final void terrainBackendOverride(String id) { terrainBackendOverride = id; }
     final String terrainBackendOverride() { return terrainBackendOverride; }
 
+    boolean supportsLodGrid() { return false; }
     boolean sampleLodGrid(int x, int z, int step, int width, int height, ClientColumnSample[] target,
                          int offset, int stride, boolean preview) { return false; }
 

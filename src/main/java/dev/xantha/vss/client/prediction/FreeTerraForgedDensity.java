@@ -15,6 +15,8 @@ final class FreeTerraForgedDensity {
 
     static boolean coarse() { return COARSE.get(); }
 
+    static boolean isExactCell(Object function) { return function instanceof ExactCell; }
+
     static <T> T coarse(boolean value, java.util.function.Supplier<T> action) {
         return FreeTerraForgedCompat.scoped(COARSE, value, action);
     }
